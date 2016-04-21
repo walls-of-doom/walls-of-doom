@@ -31,7 +31,7 @@ void insertion_sort(void *start, size_t count, size_t width, int (*compare)(cons
     unsigned char helper[INSERTION_SORT_MAXIMUM_SIZE];
     unsigned char *pointer = (unsigned char *)start;
     size_t i = 0;
-    for (i = 0; i < count; i++) {
+    for (i = 0; i < count - 1; i++) {
         size_t j = i + 1; // j is always positive here
         void *pointer_to_element = (void *)(pointer + j * width);
         void *pointer_to_predecessor = (void *)(pointer + (j - 1) * width);
