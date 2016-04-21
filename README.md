@@ -11,9 +11,12 @@ Bernardo Sulzbach and Leonardo Ferrazza.
 Implementation
 --------------
 
+**insertion-sort.h**
+
++ Our generic insertion sort implementation
+
 We only need to keep track of the five best scores. Therefore, insertion sort is
-a good enough algorithm for our requirements. It was implemented in
-`insertion-sort.h`.
+a good enough algorithm for our requirements.
 
 License
 -------
