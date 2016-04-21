@@ -1,0 +1,58 @@
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Debug files
+*.dSYM/
+
+# Autoconf & Automake
+.deps/
+Makefile
+Makefile.in
+aclocal.m4
+acinclude.m4
+autom4te.cache/
+compile
+config.log
+config.status
+configure
+depcomp
+install-sh
+missing
+waves
+
+# CMake
+cmake_install.cmake
+CMakeFiles/
+CMakeCache.txt
+
+# Walls of Doom
+
+autotest/autotest
+game/walls-of-doom
