@@ -9,6 +9,20 @@
 
 #define PLAYER_SYMBOL "@"
 
+enum COLOR_SCHEME {
+    // Color pair 0 is assumed to be white on black, but is actually whatever
+    // the terminal implements before color is initialized. It cannot be
+    // modified by the application, therefore we must start at 1.
+    TOP_BAR_COLOR = 1, // Set the first enum constant to one
+    BOTTOM_BAR_COLOR // Becomes two, and so on
+};
+
+int initialize_color_schemes() {
+    init_pair(TOP_BAR_COLOR, COLOR_MAGENTA, COLOR_CYAN);
+    init_pair(BOTTOM_BAR_COLOR, COLOR_BLACK, COLOR_YELLOW);
+    return 0;
+}
+
 typedef struct Player {
     char *name;
     // Could let the color of the player lay here, but why?
@@ -33,13 +47,13 @@ int write_top_bar(const Player * const player) {
     const int padding = 1; // How many spaces should surround the value (at least).
     const int columns_per_value = COLS / TOP_BAR_STRING_COUNT;
 
-    char *power_buffer = malloc(64);
+    char power_buffer[64];
     sprintf(power_buffer, "Power: %d", 0); // Use a proper label here in the future.
 
-    char *lives_buffer = malloc(64);
+    char lives_buffer[64];
     sprintf(lives_buffer, "Lives: %d", player->lives); // Could use a repeated character.
 
-    char *score_buffer = malloc(64);
+    char score_buffer[64];
     sprintf(score_buffer, "Score: %d", player->score);
 
     char *strings[TOP_BAR_STRING_COUNT] = {GAME_NAME, power_buffer, lives_buffer, score_buffer};
@@ -64,15 +78,24 @@ int write_top_bar(const Player * const player) {
         memcpy(final_buffer + x, strings[i], strlen(strings[i]));
     }
 
-    attron(COLOR_PAIR(1));
+    attron(COLOR_PAIR(TOP_BAR_COLOR));
     mvprintw(0, 0, final_buffer);
-    attroff(COLOR_PAIR(1));
+    attroff(COLOR_PAIR(TOP_BAR_COLOR));
 
     return 0;
 }
 
 int write_player(const Player * const player) {
     mvprintw(LINES / 2, COLS / 2, PLAYER_SYMBOL);
+}
+
+int write_bottom_bar() {
+    char final_buffer[COLS + 1];
+    memset(final_buffer, ' ', COLS);
+
+    attron(COLOR_PAIR(BOTTOM_BAR_COLOR));
+    mvprintw(LINES - 1, 0, final_buffer);
+    attroff(COLOR_PAIR(BOTTOM_BAR_COLOR));
 }
 
 int main() {
@@ -84,14 +107,13 @@ int main() {
     curs_set(FALSE);
     // Initialize the coloring functionality.
     start_color();
+    initialize_color_schemes();
 
     Player player = make_player("Dude");
 
-    init_pair(1, COLOR_MAGENTA, COLOR_CYAN);
-
     write_top_bar(&player);
-
     write_player(&player);
+    write_bottom_bar();
 
     refresh();
     rest_for_milliseconds(3000);
