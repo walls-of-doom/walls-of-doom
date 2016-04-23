@@ -98,11 +98,20 @@ int write_bottom_bar() {
     attroff(COLOR_PAIR(BOTTOM_BAR_COLOR));
 }
 
+int update_screen(const Player * const player) {
+    write_top_bar(player);
+    write_player(player);
+    write_bottom_bar();
+    refresh();
+}
+
 int main() {
     // Initialize the screen.
     initscr();
     // Prevent terminal echo.
     noecho();
+    // Prevent delay from getch().
+    nodelay(stdscr, TRUE);
     // Do not display the cursor.
     curs_set(FALSE);
     // Initialize the coloring functionality.
@@ -111,12 +120,15 @@ int main() {
 
     Player player = make_player("Dude");
 
-    write_top_bar(&player);
-    write_player(&player);
-    write_bottom_bar();
-
-    refresh();
-    rest_for_milliseconds(3000);
+    int playing = 1;
+    while (playing) {
+        update_screen(&player);
+        rest_for_milliseconds(250);
+        char press = getch();
+        if (press != ERR) {
+            playing = 0;
+        }
+    }
 
     endwin();
     return 0;
