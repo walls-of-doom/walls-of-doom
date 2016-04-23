@@ -25,7 +25,10 @@ int initialize_color_schemes() {
 
 typedef struct Player {
     char *name;
-    // Could let the color of the player lay here, but why?
+    // Could let the color of the player lay here, but this is only
+    // advantageous if we have multiple players.
+    int x;
+    int y;
     unsigned int lives;
     unsigned int score;
 } Player;
@@ -33,6 +36,9 @@ typedef struct Player {
 Player make_player(char *name) {
     Player player;
     player.name = name;
+    // Initialize the player to the corner so that it is in a valid state.
+    player.x = 0;
+    player.y = 0;
     player.lives = 3;
     player.score = 0;
     return player;
@@ -85,8 +91,16 @@ int write_top_bar(const Player * const player) {
     return 0;
 }
 
+int erase_background() {
+    char final_buffer[COLS + 1];
+    memset(final_buffer, ' ', COLS);
+    for (size_t i = 1; i < LINES - 1; i++) {
+        mvprintw(i, 0, final_buffer);
+    }
+}
+
 int write_player(const Player * const player) {
-    mvprintw(LINES / 2, COLS / 2, PLAYER_SYMBOL);
+    mvprintw(player->y, player->x, PLAYER_SYMBOL);
 }
 
 int write_bottom_bar() {
@@ -100,9 +114,17 @@ int write_bottom_bar() {
 
 int update_screen(const Player * const player) {
     write_top_bar(player);
+    erase_background();
     write_player(player);
     write_bottom_bar();
     refresh();
+}
+
+void place_player_on_screen(Player * const player) {
+    // This is correct. Even if we don't have the first and the last line, the
+    // middle line is unchanged.
+    player->x = COLS / 2;
+    player->y = LINES / 2;
 }
 
 int main() {
@@ -119,14 +141,25 @@ int main() {
     initialize_color_schemes();
 
     Player player = make_player("Dude");
+    place_player_on_screen(&player);
 
     int playing = 1;
     while (playing) {
         update_screen(&player);
         rest_for_milliseconds(250);
-        char press = getch();
+        int press = getch();
         if (press != ERR) {
-            playing = 0;
+            if (press == '8') {
+                player.y -= 1;
+            } else if (press == '6') {
+                player.x += 1;
+            } else if (press == '2') {
+                player.y += 1;
+            } else if (press == '4') {
+                player.x -= 1;
+            } else if (press == 'q') {
+                playing = 0;
+            }
         }
     }
 
