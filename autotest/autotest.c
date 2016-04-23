@@ -1,6 +1,27 @@
 #include "unity.h"
 
 #include "insertion-sort.h"
+#include "parser.h"
+
+void test_read_integers() {
+    char filename[L_tmpnam];
+    tmpnam(filename);
+    FILE *file = fopen(filename, "w+");
+
+    const int expected_count = 1;
+    const int expected_value = 65535;
+
+    fprintf(file, "%d", expected_value);
+    fflush(file);
+
+    int actual_values[expected_count];
+    const int actual_count = read_integers(filename, actual_values);
+
+    TEST_ASSERT_EQUAL(expected_count, actual_count);
+    TEST_ASSERT_EQUAL(expected_value, actual_values[0]);
+
+    remove(filename);
+}
 
 int compare_unsigned_char(const void *pointer_to_uchar_a, const void *pointer_to_uchar_b) {
     unsigned char a = *(unsigned char *)(pointer_to_uchar_a);
@@ -40,6 +61,7 @@ void test_insertion_sort_with_single_bytes() {
 
 int main() {
     UNITY_BEGIN();
+    RUN_TEST(test_read_integers);
     RUN_TEST(test_compare_unsigned_char);
     RUN_TEST(test_insertion_sort_with_single_bytes);
     return UNITY_END();
