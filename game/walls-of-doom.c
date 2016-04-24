@@ -127,6 +127,48 @@ void place_player_on_screen(Player * const player) {
     player->y = LINES / 2;
 }
 
+/**
+ * The Command enumerated type represents the different commands the user may issue.
+ */
+typedef enum Command {
+    NO_COMMAND,
+    MOVE_LEFT,
+    MOVE_RIGHT,
+    JUMP
+} Command;
+
+Command command_from_input(int input) {
+    if (input == '4') {
+       return MOVE_LEFT;
+    } else if (input == '6') {
+       return MOVE_RIGHT;
+    } else if (input == ' ') {
+       return JUMP;
+    } else {
+       return NO_COMMAND;
+    }
+}
+
+/**
+ * Reads the next command that needs to be processed. This is the last command
+ * on the input buffer.
+ *
+ * This function consumes the whole input buffer and returns either NO_COMMAND
+ * (if no other Command could be produced by what was in the input buffer) or
+ * the last Command different than NO_COMMAND that could be produced by what
+ * was in the input buffer.
+ */
+Command read_next_command() {
+    Command last_valid_command = NO_COMMAND;
+    for (int input = getch(); input != ERR; input = getch()) {
+        const Command current = command_from_input(input);
+        if (current != NO_COMMAND) {
+            last_valid_command = current;
+        }
+    }
+    return last_valid_command;
+}
+
 int main() {
     // Initialize the screen.
     initscr();
@@ -147,19 +189,13 @@ int main() {
     while (playing) {
         update_screen(&player);
         rest_for_milliseconds(250);
-        int press = getch();
-        if (press != ERR) {
-            if (press == '8') {
-                player.y -= 1;
-            } else if (press == '6') {
-                player.x += 1;
-            } else if (press == '2') {
-                player.y += 1;
-            } else if (press == '4') {
-                player.x -= 1;
-            } else if (press == 'q') {
-                playing = 0;
-            }
+        Command command = read_next_command();
+        if (command == MOVE_LEFT) {
+            player.x--;
+        } else if (command == MOVE_RIGHT) {
+            player.x++;
+        } else if (command == JUMP) {
+            player.y--;
         }
     }
 
