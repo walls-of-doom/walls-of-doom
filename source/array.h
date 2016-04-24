@@ -5,8 +5,8 @@
  * See LICENSE.txt for more details.
  */
 
-#ifndef ARRAY_UTILITIES_H
-#define ARRAY_UTILITIES_H
+#ifndef ARRAY_H
+#define ARRAY_H
 
 #include <stdlib.h>
 #include <stdio.h>

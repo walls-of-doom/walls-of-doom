@@ -1,3 +1,13 @@
+/**
+ * Copyright (c) 2016, Bernardo Sulzbach and Leonardo Ferrazza
+ * All rights reserved.
+ *
+ * See LICENSE.txt for more details.
+ */
+
+#ifndef DATA_H
+#define DATA_H
+
 #include <stdio.h>
 
 /**
@@ -17,3 +27,18 @@ size_t read_integers(const char * const filename, int *integer_array) {
     fclose(file);
     return next_index; // number of elements == index of next element
 }
+
+/**
+ * Write bytes to the indicated file.
+ */
+int write_bytes(const char * const filename, const void * const array, const size_t count, const size_t size) {
+    FILE *file;
+    file = fopen(filename, "wb");
+    size_t i = 0;
+    for (i = 0; i < count; i++) {
+    }
+    fclose(file);
+    return 0;
+}
+
+#endif

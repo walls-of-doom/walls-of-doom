@@ -5,8 +5,8 @@
  * See LICENSE.txt for more details.
  */
 
-#ifndef INSERTION_SORT_H
-#define INSERTION_SORT_H
+#ifndef SORT_H
+#define SORT_H
 
 #include <stdlib.h>
 #include <string.h>

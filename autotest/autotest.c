@@ -1,7 +1,7 @@
 #include "unity.h"
 
-#include "insertion-sort.h"
-#include "parser.h"
+#include "data.h"
+#include "sort.h"
 
 void test_read_integers() {
     char filename[L_tmpnam];
