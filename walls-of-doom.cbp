@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+   <FileVersion major="1" minor="6" />
+   <Project>
+      <Option title="walls-of-doom" />
+      <Option makefile_is_custom="1" />
+      <Option compiler="gcc" />
+      <Option virtualFolders="CMake Files\;CMake Files\source\;CMake Files\unity\;CMake Files\autotest\;CMake Files\game\;" />
+      <Build>
+      <Target title="all">
+         <Option working_dir="/home/mg/code/walls-of-doom" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/Makefile&quot;  VERBOSE=1 all" />
+            <CompileFile command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="edit_cache">
+         <Option working_dir="/home/mg/code/walls-of-doom" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/Makefile&quot;  VERBOSE=1 edit_cache" />
+            <CompileFile command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="rebuild_cache">
+         <Option working_dir="/home/mg/code/walls-of-doom" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/Makefile&quot;  VERBOSE=1 rebuild_cache" />
+            <CompileFile command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="walls-of-doom-source">
+         <Option output="/home/mg/code/walls-of-doom/source/libwalls-of-doom-source.a" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/mg/code/walls-of-doom/source" />
+         <Option object_output="./" />
+         <Option type="2" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="/home/mg/code/walls-of-doom/source" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/source/Makefile&quot;  VERBOSE=1 walls-of-doom-source" />
+            <CompileFile command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/source/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/source/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/source/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="walls-of-doom-source/fast">
+         <Option output="/home/mg/code/walls-of-doom/source/libwalls-of-doom-source.a" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/mg/code/walls-of-doom/source" />
+         <Option object_output="./" />
+         <Option type="2" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="/home/mg/code/walls-of-doom/source" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/source/Makefile&quot;  VERBOSE=1 walls-of-doom-source/fast" />
+            <CompileFile command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/source/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/source/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/source/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="unity">
+         <Option output="/home/mg/code/walls-of-doom/unity/libunity.a" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/mg/code/walls-of-doom/unity" />
+         <Option object_output="./" />
+         <Option type="2" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="/home/mg/code/walls-of-doom/unity" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/unity/Makefile&quot;  VERBOSE=1 unity" />
+            <CompileFile command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/unity/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/unity/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/unity/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="unity/fast">
+         <Option output="/home/mg/code/walls-of-doom/unity/libunity.a" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/mg/code/walls-of-doom/unity" />
+         <Option object_output="./" />
+         <Option type="2" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="/home/mg/code/walls-of-doom/unity" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/unity/Makefile&quot;  VERBOSE=1 unity/fast" />
+            <CompileFile command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/unity/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/unity/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/unity/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="autotest">
+         <Option output="/home/mg/code/walls-of-doom/autotest/autotest" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/mg/code/walls-of-doom/autotest" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="/home/mg/code/walls-of-doom/source" />
+            <Add directory="/home/mg/code/walls-of-doom/unity" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/autotest/Makefile&quot;  VERBOSE=1 autotest" />
+            <CompileFile command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/autotest/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/autotest/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/autotest/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="autotest/fast">
+         <Option output="/home/mg/code/walls-of-doom/autotest/autotest" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/mg/code/walls-of-doom/autotest" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="/home/mg/code/walls-of-doom/source" />
+            <Add directory="/home/mg/code/walls-of-doom/unity" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/autotest/Makefile&quot;  VERBOSE=1 autotest/fast" />
+            <CompileFile command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/autotest/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/autotest/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/autotest/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="walls-of-doom">
+         <Option output="/home/mg/code/walls-of-doom/game/walls-of-doom" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/mg/code/walls-of-doom/game" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="/home/mg/code/walls-of-doom/source" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/game/Makefile&quot;  VERBOSE=1 walls-of-doom" />
+            <CompileFile command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/game/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/game/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/game/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="walls-of-doom/fast">
+         <Option output="/home/mg/code/walls-of-doom/game/walls-of-doom" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/mg/code/walls-of-doom/game" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="/home/mg/code/walls-of-doom/source" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/game/Makefile&quot;  VERBOSE=1 walls-of-doom/fast" />
+            <CompileFile command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/game/Makefile&quot;  VERBOSE=1 &quot;$file&quot;" />
+            <Clean command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/game/Makefile&quot;  VERBOSE=1 clean" />
+            <DistClean command="/usr/bin/gmake -f &quot;/home/mg/code/walls-of-doom/game/Makefile&quot;  VERBOSE=1 clean" />
+         </MakeCommands>
+      </Target>
+      </Build>
+      <Unit filename="/home/mg/code/walls-of-doom/autotest/autotest.c">
+         <Option target="autotest"/>
+      </Unit>
+      <Unit filename="/home/mg/code/walls-of-doom/game/walls-of-doom.c">
+         <Option target="walls-of-doom"/>
+      </Unit>
+      <Unit filename="/home/mg/code/walls-of-doom/source/array.h">
+         <Option target="walls-of-doom-source"/>
+      </Unit>
+      <Unit filename="/home/mg/code/walls-of-doom/source/data.h">
+         <Option target="walls-of-doom-source"/>
+      </Unit>
+      <Unit filename="/home/mg/code/walls-of-doom/source/record.h">
+         <Option target="walls-of-doom-source"/>
+      </Unit>
+      <Unit filename="/home/mg/code/walls-of-doom/source/rest.h">
+         <Option target="walls-of-doom-source"/>
+      </Unit>
+      <Unit filename="/home/mg/code/walls-of-doom/source/sort.h">
+         <Option target="walls-of-doom-source"/>
+      </Unit>
+      <Unit filename="/home/mg/code/walls-of-doom/unity/unity.c">
+         <Option target="unity"/>
+      </Unit>
+      <Unit filename="/home/mg/code/walls-of-doom/unity/unity.h">
+         <Option target="unity"/>
+      </Unit>
+      <Unit filename="/home/mg/code/walls-of-doom/unity/unity_internals.h">
+         <Option target="unity"/>
+      </Unit>
+      <Unit filename="/home/mg/code/walls-of-doom/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\" />
+      </Unit>
+      <Unit filename="/home/mg/code/walls-of-doom/source/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\source\" />
+      </Unit>
+      <Unit filename="/home/mg/code/walls-of-doom/unity/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\unity\" />
+      </Unit>
+      <Unit filename="/home/mg/code/walls-of-doom/autotest/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\autotest\" />
+      </Unit>
+      <Unit filename="/home/mg/code/walls-of-doom/game/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\game\" />
+      </Unit>
+   </Project>
+</CodeBlocks_project_file>
