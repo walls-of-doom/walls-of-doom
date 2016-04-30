@@ -8,8 +8,50 @@ Walls of Doom (WoD) is a minimalistic
 [platformer](https://en.wikipedia.org/wiki/Platform_game) written in C by
 Bernardo Sulzbach and Leonardo Ferrazza.
 
-Implementation
---------------
+Building and Running
+--------------------
+
+### Terminal
+
+```bash
+$ cmake .
+$ make
+```
+
+#### Running the tests
+
+```bash
+$ ./autotest/autotest
+```
+
+#### Running the game
+
+```bash
+$ ./game/walls-of-doom
+```
+
+### Code::Blocks
+
+```bash
+$ cmake . -G"CodeBlocks - Unix Makefiles"
+```
+
+#### Running the tests
+
++ Open Code::Blocks
++ Open the Code::Blocks project file on the root directory
++ Select `autotest` as the target
++ Press "Build and run"
+
+#### Running the game
+
++ Open Code::Blocks
++ Open the Code::Blocks project file on the root directory
++ Select `walls-of-doom` as the target
++ Press "Build and run"
+
+Implementation Notes
+--------------------
 
 **insertion-sort.h**
 
