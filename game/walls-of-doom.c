@@ -64,9 +64,11 @@ int write_top_bar(const Player * const player) {
 
     char *strings[TOP_BAR_STRING_COUNT] = {GAME_NAME, power_buffer, lives_buffer, score_buffer};
 
+    size_t i = 0;
+
     // Check that there are enough columns.
     const int maximum_columns_per_string = columns_per_value - 2 * padding;
-    for (size_t i = 0; i < TOP_BAR_STRING_COUNT; i++) {
+    for (i = 0; i < TOP_BAR_STRING_COUNT; i++) {
         if (strlen(strings[i]) > maximum_columns_per_string) {
             return 1;
         }
@@ -78,7 +80,7 @@ int write_top_bar(const Player * const player) {
     memset(final_buffer, ' ', COLS);
     final_buffer[COLS] = '\0';
 
-    for (size_t i = 0; i < TOP_BAR_STRING_COUNT; i++) {
+    for (i = 0; i < TOP_BAR_STRING_COUNT; i++) {
         const int centering_padding = (maximum_columns_per_string - strlen(strings[i])) / 2;
         const int x = i * columns_per_value + padding + centering_padding;
         memcpy(final_buffer + x, strings[i], strlen(strings[i]));
@@ -94,7 +96,8 @@ int write_top_bar(const Player * const player) {
 int erase_background() {
     char final_buffer[COLS + 1];
     memset(final_buffer, ' ', COLS);
-    for (size_t i = 1; i < LINES - 1; i++) {
+    size_t i = 0;
+    for (i = 1; i < LINES - 1; i++) {
         mvprintw(i, 0, final_buffer);
     }
 }
@@ -160,7 +163,8 @@ Command command_from_input(int input) {
  */
 Command read_next_command() {
     Command last_valid_command = NO_COMMAND;
-    for (int input = getch(); input != ERR; input = getch()) {
+    int input;
+    for (input = getch(); input != ERR; input = getch()) {
         const Command current = command_from_input(input);
         if (current != NO_COMMAND) {
             last_valid_command = current;
