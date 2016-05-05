@@ -2,6 +2,7 @@
 #include <string.h>
 #include <curses.h>
 
+#include "io.h"
 #include "rest.h"
 
 #define GAME_NAME "Walls of Doom"
@@ -103,7 +104,7 @@ int erase_background() {
 }
 
 int write_player(const Player * const player) {
-    mvprintw(player->y, player->x, PLAYER_SYMBOL);
+    print(player->x, player->y, PLAYER_SYMBOL);
 }
 
 int write_bottom_bar() {
