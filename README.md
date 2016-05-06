@@ -60,6 +60,15 @@ Implementation Notes
 We only need to keep track of the five best scores. Therefore, insertion sort is
 a good enough algorithm for our requirements.
 
+**random.h**
+
+We are using the **[xoroshiro+](http://xoroshiro.di.unimi.it/)** algorithm to
+efficiently generate pseudo-random numbers with big period.
+
+The convenience function that returns an integer in the specified range uses
+repeated random numbers modulo the next power of two to prevent the modulo bias
+that comes with more naive approaches.
+
 License
 -------
 

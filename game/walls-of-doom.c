@@ -3,10 +3,14 @@
 #include <curses.h>
 
 #include "io.h"
+#include "platform.h"
+#include "random.h"
 #include "rest.h"
 
 #define GAME_NAME "Walls of Doom"
 #define TOP_BAR_STRING_COUNT 4
+
+#define PLATFORM_COUNT 16
 
 #define PLAYER_SYMBOL "@"
 #define GAME_FPS 5
@@ -112,6 +116,17 @@ int write_player(const Player * const player) {
     return 0;
 }
 
+int write_platforms(const Platform * platforms, const size_t platform_count) {
+    size_t i = 0;
+    for (i = 0; i < platform_count; i++) {
+        size_t w;
+        for (w = 0; w < platforms[i].width; w++) {
+            print(platforms[i].x + w, platforms[i].y, "X");
+        }
+    }
+    return 0;
+}
+
 int write_bottom_bar() {
     char final_buffer[COLS + 1];
     memset(final_buffer, ' ', COLS);
@@ -121,10 +136,11 @@ int write_bottom_bar() {
     return 0;
 }
 
-int update_screen(const Player * const player) {
+int update_screen(const Player * const player, const Platform *platforms, const size_t platform_count) {
     write_top_bar(player);
     erase_background();
     write_player(player);
+    write_platforms(platforms, platform_count);
     write_bottom_bar();
     refresh();
     return 0;
@@ -259,9 +275,19 @@ int game() {
     Player player = make_player("Player");
     player.x = COLS / 2;
     player.y = LINES / 2;
+
+    Platform platforms[PLATFORM_COUNT];
+    size_t i;
+    for (i = 0; i < PLATFORM_COUNT; i++) {
+        platforms[i].x = random_integer(0, COLS);
+        platforms[i].y = random_integer(4, LINES - 4);
+        platforms[i].width = random_integer(4, 16);
+        platforms[i].speed = random_integer(-3, 3);
+    }
+
     Command command = NO_COMMAND;
     while (1) {
-        update_screen(&player);
+        update_screen(&player, platforms, PLATFORM_COUNT);
         rest_for_second_fraction(GAME_FPS);
         command = read_next_command();
         if (command == COMMAND_LEFT) {
