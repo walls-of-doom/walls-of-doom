@@ -34,9 +34,7 @@ size_t read_integers(const char * const filename, int *integer_array) {
 int write_bytes(const char * const filename, const void * const array, const size_t count, const size_t size) {
     FILE *file;
     file = fopen(filename, "wb");
-    size_t i = 0;
-    for (i = 0; i < count; i++) {
-    }
+    fwrite(array, size, count, file);
     fclose(file);
     return 0;
 }
