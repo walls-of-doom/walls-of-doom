@@ -9,6 +9,9 @@
 #define TOP_BAR_STRING_COUNT 4
 
 #define PLAYER_SYMBOL "@"
+#define GAME_FPS 5
+
+#define MENU_FPS 30
 
 enum COLOR_SCHEME {
     // Color pair 0 is assumed to be white on black, but is actually whatever
@@ -52,7 +55,7 @@ Player make_player(char *name) {
  */
 int write_top_bar(const Player * const player) {
     const int padding = 1; // How many spaces should surround the value (at least).
-    const int columns_per_value = COLS / TOP_BAR_STRING_COUNT;
+    const size_t columns_per_value = COLS / TOP_BAR_STRING_COUNT;
 
     char power_buffer[64];
     sprintf(power_buffer, "Power: %d", 0); // Use a proper label here in the future.
@@ -68,7 +71,7 @@ int write_top_bar(const Player * const player) {
     size_t i = 0;
 
     // Check that there are enough columns.
-    const int maximum_columns_per_string = columns_per_value - 2 * padding;
+    const size_t maximum_columns_per_string = columns_per_value - 2 * padding;
     for (i = 0; i < TOP_BAR_STRING_COUNT; i++) {
         if (strlen(strings[i]) > maximum_columns_per_string) {
             return 1;
@@ -82,8 +85,8 @@ int write_top_bar(const Player * const player) {
     final_buffer[COLS] = '\0';
 
     for (i = 0; i < TOP_BAR_STRING_COUNT; i++) {
-        const int centering_padding = (maximum_columns_per_string - strlen(strings[i])) / 2;
-        const int x = i * columns_per_value + padding + centering_padding;
+        const size_t centering_padding = (maximum_columns_per_string - strlen(strings[i])) / 2;
+        const size_t x = i * columns_per_value + padding + centering_padding;
         memcpy(final_buffer + x, strings[i], strlen(strings[i]));
     }
 
@@ -97,23 +100,25 @@ int write_top_bar(const Player * const player) {
 int erase_background() {
     char final_buffer[COLS + 1];
     memset(final_buffer, ' ', COLS);
-    size_t i = 0;
+    int i;
     for (i = 1; i < LINES - 1; i++) {
         mvprintw(i, 0, final_buffer);
     }
+    return 0;
 }
 
 int write_player(const Player * const player) {
     print(player->x, player->y, PLAYER_SYMBOL);
+    return 0;
 }
 
 int write_bottom_bar() {
     char final_buffer[COLS + 1];
     memset(final_buffer, ' ', COLS);
-
     attron(COLOR_PAIR(BOTTOM_BAR_COLOR));
     mvprintw(LINES - 1, 0, final_buffer);
     attroff(COLOR_PAIR(BOTTOM_BAR_COLOR));
+    return 0;
 }
 
 int update_screen(const Player * const player) {
@@ -122,6 +127,7 @@ int update_screen(const Player * const player) {
     write_player(player);
     write_bottom_bar();
     refresh();
+    return 0;
 }
 
 void place_player_on_screen(Player * const player) {
@@ -136,21 +142,34 @@ void place_player_on_screen(Player * const player) {
  */
 typedef enum Command {
     NO_COMMAND,
-    MOVE_LEFT,
+    MOVE_UP,
     MOVE_RIGHT,
-    JUMP
+    MOVE_DOWN,
+    MOVE_LEFT,
+    JUMP,
+    ENTER
 } Command;
 
 Command command_from_input(int input) {
-    if (input == '4') {
-       return MOVE_LEFT;
+    if (input == '8') {
+       return MOVE_UP;
     } else if (input == '6') {
        return MOVE_RIGHT;
+    } else if (input == '2') {
+       return MOVE_DOWN;
+    } else if (input == '4') {
+       return MOVE_LEFT;
     } else if (input == ' ') {
        return JUMP;
+    } else if (input == '\n') {
+       return ENTER;
     } else {
        return NO_COMMAND;
     }
+}
+
+void rest_for_second_fraction(int FPS) {
+    rest_for_milliseconds(1000 / FPS);
 }
 
 /**
@@ -174,7 +193,24 @@ Command read_next_command() {
     return last_valid_command;
 }
 
-int main() {
+/**
+ * Waits for user input, indefinitely.
+ */
+Command wait_for_next_command() {
+    Command command = NO_COMMAND;
+    while (command == NO_COMMAND) {
+        rest_for_second_fraction(MENU_FPS);
+        command = read_next_command();
+    }
+    return command;
+}
+
+/**
+ * Initializes the required resources.
+ *
+ * Should only be called once.
+ */
+void init() {
     // Initialize the screen.
     initscr();
     // Prevent terminal echo.
@@ -186,15 +222,45 @@ int main() {
     // Initialize the coloring functionality.
     start_color();
     initialize_color_schemes();
+}
 
-    Player player = make_player("Dude");
-    place_player_on_screen(&player);
+/**
+ * Finalizes the acquired resources.
+ *
+ * Should only be called once, right before exitting.
+ */
+void finalize() {
+    endwin();
+}
 
-    int playing = 1;
-    while (playing) {
+int render_menu(char **labels, const size_t label_count, const size_t selection) {
+    size_t i;
+    const int starting_y = (LINES - 3 * label_count) / 2;
+    for (i = 0; i < label_count; i++) {
+        const int x = (COLS - strlen(labels[i])) / 2;
+        // TODO: prevent breaking on short consoles
+        // TODO: add an extra empty line or two between options if the space allows for it
+        const int y = starting_y + 3 * i;
+        if (i == selection) {
+            attron(A_BOLD);
+        }
+        print(x, y, labels[i]);
+        if (i == selection) {
+            attroff(A_BOLD);
+        }
+    }
+    return 0;
+}
+
+int game() {
+    Player player = make_player("Player");
+    player.x = COLS / 2;
+    player.y = LINES / 2;
+    Command command = NO_COMMAND;
+    while (1) {
         update_screen(&player);
-        rest_for_milliseconds(250);
-        Command command = read_next_command();
+        rest_for_second_fraction(GAME_FPS);
+        command = read_next_command();
         if (command == MOVE_LEFT) {
             player.x--;
         } else if (command == MOVE_RIGHT) {
@@ -203,7 +269,37 @@ int main() {
             player.y--;
         }
     }
-
-    endwin();
     return 0;
+}
+
+int menu() {
+    int got_quit = 0;
+    char *options[] = {"Play", "Highscores", "Quit"};
+    size_t option_count = 3;
+    size_t selection = 0;
+    while (!got_quit) {
+        render_menu(options, option_count, selection);
+        Command command = wait_for_next_command();
+        if (command == MOVE_UP) {
+            if (selection > 0) {
+                selection--;
+            }
+        } else if (command == MOVE_DOWN) {
+            if (selection + 1 < option_count) {
+                selection++;
+            }
+        } else if (command == ENTER) {
+            if (selection == 0) {
+                game();
+            }
+        }
+    }
+    return 0;
+}
+
+int main() {
+    init();
+    int result = menu();
+    finalize();
+    return result;
 }
