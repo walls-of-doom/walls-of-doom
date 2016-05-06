@@ -142,29 +142,32 @@ void place_player_on_screen(Player * const player) {
  */
 typedef enum Command {
     NO_COMMAND,
-    MOVE_UP,
-    MOVE_RIGHT,
-    MOVE_DOWN,
-    MOVE_LEFT,
-    JUMP,
-    ENTER
+    COMMAND_UP,
+    COMMAND_LEFT,
+    COMMAND_CENTER,
+    COMMAND_RIGHT,
+    COMMAND_DOWN,
+    COMMAND_JUMP,
+    COMMAND_ENTER
 } Command;
 
-Command command_from_input(int input) {
+Command command_from_input(const int input) {
     if (input == '8') {
-       return MOVE_UP;
-    } else if (input == '6') {
-       return MOVE_RIGHT;
-    } else if (input == '2') {
-       return MOVE_DOWN;
+        return COMMAND_UP;
     } else if (input == '4') {
-       return MOVE_LEFT;
+        return COMMAND_LEFT;
+    } else if (input == '5') {
+        return COMMAND_CENTER;
+    } else if (input == '6') {
+        return COMMAND_RIGHT;
+    } else if (input == '2') {
+        return COMMAND_DOWN;
     } else if (input == ' ') {
-       return JUMP;
+        return COMMAND_JUMP;
     } else if (input == '\n') {
-       return ENTER;
+        return COMMAND_ENTER;
     } else {
-       return NO_COMMAND;
+        return NO_COMMAND;
     }
 }
 
@@ -261,11 +264,11 @@ int game() {
         update_screen(&player);
         rest_for_second_fraction(GAME_FPS);
         command = read_next_command();
-        if (command == MOVE_LEFT) {
+        if (command == COMMAND_LEFT) {
             player.x--;
-        } else if (command == MOVE_RIGHT) {
+        } else if (command == COMMAND_RIGHT) {
             player.x++;
-        } else if (command == JUMP) {
+        } else if (command == COMMAND_JUMP) {
             player.y--;
         }
     }
@@ -280,17 +283,19 @@ int menu() {
     while (!got_quit) {
         render_menu(options, option_count, selection);
         Command command = wait_for_next_command();
-        if (command == MOVE_UP) {
+        if (command == COMMAND_UP) {
             if (selection > 0) {
                 selection--;
             }
-        } else if (command == MOVE_DOWN) {
+        } else if (command == COMMAND_DOWN) {
             if (selection + 1 < option_count) {
                 selection++;
             }
-        } else if (command == ENTER) {
+        } else if (command == COMMAND_ENTER || command == COMMAND_CENTER) {
             if (selection == 0) {
                 game();
+            } else if (selection == 2) {
+                got_quit = 1;
             }
         }
     }
