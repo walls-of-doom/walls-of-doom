@@ -1,15 +1,13 @@
 Walls of Doom
 =============
 
-About
------
+# About
 
 Walls of Doom (WoD) is a minimalistic
 [platformer](https://en.wikipedia.org/wiki/Platform_game) written in C by
 Bernardo Sulzbach and Leonardo Ferrazza.
 
-Building and Running
---------------------
+# Building and Running
 
 ### Terminal
 
@@ -50,23 +48,22 @@ $ cmake . -G"CodeBlocks - Unix Makefiles"
 + Select `walls-of-doom` as the target
 + Press "Build and run"
 
-Implementation Notes
---------------------
+# Implementation Notes
 
-**insertion-sort.h**
+## **insertion-sort.h**
 
 + Our generic insertion sort implementation
 
 We only need to keep track of the five best scores. Therefore, insertion sort is
 a good enough algorithm for our requirements.
 
-**random.h**
+## **random.h**
 
 We are using the **[xoroshiro+](http://xoroshiro.di.unimi.it/)** algorithm to
-efficiently generate pseudo-random numbers with big period.
+efficiently generate pseudo-random numbers with a big period.
 
 The convenience function that returns an integer in the specified range uses
-repeated random numbers modulo the next power of two to prevent the modulo bias
+multiple random numbers modulo the next power of two to prevent the modulo bias
 that comes with more naive approaches.
 
 License
