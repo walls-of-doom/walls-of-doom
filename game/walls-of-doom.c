@@ -189,10 +189,6 @@ Command command_from_input(const int input) {
     }
 }
 
-void rest_for_second_fraction(int FPS) {
-    rest_for_milliseconds(1000 / FPS);
-}
-
 /**
  * Reads the next command that needs to be processed. This is the last command
  * on the input buffer.

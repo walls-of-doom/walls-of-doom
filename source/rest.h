@@ -8,24 +8,31 @@
 #ifndef REST_H
 #define REST_H
 
-#ifdef __linux__
+#define ONE_BILLION 1000000000
 
-#include <unistd.h>
-void rest_for_milliseconds(unsigned int milliseconds) {
-    usleep(milliseconds * 1000);
+#include <time.h>
+
+void rest_for_ns(long ns) {
+    if (ns < 1) {
+        return;
+    }
+    struct timespec sleep_duration;
+    sleep_duration.tv_sec = 0;
+    sleep_duration.tv_nsec = ns;
+    struct timespec remaining;
+    nanosleep(&sleep_duration, &remaining);
+    // Currently we quietly ignore if the sleep was interrupted.
 }
 
-#elif _WIN32
-
-#include <windows.h>
-void rest_for_milliseconds(unsigned int milliseconds) {
-    Sleep(milliseconds);
+/**
+ * Rests for a number of seconds equal to the reciprocal of the provided
+ * argument.
+ */
+void rest_for_second_fraction(int fps) {
+    if (fps < 1) {
+        return;
+    }
+    rest_for_ns(ONE_BILLION / fps);
 }
-
-#else
-
-#error Platform not supported!
-
-#endif
 
 #endif
