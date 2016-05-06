@@ -25,7 +25,7 @@ enum COLOR_SCHEME {
     BOTTOM_BAR_COLOR // Becomes two, and so on
 };
 
-int initialize_color_schemes() {
+int initialize_color_schemes(void) {
     init_pair(TOP_BAR_COLOR, COLOR_MAGENTA, COLOR_CYAN);
     init_pair(BOTTOM_BAR_COLOR, COLOR_BLACK, COLOR_YELLOW);
     return 0;
@@ -101,7 +101,7 @@ int write_top_bar(const Player * const player) {
     return 0;
 }
 
-int erase_background() {
+int erase_background(void) {
     char final_buffer[COLS + 1];
     memset(final_buffer, ' ', COLS);
     int i;
@@ -127,7 +127,7 @@ int write_platforms(const Platform * platforms, const size_t platform_count) {
     return 0;
 }
 
-int write_bottom_bar() {
+int write_bottom_bar(void) {
     char final_buffer[COLS + 1];
     memset(final_buffer, ' ', COLS);
     attron(COLOR_PAIR(BOTTOM_BAR_COLOR));
@@ -229,7 +229,7 @@ Command wait_for_next_command() {
  *
  * Should only be called once.
  */
-void init() {
+void init(void) {
     // Initialize the screen.
     initscr();
     // Prevent terminal echo.
@@ -248,7 +248,7 @@ void init() {
  *
  * Should only be called once, right before exitting.
  */
-void finalize() {
+void finalize(void) {
     endwin();
 }
 
@@ -271,7 +271,7 @@ int render_menu(char **labels, const size_t label_count, const size_t selection)
     return 0;
 }
 
-int game() {
+int game(void) {
     Player player = make_player("Player");
     player.x = COLS / 2;
     player.y = LINES / 2;
@@ -301,7 +301,7 @@ int game() {
     return 0;
 }
 
-int menu() {
+int menu(void) {
     int got_quit = 0;
     char *options[] = {"Play", "Highscores", "Quit"};
     size_t option_count = 3;
@@ -328,7 +328,7 @@ int menu() {
     return 0;
 }
 
-int main() {
+int main(void) {
     init();
     int result = menu();
     finalize();
