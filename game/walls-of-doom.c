@@ -12,6 +12,8 @@
 
 #define PLATFORM_COUNT 16
 
+#define MAXIMUM_STRING_SIZE 256
+
 #define PLAYER_SYMBOL "@"
 #define GAME_FPS 5
 
@@ -61,13 +63,13 @@ int write_top_bar(const Player * const player) {
     const int padding = 1; // How many spaces should surround the value (at least).
     const size_t columns_per_value = COLS / TOP_BAR_STRING_COUNT;
 
-    char power_buffer[64];
+    char power_buffer[MAXIMUM_STRING_SIZE];
     sprintf(power_buffer, "Power: %d", 0); // Use a proper label here in the future.
 
-    char lives_buffer[64];
+    char lives_buffer[MAXIMUM_STRING_SIZE];
     sprintf(lives_buffer, "Lives: %d", player->lives); // Could use a repeated character.
 
-    char score_buffer[64];
+    char score_buffer[MAXIMUM_STRING_SIZE];
     sprintf(score_buffer, "Score: %d", player->score);
 
     char *strings[TOP_BAR_STRING_COUNT] = {GAME_NAME, power_buffer, lives_buffer, score_buffer};
@@ -117,7 +119,7 @@ int write_player(const Player * const player) {
 }
 
 int write_platforms(const Platform * platforms, const size_t platform_count) {
-    size_t i = 0;
+    size_t i;
     for (i = 0; i < platform_count; i++) {
         size_t w;
         for (w = 0; w < platforms[i].width; w++) {
@@ -252,21 +254,23 @@ void finalize(void) {
     endwin();
 }
 
+void render_menu_label(char *label, int is_selected, int pos, int total) {
+    const int starting_y = (LINES - 3 * total) / 2;
+    const int y = starting_y + 3 * pos;
+    if (is_selected) {
+        char buffer[MAXIMUM_STRING_SIZE];
+        sprintf(buffer, "> %s <", label);
+        label = buffer;
+    }
+    const int x = (COLS - strlen(label)) / 2;
+    print(x, y, label);
+}
+
 int render_menu(char **labels, const size_t label_count, const size_t selection) {
+    clear();
     size_t i;
-    const int starting_y = (LINES - 3 * label_count) / 2;
     for (i = 0; i < label_count; i++) {
-        const int x = (COLS - strlen(labels[i])) / 2;
-        // TODO: prevent breaking on short consoles
-        // TODO: add an extra empty line or two between options if the space allows for it
-        const int y = starting_y + 3 * i;
-        if (i == selection) {
-            attron(A_BOLD);
-        }
-        print(x, y, labels[i]);
-        if (i == selection) {
-            attroff(A_BOLD);
-        }
+        render_menu_label(labels[i], i == selection, i, label_count);
     }
     return 0;
 }
