@@ -25,11 +25,13 @@ enum COLOR_SCHEME {
     // the terminal implements before color is initialized. It cannot be
     // modified by the application, therefore we must start at 1.
     TOP_BAR_COLOR = 1, // Set the first enum constant to one
-    BOTTOM_BAR_COLOR // Becomes two, and so on
+    PLATFORM_COLOR,    // Becomes two, and so on
+    BOTTOM_BAR_COLOR
 };
 
 int initialize_color_schemes(void) {
-    init_pair(TOP_BAR_COLOR, COLOR_MAGENTA, COLOR_CYAN);
+    init_pair(TOP_BAR_COLOR, COLOR_CYAN, COLOR_MAGENTA);
+    init_pair(PLATFORM_COLOR, COLOR_WHITE, COLOR_WHITE);
     init_pair(BOTTOM_BAR_COLOR, COLOR_BLACK, COLOR_YELLOW);
     return 0;
 }
@@ -40,6 +42,8 @@ typedef struct Player {
     // advantageous if we have multiple players.
     int x;
     int y;
+    // How many jumps they player has left.
+    unsigned int jumps;
     unsigned int lives;
     unsigned int score;
 } Player;
@@ -50,6 +54,7 @@ Player make_player(char *name) {
     // Initialize the player to the corner so that it is in a valid state.
     player.x = 0;
     player.y = 0;
+    player.jumps = 2;
     player.lives = 3;
     player.score = 0;
     return player;
@@ -98,7 +103,9 @@ int write_top_bar(const Player * const player) {
     }
 
     attron(COLOR_PAIR(TOP_BAR_COLOR));
-    mvprintw(0, 0, final_buffer);
+    attron(A_BOLD);
+    print(0, 0, final_buffer);
+    attroff(A_BOLD);
     attroff(COLOR_PAIR(TOP_BAR_COLOR));
 
     return 0;
@@ -121,12 +128,14 @@ int write_player(const Player * const player) {
 
 int write_platforms(const Platform * platforms, const size_t platform_count) {
     size_t i;
+    attron(COLOR_PAIR(PLATFORM_COLOR));
     for (i = 0; i < platform_count; i++) {
         size_t w;
         for (w = 0; w < platforms[i].width; w++) {
-            print(platforms[i].x + w, platforms[i].y, "X");
+            print(platforms[i].x + w, platforms[i].y, " ");
         }
     }
+    attroff(COLOR_PAIR(PLATFORM_COLOR));
     return 0;
 }
 
@@ -289,6 +298,13 @@ void write_menu(const Menu * const menu) {
     }
 }
 
+typedef struct Game {
+    Player *player;
+    unsigned int score;
+    Platform **platforms;
+    size_t platform_count;
+} Game;
+
 int game(void) {
     Player player = make_player("Player");
     player.x = COLS / 2;
@@ -303,8 +319,15 @@ int game(void) {
         platforms[i].speed = random_integer(-3, 3);
     }
 
+    unsigned long frame = 0;
+    unsigned long next_frame_score = GAME_FPS;
+
     Command command = NO_COMMAND;
     while (command != COMMAND_QUIT) {
+        if (frame == next_frame_score) {
+            player.score++;
+            next_frame_score += GAME_FPS;
+        }
         update_screen(&player, platforms, PLATFORM_COUNT);
         rest_for_second_fraction(GAME_FPS);
         command = read_next_command();
@@ -315,6 +338,7 @@ int game(void) {
         } else if (command == COMMAND_JUMP) {
             player.y--;
         }
+        frame++;
     }
     return 0;
 }
