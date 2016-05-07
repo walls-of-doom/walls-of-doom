@@ -2,6 +2,9 @@ cmake_minimum_required (VERSION 2.8.7)
 
 project (walls-of-doom)
 
+set (walls-of-doom_VERSION_MAJOR 0)
+set (walls-of-doom_VERSION_MINOR 1)
+
 # The standard is C 90, always.
 set (C_STANDARD 90)
 

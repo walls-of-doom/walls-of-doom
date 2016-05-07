@@ -6,6 +6,7 @@
 #include "platform.h"
 #include "random.h"
 #include "rest.h"
+#include "version.h"
 
 #define GAME_NAME "Walls of Doom"
 #define TOP_BAR_STRING_COUNT 4
@@ -250,25 +251,39 @@ void finalize(void) {
     endwin();
 }
 
-void render_menu_label(char *label, int is_selected, int pos, int total) {
-    const int starting_y = (LINES - 3 * total) / 2;
-    const int y = starting_y + 3 * pos;
-    if (is_selected) {
-        char buffer[MAXIMUM_STRING_SIZE];
-        sprintf(buffer, "> %s <", label);
-        label = buffer;
-    }
-    const int x = (COLS - strlen(label)) / 2;
-    print(x, y, label);
-}
+typedef struct Menu {
+    char *title;
+    char **options;
+    size_t option_count;
+    size_t selected_option;
+} Menu;
 
-int render_menu(char **labels, const size_t label_count, const size_t selection) {
+void write_menu(const Menu * const menu) {
     clear();
+    const size_t entries = menu->option_count + 1;
+    const unsigned int ENTRY_HEIGHT = 3;
+    const unsigned int height = entries * ENTRY_HEIGHT;
+    const int starting_y = (LINES - height) / 2;
+    int y = starting_y + 1;
+    print((COLS - strlen(menu->title)) / 2, y, menu->title);
     size_t i;
-    for (i = 0; i < label_count; i++) {
-        render_menu_label(labels[i], i == selection, i, label_count);
+    for (i = 0; i < menu->option_count; i++) {
+        char *string = menu->options[i];
+        if (i == menu->selected_option) {
+            char buffer[MAXIMUM_STRING_SIZE];
+            sprintf(buffer, "> %s <", string);
+            string = buffer;
+        }
+        const int x = (COLS - strlen(string)) / 2;
+        y += ENTRY_HEIGHT;
+        if (i == menu->selected_option) {
+            attron(A_BOLD);
+        }
+        print(x, y, string);
+        if (i == menu->selected_option) {
+            attroff(A_BOLD);
+        }
     }
-    return 0;
 }
 
 int game(void) {
@@ -301,26 +316,32 @@ int game(void) {
     return 0;
 }
 
-int menu(void) {
-    int got_quit = 0;
+int main_menu(void) {
+    Menu menu;
+    char title[MAXIMUM_STRING_SIZE];
+    sprintf(title, "%s version %s", "Walls of Doom", WALLS_OF_DOOM_VERSION);
+    menu.title = title;
     char *options[] = {"Play", "Highscores", "Quit"};
-    size_t option_count = 3;
-    size_t selection = 0;
+    menu.options = options;
+    menu.option_count = 3;
+    menu.selected_option = 0;
+
+    int got_quit = 0;
     while (!got_quit) {
-        render_menu(options, option_count, selection);
+        write_menu(&menu);
         Command command = wait_for_next_command();
         if (command == COMMAND_UP) {
-            if (selection > 0) {
-                selection--;
+            if (menu.selected_option > 0) {
+                menu.selected_option--;
             }
         } else if (command == COMMAND_DOWN) {
-            if (selection + 1 < option_count) {
-                selection++;
+            if (menu.selected_option + 1 < menu.option_count) {
+                menu.selected_option++;
             }
         } else if (command == COMMAND_ENTER || command == COMMAND_CENTER) {
-            if (selection == 0) {
+            if (menu.selected_option == 0) {
                 game();
-            } else if (selection == 2) {
+            } else if (menu.selected_option == 2) {
                 got_quit = 1;
             }
         }
@@ -330,7 +351,7 @@ int menu(void) {
 
 int main(void) {
     init();
-    int result = menu();
+    int result = main_menu();
     finalize();
     return result;
 }
