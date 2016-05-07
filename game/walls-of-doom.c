@@ -167,7 +167,8 @@ typedef enum Command {
     COMMAND_RIGHT,
     COMMAND_DOWN,
     COMMAND_JUMP,
-    COMMAND_ENTER
+    COMMAND_ENTER,
+    COMMAND_QUIT
 } Command;
 
 Command command_from_input(const int input) {
@@ -181,6 +182,8 @@ Command command_from_input(const int input) {
         return COMMAND_RIGHT;
     } else if (input == '2') {
         return COMMAND_DOWN;
+    } else if (input == 'q' || input == 'Q') {
+        return COMMAND_QUIT;
     } else if (input == ' ') {
         return COMMAND_JUMP;
     } else if (input == '\n') {
@@ -301,7 +304,7 @@ int game(void) {
     }
 
     Command command = NO_COMMAND;
-    while (1) {
+    while (command != COMMAND_QUIT) {
         update_screen(&player, platforms, PLATFORM_COUNT);
         rest_for_second_fraction(GAME_FPS);
         command = read_next_command();
