@@ -12,7 +12,9 @@ Bernardo Sulzbach and Leonardo Ferrazza.
 ### Terminal
 
 ```bash
-$ cmake .
+$ mkdir build
+$ cd build
+$ cmake ..
 $ make
 ```
 

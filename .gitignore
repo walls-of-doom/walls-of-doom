@@ -53,8 +53,7 @@ CMakeFiles/
 CMakeCache.txt
 
 # Walls of Doom
-autotest/autotest
-game/walls-of-doom
+build/
 
 # Code::Blocks
 *.layout
