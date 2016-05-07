@@ -209,7 +209,7 @@ Command command_from_input(const int input) {
  * the last Command different than NO_COMMAND that could be produced by what
  * was in the input buffer.
  */
-Command read_next_command() {
+Command read_next_command(void) {
     Command last_valid_command = NO_COMMAND;
     int input;
     for (input = getch(); input != ERR; input = getch()) {
@@ -224,7 +224,7 @@ Command read_next_command() {
 /**
  * Waits for user input, indefinitely.
  */
-Command wait_for_next_command() {
+Command wait_for_next_command(void) {
     Command command = NO_COMMAND;
     while (command == NO_COMMAND) {
         rest_for_second_fraction(MENU_FPS);

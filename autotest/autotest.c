@@ -82,7 +82,7 @@ void test_random_integer_respects_the_provided_range(void) {
     }
 }
 
-int main() {
+int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_read_integers);
     RUN_TEST(test_compare_unsigned_char);
