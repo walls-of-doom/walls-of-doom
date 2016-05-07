@@ -17,8 +17,7 @@ char *to_string_unsigned_char(const void *pointer_to_uchar) {
 }
 
 void test_read_integers(void) {
-    char filename[L_tmpnam];
-    tmpnam(filename);
+    char filename[] = "test_read_integers_file.txt";
     FILE *file = fopen(filename, "w+");
 
     const int expected_count = 1;
