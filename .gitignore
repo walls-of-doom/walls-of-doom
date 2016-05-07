@@ -53,6 +53,7 @@ CMakeFiles/
 CMakeCache.txt
 
 # Walls of Doom
+platforms.txt
 build/
 
 # Code::Blocks
