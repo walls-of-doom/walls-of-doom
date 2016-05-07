@@ -11,7 +11,7 @@
 #define GAME_NAME "Walls of Doom"
 #define TOP_BAR_STRING_COUNT 4
 
-#define PLATFORM_COUNT 16
+#define PLATFORM_COUNT 8
 
 #define MAXIMUM_STRING_SIZE 256
 
@@ -126,11 +126,11 @@ int write_player(const Player * const player) {
     return 0;
 }
 
-int write_platforms(const Platform * platforms, const size_t platform_count) {
+int write_platforms(const Platform * platforms, const size_t platform_count, const BoundingBox * const box) {
     size_t i;
     attron(COLOR_PAIR(PLATFORM_COLOR));
     for (i = 0; i < platform_count; i++) {
-        print_platform(&platforms[i]);
+        print_platform(&platforms[i], box);
     }
     attroff(COLOR_PAIR(PLATFORM_COLOR));
     return 0;
@@ -145,11 +145,12 @@ int write_bottom_bar(void) {
     return 0;
 }
 
-int update_screen(const Player * const player, const Platform *platforms, const size_t platform_count) {
+int update_screen(const Player * const player, const Platform *platforms, const size_t platform_count, const BoundingBox * const box) {
+    clear();
     write_top_bar(player);
     erase_background();
     write_player(player);
-    write_platforms(platforms, platform_count);
+    write_platforms(platforms, platform_count, box);
     write_bottom_bar();
     refresh();
     return 0;
@@ -303,6 +304,12 @@ typedef struct Game {
 } Game;
 
 int game(void) {
+    BoundingBox box;
+    box.min_x = 0;
+    box.min_y = 1; // Top bar.
+    box.max_x = COLS - 1;
+    box.max_y = LINES - 3; // Top and bottom bars.
+
     Player player = make_player("Player");
     player.x = COLS / 2;
     player.y = LINES / 2;
@@ -313,19 +320,27 @@ int game(void) {
         platforms[i].x = random_integer(0, COLS);
         platforms[i].y = random_integer(4, LINES - 4);
         platforms[i].width = random_integer(4, 16);
-        platforms[i].speed = random_integer(-3, 3);
+        platforms[i].speed_x = 0;
+        platforms[i].speed_y = 0;
+        int movement_type = random_integer(0, 4);
+        if (movement_type < 2) {
+            platforms[i].speed_x = random_integer(1, 3);
+        } else if (movement_type < 4) {
+            platforms[i].speed_x = random_integer(-3, -1);
+        } else {
+            platforms[i].speed_y = random_integer(-3, -1);
+        }
     }
 
     unsigned long frame = 0;
     unsigned long next_frame_score = GAME_FPS;
-
     Command command = NO_COMMAND;
     while (command != COMMAND_QUIT) {
         if (frame == next_frame_score) {
             player.score++;
             next_frame_score += GAME_FPS;
         }
-        update_screen(&player, platforms, PLATFORM_COUNT);
+        update_screen(&player, platforms, PLATFORM_COUNT, &box);
         rest_for_second_fraction(GAME_FPS);
         command = read_next_command();
         if (command == COMMAND_LEFT) {
@@ -335,6 +350,7 @@ int game(void) {
         } else if (command == COMMAND_JUMP) {
             player.y--;
         }
+        update_platforms(platforms, PLATFORM_COUNT, &box);
         frame++;
     }
     return 0;
