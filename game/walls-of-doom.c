@@ -20,14 +20,14 @@
 
 #define MENU_FPS 30
 
-enum COLOR_SCHEME {
+typedef enum ColorScheme {
     // Color pair 0 is assumed to be white on black, but is actually whatever
     // the terminal implements before color is initialized. It cannot be
     // modified by the application, therefore we must start at 1.
     TOP_BAR_COLOR = 1, // Set the first enum constant to one
     PLATFORM_COLOR,    // Becomes two, and so on
     BOTTOM_BAR_COLOR
-};
+} ColorScheme;
 
 int initialize_color_schemes(void) {
     init_pair(TOP_BAR_COLOR, COLOR_CYAN, COLOR_MAGENTA);
@@ -130,10 +130,7 @@ int write_platforms(const Platform * platforms, const size_t platform_count) {
     size_t i;
     attron(COLOR_PAIR(PLATFORM_COLOR));
     for (i = 0; i < platform_count; i++) {
-        size_t w;
-        for (w = 0; w < platforms[i].width; w++) {
-            print(platforms[i].x + w, platforms[i].y, " ");
-        }
+        print_platform(&platforms[i]);
     }
     attroff(COLOR_PAIR(PLATFORM_COLOR));
     return 0;
