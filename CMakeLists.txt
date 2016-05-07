@@ -5,6 +5,9 @@ project (walls-of-doom)
 set (walls-of-doom_VERSION_MAJOR 0)
 set (walls-of-doom_VERSION_MINOR 2)
 
+set (CMAKE_INCLUDE_CURRENT_DIR ON)
+set (CMAKE_INCLUDE_CURRENT_DIR_IN_INTERFACE ON)
+
 # The standard is C 90, always.
 set (C_STANDARD 90)
 
