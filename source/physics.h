@@ -32,9 +32,9 @@ int is_out_of_bounding_box(Platform * const platform, const BoundingBox * const 
  */
 int is_within_platform(const int x, const int y, const Platform * const platform);
 
-void update_platform(Platform * const platform, const BoundingBox * const box);
+void update_platform(Player * const player, Platform * const platform, const BoundingBox * const box);
 
-void update_platforms(Platform * const platforms, const size_t platform_count, const BoundingBox * const box);
+void update_platforms(Player * const player, Platform * const platforms, const size_t platform_count, const BoundingBox * const box);
 
 void update_player(Player * const player, const Platform *platforms, const size_t platform_count, const BoundingBox * const box, const Command command);
 

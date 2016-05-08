@@ -1,6 +1,7 @@
 #include "constants.h"
 #include "io.h"
 #include "physics.h"
+#include "rest.h"
 
 #include <curses.h>
 

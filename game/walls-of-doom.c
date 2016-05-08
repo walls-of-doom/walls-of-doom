@@ -245,7 +245,7 @@ int game(void) {
             next_frame_score += GAME_FPS;
         }
         // 2. Update the platforms
-        update_platforms(platforms, PLATFORM_COUNT, &box);
+        update_platforms(&player, platforms, PLATFORM_COUNT, &box);
         // 3. Draw everything
         draw(&player, platforms, PLATFORM_COUNT, &box);
         // 4. Sleep
