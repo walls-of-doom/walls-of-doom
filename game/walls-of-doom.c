@@ -2,8 +2,9 @@
 #include <string.h>
 #include <curses.h>
 
+#include "constants.h"
 #include "io.h"
-#include "platform.h"
+#include "physics.h"
 #include "random.h"
 #include "rest.h"
 #include "version.h"
@@ -14,11 +15,6 @@
 #define PLATFORM_COUNT 8
 
 #define MAXIMUM_STRING_SIZE 256
-
-#define PLAYER_SYMBOL "@"
-#define GAME_FPS 5
-
-#define MENU_FPS 30
 
 typedef enum ColorScheme {
     // Color pair 0 is assumed to be white on black, but is actually whatever
@@ -34,30 +30,6 @@ int initialize_color_schemes(void) {
     init_pair(PLATFORM_COLOR, COLOR_WHITE, COLOR_WHITE);
     init_pair(BOTTOM_BAR_COLOR, COLOR_BLACK, COLOR_YELLOW);
     return 0;
-}
-
-typedef struct Player {
-    char *name;
-    // Could let the color of the player lay here, but this is only
-    // advantageous if we have multiple players.
-    int x;
-    int y;
-    // How many jumps they player has left.
-    unsigned int jumps;
-    unsigned int lives;
-    unsigned int score;
-} Player;
-
-Player make_player(char *name) {
-    Player player;
-    player.name = name;
-    // Initialize the player to the corner so that it is in a valid state.
-    player.x = 0;
-    player.y = 0;
-    player.jumps = 2;
-    player.lives = 3;
-    player.score = 0;
-    return player;
 }
 
 int erase_background(void) {
@@ -162,75 +134,6 @@ void place_player_on_screen(Player * const player) {
     player->y = LINES / 2;
 }
 
-/**
- * The Command enumerated type represents the different commands the user may issue.
- */
-typedef enum Command {
-    NO_COMMAND,
-    COMMAND_UP,
-    COMMAND_LEFT,
-    COMMAND_CENTER,
-    COMMAND_RIGHT,
-    COMMAND_DOWN,
-    COMMAND_JUMP,
-    COMMAND_ENTER,
-    COMMAND_QUIT
-} Command;
-
-Command command_from_input(const int input) {
-    if (input == '8') {
-        return COMMAND_UP;
-    } else if (input == '4') {
-        return COMMAND_LEFT;
-    } else if (input == '5') {
-        return COMMAND_CENTER;
-    } else if (input == '6') {
-        return COMMAND_RIGHT;
-    } else if (input == '2') {
-        return COMMAND_DOWN;
-    } else if (input == 'q' || input == 'Q') {
-        return COMMAND_QUIT;
-    } else if (input == ' ') {
-        return COMMAND_JUMP;
-    } else if (input == '\n') {
-        return COMMAND_ENTER;
-    } else {
-        return NO_COMMAND;
-    }
-}
-
-/**
- * Reads the next command that needs to be processed. This is the last command
- * on the input buffer.
- *
- * This function consumes the whole input buffer and returns either NO_COMMAND
- * (if no other Command could be produced by what was in the input buffer) or
- * the last Command different than NO_COMMAND that could be produced by what
- * was in the input buffer.
- */
-Command read_next_command(void) {
-    Command last_valid_command = NO_COMMAND;
-    int input;
-    for (input = getch(); input != ERR; input = getch()) {
-        const Command current = command_from_input(input);
-        if (current != NO_COMMAND) {
-            last_valid_command = current;
-        }
-    }
-    return last_valid_command;
-}
-
-/**
- * Waits for user input, indefinitely.
- */
-Command wait_for_next_command(void) {
-    Command command = NO_COMMAND;
-    while (command == NO_COMMAND) {
-        rest_for_second_fraction(MENU_FPS);
-        command = read_next_command();
-    }
-    return command;
-}
 
 /**
  * Initializes the required resources.
@@ -301,28 +204,6 @@ typedef struct Game {
     Platform **platforms;
     size_t platform_count;
 } Game;
-
-int is_valid_move(const int x, const int y, const Platform *platforms, const size_t platform_count) {
-    size_t i;
-    for (i = 0; i < platform_count; i++) {
-        if (is_within_platform(x, y, platforms + i)) {
-            return 0;
-        }
-    }
-    return 1;
-}
-
-void update_player(Player * const player, const Platform *platforms, const size_t platform_count, const BoundingBox * const box, const Command command) {
-    if (command == COMMAND_LEFT) {
-        if (is_valid_move(player->x - 1, player->y, platforms, platform_count)) {
-            player->x -= 1;
-        }
-    } else if (command == COMMAND_RIGHT) {
-        if (is_valid_move(player->x + 1, player->y, platforms, platform_count)) {
-            player->x += 1;
-        }
-    }
-}
 
 int game(void) {
     BoundingBox box;
