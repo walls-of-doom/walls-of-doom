@@ -1,6 +1,7 @@
 #include "unity.h"
 
 #include "data.h"
+#include "logger.h"
 #include "random.h"
 #include "sort.h"
 
@@ -84,10 +85,12 @@ void test_random_integer_respects_the_provided_range(void) {
 
 int main(void) {
     UNITY_BEGIN();
+    log_message("Started running tests");
     RUN_TEST(test_read_integers);
     RUN_TEST(test_compare_unsigned_char);
     RUN_TEST(test_insertion_sort_with_single_bytes);
     RUN_TEST(test_find_next_power_of_two_works_for_all_integers);
     RUN_TEST(test_random_integer_respects_the_provided_range);
+    log_message("Finished running tests");
     return UNITY_END();
 }
