@@ -2,8 +2,17 @@
 
 #include "data.h"
 #include "logger.h"
+#include "math.h"
 #include "random.h"
 #include "sort.h"
+
+void test_normalize(void) {
+    TEST_ASSERT_EQUAL_INT(-1, normalize(INT_MIN));
+    TEST_ASSERT_EQUAL_INT(-1, normalize(-1));
+    TEST_ASSERT_EQUAL_INT(0, normalize(0));
+    TEST_ASSERT_EQUAL_INT(1, normalize(1));
+    TEST_ASSERT_EQUAL_INT(1, normalize(INT_MAX));
+}
 
 int compare_unsigned_char(const void *pointer_to_uchar_a, const void *pointer_to_uchar_b) {
     unsigned char a = *(unsigned char *)(pointer_to_uchar_a);
@@ -86,6 +95,7 @@ void test_random_integer_respects_the_provided_range(void) {
 int main(void) {
     UNITY_BEGIN();
     log_message("Started running tests");
+    RUN_TEST(test_normalize);
     RUN_TEST(test_read_integers);
     RUN_TEST(test_compare_unsigned_char);
     RUN_TEST(test_insertion_sort_with_single_bytes);
