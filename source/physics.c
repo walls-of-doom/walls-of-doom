@@ -119,6 +119,22 @@ int is_valid_move(const int x, const int y, const Platform *platforms, const siz
     return 1;
 }
 
+int is_falling(const Player * const player, const Platform *platforms, const size_t platform_count, const BoundingBox * const box) {
+    if (box->max_y == player->y) {
+        return 0;
+    } else {
+        size_t i;
+        for (i = 0; i < platform_count; i++) {
+            if (player->y == platforms[i].y - 1) {
+                if (player->x >= platforms[i].x && player->x < platforms[i].x + platforms[i].width) {
+                    return 0;
+                }
+            }
+        }
+    }
+    return 1;
+}
+
 void update_player(Player * const player, const Platform *platforms, const size_t platform_count, const BoundingBox * const box, const Command command) {
     if (command == COMMAND_LEFT) {
         if (is_valid_move(player->x - 1, player->y, platforms, platform_count)) {
@@ -128,5 +144,9 @@ void update_player(Player * const player, const Platform *platforms, const size_
         if (is_valid_move(player->x + 1, player->y, platforms, platform_count)) {
             player->x += 1;
         }
+    }
+    // After moving, if it even happened, simulate gravity
+    if (is_falling(player, platforms, platform_count, box)) {
+        player->y++;
     }
 }
