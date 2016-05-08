@@ -210,7 +210,7 @@ int game(void) {
     box.min_x = 0;
     box.min_y = 1; // Top bar.
     box.max_x = COLS - 1;
-    box.max_y = LINES - 3; // Top and bottom bars.
+    box.max_y = LINES - 2; // Bottom bar.
 
     Player player = make_player("Player");
     player.x = COLS / 2;
