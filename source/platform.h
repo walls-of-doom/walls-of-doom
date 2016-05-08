@@ -66,6 +66,13 @@ int is_out_of_bounding_box(Platform * const platform, const BoundingBox * const 
     }
 }
 
+/**
+ * Evaluates whether or not a point is within a Platform.
+ */
+int is_within_platform(const int x, const int y, const Platform * const platform) {
+    return y == platform->y && x >= platform->x && x < platform->x + platform->width;
+}
+
 void update_platform(Platform * const platform, const BoundingBox * const box) {
     platform->x += platform->speed_x;
     platform->y += platform->speed_y;

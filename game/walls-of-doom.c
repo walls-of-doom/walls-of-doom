@@ -60,12 +60,22 @@ Player make_player(char *name) {
     return player;
 }
 
+int erase_background(void) {
+    char final_buffer[COLS + 1];
+    memset(final_buffer, ' ', COLS);
+    int i;
+    for (i = 1; i < LINES - 1; i++) {
+        mvprintw(i, 0, final_buffer);
+    }
+    return 0;
+}
+
 /**
  * Writes the top status bar on the screen for a given Player.
  *
  * Returns 0 if successful.
  */
-int write_top_bar(const Player * const player) {
+int draw_top_bar(const Player * const player) {
     const int padding = 1; // How many spaces should surround the value (at least).
     const size_t columns_per_value = COLS / TOP_BAR_STRING_COUNT;
 
@@ -111,22 +121,16 @@ int write_top_bar(const Player * const player) {
     return 0;
 }
 
-int erase_background(void) {
+int draw_bottom_bar(void) {
     char final_buffer[COLS + 1];
     memset(final_buffer, ' ', COLS);
-    int i;
-    for (i = 1; i < LINES - 1; i++) {
-        mvprintw(i, 0, final_buffer);
-    }
+    attron(COLOR_PAIR(BOTTOM_BAR_COLOR));
+    mvprintw(LINES - 1, 0, final_buffer);
+    attroff(COLOR_PAIR(BOTTOM_BAR_COLOR));
     return 0;
 }
 
-int write_player(const Player * const player) {
-    print(player->x, player->y, PLAYER_SYMBOL);
-    return 0;
-}
-
-int write_platforms(const Platform * platforms, const size_t platform_count, const BoundingBox * const box) {
+int draw_platforms(const Platform * platforms, const size_t platform_count, const BoundingBox * const box) {
     size_t i;
     attron(COLOR_PAIR(PLATFORM_COLOR));
     for (i = 0; i < platform_count; i++) {
@@ -136,22 +140,17 @@ int write_platforms(const Platform * platforms, const size_t platform_count, con
     return 0;
 }
 
-int write_bottom_bar(void) {
-    char final_buffer[COLS + 1];
-    memset(final_buffer, ' ', COLS);
-    attron(COLOR_PAIR(BOTTOM_BAR_COLOR));
-    mvprintw(LINES - 1, 0, final_buffer);
-    attroff(COLOR_PAIR(BOTTOM_BAR_COLOR));
+int draw_player(const Player * const player) {
+    print(player->x, player->y, PLAYER_SYMBOL);
     return 0;
 }
 
-int update_screen(const Player * const player, const Platform *platforms, const size_t platform_count, const BoundingBox * const box) {
-    clear();
-    write_top_bar(player);
+int draw(const Player * const player, const Platform *platforms, const size_t platform_count, const BoundingBox * const box) {
     erase_background();
-    write_player(player);
-    write_platforms(platforms, platform_count, box);
-    write_bottom_bar();
+    draw_top_bar(player);
+    draw_bottom_bar();
+    draw_platforms(platforms, platform_count, box);
+    draw_player(player);
     refresh();
     return 0;
 }
@@ -303,6 +302,28 @@ typedef struct Game {
     size_t platform_count;
 } Game;
 
+int is_valid_move(const int x, const int y, const Platform *platforms, const size_t platform_count) {
+    size_t i;
+    for (i = 0; i < platform_count; i++) {
+        if (is_within_platform(x, y, platforms + i)) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+void update_player(Player * const player, const Platform *platforms, const size_t platform_count, const BoundingBox * const box, const Command command) {
+    if (command == COMMAND_LEFT) {
+        if (is_valid_move(player->x - 1, player->y, platforms, platform_count)) {
+            player->x -= 1;
+        }
+    } else if (command == COMMAND_RIGHT) {
+        if (is_valid_move(player->x + 1, player->y, platforms, platform_count)) {
+            player->x += 1;
+        }
+    }
+}
+
 int game(void) {
     BoundingBox box;
     box.min_x = 0;
@@ -336,21 +357,23 @@ int game(void) {
     unsigned long next_frame_score = GAME_FPS;
     Command command = NO_COMMAND;
     while (command != COMMAND_QUIT) {
+        // Game loop description
+        // 1. Update the score
         if (frame == next_frame_score) {
             player.score++;
             next_frame_score += GAME_FPS;
         }
-        update_screen(&player, platforms, PLATFORM_COUNT, &box);
-        rest_for_second_fraction(GAME_FPS);
-        command = read_next_command();
-        if (command == COMMAND_LEFT) {
-            player.x--;
-        } else if (command == COMMAND_RIGHT) {
-            player.x++;
-        } else if (command == COMMAND_JUMP) {
-            player.y--;
-        }
+        // 2. Update the platforms
         update_platforms(platforms, PLATFORM_COUNT, &box);
+        // 3. Draw everything
+        draw(&player, platforms, PLATFORM_COUNT, &box);
+        // 4. Sleep
+        rest_for_second_fraction(GAME_FPS);
+        // 5. Read whatever command we got (if any)
+        command = read_next_command();
+        // 6. Update the player using the command (may be a no-op)
+        update_player(&player, platforms, PLATFORM_COUNT, &box, command);
+        // 7. Increment the frame counter
         frame++;
     }
     return 0;
