@@ -5,12 +5,6 @@
  * Normalizes a scalar by returning either -1, 0 or 1 if this scalar is
  * negative, zero, or positive, respectively.
  */
-int normalize(int value) {
-    if (value == 0) {
-        return 0;
-    } else {
-        return value / value;
-    }
-}
+int normalize(int value);
 
 #endif
