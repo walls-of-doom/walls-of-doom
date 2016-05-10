@@ -7,6 +7,9 @@ Walls of Doom (WoD) is a minimalistic
 [platformer](https://en.wikipedia.org/wiki/Platform_game) written in C by
 Bernardo Sulzbach and Leonardo Ferrazza.
 
+The issue tracker may be found at the [Bitbucket
+repository](https://bitbucket.org/mafagafogigante/walls-of-doom/issues?status=new&status=open&sort=-priority).
+
 # Building and Running
 
 ### Terminal
