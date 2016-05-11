@@ -1,10 +1,3 @@
-/**
- * Copyright (c) 2016, Bernardo Sulzbach and Leonardo Ferrazza
- * All rights reserved.
- *
- * See LICENSE.txt for more details.
- */
-
 #ifndef DATA_H
 #define DATA_H
 

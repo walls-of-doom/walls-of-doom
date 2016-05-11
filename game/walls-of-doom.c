@@ -117,12 +117,30 @@ int draw_player(const Player * const player) {
     return 0;
 }
 
+int draw_borders(void) {
+    int i;
+    for (i = 1; i < COLS - 1; i++) {
+        print(i, 1, "+");
+    }
+    for (i = 1; i < LINES - 1; i++) {
+        print(0, i, "+");
+    }
+    for (i = 1; i < COLS - 1; i++) {
+        print(i, LINES - 2, "+");
+    }
+    for (i = 1; i < LINES - 1; i++) {
+        print(COLS - 1, i, "+");
+    }
+    return 0;
+}
+
 int draw(const Player * const player, const Platform *platforms, const size_t platform_count, const BoundingBox * const box) {
     erase_background();
     draw_top_bar(player);
     draw_bottom_bar();
     draw_platforms(platforms, platform_count, box);
     draw_player(player);
+    draw_borders();
     refresh();
     return 0;
 }
@@ -207,10 +225,10 @@ typedef struct Game {
 
 BoundingBox bounding_box_from_screen() {
     BoundingBox box;
-    box.min_x = 0;
-    box.min_y = 1; // Top bar.
-    box.max_x = COLS - 1;
-    box.max_y = LINES - 2; // Bottom bar.
+    box.min_x = 1;
+    box.min_y = 2; // Top bar.
+    box.max_x = COLS - 2;
+    box.max_y = LINES - 3; // Bottom bar.
     return box;
 }
 

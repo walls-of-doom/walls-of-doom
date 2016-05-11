@@ -1,9 +1,4 @@
-/**
- * Copyright (c) 2016, Bernardo Sulzbach and Leonardo Ferrazza
- * All rights reserved.
- *
- * See LICENSE.txt for more details.
- */
+
 
 #ifndef ARRAY_H
 #define ARRAY_H
