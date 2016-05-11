@@ -5,10 +5,64 @@
 #include <math.h>
 #include <stdio.h>
 
+void log_if_not_normalized(const int value) {
+    if (value < -1 && value > 1) {
+        char buffer[256];
+        char *format = "Expected a normalized value, but got %d instead\n";
+        sprintf(buffer, format, value);
+        log_message(buffer);
+    }
+}
+
+/**
+ * Evaluates whether or not a point is within a Platform.
+ */
+int is_within_platform(const int x, const int y, const Platform * const platform) {
+    return y == platform->y && x >= platform->x && x < platform->x + platform->width;
+}
+
+int is_over_platform(const int x, const int y, const Platform * const platform) {
+    return is_within_platform(x, y + 1, platform);
+}
+
+void move_platform_horizontally(Player * const player, Platform * const platform, const int direction) {
+    log_if_not_normalized(direction);
+    if (player->y == platform->y) { // Fail fast if the platform is not on the same line
+        if (direction == 1) {
+            if (player->x == platform->x + platform->width) {
+                player->x++;
+            }
+        } else if (direction == -1) {
+            if (player->x == platform->x - 1) {
+                player->x--;
+            }
+        }
+    } else if (is_over_platform(player->x, player->y, platform)) {  // If the player is over the platform
+        player->x += direction;
+    }
+    platform->x += direction;
+}
+
+void move_platform_vertically(Player * const player, Platform * const platform, const int direction) {
+    log_if_not_normalized(direction);
+    if (player->x >= platform->x && player->x < platform->x + platform->width) {
+        if (direction == 1) {
+            if (player->y == platform->y + 1) {
+                player->y++;
+            }
+        } else if (direction == -1) {
+            if (player->y == platform->y - 1) {
+                player->y--;
+            }
+        }
+    }
+    platform->y += direction;
+}
+
 /**
  * Repositions a Platform in the vicinity of a BoundingBox.
  */
-void reposition(Platform * const platform, const BoundingBox * const box) {
+void reposition(Player * const player, Platform * const platform, const BoundingBox * const box) {
     if (platform->x > box->max_x) { // To the right of the box
         platform->x = 1 - platform->width;
         platform->y = random_integer(box->min_y, box->max_y);
@@ -17,7 +71,9 @@ void reposition(Platform * const platform, const BoundingBox * const box) {
         platform->y = random_integer(box->min_y, box->max_y);
     } else if (platform->y < box->min_y) { // Above the box
         platform->x = random_integer(box->min_x, box->max_x);
-        platform->y = box->max_y;
+        // Must work when the player is in the last line
+        platform->y = box->max_y + 1; // Create it under the bounding box
+        move_platform_vertically(player, platform, -1); // Use the move function to keep the game in a valid state
     }
     // We don't have to deal with platforms below the box.
 }
@@ -41,54 +97,6 @@ int is_out_of_bounding_box(Platform * const platform, const BoundingBox * const 
     }
 }
 
-/**
- * Evaluates whether or not a point is within a Platform.
- */
-int is_within_platform(const int x, const int y, const Platform * const platform) {
-    return y == platform->y && x >= platform->x && x < platform->x + platform->width;
-}
-
-void log_if_not_normalized(const int value) {
-    if (value < -1 && value > 1) {
-        char buffer[256];
-        char *format = "Expected a normalized value, but got %d instead\n";
-        sprintf(buffer, format, value);
-        log_message(buffer);
-    }
-}
-
-void move_platform_horizontally(Player * const player, Platform * const platform, const int direction) {
-    log_if_not_normalized(direction);
-    if (player->y == platform->y) { // Fail fast if the platform is not on the same line
-        if (direction == 1) {
-            if (player->x == platform->x + platform->width) {
-                player->x++;
-            }
-        } else if (direction == -1) {
-            if (player->x == platform->x - 1) {
-                player->x--;
-            }
-        }
-    }
-    platform->x += direction;
-}
-
-void move_platform_vertically(Player * const player, Platform * const platform, const int direction) {
-    log_if_not_normalized(direction);
-    if (player->x >= platform->x && player->x < platform->x + platform->width) {
-        if (direction == 1) {
-            if (player->y == platform->y + 1) {
-                player->y++;
-            }
-        } else if (direction == -1) {
-            if (player->y == platform->y - 1) {
-                player->y--;
-            }
-        }
-    }
-    platform->y += direction;
-}
-
 void update_platform(Player * const player, Platform * const platform, const BoundingBox * const box) {
     int i;
     for (i = 0; i < abs(platform->speed_x); i++) {
@@ -98,7 +106,7 @@ void update_platform(Player * const player, Platform * const platform, const Bou
         move_platform_vertically(player, platform, normalize(platform->speed_y));
     }
     if (is_out_of_bounding_box(platform, box)) {
-        reposition(platform, box);
+        reposition(player, platform, box);
     }
 }
 

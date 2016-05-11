@@ -16,7 +16,7 @@ typedef struct BoundingBox {
 /**
  * Repositions a Platform in the vicinity of a BoundingBox.
  */
-void reposition(Platform * const platform, const BoundingBox * const box);
+void reposition(Player * const player, Platform * const platform, const BoundingBox * const box);
 
 /**
  * Evaluates whether or not a Platform is completely outside of a BoundingBox.
