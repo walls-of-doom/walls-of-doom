@@ -13,6 +13,8 @@ typedef struct BoundingBox {
     int max_y;
 } BoundingBox;
 
+int bounding_box_equals(const BoundingBox * const a, const BoundingBox * const b);
+
 /**
  * Repositions a Platform in the vicinity of a BoundingBox.
  */

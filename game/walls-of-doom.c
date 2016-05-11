@@ -205,12 +205,17 @@ typedef struct Game {
     size_t platform_count;
 } Game;
 
-int game(void) {
+BoundingBox bounding_box_from_screen() {
     BoundingBox box;
     box.min_x = 0;
     box.min_y = 1; // Top bar.
     box.max_x = COLS - 1;
     box.max_y = LINES - 2; // Bottom bar.
+    return box;
+}
+
+int game(void) {
+    BoundingBox box = bounding_box_from_screen();
 
     Player player = make_player("Player");
     player.x = COLS / 2;
@@ -239,22 +244,27 @@ int game(void) {
     Command command = NO_COMMAND;
     while (command != COMMAND_QUIT) {
         // Game loop description
-        // 1. Update the score
+        // 1. If the number of columns and lines has changed, finish the game
+        BoundingBox current_box = bounding_box_from_screen();
+        if (!bounding_box_equals(&box, &current_box)) {
+            break;
+        }
+        // 2. Update the score
         if (frame == next_frame_score) {
             player.score++;
             next_frame_score += GAME_FPS;
         }
-        // 2. Update the platforms
+        // 3. Update the platforms
         update_platforms(&player, platforms, PLATFORM_COUNT, &box);
-        // 3. Draw everything
+        // 4. Draw everything
         draw(&player, platforms, PLATFORM_COUNT, &box);
-        // 4. Sleep
+        // 5. Sleep
         rest_for_second_fraction(GAME_FPS);
-        // 5. Read whatever command we got (if any)
+        // 6. Read whatever command we got (if any)
         command = read_next_command();
-        // 6. Update the player using the command (may be a no-op)
+        // 7. Update the player using the command (may be a no-op)
         update_player(&player, platforms, PLATFORM_COUNT, &box, command);
-        // 7. Increment the frame counter
+        // 8. Increment the frame counter
         frame++;
     }
     return 0;
