@@ -1,10 +1,3 @@
-/**
- * Copyright (c) 2016, Bernardo Sulzbach and Leonardo Ferrazza
- * All rights reserved.
- *
- * See LICENSE.txt for more details.
- */
-
 #define ONE_BILLION 1000000000
 
 #include <time.h>

@@ -1,14 +1,3 @@
-/**
- * Copyright (c) 2016, Bernardo Sulzbach and Leonardo Ferrazza
- * All rights reserved.
- *
- * The xoroshiro128+ algorithm was written in 2016 by David Blackman and
- * Sebastiano Vigna (vigna@acm.org) and released to the public domain. We do
- * not claim ownership of their algorithm.
- *
- * See LICENSE.txt for more details.
- */
-
 #include "random.h"
 
 #include <stdlib.h>
