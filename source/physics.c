@@ -134,20 +134,33 @@ int is_valid_move(const int x, const int y, const Platform *platforms, const siz
     return 1;
 }
 
-int is_falling(const Player * const player, const Platform *platforms, const size_t platform_count, const BoundingBox * const box) {
-    if (box->max_y == player->y) {
-        return 0;
-    } else {
-        size_t i;
-        for (i = 0; i < platform_count; i++) {
-            if (player->y == platforms[i].y - 1) {
-                if (player->x >= platforms[i].x && player->x < platforms[i].x + platforms[i].width) {
-                    return 0;
-                }
+int is_falling(const Player * const player, const Platform *platforms, const size_t platform_count) {
+    size_t i;
+    for (i = 0; i < platform_count; i++) {
+        if (player->y == platforms[i].y - 1) {
+            if (player->x >= platforms[i].x && player->x < platforms[i].x + platforms[i].width) {
+                return 0;
             }
         }
     }
     return 1;
+}
+
+int is_touching_a_wall(const Player * const player, const BoundingBox * const box) {
+    return (player->x < box->min_x || player->x > box->max_x) || (player->y < box->min_y || player->y > box->max_y);
+}
+
+int get_bounding_box_center_x(const BoundingBox * const box) {
+    return box->min_x + (box->max_x - box->min_x + 1) / 2;
+}
+
+int get_bounding_box_center_y(const BoundingBox * const box) {
+    return box->min_y + (box->max_y - box->min_y + 1) / 2;
+}
+
+void reposition_player(Player * const player, const BoundingBox * const box) {
+    player->x = get_bounding_box_center_x(box);
+    player->y = get_bounding_box_center_y(box);
 }
 
 void update_player(Player * const player, const Platform *platforms, const size_t platform_count, const BoundingBox * const box, const Command command) {
@@ -161,7 +174,11 @@ void update_player(Player * const player, const Platform *platforms, const size_
         }
     }
     // After moving, if it even happened, simulate gravity
-    if (is_falling(player, platforms, platform_count, box)) {
+    if (is_falling(player, platforms, platform_count)) {
         player->y++;
+    }
+    if (is_touching_a_wall(player, box)) {
+        player->lives--;
+        reposition_player(player, box);
     }
 }

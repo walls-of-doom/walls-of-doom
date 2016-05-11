@@ -4,6 +4,7 @@
 
 #include "constants.h"
 #include "io.h"
+#include "logger.h"
 #include "physics.h"
 #include "random.h"
 #include "rest.h"
@@ -232,6 +233,23 @@ BoundingBox bounding_box_from_screen() {
     return box;
 }
 
+void register_highscore(const Player * const player) {
+    char buffer[256];
+    sprintf(buffer, "Register a highscore of %d points", player->score);
+    log_message(buffer);
+    char *message = "Highscores coming soon!";
+    const size_t message_size = strlen(message);
+    clear();
+    print((COLS - message_size) / 2, LINES / 2, message);
+    refresh();
+    rest_for_second_fraction(2);
+}
+
+int check_for_screen_size_change(const BoundingBox * const box) {
+    BoundingBox current_box = bounding_box_from_screen();
+    return !bounding_box_equals(box, &current_box);
+}
+
 int game(void) {
     BoundingBox box = bounding_box_from_screen();
 
@@ -260,30 +278,29 @@ int game(void) {
     unsigned long frame = 0;
     unsigned long next_frame_score = GAME_FPS;
     Command command = NO_COMMAND;
-    while (command != COMMAND_QUIT) {
+    while (command != COMMAND_QUIT && !check_for_screen_size_change(&box)) {
         // Game loop description
-        // 1. If the number of columns and lines has changed, finish the game
-        BoundingBox current_box = bounding_box_from_screen();
-        if (!bounding_box_equals(&box, &current_box)) {
-            break;
-        }
-        // 2. Update the score
+        // 1. Update the score
         if (frame == next_frame_score) {
             player.score++;
             next_frame_score += GAME_FPS;
         }
-        // 3. Update the platforms
+        // 2. Update the platforms
         update_platforms(&player, platforms, PLATFORM_COUNT, &box);
-        // 4. Draw everything
+        // 3. Draw everything
         draw(&player, platforms, PLATFORM_COUNT, &box);
-        // 5. Sleep
+        // 4. Sleep
         rest_for_second_fraction(GAME_FPS);
-        // 6. Read whatever command we got (if any)
+        // 5. Read whatever command we got (if any)
         command = read_next_command();
-        // 7. Update the player using the command (may be a no-op)
+        // 6. Update the player using the command (may be a no-op)
         update_player(&player, platforms, PLATFORM_COUNT, &box, command);
-        // 8. Increment the frame counter
+        // 7. Increment the frame counter
         frame++;
+        if (player.lives == 0) { // <= would be safer but could hide some bugs
+            register_highscore(&player);
+            break;
+        }
     }
     return 0;
 }
