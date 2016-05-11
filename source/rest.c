@@ -7,8 +7,8 @@ void rest_for_ns(long ns) {
         return;
     }
     struct timespec sleep_duration;
-    sleep_duration.tv_sec = 0;
-    sleep_duration.tv_nsec = ns;
+    sleep_duration.tv_sec = ns / ONE_BILLION;
+    sleep_duration.tv_nsec = ns % ONE_BILLION;
     struct timespec remaining;
     nanosleep(&sleep_duration, &remaining);
     // Currently we quietly ignore if the sleep was interrupted.
