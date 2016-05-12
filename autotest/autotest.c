@@ -4,15 +4,11 @@
 #include "logger.h"
 #include "math.h"
 #include "random.h"
+#include "rest.h"
 #include "sort.h"
 
-void test_normalize(void) {
-    TEST_ASSERT_EQUAL_INT(-1, normalize(INT_MIN));
-    TEST_ASSERT_EQUAL_INT(-1, normalize(-1));
-    TEST_ASSERT_EQUAL_INT(0, normalize(0));
-    TEST_ASSERT_EQUAL_INT(1, normalize(1));
-    TEST_ASSERT_EQUAL_INT(1, normalize(INT_MAX));
-}
+#include <time.h>
+#include <stdint.h>
 
 int compare_unsigned_char(const void *pointer_to_uchar_a, const void *pointer_to_uchar_b) {
     unsigned char a = *(unsigned char *)(pointer_to_uchar_a);
@@ -24,6 +20,53 @@ char *to_string_unsigned_char(const void *pointer_to_uchar) {
     char *buffer = malloc(16);
     sprintf(buffer, "%d", *(unsigned char *)(pointer_to_uchar));
     return buffer;
+}
+
+void test_normalize(void) {
+    TEST_ASSERT_EQUAL_INT(-1, normalize(INT_MIN));
+    TEST_ASSERT_EQUAL_INT(-1, normalize(-1));
+    TEST_ASSERT_EQUAL_INT(0, normalize(0));
+    TEST_ASSERT_EQUAL_INT(1, normalize(1));
+    TEST_ASSERT_EQUAL_INT(1, normalize(INT_MAX));
+}
+
+void test_rest_for_nanoseconds_with_one_microsecond(void) {
+    struct timespec start;
+    struct timespec end;
+
+    clock_gettime(CLOCK_REALTIME, &start);
+    rest_for_nanoseconds(NANOSECONDS_IN_ONE_MICROSECOND);
+    clock_gettime(CLOCK_REALTIME, &end);
+
+    const uint_least64_t elapsed_time = elapsed_time_in_nanoseconds(&start, &end);
+
+    TEST_ASSERT_MESSAGE(elapsed_time >= NANOSECONDS_IN_ONE_MICROSECOND, "elapsed time is less than one microsecond");
+}
+
+void test_rest_for_nanoseconds_with_one_millisecond(void) {
+    struct timespec start;
+    struct timespec end;
+
+    clock_gettime(CLOCK_REALTIME, &start);
+    rest_for_nanoseconds(NANOSECONDS_IN_ONE_MILLISECOND);
+    clock_gettime(CLOCK_REALTIME, &end);
+
+    const uint_least64_t elapsed_time = elapsed_time_in_nanoseconds(&start, &end);
+
+    TEST_ASSERT_MESSAGE(elapsed_time >= NANOSECONDS_IN_ONE_MILLISECOND, "elapsed time is less than one millisecond");
+}
+
+void test_rest_for_nanoseconds_with_one_second(void) {
+    struct timespec start;
+    struct timespec end;
+
+    clock_gettime(CLOCK_REALTIME, &start);
+    rest_for_nanoseconds(NANOSECONDS_IN_ONE_SECOND);
+    clock_gettime(CLOCK_REALTIME, &end);
+
+    const uint_least64_t elapsed_time = elapsed_time_in_nanoseconds(&start, &end);
+
+    TEST_ASSERT_MESSAGE(elapsed_time >= NANOSECONDS_IN_ONE_SECOND, "elapsed time is less than one second");
 }
 
 void test_read_integers(void) {
@@ -96,6 +139,9 @@ int main(void) {
     UNITY_BEGIN();
     log_message("Started running tests");
     RUN_TEST(test_normalize);
+    RUN_TEST(test_rest_for_nanoseconds_with_one_microsecond);
+    RUN_TEST(test_rest_for_nanoseconds_with_one_millisecond);
+    RUN_TEST(test_rest_for_nanoseconds_with_one_second);
     RUN_TEST(test_read_integers);
     RUN_TEST(test_compare_unsigned_char);
     RUN_TEST(test_insertion_sort_with_single_bytes);

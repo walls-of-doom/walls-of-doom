@@ -242,7 +242,7 @@ void register_highscore(const Player * const player) {
     clear();
     print((COLS - message_size) / 2, LINES / 2, message);
     refresh();
-    rest_for_ns(2000000000);
+    rest_for_nanoseconds(2UL * NANOSECONDS_IN_ONE_SECOND);
 }
 
 int check_for_screen_size_change(const BoundingBox * const box) {
