@@ -14,7 +14,7 @@ add_library (walls-of-doom-source
     platform.h
     player.h player.c
     random.h random.c
-    record.h
+    record.h record.c
     rest.h rest.c
     sort.h sort.c
     version.h)
