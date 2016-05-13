@@ -3,6 +3,8 @@
 
 #define RECORD_NAME_MAXIMUM_SIZE 64
 
+#include <stdlib.h>
+
 /**
  * A Record is a structure that stores the outcome of a game.
  */
@@ -18,5 +20,21 @@ typedef struct Record {
  * possible size.
  */
 Record make_record(const char * const name, const int score);
+
+/**
+ * Writes the specified Record to to the system.
+ *
+ * Returns the index of the provided record in the record table or -1 if it
+ * didn't make it to the table.
+ */
+int save_record(const Record * const record);
+
+/**
+ * Reads Records from the system into the specified destination. Reading at
+ * most destination_size Records.
+ *
+ * Returns how many Records were actually read.
+ */
+size_t read_records(Record * destination, size_t destination_size);
 
 #endif

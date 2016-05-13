@@ -4,6 +4,7 @@
 #include "rest.h"
 
 #include <curses.h>
+#include <string.h>
 
 /**
  * Prints the provided string on the screen starting at (x, y).
@@ -14,6 +15,14 @@ void print(const int x, const int y, const char *string) {
         return;
     }
     mvprintw(y, x, string);
+}
+
+/**
+ * Prints the provided string centered on the screen at the provided line.
+ */
+void print_centered(const int y, const char *string) {
+    const int x = (COLS - strlen(string)) / 2;
+    print(x, y, string);
 }
 
 /**

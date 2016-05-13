@@ -7,6 +7,7 @@
 #include "logger.h"
 #include "physics.h"
 #include "random.h"
+#include "record.h"
 #include "rest.h"
 #include "version.h"
 
@@ -234,15 +235,37 @@ BoundingBox bounding_box_from_screen() {
 }
 
 void register_highscore(const Player * const player) {
-    char buffer[256];
-    const char *format = "Started registering a highscore of %d points";
-    sprintf(buffer, format, player->score);
+    // Log that we are registering the highscore
+    char buffer[MAXIMUM_STRING_SIZE];
+    const char *format = "Started registering a highscore of %d points for %s";
+    sprintf(buffer, format, player->score, player->name);
     log_message(buffer);
-    char *message = "Highscores coming soon!";
-    const size_t message_size = strlen(message);
+
+    // The name has already been entered to make the Player object.
+    Record record = make_record(player->name, player->score);
+
+    // Write the Record to disk
+    int scoreboard_index = save_record(&record);
+    int position = scoreboard_index + 1;
+
+    sprintf(buffer, "Saved the record successfully");
+    log_message(buffer);
+
+    char first_line[MAXIMUM_STRING_SIZE];
+    sprintf(first_line, "%s died after making %d points.", player->name, player->score);
+
+    char second_line[MAXIMUM_STRING_SIZE];
+    if (position > 0) {
+        sprintf(second_line, "%s got to position %d!", player->name, position);
+    } else {
+        sprintf(second_line, "%s didn't make it to the top scores.", player->name);
+    }
+
     clear();
-    print((COLS - message_size) / 2, LINES / 2, message);
+    print_centered(LINES / 2 - 1, first_line);
+    print_centered(LINES / 2 + 1, second_line);
     refresh();
+
     rest_for_nanoseconds(2UL * NANOSECONDS_IN_ONE_SECOND);
 }
 
@@ -306,6 +329,44 @@ int game(void) {
     return 0;
 }
 
+/**
+ * Returns the number of characters used to represent the provided number on
+ * base 10.
+ */
+int count_digits(int number) {
+    char buffer[MAXIMUM_STRING_SIZE];
+    sprintf(buffer, "%d", number);
+    return strlen(buffer);
+}
+
+void record_to_string(const Record * const record, char *buffer, const int expected_width) {
+    char padding_string[MAXIMUM_STRING_SIZE];
+    memset(padding_string, '.', MAXIMUM_STRING_SIZE - 1);
+    padding_string[MAXIMUM_STRING_SIZE - 1] = '\0';
+    const char format[] = "%s%*.*s%d";
+    int padding_length = expected_width - strlen(record->name) - count_digits(record->score);
+    sprintf(buffer, format, record->name, padding_length, padding_length, padding_string, record->score);
+}
+
+void highscores(void) {
+    if (COLS < 16) {
+        return;
+    }
+    const int line_width = COLS - 8;
+    Record records[16];
+    size_t actually_read_records = read_records(records, 16);
+    int y = 2;
+    char line[128];
+    size_t i;
+    clear();
+    for (i = 0; i < actually_read_records; i++) {
+        record_to_string(records + i, line, line_width);
+        print_centered(y + i, line);
+    }
+    refresh();
+    rest_for_nanoseconds(2UL * NANOSECONDS_IN_ONE_SECOND);
+}
+
 int main_menu(void) {
     Menu menu;
     char title[MAXIMUM_STRING_SIZE];
@@ -331,6 +392,8 @@ int main_menu(void) {
         } else if (command == COMMAND_ENTER || command == COMMAND_CENTER) {
             if (menu.selected_option == 0) {
                 game();
+            } else if (menu.selected_option == 1) {
+                highscores();
             } else if (menu.selected_option == 2) {
                 got_quit = 1;
             }
