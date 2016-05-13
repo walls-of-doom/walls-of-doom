@@ -54,6 +54,17 @@ $ cmake . -G"CodeBlocks - Unix Makefiles"
 
 # Implementation Notes
 
+Before using the I/O capabilities of WoD, initialize() must be called.
+Before quitting the game, finalize() must be called to free associated
+resources.
+
+Similarly, before using the logging capabilities, initialize_logger() should be
+called and finalize_logger() should be called after quitting. Note, however,
+that if the program makes use of the I/O capabilities, the calls to initialize()
+and finalize() will also properly initialize and finalize the logger, so
+handling logger initialization and finalization is only required if the I/O
+initialization and finalization are not performed.
+
 ## **insertion-sort.h**
 
 + Our generic insertion sort implementation

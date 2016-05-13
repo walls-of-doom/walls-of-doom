@@ -4,6 +4,34 @@
 #include "command.h"
 #include "physics.h"
 
+typedef enum ColorScheme {
+    // Color pair 0 is assumed to be white on black, but is actually whatever
+    // the terminal implements before color is initialized. It cannot be
+    // modified by the application, therefore we must start at 1.
+    TOP_BAR_COLOR = 1, // Set the first enum constant to one
+    PLATFORM_COLOR,    // Becomes two, and so on
+    BOTTOM_BAR_COLOR
+} ColorScheme;
+
+/**
+ * Initializes the required resources.
+ *
+ * Should only be called once, right after starting.
+ */
+void initialize(void);
+
+/**
+ * Finalizes the acquired resources.
+ *
+ * Should only be called once, right before exitting.
+ */
+void finalize(void);
+
+/**
+ * Draws a full game to the screen.
+ */
+int draw(const Player * const player, const Platform *platforms, const size_t platform_count, const BoundingBox * const box);
+
 /**
  * Prints the provided string on the screen starting at (x, y).
  */
