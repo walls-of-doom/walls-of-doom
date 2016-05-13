@@ -235,7 +235,8 @@ BoundingBox bounding_box_from_screen() {
 
 void register_highscore(const Player * const player) {
     char buffer[256];
-    sprintf(buffer, "Register a highscore of %d points", player->score);
+    const char *format = "Started registering a highscore of %d points";
+    sprintf(buffer, format, player->score);
     log_message(buffer);
     char *message = "Highscores coming soon!";
     const size_t message_size = strlen(message);
