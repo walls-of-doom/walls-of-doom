@@ -340,6 +340,7 @@ int main_menu(void) {
 
 int main(void) {
     init();
+    seed_random();
     int result = main_menu();
     finalize();
     return result;

@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <time.h>
 
 /**
  * This is the successor to xorshift128+. It is the fastest full-period
@@ -25,6 +26,15 @@
  */
 
 uint64_t s[2] = {0x7c87b3fced63be76, 0x4ec3c3191d40a751};
+
+uint64_t random_time_seed() {
+    // If tloc is a null pointer, no value is stored.
+    return (uint64_t) time(NULL);
+}
+
+void seed_random() {
+    s[0] = random_time_seed();
+}
 
 static inline uint64_t rotl(const uint64_t x, int k) {
     return (x << k) | (x >> (64 - k));

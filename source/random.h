@@ -4,6 +4,11 @@
 #include <stdint.h>
 
 /**
+ * Seeds the PRNG with the current time.
+ */
+void seed_random();
+
+/**
  * Returns the next power of two bigger than the provided number.
  */
 uint64_t find_next_power_of_two(uint64_t number);
