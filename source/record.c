@@ -1,13 +1,11 @@
 #include "record.h"
 
-#include "sort.h"
+#include "data.h"
 #include "logger.h"
+#include "sort.h"
 
 #include <stdio.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
 
 #define RECORD_ARRAY_SIZE 8
 #define RECORD_TABLE_FILENAME "records.bin"
@@ -36,11 +34,6 @@ Record make_record(const char * name, const int score) {
     return record;
 }
 
-int file_exists(const char* filename) {
-    struct stat buffer;
-    return (stat(filename, &buffer) == 0);
-}
-
 int compare_records(const Record * const a, const Record * const b) {
     if (a->score < b->score) {
         return -1;
@@ -57,9 +50,7 @@ int compare_void_record_pointers(const void *a, const void *b) {
 
 void read_table(RecordTable * const table) {
     if (file_exists(RECORD_TABLE_FILENAME)) {
-        FILE *input = fopen(RECORD_TABLE_FILENAME, "rb");
-        fread(table, sizeof(RecordTable), 1, input);
-        fclose(input);
+        read_bytes(RECORD_TABLE_FILENAME, table, sizeof(RecordTable), 1);
     } else {
         RecordTable empty_table;
         // Properly set the record_count field.
@@ -69,9 +60,7 @@ void read_table(RecordTable * const table) {
 }
 
 void write_table(const RecordTable * const table) {
-    FILE *output = fopen(RECORD_TABLE_FILENAME, "wb");
-    fwrite(table, sizeof(RecordTable), 1, output);
-    fclose(output);
+    write_bytes(RECORD_TABLE_FILENAME, table, sizeof(RecordTable), 1);
 }
 
 /**

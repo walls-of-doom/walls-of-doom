@@ -6,7 +6,7 @@ add_library (walls-of-doom-source
     array.h
     command.h
     constants.h
-    data.h
+    data.h data.c
     io.h io.c
     logger.h logger.c
     math.h math.c
