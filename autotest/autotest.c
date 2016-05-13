@@ -17,12 +17,6 @@ int compare_unsigned_char(const void *pointer_to_uchar_a, const void *pointer_to
     return a < b ? -1 : a == b ? 0 : 1;
 }
 
-char *to_string_unsigned_char(const void *pointer_to_uchar) {
-    char *buffer = malloc(16);
-    sprintf(buffer, "%d", *(unsigned char *)(pointer_to_uchar));
-    return buffer;
-}
-
 void test_normalize(void) {
     TEST_ASSERT_EQUAL_INT(-1, normalize(INT_MIN));
     TEST_ASSERT_EQUAL_INT(-1, normalize(-1));
