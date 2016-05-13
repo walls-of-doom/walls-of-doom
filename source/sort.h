@@ -21,4 +21,9 @@
  */
 void insertion_sort(void *start, size_t count, size_t width, int (*compare)(const void*, const void*));
 
+/**
+ * Reverses the ordering of a generic contiguous chunk of memory.
+ */
+void reverse(void *start, size_t count, size_t width);
+
 #endif

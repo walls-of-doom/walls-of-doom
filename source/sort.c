@@ -18,8 +18,8 @@
 void insertion_sort(void *start, size_t count, size_t width, int (*compare)(const void*, const void*)) {
     unsigned char helper[INSERTION_SORT_MAXIMUM_SIZE];
     unsigned char *pointer = (unsigned char *)start;
-    size_t i = 0;
-    for (i = 0; i < count - 1; i++) {
+    size_t i;
+    for (i = 0; i + 1 < count; i++) {
         size_t j = i + 1; // j is always positive here
         void *pointer_to_element = (void *)(pointer + j * width);
         void *pointer_to_predecessor = (void *)(pointer + (j - 1) * width);
@@ -35,5 +35,25 @@ void insertion_sort(void *start, size_t count, size_t width, int (*compare)(cons
             // Update the index
             j--;
         }
+    }
+}
+
+/**
+ * Reverses the ordering of a generic contiguous chunk of memory.
+ *
+ * This function only works for elements up to 1024 bytes (1 KiB) in size.
+ */
+void reverse(void *start, size_t count, size_t width) {
+    unsigned char helper[INSERTION_SORT_MAXIMUM_SIZE];
+    unsigned char *pointer = (unsigned char *)start;
+    size_t i;
+    for (i = 0; i < count / 2; i++) {
+        size_t j = count - i - 1;
+        // Swap i and j
+        void *pointer_to_i = (void *)(pointer + i * width);
+        void *pointer_to_j = (void *)(pointer + j * width);
+        memcpy(helper, pointer_to_i, width);
+        memcpy(pointer_to_i, pointer_to_j, width);
+        memcpy(pointer_to_j, helper, width);
     }
 }

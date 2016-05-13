@@ -106,11 +106,46 @@ void test_compare_unsigned_char(void) {
     TEST_ASSERT_EQUAL_INT8(1, compare_unsigned_char((void *)(&c), (void *)(&b)));
 }
 
-void test_insertion_sort_with_single_bytes(void) {
+void test_insertion_sort_with_empty_range(void) {
+    unsigned char source[] = {};
+    insertion_sort(source, 0, sizeof(unsigned char), compare_unsigned_char);
+}
+
+void test_insertion_sort_with_an_odd_number_of_single_bytes(void) {
+    unsigned char source[] = {2, 3, 1};
+    const unsigned char sorted[] = {1, 2, 3};
+    const size_t array_size = sizeof(source) / sizeof(unsigned char);
+    insertion_sort(source, array_size, sizeof(unsigned char), compare_unsigned_char);
+    TEST_ASSERT_EQUAL_INT8_ARRAY_MESSAGE(sorted, source, array_size, "insertion sort failed to sort the input");
+}
+
+void test_insertion_sort_with_an_even_number_of_single_bytes(void) {
     unsigned char source[] = {4, 2, 3, 1};
     const unsigned char sorted[] = {1, 2, 3, 4};
-    insertion_sort(source, sizeof(source) / sizeof(unsigned char), sizeof(unsigned char), compare_unsigned_char);
-    TEST_ASSERT_EQUAL_INT8_ARRAY_MESSAGE(sorted, source, sizeof(source) / sizeof(unsigned char), "insertion sort failed to sort the input");
+    const size_t array_size = sizeof(source) / sizeof(unsigned char);
+    insertion_sort(source, array_size, sizeof(unsigned char), compare_unsigned_char);
+    TEST_ASSERT_EQUAL_INT8_ARRAY_MESSAGE(sorted, source, array_size, "insertion sort failed to sort the input");
+}
+
+void test_reverse_with_empty_range(void) {
+    unsigned char source[] = {};
+    reverse(source, 0, sizeof(unsigned char));
+}
+
+void test_reverse_with_an_odd_number_of_single_bytes(void) {
+    unsigned char source[] = {2, 3, 1};
+    const unsigned char sorted[] = {1, 3, 2};
+    const size_t array_size = sizeof(source) / sizeof(unsigned char);
+    reverse(source, array_size, sizeof(unsigned char));
+    TEST_ASSERT_EQUAL_INT8_ARRAY_MESSAGE(sorted, source, array_size, "reverse failed to reverse the input");
+}
+
+void test_reverse_with_an_even_number_of_single_bytes(void) {
+    unsigned char source[] = {2, 3, 1, 4};
+    const unsigned char sorted[] = {4, 1, 3, 2};
+    const size_t array_size = sizeof(source) / sizeof(unsigned char);
+    reverse(source, array_size, sizeof(unsigned char));
+    TEST_ASSERT_EQUAL_INT8_ARRAY_MESSAGE(sorted, source, array_size, "reverse failed to reverse the input");
 }
 
 void test_find_next_power_of_two_works_for_all_integers(void) {
@@ -327,7 +362,12 @@ int main(void) {
     RUN_TEST(test_rest_for_nanoseconds_with_one_second);
     RUN_TEST(test_read_integers);
     RUN_TEST(test_compare_unsigned_char);
-    RUN_TEST(test_insertion_sort_with_single_bytes);
+    RUN_TEST(test_insertion_sort_with_empty_range);
+    RUN_TEST(test_insertion_sort_with_an_odd_number_of_single_bytes);
+    RUN_TEST(test_insertion_sort_with_an_even_number_of_single_bytes);
+    RUN_TEST(test_reverse_with_empty_range);
+    RUN_TEST(test_reverse_with_an_odd_number_of_single_bytes);
+    RUN_TEST(test_reverse_with_an_even_number_of_single_bytes);
     RUN_TEST(test_find_next_power_of_two_works_for_all_integers);
     RUN_TEST(test_random_integer_respects_the_provided_range);
     log_message("Finished running tests");
