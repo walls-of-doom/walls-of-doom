@@ -52,6 +52,15 @@ $ cmake . -G"CodeBlocks - Unix Makefiles"
 + Select `walls-of-doom` as the target
 + Press "Build and run"
 
+#### Generating the images
+
+```bash
+$ cd blender
+$ bash render.sh
+```
+
+And they should be written in to the output subdirectory.
+
 # Implementation Notes
 
 Before using the I/O capabilities of WoD, initialize() must be called.

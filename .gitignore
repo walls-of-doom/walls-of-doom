@@ -58,3 +58,6 @@ build/
 
 # Code::Blocks
 *.layout
+
+# Blender
+blender/output/
