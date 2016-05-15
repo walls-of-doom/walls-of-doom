@@ -50,7 +50,11 @@ int compare_void_record_pointers(const void *a, const void *b) {
 
 void read_table(RecordTable * const table) {
     if (file_exists(RECORD_TABLE_FILENAME)) {
-        read_bytes(RECORD_TABLE_FILENAME, table, sizeof(RecordTable), 1);
+        if (read_bytes(RECORD_TABLE_FILENAME, table, sizeof(RecordTable), 1)) {
+            char message[512];
+            sprintf(message, "Failed to read a RecordTable from %s", RECORD_TABLE_FILENAME);
+            log_message(message);
+        }
     } else {
         RecordTable empty_table;
         // Properly set the record_count field.
