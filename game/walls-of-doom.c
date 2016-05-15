@@ -202,14 +202,18 @@ void highscores(void) {
     rest_for_nanoseconds(2UL * NANOSECONDS_IN_ONE_SECOND);
 }
 
+void draw_about_page(void) {
+
+}
+
 int main_menu(void) {
     Menu menu;
     char title[MAXIMUM_STRING_SIZE];
     sprintf(title, "%s version %s", "Walls of Doom", WALLS_OF_DOOM_VERSION);
     menu.title = title;
-    char *options[] = {"Play", "Highscores", "Quit"};
+    char *options[] = {"Play", "Highscores", "About", "Quit"};
     menu.options = options;
-    menu.option_count = 3;
+    menu.option_count = 4;
     menu.selected_option = 0;
 
     int got_quit = 0;
@@ -230,6 +234,8 @@ int main_menu(void) {
             } else if (menu.selected_option == 1) {
                 highscores();
             } else if (menu.selected_option == 2) {
+                draw_about_page();
+            } else if (menu.selected_option == 3) {
                 got_quit = 1;
             }
         }
