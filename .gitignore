@@ -61,3 +61,4 @@ build/
 
 # Blender
 blender/output/
+blender/*.blend[0-9]
