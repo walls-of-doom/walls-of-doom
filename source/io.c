@@ -8,7 +8,6 @@
 #include <curses.h>
 #include <string.h>
 
-
 /**
  * Initializes the color schemes used to render the game.
  */
@@ -17,6 +16,14 @@ int initialize_color_schemes(void) {
     init_pair(PLATFORM_COLOR, COLOR_WHITE, COLOR_WHITE);
     init_pair(BOTTOM_BAR_COLOR, COLOR_BLACK, COLOR_YELLOW);
     return 0;
+}
+
+void log_terminal_color_support(void) {
+    char message[256];
+    sprintf(message, "Current terminal supports %d colors", COLORS);
+    log_message(message);
+    sprintf(message, "Current terminal supports %d color pairs", COLOR_PAIRS);
+    log_message(message);
 }
 
 /**
@@ -36,6 +43,7 @@ void initialize(void) {
     curs_set(FALSE);
     // Initialize the coloring functionality.
     start_color();
+    log_terminal_color_support();
     initialize_color_schemes();
 }
 
