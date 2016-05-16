@@ -191,7 +191,7 @@ void highscores(void) {
     Record records[16];
     size_t actually_read_records = read_records(records, 16);
     int y = 2;
-    char line[128];
+    char line[COLS];
     size_t i;
     clear();
     for (i = 0; i < actually_read_records; i++) {
