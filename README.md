@@ -11,7 +11,7 @@ See [the Bitbucket issue tracker](https://bitbucket.org/mafagafogigante/walls-of
 
 # Building and Running
 
-### Terminal
+## Terminal
 
 ```bash
 $ mkdir build
@@ -20,39 +20,39 @@ $ cmake ..
 $ make
 ```
 
-#### Running the tests
+### Running the tests
 
 ```bash
 $ ./autotest/autotest
 ```
 
-#### Running the game
+### Running the game
 
 ```bash
 $ ./game/walls-of-doom
 ```
 
-### Code::Blocks
+## Code::Blocks
 
 ```bash
 $ cmake . -G"CodeBlocks - Unix Makefiles"
 ```
 
-#### Running the tests
+### Running the tests
 
 + Open Code::Blocks
 + Open the Code::Blocks project file on the root directory
 + Select `autotest` as the target
 + Press "Build and run"
 
-#### Running the game
+### Running the game
 
 + Open Code::Blocks
 + Open the Code::Blocks project file on the root directory
 + Select `walls-of-doom` as the target
 + Press "Build and run"
 
-#### Generating the images
+# Generating the Images
 
 ```bash
 $ cd blender
@@ -90,8 +90,11 @@ The convenience function that returns an integer in the specified range uses
 multiple random numbers modulo the next power of two to prevent the modulo bias
 that comes with more naive approaches.
 
-License
--------
+# Links
+
+[Imgur album of the project](http://imgur.com/a/kiOY2).
+
+# License
 
 It is licensed under the BSD 3-Clause license. See LICENSE.txt for more
 information.
