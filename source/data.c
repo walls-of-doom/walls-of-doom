@@ -38,14 +38,10 @@ void log_access(Operation operation, const size_t byte_count, const char *filena
  */
 int write_bytes(const char *filename, const void *source, const size_t size, const size_t count) {
     log_access(WRITE, size * count, filename);
-    if (file_exists(filename)) {
-        FILE *file = fopen(filename, "wb");
-        fwrite(source, size, count, file);
-        fclose(file);
-        return 0;
-    } else {
-        return 1;
-    }
+    FILE *file = fopen(filename, "wb");
+    fwrite(source, size, count, file);
+    fclose(file);
+    return 0;
 }
 
 /**
