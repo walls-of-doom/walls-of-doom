@@ -3,6 +3,7 @@
 #include <curses.h>
 
 #include "constants.h"
+#include "data.h"
 #include "io.h"
 #include "logger.h"
 #include "physics.h"
@@ -10,6 +11,10 @@
 #include "record.h"
 #include "rest.h"
 #include "version.h"
+
+#define ABOUT_PAGE_BUFFER_SIZE 1024
+#define ABOUT_PAGE_PATH "assets/about.txt"
+#define MAXIMUM_LINE_WIDTH 80
 
 void place_player_on_screen(Player * const player) {
     // This is correct. Even if we don't have the first and the last line, the
@@ -202,8 +207,85 @@ void highscores(void) {
     rest_for_nanoseconds(2UL * NANOSECONDS_IN_ONE_SECOND);
 }
 
-void draw_about_page(void) {
+/**
+ * Replaces all newlines, carriage returns, and tabs by the ASCII space.
+ */
+void normalize_whitespaces(char *string) {
+    char c;
+    size_t i;
+    for (i = 0; string[i] != '\0'; i++) {
+        c = string[i];
+        if (c == '\n' || c == '\t') {
+            string[i] = ' ';
+        }
+    }
+}
 
+void wrap_at_right_margin(char *string, const size_t columns) {
+    size_t last_line_start = 0;
+    size_t string_length = strlen(string);
+    while (string_length - last_line_start > columns) {
+        size_t next_line_start = last_line_start + columns;
+        while (string[next_line_start] != ' ') {
+            next_line_start--;
+            if (next_line_start == last_line_start) {
+               // There are no spaces in this line, so we can't do anything.
+               // Abort, simply.
+               break;
+            }
+            next_line_start--;
+        }
+        string[next_line_start] = '\n';
+        last_line_start = next_line_start;
+    }
+}
+
+int count_lines(char *buffer) {
+    size_t counter = 0;
+    size_t i = 0;
+    while (buffer[i] != '\0') {
+        if (buffer[i] == '\n') {
+            counter++;
+        }
+        i++;
+    }
+    return counter;
+}
+
+char *copy_first_line(char *source, char *destination) {
+    while (*source != '\0' && *source != '\n') {
+        *destination++ = *source++;
+    }
+    *destination = '\0';
+    if (*source == '\0') {
+        return source;
+    } else {
+        return source + 1;
+    }
+}
+
+void info(void) {
+    char buffer[ABOUT_PAGE_BUFFER_SIZE];
+    read_characters(ABOUT_PAGE_PATH, buffer, ABOUT_PAGE_BUFFER_SIZE);
+    normalize_whitespaces(buffer);
+    int width = MAXIMUM_LINE_WIDTH;
+    if (MAXIMUM_LINE_WIDTH > COLS - 2) {
+        width = COLS - 2;
+    }
+    wrap_at_right_margin(buffer, width);
+    int line_count = count_lines(buffer);
+    clear();
+    // Print each line.
+    char line[MAXIMUM_LINE_WIDTH];
+    char *cursor = buffer;
+    size_t lines_copied = 0;
+    while (*cursor != '\0') {
+        cursor = copy_first_line(cursor, line);
+        print((COLS - width) / 2, (LINES - line_count) / 2 + lines_copied, line);
+        lines_copied++;
+    }
+    refresh();
+    rest_for_nanoseconds(2UL * NANOSECONDS_IN_ONE_SECOND);
 }
 
 int main_menu(void) {
@@ -211,7 +293,7 @@ int main_menu(void) {
     char title[MAXIMUM_STRING_SIZE];
     sprintf(title, "%s version %s", "Walls of Doom", WALLS_OF_DOOM_VERSION);
     menu.title = title;
-    char *options[] = {"Play", "Highscores", "About", "Quit"};
+    char *options[] = {"Play", "Highscores", "Info", "Quit"};
     menu.options = options;
     menu.option_count = 4;
     menu.selected_option = 0;
@@ -234,7 +316,7 @@ int main_menu(void) {
             } else if (menu.selected_option == 1) {
                 highscores();
             } else if (menu.selected_option == 2) {
-                draw_about_page();
+                info();
             } else if (menu.selected_option == 3) {
                 got_quit = 1;
             }
