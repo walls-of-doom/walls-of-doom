@@ -58,13 +58,6 @@ void write_menu(const Menu * const menu) {
     }
 }
 
-typedef struct Game {
-    Player *player;
-    unsigned int score;
-    Platform **platforms;
-    size_t platform_count;
-} Game;
-
 BoundingBox bounding_box_from_screen() {
     BoundingBox box;
     box.min_x = 1;
