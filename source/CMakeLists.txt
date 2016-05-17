@@ -3,6 +3,7 @@ cmake_minimum_required (VERSION 2.8.7)
 configure_file (version.h.in version.h)
 
 add_library (walls-of-doom-source
+    about.h about.c
     command.h
     constants.h
     data.h data.c

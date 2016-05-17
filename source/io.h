@@ -43,6 +43,11 @@ void print(const int x, const int y, const char *string);
 void print_centered(const int y, const char *string);
 
 /**
+ * Prints the provided string after formatting it to increase readability.
+ */
+void print_long_text(char *string);
+
+/**
  * Prints the provided Platform, respecting the BoundingBox.
  */
 void print_platform(const Platform * const platform, const BoundingBox * const box);

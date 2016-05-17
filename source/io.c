@@ -8,6 +8,8 @@
 #include <curses.h>
 #include <string.h>
 
+#define MAXIMUM_LINE_WIDTH 80
+
 /**
  * Initializes the color schemes used to render the game.
  */
@@ -74,6 +76,96 @@ void print(const int x, const int y, const char *string) {
 void print_centered(const int y, const char *string) {
     const int x = (COLS - strlen(string)) / 2;
     print(x, y, string);
+}
+
+/**
+ * Replaces all newlines, carriage returns, and tabs by the ASCII space.
+ */
+void normalize_whitespaces(char *string) {
+    char c;
+    size_t i;
+    for (i = 0; string[i] != '\0'; i++) {
+        c = string[i];
+        if (c == '\n' || c == '\t') {
+            string[i] = ' ';
+        }
+    }
+}
+
+void wrap_at_right_margin(char *string, const size_t columns) {
+    size_t last_line_start = 0;
+    size_t string_length = strlen(string);
+    while (string_length - last_line_start > columns) {
+        size_t next_line_start = last_line_start + columns;
+        while (string[next_line_start] != ' ') {
+            next_line_start--;
+            if (next_line_start == last_line_start) {
+               // There are no spaces in this line, so we can't do anything.
+               // Abort, simply.
+               break;
+            }
+            next_line_start--;
+        }
+        string[next_line_start] = '\n';
+        last_line_start = next_line_start;
+    }
+}
+
+int count_lines(char *buffer) {
+    size_t counter = 0;
+    size_t i = 0;
+    while (buffer[i] != '\0') {
+        if (buffer[i] == '\n') {
+            counter++;
+        }
+        i++;
+    }
+    return counter;
+}
+
+char *copy_first_line(char *source, char *destination) {
+    while (*source != '\0' && *source != '\n') {
+        *destination++ = *source++;
+    }
+    *destination = '\0';
+    if (*source == '\0') {
+        return source;
+    } else {
+        return source + 1;
+    }
+}
+
+void pad_line_right(char *line, const size_t width) {
+    size_t i;
+    for (i = strlen(line); i < width; i++) {
+        line[i] = ' ';
+    }
+    line[width] = '\0';
+}
+
+/**
+ * Prints the provided string after formatting it to increase readability.
+ */
+void print_long_text(char *string) {
+    normalize_whitespaces(string);
+    int width = MAXIMUM_LINE_WIDTH;
+    if (MAXIMUM_LINE_WIDTH > COLS - 2) {
+        width = COLS - 2;
+    }
+    wrap_at_right_margin(string, width);
+    int line_count = count_lines(string);
+    clear();
+    // Print each line.
+    char line[MAXIMUM_LINE_WIDTH];
+    char *cursor = string;
+    size_t lines_copied = 0;
+    while (*cursor != '\0') {
+        cursor = copy_first_line(cursor, line);
+        pad_line_right(line, width);
+        print_centered((LINES - line_count) / 2 + lines_copied, line);
+        lines_copied++;
+    }
+    refresh();
 }
 
 /**
