@@ -108,6 +108,45 @@ int check_for_screen_size_change(const BoundingBox * const box) {
     return !bounding_box_equals(box, &current_box);
 }
 
+int read_platforms(Platform *platforms) {
+    const size_t INTEGER_ARRAY_SIZE = 1 + 2 * MAXIMUM_PLATFORM_COUNT;
+    int input_integers[INTEGER_ARRAY_SIZE];
+    log_message("Started reading platform data");
+    const size_t actually_read = read_integers("assets/platforms.txt", input_integers, INTEGER_ARRAY_SIZE);
+
+    char log_message_buffer[256];
+    sprintf(log_message_buffer, "Read %lu integers", actually_read);
+    log_message(log_message_buffer);
+
+    const size_t platform_count = input_integers[0] < MAXIMUM_PLATFORM_COUNT ? input_integers[0] : MAXIMUM_PLATFORM_COUNT;
+    sprintf(log_message_buffer, "Platform count is %lu", platform_count);
+    log_message(log_message_buffer);
+
+    size_t i;
+    for (i = 0; i < platform_count; i++) {
+        Platform *platform = platforms + i;
+
+        platform->width = input_integers[1 + 2 * i];
+
+        platform->x = random_integer(1, COLS - 1);
+        platform->y = random_integer(4, LINES - 4);
+
+        platform->speed_x = 0;
+        platform->speed_y = 0;
+        const int speed = input_integers[1 + 2 * i + 1];
+        const int movement_type = random_integer(0, 4);
+        if (movement_type < 2) { // 40%
+            platform->speed_x = speed;
+        } else if (movement_type < 4) { // 40%
+            platform->speed_x = -speed;
+        } else { // 20 %
+            platform->speed_y = -speed;
+        }
+    }
+
+    return platform_count;
+}
+
 int game(void) {
     BoundingBox box = bounding_box_from_screen();
 
@@ -116,22 +155,7 @@ int game(void) {
     player.y = LINES / 2;
 
     Platform platforms[MAXIMUM_PLATFORM_COUNT];
-    size_t i;
-    for (i = 0; i < MAXIMUM_PLATFORM_COUNT; i++) {
-        platforms[i].x = random_integer(0, COLS);
-        platforms[i].y = random_integer(4, LINES - 4);
-        platforms[i].width = random_integer(4, 16);
-        platforms[i].speed_x = 0;
-        platforms[i].speed_y = 0;
-        int movement_type = random_integer(0, 4);
-        if (movement_type < 2) {
-            platforms[i].speed_x = random_integer(1, 3);
-        } else if (movement_type < 4) {
-            platforms[i].speed_x = random_integer(-3, -1);
-        } else {
-            platforms[i].speed_y = random_integer(-3, -1);
-        }
-    }
+    const size_t platform_count = read_platforms(platforms);
 
     unsigned long frame = 0;
     unsigned long next_frame_score = GAME_FPS;
@@ -144,15 +168,15 @@ int game(void) {
             next_frame_score += GAME_FPS;
         }
         // 2. Update the platforms
-        update_platforms(&player, platforms, MAXIMUM_PLATFORM_COUNT, &box);
+        update_platforms(&player, platforms, platform_count, &box);
         // 3. Draw everything
-        draw(&player, platforms, MAXIMUM_PLATFORM_COUNT, &box);
+        draw(&player, platforms, platform_count, &box);
         // 4. Sleep
         rest_for_second_fraction(GAME_FPS);
         // 5. Read whatever command we got (if any)
         command = read_next_command();
         // 6. Update the player using the command (may be a no-op)
-        update_player(&player, platforms, MAXIMUM_PLATFORM_COUNT, &box, command);
+        update_player(&player, platforms, platform_count, &box, command);
         // 7. Increment the frame counter
         frame++;
         if (player.lives == 0) { // <= would be safer but could hide some bugs

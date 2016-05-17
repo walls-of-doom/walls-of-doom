@@ -32,10 +32,8 @@ int read_characters(const char * const filename, char *destination, const size_t
 /**
  * Reads integers from the indicated file into the provided array.
  *
- * The array should be big enough for the provided file.
- *
  * Returns the number of integers read.
  */
-size_t read_integers(const char * const filename, int *integer_array);
+size_t read_integers(const char * const filename, int *integer_array, const size_t integer_array_size);
 
 #endif

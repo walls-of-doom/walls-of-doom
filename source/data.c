@@ -91,15 +91,13 @@ int read_characters(const char * const filename, char *destination, const size_t
 /**
  * Reads integers from the indicated file into the provided array.
  *
- * The array should be big enough for the provided file.
- *
  * Returns the number of integers read.
  */
-size_t read_integers(const char * const filename, int *integer_array) {
+size_t read_integers(const char * const filename, int *integer_array, const size_t integer_array_size) {
     FILE *file;
     file = fopen(filename, "r");
     size_t next_index = 0;
-    while (fscanf(file, "%d", &integer_array[next_index]) != EOF) {
+    while (next_index < integer_array_size && fscanf(file, "%d", &integer_array[next_index]) != EOF) {
         next_index++;
     }
     fclose(file);

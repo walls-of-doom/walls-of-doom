@@ -75,7 +75,7 @@ void test_read_integers(void) {
     fflush(file);
 
     int actual_values[expected_count];
-    const int actual_count = read_integers(filename, actual_values);
+    const int actual_count = read_integers(filename, actual_values, expected_count);
 
     TEST_ASSERT_EQUAL(expected_count, actual_count);
     TEST_ASSERT_EQUAL(expected_value, actual_values[0]);

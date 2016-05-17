@@ -117,7 +117,7 @@ void update_platform(Player * const player, Platform * const platform, const Bou
     }
 }
 
-void update_platforms(Player * const player, Platform *platforms, size_t platform_count, const BoundingBox * const box) {
+void update_platforms(Player * const player, Platform *platforms, const size_t platform_count, const BoundingBox * const box) {
     size_t i;
     for (i = 0; i < platform_count; i++) {
         update_platform(player, &platforms[i], box);
