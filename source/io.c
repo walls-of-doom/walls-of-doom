@@ -14,9 +14,17 @@
  * Initializes the color schemes used to render the game.
  */
 int initialize_color_schemes(void) {
-    init_pair(TOP_BAR_COLOR, COLOR_CYAN, COLOR_MAGENTA);
-    init_pair(PLATFORM_COLOR, COLOR_WHITE, COLOR_WHITE);
-    init_pair(BOTTOM_BAR_COLOR, COLOR_BLACK, COLOR_YELLOW);
+    init_pair(COLOR_TOP_BAR, COLOR_CYAN, COLOR_MAGENTA);
+    init_pair(COLOR_BOTTOM_BAR, COLOR_BLACK, COLOR_YELLOW);
+    init_pair(COLOR_PLATFORMS, COLOR_WHITE, COLOR_WHITE);
+    init_pair(COLOR_PLAYER, COLOR_WHITE, COLOR_BLACK);
+    init_pair(COLOR_INVINCIBILITY, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(COLOR_LEVITATION, COLOR_WHITE, COLOR_BLACK); // Requested was grey
+    init_pair(COLOR_LOW_GRAVITY, COLOR_BLUE, COLOR_BLACK); // Requested was purple
+    init_pair(COLOR_SUPER_JUMP, COLOR_CYAN, COLOR_BLACK);
+    init_pair(COLOR_TIME_STOP, COLOR_MAGENTA, COLOR_BLACK);
+    init_pair(COLOR_EXTRA_LIFE, COLOR_GREEN, COLOR_BLACK);
+    init_pair(COLOR_EXTRA_POINTS, COLOR_RED, COLOR_BLACK); // Requested was brown
     return 0;
 }
 
@@ -224,11 +232,11 @@ int draw_top_bar(const Player * const player) {
         memcpy(final_buffer + x, strings[i], strlen(strings[i]));
     }
 
-    attron(COLOR_PAIR(TOP_BAR_COLOR));
+    attron(COLOR_PAIR(COLOR_TOP_BAR));
     attron(A_BOLD);
     print(0, 0, final_buffer);
     attroff(A_BOLD);
-    attroff(COLOR_PAIR(TOP_BAR_COLOR));
+    attroff(COLOR_PAIR(COLOR_TOP_BAR));
 
     return 0;
 }
@@ -241,9 +249,9 @@ int draw_top_bar(const Player * const player) {
 int draw_bottom_bar(void) {
     char final_buffer[COLS + 1];
     memset(final_buffer, ' ', COLS);
-    attron(COLOR_PAIR(BOTTOM_BAR_COLOR));
+    attron(COLOR_PAIR(COLOR_BOTTOM_BAR));
     mvprintw(LINES - 1, 0, final_buffer);
-    attroff(COLOR_PAIR(BOTTOM_BAR_COLOR));
+    attroff(COLOR_PAIR(COLOR_BOTTOM_BAR));
     return 0;
 }
 
@@ -266,16 +274,18 @@ int draw_borders(void) {
 
 int draw_platforms(const Platform * platforms, const size_t platform_count, const BoundingBox * const box) {
     size_t i;
-    attron(COLOR_PAIR(PLATFORM_COLOR));
+    attron(COLOR_PAIR(COLOR_PLATFORMS));
     for (i = 0; i < platform_count; i++) {
         print_platform(&platforms[i], box);
     }
-    attroff(COLOR_PAIR(PLATFORM_COLOR));
+    attroff(COLOR_PAIR(COLOR_PLATFORMS));
     return 0;
 }
 
 int draw_player(const Player * const player) {
+    attron(COLOR_PAIR(COLOR_PLAYER));
     print(player->x, player->y, PLAYER_SYMBOL);
+    attroff(COLOR_PAIR(COLOR_PLAYER));
     return 0;
 }
 

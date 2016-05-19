@@ -8,9 +8,17 @@ typedef enum ColorScheme {
     // Color pair 0 is assumed to be white on black, but is actually whatever
     // the terminal implements before color is initialized. It cannot be
     // modified by the application, therefore we must start at 1.
-    TOP_BAR_COLOR = 1, // Set the first enum constant to one
-    PLATFORM_COLOR,    // Becomes two, and so on
-    BOTTOM_BAR_COLOR
+    COLOR_TOP_BAR = 1, // Set the first enum constant to one
+    COLOR_BOTTOM_BAR,  // Becomes two, and so on
+    COLOR_PLATFORMS,
+    COLOR_PLAYER,
+    COLOR_INVINCIBILITY,
+    COLOR_LEVITATION,
+    COLOR_LOW_GRAVITY,
+    COLOR_SUPER_JUMP,
+    COLOR_TIME_STOP,
+    COLOR_EXTRA_LIFE,
+    COLOR_EXTRA_POINTS,
 } ColorScheme;
 
 /**
