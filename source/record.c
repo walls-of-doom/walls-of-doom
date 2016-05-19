@@ -26,9 +26,9 @@ Record make_record(const char * name, const int score) {
     Record record;
     
     // Safely copy the provided name into the array.
-    strncpy(record.name, name, RECORD_NAME_MAXIMUM_SIZE - 1);
+    strncpy(record.name, name, PLAYER_NAME_MAXIMUM_SIZE - 1);
     // We must manually assure that the last char is a null character.
-    record.name[RECORD_NAME_MAXIMUM_SIZE - 1] = '\0';
+    record.name[PLAYER_NAME_MAXIMUM_SIZE - 1] = '\0';
 
     record.score = score;
     

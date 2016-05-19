@@ -36,6 +36,15 @@ void initialize(void);
 void finalize(void);
 
 /**
+ * Enables echo and reads a string from the user.
+ *
+ * Returns 0 in case of success.
+ */
+int read_string(char *destination, const size_t maximum_size);
+
+void read_player_name(char *destination, const size_t maximum_size);
+
+/**
  * Draws a full game to the screen.
  */
 int draw(const Player * const player, const Platform *platforms, const size_t platform_count, const BoundingBox * const box);

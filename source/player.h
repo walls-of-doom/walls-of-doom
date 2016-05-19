@@ -1,6 +1,8 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#define PLAYER_NAME_MAXIMUM_SIZE 64
+
 typedef struct Player {
     char *name;
     // Could let the color of the player lay here, but this is only

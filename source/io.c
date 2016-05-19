@@ -5,8 +5,10 @@
 #include "physics.h"
 #include "rest.h"
 
-#include <curses.h>
+#include <stdio.h>
 #include <string.h>
+
+#include <curses.h>
 
 #define MAXIMUM_LINE_WIDTH 80
 
@@ -57,6 +59,17 @@ void initialize(void) {
     initialize_color_schemes();
 }
 
+void enable_string_input() {
+    fflush(stdin);
+    echo();
+    nodelay(stdscr, FALSE);
+}
+
+void disable_string_input() {
+    noecho();
+    nodelay(stdscr, TRUE);
+}
+
 /**
  * Finalizes the acquired resources.
  *
@@ -65,6 +78,37 @@ void initialize(void) {
 void finalize(void) {
     finalize_logger();
     endwin();
+}
+
+/**
+ * Enables echo and reads a string from the user.
+ *
+ * Returns 0 in case of success.
+ */
+int read_string(char *destination, const size_t maximum_size) {
+    enable_string_input();
+    const int result = getnstr(destination, maximum_size);
+    disable_string_input();
+    if (result == ERR) { // Got curses error code.
+        log_message("Got an error when reading string");
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+void read_player_name(char *destination, const size_t maximum_size) {
+    clear();
+    const char message[] = "Name your character: ";
+    const int message_size = strlen(message);
+    const int maximum_width = message_size + maximum_size;
+    if (maximum_width <= COLS) {
+        print((COLS - maximum_width) / 2, LINES / 2, message);
+    } else {
+        print(0, LINES / 2, message);
+    }
+    refresh();
+    read_string(destination, maximum_size);
 }
 
 /**

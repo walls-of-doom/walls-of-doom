@@ -1,7 +1,7 @@
 #ifndef RECORD_H
 #define RECORD_H
 
-#define RECORD_NAME_MAXIMUM_SIZE 64
+#include "player.h"
 
 #include <stdlib.h>
 
@@ -9,7 +9,7 @@
  * A Record is a structure that stores the outcome of a game.
  */
 typedef struct Record {
-    char name[RECORD_NAME_MAXIMUM_SIZE];
+    char name[PLAYER_NAME_MAXIMUM_SIZE];
     int score;
 } Record;
 

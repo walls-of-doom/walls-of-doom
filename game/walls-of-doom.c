@@ -148,9 +148,11 @@ int read_platforms(Platform *platforms) {
 }
 
 int game(void) {
+    char name[PLAYER_NAME_MAXIMUM_SIZE];
+    read_player_name(name, PLAYER_NAME_MAXIMUM_SIZE);
     BoundingBox box = bounding_box_from_screen();
 
-    Player player = make_player("Player");
+    Player player = make_player(name);
     player.x = COLS / 2;
     player.y = LINES / 2;
 
