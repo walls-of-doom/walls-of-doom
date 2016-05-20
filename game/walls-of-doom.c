@@ -115,11 +115,11 @@ int read_platforms(Platform *platforms) {
     const size_t actually_read = read_integers("assets/platforms.txt", input_integers, INTEGER_ARRAY_SIZE);
 
     char log_message_buffer[256];
-    sprintf(log_message_buffer, "Read %lu integers", actually_read);
+    sprintf(log_message_buffer, "Read %lu integers", (unsigned long) actually_read);
     log_message(log_message_buffer);
 
     const size_t platform_count = input_integers[0] < MAXIMUM_PLATFORM_COUNT ? input_integers[0] : MAXIMUM_PLATFORM_COUNT;
-    sprintf(log_message_buffer, "Platform count is %lu", platform_count);
+    sprintf(log_message_buffer, "Platform count is %lu", (unsigned long) platform_count);
     log_message(log_message_buffer);
 
     size_t i;
