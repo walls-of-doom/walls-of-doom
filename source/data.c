@@ -57,7 +57,7 @@ int read_bytes(const char *filename, void *destination, const size_t size, const
         fclose(file);
         if (read_items != count) {
             char message[512];
-            sprintf(message, "Expected to read %lu items but actually read %lu", (unsigned long) count, (unsigned long) read_items);
+            sprintf(message, "Expected to read %lu but actually read %lu", (unsigned long) count, (unsigned long) read_items);
             log_message(message);
             return 2;
         }

@@ -49,15 +49,26 @@ int compare_void_record_pointers(const void *a, const void *b) {
     return compare_records((const Record *) a, (const Record *) b);
 }
 
+/**
+ * Reads a RecordTable into the provided destination.
+ *
+ * If the existing table cannot be used a new one is created.
+ */
 void read_table(RecordTable * const table) {
+    int read_error = 0;
     if (file_exists(RECORD_TABLE_FILENAME)) {
         if (read_bytes(RECORD_TABLE_FILENAME, table, sizeof(RecordTable), 1)) {
             char message[512];
             sprintf(message, "Failed to read a RecordTable from %s", RECORD_TABLE_FILENAME);
             log_message(message);
+            read_error = 1; // Set the error flag to trigger the creation of a new table.
         }
     } else {
+        read_error = 1; // Set the error flag to trigger the creation of a new table.
+    }
+    if (read_error) {
         RecordTable empty_table;
+        log_message("Created an empty RecordTable");
         // Properly set the record_count field.
         empty_table.record_count = 0;
         *table = empty_table;
