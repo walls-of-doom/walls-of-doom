@@ -9,6 +9,8 @@ typedef struct Player {
     // advantageous if we have multiple players.
     int x;
     int y;
+    // Whether or not the player is being affected by physics.
+    int physics;
     // How many jumps they player has left.
     unsigned int jumps;
     unsigned int lives;

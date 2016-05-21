@@ -17,6 +17,7 @@ add_library (walls-of-doom-source
     record.h record.c
     rest.h rest.c
     sort.h sort.c
+    vector.h vector.c
     version.h)
 
 set_target_properties (walls-of-doom-source PROPERTIES LINKER_LANGUAGE C)

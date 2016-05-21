@@ -1,6 +1,7 @@
 #include "logger.h"
 #include "physics.h"
 #include "random.h"
+#include "vector.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -32,20 +33,48 @@ int is_over_platform(const int x, const int y, const Platform * const platform) 
     return is_within_platform(x, y + 1, platform);
 }
 
+/**
+ * Attempts to force the Player to move according to the provided displacement.
+ *
+ * If the player does not have physics enabled, this is a no-op.
+ */
+void shove_player(Player * const player, const Vector displacement) {
+    if (player->physics) {
+        player->x += displacement.x;
+        player->y += displacement.y;
+    }
+}
+
 void move_platform_horizontally(Player * const player, Platform * const platform, const int direction) {
     log_if_not_normalized(direction);
     if (player->y == platform->y) { // Fail fast if the platform is not on the same line
         if (direction == 1) {
             if (player->x == platform->x + platform->width) {
-                player->x++;
+                Vector displacement;
+                displacement.x = 1;
+                displacement.y = 0;
+                shove_player(player, displacement);
             }
         } else if (direction == -1) {
             if (player->x == platform->x - 1) {
-                player->x--;
+                Vector displacement;
+                displacement.x = -1;
+                displacement.y = 0;
+                shove_player(player, displacement);
             }
         }
     } else if (is_over_platform(player->x, player->y, platform)) {  // If the player is over the platform
-        player->x += direction;
+        Vector displacement;
+        displacement.y = 0;
+        // We could just assing direction to x, but I think this is better.
+        if (direction == 1) {
+            displacement.x = 1;
+        } else if (direction == -1) {
+            displacement.x = -1;
+        } else {
+            displacement.x = 0;
+        }
+        shove_player(player, displacement);
     }
     platform->x += direction;
 }
@@ -55,11 +84,17 @@ void move_platform_vertically(Player * const player, Platform * const platform, 
     if (player->x >= platform->x && player->x < platform->x + platform->width) {
         if (direction == 1) {
             if (player->y == platform->y + 1) {
-                player->y++;
+                Vector displacement;
+                displacement.x = 0;
+                displacement.y = 1;
+                shove_player(player, displacement);
             }
         } else if (direction == -1) {
             if (player->y == platform->y - 1) {
-                player->y--;
+                Vector displacement;
+                displacement.x = 0;
+                displacement.y = -1;
+                shove_player(player, displacement);
             }
         }
     }
@@ -134,7 +169,13 @@ int is_valid_move(const int x, const int y, const Platform *platforms, const siz
     return 1;
 }
 
+/**
+ * Evaluates whether or not the Player is falling. Takes the physics field into account.
+ */
 int is_falling(const Player * const player, const Platform *platforms, const size_t platform_count) {
+    if (!player->physics) {
+        return 0;
+    }
     size_t i;
     for (i = 0; i < platform_count; i++) {
         if (player->y == platforms[i].y - 1) {
@@ -164,6 +205,9 @@ void reposition_player(Player * const player, const BoundingBox * const box) {
 }
 
 void update_player(Player * const player, const Platform *platforms, const size_t platform_count, const BoundingBox * const box, const Command command) {
+    if (command != NO_COMMAND) {
+        player->physics = 1;
+    }
     if (command == COMMAND_LEFT) {
         if (is_valid_move(player->x - 1, player->y, platforms, platform_count)) {
             player->x -= 1;
@@ -180,5 +224,7 @@ void update_player(Player * const player, const Platform *platforms, const size_
     if (is_touching_a_wall(player, box)) {
         player->lives--;
         reposition_player(player, box);
+        // Unset physics collisions for the player.
+        player->physics = 0;
     }
 }
