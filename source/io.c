@@ -172,7 +172,7 @@ int is_valid_player_name(const char *player_name) {
     char buffer[PLAYER_NAME_MAXIMUM_SIZE];
     strcpy(buffer, player_name);
     trim_string(buffer);
-    return strlen(player_name) >= 2;
+    return strlen(buffer) >= 2;
 }
 
 void read_player_name(char *destination, const size_t maximum_size) {
