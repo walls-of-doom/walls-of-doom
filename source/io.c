@@ -64,11 +64,15 @@ void initialize(void) {
 void enable_string_input() {
     fflush(stdin);
     echo();
+    // Display the cursor.
+    curs_set(TRUE);
     nodelay(stdscr, FALSE);
 }
 
 void disable_string_input() {
     noecho();
+    // Do not display the cursor.
+    curs_set(FALSE);
     nodelay(stdscr, TRUE);
 }
 
