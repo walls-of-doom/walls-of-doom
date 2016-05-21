@@ -176,22 +176,31 @@ int is_valid_player_name(const char *player_name) {
 }
 
 void read_player_name(char *destination, const size_t maximum_size) {
-    clear();
-    const char message[] = "Name your character: ";
-    const int message_size = strlen(message);
-    const int maximum_width = message_size + maximum_size;
-    if (maximum_width <= COLS) {
-        print((COLS - maximum_width) / 2, LINES / 2, message);
-    } else {
-        print(0, LINES / 2, message);
-    }
-    refresh();
     int read_error = 0;
     int valid_name = 0;
-    do {
+    // While there is not a read error or a valid name.
+    while (!read_error && !valid_name) {
+        clear();
+        const char message[] = "Name your character: ";
+        const int message_size = strlen(message);
+        const int maximum_width = message_size + maximum_size;
+        if (maximum_width <= COLS) {
+            print((COLS - maximum_width) / 2, LINES / 2, message);
+        } else {
+            print(0, LINES / 2, message);
+        }
+        refresh();
         read_error = read_string(destination, maximum_size);
-        valid_name = is_valid_player_name(destination); 
-    } while (!read_error && !valid_name);
+        if (read_error) {
+            log_message("Failed to read player name");
+            // Cope with it by providing a name for the player.
+            strcpy(destination, "ERROR READING PLAYER NAME");
+        } else {
+            // Trim the name the user entered.
+            trim_string(destination);
+            valid_name = is_valid_player_name(destination);
+        }
+    }
 }
 
 /**
