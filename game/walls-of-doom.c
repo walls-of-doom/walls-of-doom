@@ -1,7 +1,3 @@
-#include <stdlib.h>
-#include <string.h>
-#include <curses.h>
-
 #include "about.h"
 #include "constants.h"
 #include "data.h"
@@ -12,6 +8,11 @@
 #include "record.h"
 #include "rest.h"
 #include "version.h"
+
+#include <stdlib.h>
+#include <string.h>
+
+#include <curses.h>
 
 #define ABOUT_PAGE_BUFFER_SIZE 1024
 #define ABOUT_PAGE_PATH "assets/about.txt"

@@ -36,6 +36,25 @@ void initialize(void);
 void finalize(void);
 
 /**
+ * Returns a pointer to the start of the text of the string.
+ *
+ * This is either the first character which is not a space or '\0'.
+ */
+char *find_start_of_text(char *string);
+
+/**
+ * Returns a pointer to the end of the text of the string.
+ *
+ * This is either the first trailing space or '\0'.
+ */
+char *find_end_of_text(char *string);
+
+/**
+ * Trims a string by removing whitespace from its start and from its end.
+ */
+void trim_string(char *string);
+
+/**
  * Enables echo and reads a string from the user.
  *
  * Returns 0 in case of success.

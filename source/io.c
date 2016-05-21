@@ -1,12 +1,14 @@
 #include "io.h"
 
 #include "constants.h"
+#include "player.h"
 #include "logger.h"
 #include "physics.h"
 #include "rest.h"
 
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 #include <curses.h>
 
@@ -73,7 +75,7 @@ void disable_string_input() {
 /**
  * Finalizes the acquired resources.
  *
- * Should only be called once, right before exitting.
+ * Should only be called once, right before exiting.
  */
 void finalize(void) {
     finalize_logger();
@@ -97,6 +99,78 @@ int read_string(char *destination, const size_t maximum_size) {
     }
 }
 
+/**
+ * Returns a pointer to the start of the text of the string.
+ *
+ * This is either the first character which is not a space or '\0'.
+ */
+char *find_start_of_text(char *string) {
+    while (*string != '\0' && isspace(*string)) {
+        string++;
+    }
+    return string;
+}
+
+/**
+ * Returns a pointer to the end of the text of the string.
+ *
+ * This is either the first trailing space or '\0'.
+ */
+char *find_end_of_text(char *string) {
+    char *last_not_space = string;
+    while (*string != '\0') {
+        if (!isspace(*string)) {
+            last_not_space = string;
+        }
+        string++;
+    }
+    if (*last_not_space != '\0') {
+        last_not_space++;
+    }
+    return last_not_space;
+}
+
+/**
+ * Trims a string by removing all leading and trailing spaces.
+ */
+void trim_string(char *string) {
+    int copying = 0;
+    char *write = string;
+    char *read = string;
+    // Copy everthing from the first not space up to the end.
+    while (*read != '\0') {
+        if (!copying) {
+            copying = !isspace(*read);
+        }
+        if (copying) {
+            *write = *read;
+            write++;
+        }
+        read++;
+    }
+    *write = '\0';
+    // Replace all trailing spaces by the null character.
+    if (write != string) { // At the first position there is not a space.
+        write--;
+        while (isspace(*write)) {
+            *write = '\0';
+            write--;
+        }
+    }
+}
+
+/**
+ * Evaluates whether or not a Player name is a valid name.
+ *
+ * A name is considered to be valid if it has at least two characters after being trimmed.
+ */
+int is_valid_player_name(const char *player_name) {
+    char buffer[PLAYER_NAME_MAXIMUM_SIZE];
+    strcpy(buffer, player_name);
+    trim_string(buffer);
+    return strlen(player_name) >= 2;
+}
+
 void read_player_name(char *destination, const size_t maximum_size) {
     clear();
     const char message[] = "Name your character: ";
@@ -108,7 +182,12 @@ void read_player_name(char *destination, const size_t maximum_size) {
         print(0, LINES / 2, message);
     }
     refresh();
-    read_string(destination, maximum_size);
+    int read_error = 0;
+    int valid_name = 0;
+    do {
+        read_error = read_string(destination, maximum_size);
+        valid_name = is_valid_player_name(destination); 
+    } while (!read_error && !valid_name);
 }
 
 /**

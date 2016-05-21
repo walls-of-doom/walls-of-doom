@@ -1,6 +1,7 @@
 #include "unity.h"
 
 #include "data.h"
+#include "io.h"
 #include "logger.h"
 #include "math.h"
 #include "random.h"
@@ -8,8 +9,9 @@
 #include "sort.h"
 #include "vector.h"
 
-#include <stdlib.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 int compare_unsigned_char(const void *pointer_to_uchar_a, const void *pointer_to_uchar_b) {
@@ -35,6 +37,60 @@ void test_vector_add(void) {
     b.y = 4.0;
     TEST_ASSERT_EQUAL_FLOAT(4.0, vector_add(a, b).x);
     TEST_ASSERT_EQUAL_FLOAT(6.0, vector_add(a, b).y);
+}
+
+void test_trim_string_works_with_empty_strings(void) {
+    const char *input = "";
+    const char *expected = input; // Use a more meaningful name.
+    char buffer[64];
+    strcpy(buffer, input);
+    trim_string(buffer);
+    TEST_ASSERT_EQUAL_STRING(expected, buffer);
+}
+
+void test_trim_string_works_with_already_trimmed_strings(void) {
+    const char *input = "a b";
+    const char *expected = input; // Use a more meaningful name.
+    char buffer[64];
+    strcpy(buffer, input);
+    trim_string(buffer);
+    TEST_ASSERT_EQUAL_STRING(expected, buffer);
+}
+
+void test_trim_string_properly_trims_preceding_spaces(void) {
+    const char *input = "  a b";
+    const char *expected = "a b";
+    char buffer[64];
+    strcpy(buffer, input);
+    trim_string(buffer);
+    TEST_ASSERT_EQUAL_STRING(expected, buffer);
+}
+
+void test_trim_string_properly_trims_trailing_spaces(void) {
+    const char *input = "a b  ";
+    const char *expected = "a b";
+    char buffer[64];
+    strcpy(buffer, input);
+    trim_string(buffer);
+    TEST_ASSERT_EQUAL_STRING(expected, buffer);
+}
+
+void test_trim_string_properly_trims_space_padded_strings(void) {
+    const char *input = "  a b  ";
+    const char *expected = "a b";
+    char buffer[64];
+    strcpy(buffer, input);
+    trim_string(buffer);
+    TEST_ASSERT_EQUAL_STRING(expected, buffer);
+}
+
+void test_trim_string_works_with_strings_of_whitespaces(void) {
+    const char *input = " \t \n ";
+    const char *expected = "";
+    char buffer[64];
+    strcpy(buffer, input);
+    trim_string(buffer);
+    TEST_ASSERT_EQUAL_STRING(expected, buffer);
 }
 
 void test_rest_for_nanoseconds_with_one_microsecond(void) {
@@ -364,6 +420,12 @@ int main(void) {
     log_message("Started running tests");
     RUN_TEST(test_normalize);
     RUN_TEST(test_vector_add);
+    RUN_TEST(test_trim_string_works_with_empty_strings);
+    RUN_TEST(test_trim_string_works_with_already_trimmed_strings);
+    RUN_TEST(test_trim_string_properly_trims_preceding_spaces);
+    RUN_TEST(test_trim_string_properly_trims_trailing_spaces);
+    RUN_TEST(test_trim_string_properly_trims_space_padded_strings);
+    RUN_TEST(test_trim_string_works_with_strings_of_whitespaces);
     RUN_TEST(test_rest_for_nanoseconds_with_one_microsecond);
     RUN_TEST(test_rest_for_nanoseconds_with_one_millisecond);
     RUN_TEST(test_rest_for_nanoseconds_with_one_second);
