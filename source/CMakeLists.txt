@@ -4,12 +4,16 @@ configure_file (version.h.in version.h)
 
 add_library (walls-of-doom-source
     about.h about.c
+    box.h box.c
     command.h
     constants.h
     data.h data.c
+    game.h game.c
     io.h io.c
     logger.h logger.c
     math.h math.c
+    menu.h menu.c
+    perks.h perks.c
     physics.h physics.c
     platform.h
     player.h player.c

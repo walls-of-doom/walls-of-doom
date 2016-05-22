@@ -5,7 +5,7 @@
  * The Command enumerated type represents the different commands the user may issue.
  */
 typedef enum Command {
-    NO_COMMAND,
+    COMMAND_NONE,
     COMMAND_UP,
     COMMAND_LEFT,
     COMMAND_CENTER,

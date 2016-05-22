@@ -152,10 +152,10 @@ void update_platform(Player * const player, Platform * const platform, const Bou
     }
 }
 
-void update_platforms(Player * const player, Platform *platforms, const size_t platform_count, const BoundingBox * const box) {
+void update_platforms(Game * const game) {
     size_t i;
-    for (i = 0; i < platform_count; i++) {
-        update_platform(player, &platforms[i], box);
+    for (i = 0; i < game->platform_count; i++) {
+        update_platform(game->player, game->platforms + i, game->box);
     }
 }
 
@@ -204,8 +204,15 @@ void reposition_player(Player * const player, const BoundingBox * const box) {
     player->y = get_bounding_box_center_y(box);
 }
 
-void update_player(Player * const player, const Platform *platforms, const size_t platform_count, const BoundingBox * const box, const Command command) {
-    if (command != NO_COMMAND) {
+void update_perk(Game * const game) {
+}
+
+void update_player(Game * const game, const Command command) {
+    Player * const player = game->player;
+    Platform *platforms = game->platforms;
+    const size_t platform_count = game->platform_count;
+    BoundingBox *box = game->box;
+    if (command != COMMAND_NONE) {
         player->physics = 1;
     }
     if (command == COMMAND_LEFT) {

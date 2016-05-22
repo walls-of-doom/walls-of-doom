@@ -2,6 +2,7 @@
 #define IO_H
 
 #include "command.h"
+#include "game.h"
 #include "physics.h"
 
 typedef enum ColorScheme {
@@ -66,7 +67,7 @@ void read_player_name(char *destination, const size_t maximum_size);
 /**
  * Draws a full game to the screen.
  */
-int draw(const Player * const player, const Platform *platforms, const size_t platform_count, const BoundingBox * const box);
+int draw_game(const Game * const game);
 
 /**
  * Prints the provided string on the screen starting at (x, y).
@@ -88,14 +89,21 @@ void print_long_text(char *string);
  */
 void print_platform(const Platform * const platform, const BoundingBox * const box);
 
+void print_game_result(const char *name, const unsigned int score, const int position);
+
+/**
+ * Returns a BoundingBox that represents the playable area after removing bars and margins.
+ */
+BoundingBox bounding_box_from_screen();
+
 /**
  * Reads the next command that needs to be processed. This is the last command
  * on the input buffer.
  *
- * This function consumes the whole input buffer and returns either NO_COMMAND
- * (if no other Command could be produced by what was in the input buffer) or
- * the last Command different than NO_COMMAND that could be produced by what
- * was in the input buffer.
+ * This function consumes the whole input buffer and returns either
+ * COMMAND_NONE (if no other Command could be produced by what was in the input
+ * buffer) or the last Command different than COMMAND_NONE that could be
+ * produced by what was in the input buffer.
  */
 Command read_next_command(void);
 

@@ -1,81 +1,106 @@
 #include "game.h"
 
-void update_platform(Platform * const platform, const BoundingBox * const box);
-int is_out_of_bounding_box(Platform * const platform, const BoundingBox * const box);
-void reposition(Platform * const platform, const BoundingBox * const box);
-int is_within_platform(const int x, const int y, const Platform * const platform);
-void log_if_amount_is_not_normalized(const int amount);
+#include "about.h"
+#include "data.h"
+#include "constants.h"
+#include "menu.h"
+#include "game.h"
+#include "io.h"
+#include "logger.h"
+#include "menu.h"
+#include "physics.h"
+#include "random.h"
+#include "record.h"
+#include "rest.h"
+#include "version.h"
 
-void update_game(Game * const game) {
-    update_platforms(game);
-    update_player(game);
-}
+#include <stdlib.h>
+#include <string.h>
 
-void update_platforms(Game * const game) {
-    size_t i;
-    for (i = 0; i < game->platform_count; i++) {
-        update_platform(game->player, game->platforms +i, game->box);
-    }
-}
+/**
+ * Creates a new Game object with the provided objects.
+ */
+Game create_game(Player *player, Platform *platforms, const size_t platform_count, BoundingBox *box) {
+    Game game;
 
-void update_platform(Platform * const platform, const BoundingBox * const box) {
-    platform->x += platform->speed_x;
-    platform->y += platform->speed_y;
-    if (is_out_of_bounding_box(platform, box)) {
-        reposition(platform, box);
-    }
+    game.player = player;
+    game.platforms = platforms;
+    game.platform_count = platform_count;
+    
+    game.frame = 0;
+
+    game.box = box;
+
+    game.perk = PERK_NONE;
+    game.perk_end_frame = 0; // No perk and already expired.
+    game.perk_position = bounding_box_center(box);
+
+    return game;
 }
 
 /**
- * Evaluates whether or not a Platform is completely outside of a BoundingBox.
+ * Returns 0 if the screen size has not changed since the creation of the provided Game.
+ */
+int check_for_screen_size_change(const Game * const game) {
+    BoundingBox current_box = bounding_box_from_screen();
+    return !bounding_box_equals(&current_box, game->box);
+}
+
+void register_highscore(const Game * const game) {
+    const Player * const player = game->player;
+    // Log that we are registering the highscore
+    char buffer[MAXIMUM_STRING_SIZE];
+    const char *format = "Started registering a highscore of %d points for %s";
+    sprintf(buffer, format, player->score, player->name);
+    log_message(buffer);
+
+    // The name has already been entered to make the Player object.
+    Record record = make_record(player->name, player->score);
+
+    // Write the Record to disk
+    int scoreboard_index = save_record(&record);
+    int position = scoreboard_index + 1;
+
+    sprintf(buffer, "Saved the record successfully");
+    log_message(buffer);
+
+    print_game_result(player->name, player->score, position);
+    
+    rest_for_nanoseconds(2UL * NANOSECONDS_IN_ONE_SECOND);
+}
+
+/**
+ * Runs the main loop of the provided game and registers the player score at the end.
  *
- * Returns 0 if the platform intersects the bounding box.
- * Returns 1 if the platform is to the left or to the right of the bounding box.
- * Returns 2 if the platform is above or below the bounding box.
+ * Returns 0 if successful.
  */
-int is_out_of_bounding_box(Platform * const platform, const BoundingBox * const box) {
-    const int min_x = platform->x;
-    const int max_x = platform->x + platform->width;
-    if (max_x < box->min_x || min_x > box->max_x) {
-        return 1;
-    } else if (platform->y < box->min_y || platform->y > box->max_y) {
-        return 2;
-    } else {
-        return 0;
+int run_game(Game * const game) {
+    unsigned long next_frame_score = GAME_FPS;
+    Command command = COMMAND_NONE;
+    // Checking for any nonpositive player.lives value would be safer but could hide some bugs
+    while (command != COMMAND_QUIT && !check_for_screen_size_change(game) && game->player->lives != 0) {
+        // Game loop
+        // 1. Update the score
+        if (game->frame == next_frame_score) {
+            game->player->score++;
+            next_frame_score += GAME_FPS;
+        }
+        // 2. Update the platforms
+        update_platforms(game);
+        // 3. Update the perk
+        update_perk(game);
+        // 4. Draw everything
+        draw_game(game);
+        // 5. Sleep
+        rest_for_second_fraction(GAME_FPS);
+        // 6. Read whatever command we got (if any)
+        command = read_next_command();
+        // 7. Update the player using the command
+        update_player(game, command);
+        // 8. Increment the frame counter
+        game->frame++;
     }
-}
-
-/**
- * Repositions a Platform in the vicinity of a BoundingBox.
- */
-void reposition(Platform * const platform, const BoundingBox * const box) {
-    if (platform->x > box->max_x) { // To the right of the box
-        platform->x = 1 - platform->width;
-        platform->y = random_integer(box->min_y, box->max_y);
-    } else if (platform->x + platform->width < box->min_x) { // To the left of the box
-        platform->x = box->max_x;
-        platform->y = random_integer(box->min_y, box->max_y);
-    } else if (platform->y < box->min_y) { // Above the box
-        platform->x = random_integer(box->min_x, box->max_x);
-        platform->y = box->max_y;
-    }
-    // We don't have to deal with platforms below the box.
-}
-
-void update_player(Game * const game) {
-}
-
-/**
- * Evaluates whether or not a point is within a Platform.
- */
-int is_within_platform(const int x, const int y, const Platform * const platform) {
-    return y == platform->y && x >= platform->x && x < platform->x + platform->width;
-}
-
-void log_if_amount_is_not_normalized(const int amount) {
-    if (amount < -1 || amount > 1) {
-        char buffer[128];
-        sprintf(buffer, "Expected a normalized amount but got %d\n", amount);
-        log_message(buffer);
-    }
+    // Ignoring how the game ended (quit command, screen resize, or death), register the score
+    register_highscore(game);
+    return 0;
 }

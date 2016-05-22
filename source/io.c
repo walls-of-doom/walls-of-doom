@@ -1,9 +1,10 @@
 #include "io.h"
 
 #include "constants.h"
-#include "player.h"
+#include "game.h"
 #include "logger.h"
 #include "physics.h"
+#include "player.h"
 #include "rest.h"
 
 #include <stdio.h>
@@ -418,6 +419,17 @@ int draw_platforms(const Platform * platforms, const size_t platform_count, cons
     return 0;
 }
 
+int has_active_perk(const Game * const game) {
+    return game->frame < game->perk_end_frame;
+}
+
+int draw_perk(const Game * const game) {
+    if (has_active_perk(game)) {
+
+    }
+    return 0;
+}
+
 int draw_player(const Player * const player) {
     attron(COLOR_PAIR(COLOR_PLAYER));
     print(player->x, player->y, PLAYER_SYMBOL);
@@ -428,19 +440,49 @@ int draw_player(const Player * const player) {
 /**
  * Draws a full game to the screen.
  */
-int draw(const Player * const player, const Platform *platforms, const size_t platform_count, const BoundingBox * const box) {
+int draw_game(const Game * const game) {
     clear();
   
-    draw_top_bar(player);
+    draw_top_bar(game->player);
     draw_bottom_bar();
     draw_borders();
-    draw_platforms(platforms, platform_count, box);
-    draw_player(player);
-    
+    draw_platforms(game->platforms, game->platform_count, game->box);
+    draw_perk(game);
+    draw_player(game->player);
+
     refresh();
-   
+
     return 0;
 }
+
+void print_game_result(const char *name, const unsigned int score, const int position) {
+    char first_line[MAXIMUM_STRING_SIZE];
+    sprintf(first_line, "%s died after making %d points.", name, score);
+
+    char second_line[MAXIMUM_STRING_SIZE];
+    if (position > 0) {
+        sprintf(second_line, "%s got to position %d!", name, position);
+    } else {
+        sprintf(second_line, "%s didn't make it to the top scores.", name);
+    }
+    clear();
+    print_centered(LINES / 2 - 1, first_line);
+    print_centered(LINES / 2 + 1, second_line);
+    refresh();
+}
+
+/**
+ * Returns a BoundingBox that represents the playable area after removing bars and margins.
+ */
+BoundingBox bounding_box_from_screen() {
+    BoundingBox box;
+    box.min_x = 1;
+    box.min_y = 2; // Top bar.
+    box.max_x = COLS - 2;
+    box.max_y = LINES - 3; // Bottom bar.
+    return box;
+}
+
 
 Command command_from_input(const int input) {
     if (input == '8') {
@@ -460,7 +502,7 @@ Command command_from_input(const int input) {
     } else if (input == '\n') {
         return COMMAND_ENTER;
     } else {
-        return NO_COMMAND;
+        return COMMAND_NONE;
     }
 }
 
@@ -468,17 +510,17 @@ Command command_from_input(const int input) {
  * Reads the next command that needs to be processed. This is the last command
  * on the input buffer.
  *
- * This function consumes the whole input buffer and returns either NO_COMMAND
- * (if no other Command could be produced by what was in the input buffer) or
- * the last Command different than NO_COMMAND that could be produced by what
- * was in the input buffer.
+ * This function consumes the whole input buffer and returns either
+ * COMMAND_NONE (if no other Command could be produced by what was in the input
+ * buffer) or the last Command different than COMMAND_NONE that could be
+ * produced by what was in the input buffer.
  */
 Command read_next_command(void) {
-    Command last_valid_command = NO_COMMAND;
+    Command last_valid_command = COMMAND_NONE;
     int input;
     for (input = getch(); input != ERR; input = getch()) {
         const Command current = command_from_input(input);
-        if (current != NO_COMMAND) {
+        if (current != COMMAND_NONE) {
             last_valid_command = current;
         }
     }
@@ -489,8 +531,8 @@ Command read_next_command(void) {
  * Waits for user input, indefinitely.
  */
 Command wait_for_next_command(void) {
-    Command command = NO_COMMAND;
-    while (command == NO_COMMAND) {
+    Command command = COMMAND_NONE;
+    while (command == COMMAND_NONE) {
         rest_for_second_fraction(MENU_FPS);
         command = read_next_command();
     }
