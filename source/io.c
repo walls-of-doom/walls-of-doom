@@ -62,7 +62,7 @@ void initialize(void) {
     initialize_color_schemes();
 }
 
-void enable_string_input() {
+void enable_string_input(void) {
     fflush(stdin);
     echo();
     // Display the cursor.
@@ -70,7 +70,7 @@ void enable_string_input() {
     nodelay(stdscr, FALSE);
 }
 
-void disable_string_input() {
+void disable_string_input(void) {
     noecho();
     // Do not display the cursor.
     curs_set(FALSE);
@@ -506,7 +506,7 @@ void print_game_result(const char *name, const unsigned int score, const int pos
 /**
  * Returns a BoundingBox that represents the playable area after removing bars and margins.
  */
-BoundingBox bounding_box_from_screen() {
+BoundingBox bounding_box_from_screen(void) {
     BoundingBox box;
     box.min_x = 1;
     box.min_y = 2; // Top bar.

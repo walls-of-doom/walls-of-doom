@@ -27,12 +27,12 @@
 
 uint64_t s[2] = {0x7c87b3fced63be76, 0x4ec3c3191d40a751};
 
-uint64_t random_time_seed() {
+uint64_t random_time_seed(void) {
     // If tloc is a null pointer, no value is stored.
     return (uint64_t) time(NULL);
 }
 
-void seed_random() {
+void seed_random(void) {
     s[0] = random_time_seed();
 }
 
@@ -90,11 +90,7 @@ uint64_t find_next_power_of_two(uint64_t number) {
     }
     return result;
 }
-
-/**
- * Returns a random number in the range [minimum, maximum].
- */
-int random_integer(const int minimum, const int maximum) {
+/** * Returns a random number in the range [minimum, maximum].  */ int random_integer(const int minimum, const int maximum) {
     const uint64_t range = maximum - minimum + 1;
     const uint64_t next_power_of_two = find_next_power_of_two(range);
     uint64_t value;
