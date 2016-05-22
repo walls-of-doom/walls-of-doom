@@ -25,7 +25,15 @@ typedef struct Game {
     Platform *platforms;
     size_t platform_count;
 
+    /**
+     * In which frame - starting at 0 - we are now.
+     */
     unsigned long frame;
+
+    /**
+     * Count of frames on which the player was active (not in the initial state).
+     */
+    unsigned long played_frames;
 
     Perk perk;
     Vector perk_position;

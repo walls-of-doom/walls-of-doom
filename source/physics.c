@@ -205,15 +205,15 @@ void reposition_player(Player * const player, const BoundingBox * const box) {
 }
 
 void update_perk(Game * const game) {
-    if (game->frame == game->perk_end_frame) { // Current Perk must end
+    if (game->played_frames == game->perk_end_frame) { // Current Perk must end
         game->perk = PERK_NONE;
-    } else if (game->frame == game->perk_end_frame + GAME_PERK_INTERVAL_IN_FRAMES) {
+    } else if (game->played_frames == game->perk_end_frame + GAME_PERK_INTERVAL_IN_FRAMES) {
         game->perk = get_random_perk();
         Vector position;
         position.x = random_integer(game->box->min_x, game->box->max_x);
         position.y = random_integer(game->box->min_y, game->box->max_y);
         game->perk_position = position;
-        game->perk_end_frame = game->frame + GAME_PERK_DURATION_IN_FRAMES;
+        game->perk_end_frame = game->played_frames + GAME_PERK_DURATION_IN_FRAMES;
     }
 }
 
@@ -224,6 +224,9 @@ void update_player(Game * const game, const Command command) {
     BoundingBox *box = game->box;
     if (command != COMMAND_NONE) {
         player->physics = 1;
+    }
+    if (player->physics) {
+        game->played_frames++;
     }
     if (command == COMMAND_LEFT) {
         if (is_valid_move(player->x - 1, player->y, platforms, platform_count)) {

@@ -28,6 +28,7 @@ Game create_game(Player *player, Platform *platforms, const size_t platform_coun
     game.platform_count = platform_count;
     
     game.frame = 0;
+    game.played_frames = 0;
 
     game.box = box;
 
@@ -75,15 +76,15 @@ void register_highscore(const Game * const game) {
  * Returns 0 if successful.
  */
 int run_game(Game * const game) {
-    unsigned long next_frame_score = GAME_FPS;
+    unsigned long next_played_frames_score = GAME_FPS;
     Command command = COMMAND_NONE;
     // Checking for any nonpositive player.lives value would be safer but could hide some bugs
     while (command != COMMAND_QUIT && !check_for_screen_size_change(game) && game->player->lives != 0) {
         // Game loop
         // 1. Update the score
-        if (game->frame == next_frame_score) {
+        if (game->played_frames == next_played_frames_score) {
             game->player->score++;
-            next_frame_score += GAME_FPS;
+            next_played_frames_score += GAME_FPS;
         }
         // 2. Update the platforms
         update_platforms(game);
