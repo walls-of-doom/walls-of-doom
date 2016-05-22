@@ -94,7 +94,7 @@ void finalize(void) {
  */
 int read_string(char *destination, const size_t maximum_size) {
     enable_string_input();
-    const int result = getnstr(destination, maximum_size);
+    const int result = getnstr(destination, maximum_size - 1);
     disable_string_input();
     if (result == ERR) { // Got curses error code.
         log_message("Got an error when reading string");
@@ -197,8 +197,13 @@ void read_player_name(char *destination, const size_t maximum_size) {
             // Cope with it by providing a name for the player.
             strcpy(destination, "ERROR READING PLAYER NAME");
         } else {
+            char buffer[MAXIMUM_STRING_SIZE + maximum_size];
+            sprintf(buffer, "Read '%s' from the user", destination);
+            log_message(buffer);
             // Trim the name the user entered.
             trim_string(destination);
+            sprintf(buffer, "Trimmed the input to '%s'", destination);
+            log_message(buffer);
             valid_name = is_valid_player_name(destination);
         }
     }
