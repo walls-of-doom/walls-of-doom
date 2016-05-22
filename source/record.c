@@ -49,6 +49,20 @@ int compare_void_record_pointers(const void *a, const void *b) {
     return compare_records((const Record *) a, (const Record *) b);
 }
 
+void populate_table_with_default_records(RecordTable * table) {
+    static char *names[] = {"Adam", "Bree", "Cora", "Dave", "Elmo"};
+    static int scores[] =  {    18,     14,     10,      8,      2};
+    size_t i;
+    size_t end = sizeof(scores) / sizeof(int);
+    if (RECORD_ARRAY_SIZE < end) {
+        end = RECORD_ARRAY_SIZE;
+    }
+    for (i = 0; i < end; i++) {
+        table->records[i] = make_record(names[i], scores[i]);
+        table->record_count++;
+    }
+}
+
 /**
  * Reads a RecordTable into the provided destination.
  *
@@ -67,11 +81,8 @@ void read_table(RecordTable * const table) {
         read_error = 1; // Set the error flag to trigger the creation of a new table.
     }
     if (read_error) {
-        RecordTable empty_table;
-        log_message("Created an empty RecordTable");
-        // Properly set the record_count field.
-        empty_table.record_count = 0;
-        *table = empty_table;
+        populate_table_with_default_records(table);
+        log_message("read_table populated the table with the default records");
     }
 }
 
