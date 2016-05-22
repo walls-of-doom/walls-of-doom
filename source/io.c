@@ -428,9 +428,36 @@ int has_active_perk(const Game * const game) {
     return game->frame < game->perk_end_frame;
 }
 
+ColorScheme get_perk_color(Perk perk) {
+    if (perk == PERK_POWER_INVINCIBILITY) {
+        return COLOR_INVINCIBILITY;
+    } else if (perk == PERK_POWER_LEVITATION) {
+        return COLOR_LEVITATION;
+    } else if (perk == PERK_POWER_LOW_GRAVITY) {
+        return COLOR_LOW_GRAVITY;
+    } else if (perk == PERK_POWER_SUPER_JUMP) {
+        return COLOR_SUPER_JUMP;
+    } else if (perk == PERK_POWER_TIME_STOP) {
+        return COLOR_TIME_STOP;
+    } else if (perk == PERK_BONUS_EXTRA_POINTS) {
+        return COLOR_EXTRA_POINTS;
+    } else if (perk == PERK_BONUS_EXTRA_LIFE) {
+        return COLOR_EXTRA_LIFE;
+    } else {
+        char buffer[MAXIMUM_STRING_SIZE];
+        sprintf(buffer, "get_perk_color called with invalid value: %d", perk);
+        log_message(buffer);
+        return COLOR_PLAYER;
+    }
+}
+
 int draw_perk(const Game * const game) {
     if (has_active_perk(game)) {
-
+        attron(COLOR_PAIR(get_perk_color(game->perk)));
+        attron(A_BOLD);
+        print(game->perk_position.x, game->perk_position.y, get_perk_symbol());
+        attroff(A_BOLD);
+        attroff(COLOR_PAIR(get_perk_color(game->perk)));
     }
     return 0;
 }

@@ -13,8 +13,8 @@ typedef enum Perk {
     PERK_NONE
 } Perk;
 
-char get_perk_symbol();
+char *get_perk_symbol(void);
 
-Perk get_random_perk();
+Perk get_random_perk(void);
 
 # endif

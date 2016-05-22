@@ -3,6 +3,7 @@
 
 #include "command.h"
 #include "game.h"
+#include "perks.h"
 #include "physics.h"
 
 typedef enum ColorScheme {
@@ -90,6 +91,8 @@ void print_long_text(char *string);
 void print_platform(const Platform * const platform, const BoundingBox * const box);
 
 void print_game_result(const char *name, const unsigned int score, const int position);
+
+ColorScheme get_perk_color(Perk perk);
 
 /**
  * Returns a BoundingBox that represents the playable area after removing bars and margins.

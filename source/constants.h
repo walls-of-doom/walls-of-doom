@@ -11,8 +11,6 @@
 
 #define MAXIMUM_PLATFORM_COUNT 32
 
-#define GAME_FPS 10
-
 #define MENU_FPS 30
 
 #endif

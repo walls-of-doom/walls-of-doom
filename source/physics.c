@@ -205,6 +205,16 @@ void reposition_player(Player * const player, const BoundingBox * const box) {
 }
 
 void update_perk(Game * const game) {
+    if (game->frame == game->perk_end_frame) { // Current Perk must end
+        game->perk = PERK_NONE;
+    } else if (game->frame == game->perk_end_frame + GAME_PERK_INTERVAL_IN_FRAMES) {
+        game->perk = get_random_perk();
+        Vector position;
+        position.x = random_integer(game->box->min_x, game->box->max_x);
+        position.y = random_integer(game->box->min_y, game->box->max_y);
+        game->perk_position = position;
+        game->perk_end_frame = game->frame + GAME_PERK_DURATION_IN_FRAMES;
+    }
 }
 
 void update_player(Game * const game, const Command command) {
