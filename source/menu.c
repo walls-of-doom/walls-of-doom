@@ -44,7 +44,7 @@ void record_to_string(const Record * const record, char *buffer, const int expec
     sprintf(buffer, format, record->name, padding_length, padding_length, padding_string, record->score);
 }
 
-void highscores(void) {
+void top_scores(void) {
     if (COLS < 16) {
         return;
     }
@@ -154,7 +154,7 @@ int main_menu(void) {
     char title[MAXIMUM_STRING_SIZE];
     sprintf(title, "%s version %s", "Walls of Doom", WALLS_OF_DOOM_VERSION);
     menu.title = title;
-    char *options[] = {"Play", "Highscores", "Info", "Quit"};
+    char *options[] = {"Play", "Top Scores", "Info", "Quit"};
     menu.options = options;
     menu.option_count = 4;
     menu.selected_option = 0;
@@ -175,7 +175,7 @@ int main_menu(void) {
             if (menu.selected_option == 0) {
                 game();
             } else if (menu.selected_option == 1) {
-                highscores();
+                top_scores();
             } else if (menu.selected_option == 2) {
                 info();
             } else if (menu.selected_option == 3) {

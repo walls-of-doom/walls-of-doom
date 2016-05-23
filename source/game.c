@@ -47,11 +47,11 @@ int check_for_screen_size_change(const Game * const game) {
     return !bounding_box_equals(&current_box, game->box);
 }
 
-void register_highscore(const Game * const game) {
+void register_score(const Game * const game) {
     const Player * const player = game->player;
-    // Log that we are registering the highscore
+    // Log that we are registering the score
     char buffer[MAXIMUM_STRING_SIZE];
-    const char *format = "Started registering a highscore of %d points for %s";
+    const char *format = "Started registering a score of %d points for %s";
     sprintf(buffer, format, player->score, player->name);
     log_message(buffer);
 
@@ -102,6 +102,6 @@ int run_game(Game * const game) {
         game->frame++;
     }
     // Ignoring how the game ended (quit command, screen resize, or death), register the score
-    register_highscore(game);
+    register_score(game);
     return 0;
 }
