@@ -57,6 +57,7 @@ void populate_table_with_default_records(RecordTable * table) {
     if (RECORD_ARRAY_SIZE < end) {
         end = RECORD_ARRAY_SIZE;
     }
+    table->record_count = 0;
     for (i = 0; i < end; i++) {
         table->records[i] = make_record(names[i], scores[i]);
         table->record_count++;
