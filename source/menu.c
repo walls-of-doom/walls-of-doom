@@ -18,6 +18,8 @@
 
 #include <curses.h>
 
+#define MAXIMUM_RECORD_ARRAY_SIZE 128
+
 typedef struct Menu {
     char *title;
     char **options;
@@ -48,10 +50,17 @@ void top_scores(void) {
     if (COLS < 16) {
         return;
     }
-    const int line_width = COLS - 8;
-    Record records[16];
-    size_t actually_read_records = read_records(records, 16);
+    const int line_width = COLS - 6;
+    Record records[MAXIMUM_RECORD_ARRAY_SIZE];
     int y = 2;
+    const int line_count = LINES - 2 * y;
+    size_t maximum_read_records;
+    if (line_count > MAXIMUM_RECORD_ARRAY_SIZE) {
+        maximum_read_records = MAXIMUM_RECORD_ARRAY_SIZE;
+    } else {
+        maximum_read_records = line_count;
+    }
+    size_t actually_read_records = read_records(records, maximum_read_records);
     char line[COLS];
     size_t i;
     clear();
