@@ -13,8 +13,10 @@ set (C_STANDARD 90)
 
 set (CMAKE_BUILD_TYPE Release)
 
-# If we got GCC, use -Wall and -Wextra.
-if (CMAKE_COMPILER_IS_GNUCC)
+# Based on which compiler we are using, set warning flags
+if ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
+    set (CMAKE_C_FLAGS "-Weverything")
+elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
     set (CMAKE_C_FLAGS "-Wall -Wextra")
 endif ()
 
