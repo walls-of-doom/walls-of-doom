@@ -97,7 +97,7 @@ ColorScheme get_perk_color(Perk perk);
 /**
  * Returns a BoundingBox that represents the playable area after removing bars and margins.
  */
-BoundingBox bounding_box_from_screen();
+BoundingBox bounding_box_from_screen(void);
 
 /**
  * Reads the next command that needs to be processed. This is the last command
