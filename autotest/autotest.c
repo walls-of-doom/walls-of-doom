@@ -403,7 +403,7 @@ void test_find_next_power_of_two_works_for_all_integers(void) {
 void test_random_integer_respects_the_provided_range(void) {
     const int min_min = -3;
     const int max_min = 0;
-    const int min_max = 1;
+    const int min_max = 0;
     const int max_max = 4;
     int min;
     int max;
