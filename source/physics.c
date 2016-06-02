@@ -1,3 +1,4 @@
+#include "constants.h"
 #include "logger.h"
 #include "physics.h"
 #include "random.h"
@@ -5,6 +6,30 @@
 
 #include <math.h>
 #include <stdio.h>
+
+#define PLAYER_RUNNING_SPEED 4
+#define PLAYER_FALLING_SPEED 8
+
+/**
+ * Repositions a Platform in the vicinity of a BoundingBox.
+ */
+void reposition(Game * const game, Platform * const platform);
+
+/**
+ * Evaluates whether or not a Platform is completely outside of a BoundingBox.
+ *
+ * Returns 0 if the platform intersects the bounding box.
+ * Returns 1 if the platform is to the left or to the right of the bounding box.
+ * Returns 2 if the platform is above or below the bounding box.
+ */
+int is_out_of_bounding_box(Platform * const platform, const BoundingBox * const box);
+
+/**
+ * Evaluates whether or not a point is within a Platform.
+ */
+int is_within_platform(const int x, const int y, const Platform * const platform);
+
+void update_platform(Game * const game, Platform * const platform);
 
 void log_if_not_normalized(const int value) {
     if (value < -1 && value > 1) {
@@ -45,66 +70,88 @@ void shove_player(Player * const player, const Vector displacement) {
     }
 }
 
-void move_platform_horizontally(Player * const player, Platform * const platform, const int direction) {
-    log_if_not_normalized(direction);
-    if (player->y == platform->y) { // Fail fast if the platform is not on the same line
-        if (direction == 1) {
-            if (player->x == platform->x + platform->width) {
-                Vector displacement;
-                displacement.x = 1;
-                displacement.y = 0;
-                shove_player(player, displacement);
-            }
-        } else if (direction == -1) {
-            if (player->x == platform->x - 1) {
-                Vector displacement;
-                displacement.x = -1;
-                displacement.y = 0;
-                shove_player(player, displacement);
-            }
-        }
-    } else if (is_over_platform(player->x, player->y, platform)) {  // If the player is over the platform
-        Vector displacement;
-        displacement.y = 0;
-        // We could just assing direction to x, but I think this is better.
-        if (direction == 1) {
-            displacement.x = 1;
-        } else if (direction == -1) {
-            displacement.x = -1;
-        } else {
-            displacement.x = 0;
-        }
-        shove_player(player, displacement);
+/**
+ * Evaluates whether or not an object with the specified speed should move in
+ * the current frame of the provided Game.
+ *
+ * Speed may be any integer, this function is robust enough to handle
+ * nonpositive integers.
+ */
+int should_move_at_current_frame(const Game * const game, const int speed) {
+    // Reasoning for rounding a double
+    // Let FPS = 30 and speed = 16, if we perform integer division, we will get
+    // one. This would be much faster than a speed of 16 would actually be as
+    // ideally the object would be moved at every 1.875 frame. Therefore, it is
+    // much better to update it at every other frame than at every frame. This
+    // shows that the expected behavior is reached by rounding a precise
+    // division rather than by truncating the quotient.
+    if (speed == 0 || game->frame == 0) { // Play it safe with floating point errors
+        return 0;
+    } else {
+        return game->frame % ((unsigned long) (round(FPS / (double) abs(speed)))) == 0;
     }
-    platform->x += direction;
 }
 
-void move_platform_vertically(Player * const player, Platform * const platform, const int direction) {
-    log_if_not_normalized(direction);
-    if (player->x >= platform->x && player->x < platform->x + platform->width) {
-        if (direction == 1) {
-            if (player->y == platform->y + 1) {
-                Vector displacement;
-                displacement.x = 0;
-                displacement.y = 1;
-                shove_player(player, displacement);
+void move_platform_horizontally(Game * const game, Platform * const platform) {
+    Player * const player = game->player;
+    if (should_move_at_current_frame(game, platform->speed_x)) {
+        if (player->y == platform->y) { // Fail fast if the platform is not on the same line
+            if (normalize(platform->speed_x) == 1) {
+                if (player->x == platform->x + platform->width) {
+                    Vector displacement;
+                    displacement.x = 1;
+                    displacement.y = 0;
+                    shove_player(player, displacement);
+                }
+            } else if (normalize(platform->speed_x) == -1) {
+                if (player->x == platform->x - 1) {
+                    Vector displacement;
+                    displacement.x = -1;
+                    displacement.y = 0;
+                    shove_player(player, displacement);
+                }
             }
-        } else if (direction == -1) {
-            if (player->y == platform->y - 1) {
-                Vector displacement;
-                displacement.x = 0;
-                displacement.y = -1;
-                shove_player(player, displacement);
+        } else if (is_over_platform(player->x, player->y, platform)) {  // If the player is over the platform
+            Vector displacement;
+            displacement.x = normalize(platform->speed_x);
+            displacement.y = 0;
+            shove_player(player, displacement);
+        }
+        platform->x += normalize(platform->speed_x);
+    }
+}
+
+void move_platform_vertically(Game * const game, Platform * const platform) {
+    Player * const player = game->player;
+    log_message("Here.");
+    if (should_move_at_current_frame(game, platform->speed_y)) {
+        log_message("DOWN Here.");
+            if (player->x >= platform->x && player->x < platform->x + platform->width) {
+            if (normalize(platform->speed_y) == 1) {
+                if (player->y == platform->y + 1) {
+                    Vector displacement;
+                    displacement.x = 0;
+                    displacement.y = 1;
+                    shove_player(player, displacement);
+                }
+            } else if (normalize(platform->speed_y) == -1) {
+                if (player->y == platform->y - 1) {
+                    Vector displacement;
+                    displacement.x = 0;
+                    displacement.y = -1;
+                    shove_player(player, displacement);
+                }
             }
         }
+        platform->y += normalize(platform->speed_y);
     }
-    platform->y += direction;
 }
 
 /**
  * Repositions a Platform in the vicinity of a BoundingBox.
  */
-void reposition(Player * const player, Platform * const platform, const BoundingBox * const box) {
+void reposition(Game * const game, Platform * const platform) {
+    const BoundingBox * const box = game->box;
     if (platform->x > box->max_x) { // To the right of the box
         platform->x = 1 - platform->width;
         platform->y = random_integer(box->min_y, box->max_y);
@@ -115,7 +162,7 @@ void reposition(Player * const player, Platform * const platform, const Bounding
         platform->x = random_integer(box->min_x, box->max_x);
         // Must work when the player is in the last line
         platform->y = box->max_y + 1; // Create it under the bounding box
-        move_platform_vertically(player, platform, -1); // Use the move function to keep the game in a valid state
+        move_platform_vertically(game, platform); // Use the move function to keep the game in a valid state
     }
     // We don't have to deal with platforms below the box.
 }
@@ -139,23 +186,18 @@ int is_out_of_bounding_box(Platform * const platform, const BoundingBox * const 
     }
 }
 
-void update_platform(Player * const player, Platform * const platform, const BoundingBox * const box) {
-    int i;
-    for (i = 0; i < abs(platform->speed_x); i++) {
-        move_platform_horizontally(player, platform, normalize(platform->speed_x));
-    }
-    for (i = 0; i < abs(platform->speed_y); i++) {
-        move_platform_vertically(player, platform, normalize(platform->speed_y));
-    }
-    if (is_out_of_bounding_box(platform, box)) {
-        reposition(player, platform, box);
+void update_platform(Game * const game, Platform * const platform) {
+    move_platform_horizontally(game, platform);
+    move_platform_vertically(game, platform);
+    if (is_out_of_bounding_box(platform, game->box)) {
+        reposition(game, platform);
     }
 }
 
 void update_platforms(Game * const game) {
     size_t i;
     for (i = 0; i < game->platform_count; i++) {
-        update_platform(game->player, game->platforms + i, game->box);
+        update_platform(game, game->platforms + i);
     }
 }
 
@@ -217,6 +259,21 @@ void update_perk(Game * const game) {
     }
 }
 
+/**
+ * Moves the player according to the sign of its current speed if it can move in that direction.
+ */
+void move_player(Player * const player, const Platform *platforms, const size_t platform_count) {
+    if (normalize(player->speed_x) == 1) {
+        if (is_valid_move(player->x + 1, player->y, platforms, platform_count)) {
+            player->x += 1;
+        }
+    } else if (normalize(player->speed_x) == -1) {
+        if (is_valid_move(player->x - 1, player->y, platforms, platform_count)) {
+            player->x -= 1;
+        }
+    }
+}
+
 void update_player(Game * const game, const Command command) {
     Player * const player = game->player;
     Platform *platforms = game->platforms;
@@ -228,23 +285,36 @@ void update_player(Game * const game, const Command command) {
     if (player->physics) {
         game->played_frames++;
     }
+    // Update the player running state
     if (command == COMMAND_LEFT) {
-        if (is_valid_move(player->x - 1, player->y, platforms, platform_count)) {
-            player->x -= 1;
+        if (player->speed_x == 0) {
+            player->speed_x = -PLAYER_RUNNING_SPEED;
+        } else if (player->speed_x > 0) {
+            player->speed_x = 0;
         }
     } else if (command == COMMAND_RIGHT) {
-        if (is_valid_move(player->x + 1, player->y, platforms, platform_count)) {
-            player->x += 1;
+        if (player->speed_x == 0) {
+            player->speed_x = PLAYER_RUNNING_SPEED;
+        } else if (player->speed_x < 0) {
+            player->speed_x = 0;
         }
     }
-    // After moving, if it even happened, simulate gravity
+    // This ordering makes the player run horizontally before falling, which
+    // seems the right thing to do to improve user experience.
+    if (should_move_at_current_frame(game, player->speed_x)) {
+        move_player(player, platforms, platform_count);
+    }
+    // After moving, if it even happened, simulate gravity.
     if (is_falling(player, platforms, platform_count)) {
-        player->y++;
+        if (should_move_at_current_frame(game, PLAYER_FALLING_SPEED)) {
+            player->y++;
+        }
     }
     if (is_touching_a_wall(player, box)) {
         player->lives--;
         reposition_player(player, box);
         // Unset physics collisions for the player.
         player->physics = 0;
+        player->speed_x = 0;
     }
 }

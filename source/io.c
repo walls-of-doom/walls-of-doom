@@ -565,7 +565,7 @@ Command read_next_command(void) {
 Command wait_for_next_command(void) {
     Command command = COMMAND_NONE;
     while (command == COMMAND_NONE) {
-        rest_for_second_fraction(MENU_FPS);
+        rest_for_second_fraction(FPS);
         command = read_next_command();
     }
     return command;

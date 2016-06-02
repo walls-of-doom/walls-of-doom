@@ -76,7 +76,7 @@ void register_score(const Game * const game) {
  * Returns 0 if successful.
  */
 int run_game(Game * const game) {
-    unsigned long next_played_frames_score = GAME_FPS;
+    unsigned long next_played_frames_score = FPS;
     Command command = COMMAND_NONE;
     // Checking for any nonpositive player.lives value would be safer but could hide some bugs
     while (command != COMMAND_QUIT && !check_for_screen_size_change(game) && game->player->lives != 0) {
@@ -84,7 +84,7 @@ int run_game(Game * const game) {
         // 1. Update the score
         if (game->played_frames == next_played_frames_score) {
             game->player->score++;
-            next_played_frames_score += GAME_FPS;
+            next_played_frames_score += FPS;
         }
         // 2. Update the platforms
         update_platforms(game);
@@ -93,7 +93,7 @@ int run_game(Game * const game) {
         // 4. Draw everything
         draw_game(game);
         // 5. Sleep
-        rest_for_second_fraction(GAME_FPS);
+        rest_for_second_fraction(FPS);
         // 6. Read whatever command we got (if any)
         command = read_next_command();
         // 7. Update the player using the command
