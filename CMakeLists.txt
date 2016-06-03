@@ -15,7 +15,7 @@ set (CMAKE_BUILD_TYPE Release)
 
 # Based on which compiler we are using, set warning flags
 if ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
-    set (CMAKE_C_FLAGS "-Weverything")
+    # Clang standard warnings are decent. No need for more.
 elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
     set (CMAKE_C_FLAGS "-Wall -Wextra")
 endif ()
