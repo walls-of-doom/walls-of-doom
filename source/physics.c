@@ -246,16 +246,31 @@ void reposition_player(Player * const player, const BoundingBox * const box) {
     player->y = get_bounding_box_center_y(box);
 }
 
+/**
+ * Conceives a bonus perk to the player.
+ */
+void conceive_bonus(Player * const player, Perk perk) {
+    if (is_bonus_perk(perk)) {
+        if (perk == PERK_BONUS_EXTRA_POINTS) {
+            player->score += 60;
+        } else if (perk == PERK_BONUS_EXTRA_LIFE) {
+            player->lives += 1;
+        }
+    } else {
+        log_message("Called conceive_bonus with a Perk that is not a bonus!");
+    }
+}
+
 void update_perk(Game * const game) {
-    if (game->played_frames == game->perk_end_frame) { // Current Perk must end
+    if (game->played_frames == game->perk_end_frame) {
+        // Current Perk (if any) must end.
         game->perk = PERK_NONE;
-    } else if (game->played_frames == game->perk_end_frame + GAME_PERK_INTERVAL_IN_FRAMES) {
+    } else if (game->played_frames == game->perk_end_frame - PERK_DURATION_ON_SCREEN_IN_FRAMES + PERK_INTERVAL_IN_FRAMES) {
+        // If the frame count since the current perk was created is equal to the perk interval, create a new Perk.
         game->perk = get_random_perk();
-        Vector position;
-        position.x = random_integer(game->box->min_x, game->box->max_x);
-        position.y = random_integer(game->box->min_y, game->box->max_y);
-        game->perk_position = position;
-        game->perk_end_frame = game->played_frames + GAME_PERK_DURATION_IN_FRAMES;
+        game->perk_x = random_integer(game->box->min_x, game->box->max_x);
+        game->perk_y = random_integer(game->box->min_y, game->box->max_y);
+        game->perk_end_frame = game->played_frames + PERK_DURATION_ON_SCREEN_IN_FRAMES;
     }
 }
 
@@ -293,7 +308,6 @@ int is_standing_on_platform(const Player * const player, const Platform * platfo
 
 void process_jump(Player * const player, const Platform * platforms, const size_t platform_count) {
     if (is_standing_on_platform(player, platforms, platform_count)) {
-        player->can_double_jump = 1;
         player->remaining_jump_height = PLAYER_JUMPING_HEIGHT;
     } else if (player->can_double_jump) {
         player->can_double_jump = 0;
@@ -311,6 +325,26 @@ void update_player(Game * const game, const Command command) {
     }
     if (player->physics) {
         game->played_frames++;
+        if (game->perk != PERK_NONE) {
+            if (game->perk_x == player->x && game->perk_y == player->y) {
+                // Copy the Perk to transfer it to the Player
+                Perk perk = game->perk;
+
+                // Remove the Perk from the screen
+                game->perk = PERK_NONE;
+                // Do not update game->perk_end_frame as it is used to
+                // calculate when the next perk is going to be created
+
+                // Attribute the Perk to the Player
+                player->perk = perk;
+                if (is_bonus_perk(perk)) {
+                    conceive_bonus(player, perk);
+                    player->perk_end_frame = game->played_frames; // The perk ends now.
+                } else {
+                    player->perk_end_frame = game->played_frames + PERK_DURATION_ON_PLAYER_IN_FRAMES;
+                }
+            }
+        }
     }
     // Update the player running state
     if (command == COMMAND_LEFT) {
@@ -343,6 +377,9 @@ void update_player(Game * const game, const Command command) {
         if (should_move_at_current_frame(game, PLAYER_FALLING_SPEED)) {
             player->y++;
         }
+    }
+    if (is_standing_on_platform(player, platforms, platform_count)) {
+        player->can_double_jump = 1;
     }
     if (is_touching_a_wall(player, box)) {
         player->lives--;

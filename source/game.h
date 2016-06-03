@@ -12,11 +12,6 @@
 
 #include <stdlib.h>
 
-#define GAME_PERK_INTERVAL_IN_SECONDS 30
-#define GAME_PERK_DURATION_IN_SECONDS 10
-#define GAME_PERK_INTERVAL_IN_FRAMES GAME_PERK_INTERVAL_IN_SECONDS * FPS
-#define GAME_PERK_DURATION_IN_FRAMES GAME_PERK_DURATION_IN_SECONDS * FPS
-
 typedef struct Game {
 
     Player *player;
@@ -35,7 +30,8 @@ typedef struct Game {
     unsigned long played_frames;
 
     Perk perk;
-    Vector perk_position;
+    int perk_x;
+    int perk_y;
     unsigned long perk_end_frame;
 
     BoundingBox *box;

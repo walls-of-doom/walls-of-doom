@@ -16,4 +16,9 @@ void update_perk(Game * const game);
 
 void update_player(Game * const game, const Command command);
 
+/**
+ * Conceives a bonus perk to the player.
+ */
+void conceive_bonus(Player * const player, Perk perk);
+
 #endif

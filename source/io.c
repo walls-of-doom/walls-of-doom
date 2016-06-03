@@ -425,7 +425,7 @@ int draw_platforms(const Platform * platforms, const size_t platform_count, cons
 }
 
 int has_active_perk(const Game * const game) {
-    return game->frame < game->perk_end_frame;
+    return game->perk != PERK_NONE;
 }
 
 ColorScheme get_perk_color(Perk perk) {
@@ -455,7 +455,7 @@ int draw_perk(const Game * const game) {
     if (has_active_perk(game)) {
         attron(COLOR_PAIR(get_perk_color(game->perk)));
         attron(A_BOLD);
-        print(game->perk_position.x, game->perk_position.y, get_perk_symbol());
+        print(game->perk_x, game->perk_y, get_perk_symbol());
         attroff(A_BOLD);
         attroff(COLOR_PAIR(get_perk_color(game->perk)));
     }

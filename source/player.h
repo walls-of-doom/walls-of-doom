@@ -1,9 +1,12 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "perks.h"
+
 #define PLAYER_NAME_MAXIMUM_SIZE 64
 
 typedef struct Player {
+
     char *name;
     
     int x;
@@ -19,6 +22,10 @@ typedef struct Player {
 
     int lives;
     int score;
+
+    Perk perk;
+    unsigned long perk_end_frame;
+
 } Player;
 
 /**

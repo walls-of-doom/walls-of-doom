@@ -33,8 +33,9 @@ Game create_game(Player *player, Platform *platforms, const size_t platform_coun
     game.box = box;
 
     game.perk = PERK_NONE;
-    game.perk_end_frame = 0; // No perk and already expired.
-    game.perk_position = bounding_box_center(box);
+    game.perk_x = 0;
+    game.perk_y = 0;
+    game.perk_end_frame = PERK_DURATION_ON_SCREEN_IN_FRAMES; // Don't start with a Perk on the screen.
 
     return game;
 }
