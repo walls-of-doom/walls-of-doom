@@ -7,7 +7,7 @@
 /**
  * Returns the nanoseconds difference between the two provided timespecs.
  */
-uint_least64_t elapsed_time_in_nanoseconds(const struct timespec * const start, const struct timespec * const end) {
+int_least64_t elapsed_time_in_nanoseconds(const struct timespec * const start, const struct timespec * const end) {
     if (end->tv_sec < start->tv_sec || (end->tv_sec == start->tv_sec && end->tv_nsec < start->tv_nsec)) {
         log_message("elapsed_time_in_nanoseconds got an end time greater than the start time");
         return 0;
@@ -21,7 +21,7 @@ uint_least64_t elapsed_time_in_nanoseconds(const struct timespec * const start, 
 /**
  * Rests for the specified number of nanoseconds.
  */
-void rest_for_nanoseconds(uint_least64_t nanoseconds) {
+void rest_for_nanoseconds(int_least64_t nanoseconds) {
     struct timespec sleep_duration;
     sleep_duration.tv_sec = nanoseconds / NANOSECONDS_IN_ONE_SECOND;
     sleep_duration.tv_nsec = nanoseconds % NANOSECONDS_IN_ONE_SECOND;
