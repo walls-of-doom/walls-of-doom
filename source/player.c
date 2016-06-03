@@ -9,7 +9,8 @@ Player make_player(char *name) {
     player.speed_x = 0;
     player.speed_y = 0;
     player.physics = 0;
-    player.jumps = 2;
+    player.can_double_jump = 0;
+    player.remaining_jump_height = 0;
     player.lives = 3;
     player.score = 0;
     return player;

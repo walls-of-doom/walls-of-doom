@@ -9,6 +9,9 @@
 
 #define PLAYER_RUNNING_SPEED 4
 #define PLAYER_FALLING_SPEED 8
+#define PLAYER_JUMPING_SPEED PLAYER_FALLING_SPEED
+
+#define PLAYER_JUMPING_HEIGHT 2 * PLAYER_JUMPING_SPEED
 
 /**
  * Repositions a Platform in the vicinity of a BoundingBox.
@@ -123,9 +126,7 @@ void move_platform_horizontally(Game * const game, Platform * const platform) {
 
 void move_platform_vertically(Game * const game, Platform * const platform) {
     Player * const player = game->player;
-    log_message("Here.");
     if (should_move_at_current_frame(game, platform->speed_y)) {
-        log_message("DOWN Here.");
             if (player->x >= platform->x && player->x < platform->x + platform->width) {
             if (normalize(platform->speed_y) == 1) {
                 if (player->y == platform->y + 1) {
@@ -274,6 +275,33 @@ void move_player(Player * const player, const Platform *platforms, const size_t 
     }
 }
 
+int is_jumping(const Player * const player) {
+    return player->remaining_jump_height > 0;
+}
+
+/**
+ * Evaluates whether or not the player is standing on a platform.
+ */
+int is_standing_on_platform(const Player * const player, const Platform * platforms, const size_t platform_count) {
+    size_t i;
+    for (i = 0; i < platform_count; i++) {
+        if (is_over_platform(player->x, player->y, platforms + i)) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+void process_jump(Player * const player, const Platform * platforms, const size_t platform_count) {
+    if (is_standing_on_platform(player, platforms, platform_count)) {
+        player->can_double_jump = 1;
+        player->remaining_jump_height = PLAYER_JUMPING_HEIGHT;
+    } else if (player->can_double_jump) {
+        player->can_double_jump = 0;
+        player->remaining_jump_height += PLAYER_JUMPING_HEIGHT / 2;
+    }
+}
+
 void update_player(Game * const game, const Command command) {
     Player * const player = game->player;
     Platform *platforms = game->platforms;
@@ -298,6 +326,8 @@ void update_player(Game * const game, const Command command) {
         } else if (player->speed_x < 0) {
             player->speed_x = 0;
         }
+    } else if (command == COMMAND_JUMP) {
+        process_jump(player, platforms, platform_count);
     }
     // This ordering makes the player run horizontally before falling, which
     // seems the right thing to do to improve user experience.
@@ -305,7 +335,12 @@ void update_player(Game * const game, const Command command) {
         move_player(player, platforms, platform_count);
     }
     // After moving, if it even happened, simulate gravity.
-    if (is_falling(player, platforms, platform_count)) {
+    if (is_jumping(player)) {
+        if (should_move_at_current_frame(game, PLAYER_JUMPING_SPEED)) {
+            player->y--;
+            player->remaining_jump_height--;
+        }
+    } else if (is_falling(player, platforms, platform_count)) {
         if (should_move_at_current_frame(game, PLAYER_FALLING_SPEED)) {
             player->y++;
         }
@@ -316,5 +351,7 @@ void update_player(Game * const game, const Command command) {
         // Unset physics collisions for the player.
         player->physics = 0;
         player->speed_x = 0;
+        player->can_double_jump = 0;
+        player->remaining_jump_height = 0;
     }
 }
