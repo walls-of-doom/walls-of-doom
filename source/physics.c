@@ -4,7 +4,6 @@
 #include "random.h"
 #include "vector.h"
 
-#include <math.h>
 #include <stdio.h>
 
 #define PLAYER_RUNNING_SPEED 4
@@ -91,7 +90,7 @@ int should_move_at_current_frame(const Game * const game, const int speed) {
     if (speed == 0 || game->frame == 0) { // Play it safe with floating point errors
         return 0;
     } else {
-        return game->frame % ((unsigned long) (round(FPS / (double) abs(speed)))) == 0;
+        return game->frame % ((unsigned long) ((FPS / (double) abs(speed)) + 0.5)) == 0;
     }
 }
 
