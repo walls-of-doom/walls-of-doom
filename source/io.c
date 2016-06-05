@@ -342,10 +342,14 @@ int draw_top_bar(const Player * const player) {
     const size_t columns_per_value = COLS / TOP_BAR_STRING_COUNT;
 
     char power_buffer[MAXIMUM_STRING_SIZE];
-    sprintf(power_buffer, "Power: %d", 0); // Use a proper label here in the future.
+    if (player->perk != PERK_NONE) {
+        sprintf(power_buffer, "Power: %s", get_perk_name(player->perk));
+    } else {
+        sprintf(power_buffer, "No Power");
+    }
 
     char lives_buffer[MAXIMUM_STRING_SIZE];
-    sprintf(lives_buffer, "Lives: %d", player->lives); // Could use a repeated character.
+    sprintf(lives_buffer, "Lives: %d", player->lives);
 
     char score_buffer[MAXIMUM_STRING_SIZE];
     sprintf(score_buffer, "Score: %d", player->score);

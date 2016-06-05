@@ -27,4 +27,6 @@ Perk get_random_perk(void);
 
 int is_bonus_perk(Perk perk);
 
+char *get_perk_name(Perk perk);
+
 # endif
