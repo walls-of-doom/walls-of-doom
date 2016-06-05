@@ -309,9 +309,15 @@ int is_standing_on_platform(const Player * const player, const Platform * platfo
 void process_jump(Player * const player, const Platform * platforms, const size_t platform_count) {
     if (is_standing_on_platform(player, platforms, platform_count)) {
         player->remaining_jump_height = PLAYER_JUMPING_HEIGHT;
+        if (player->perk == PERK_POWER_SUPER_JUMP) {
+            player->remaining_jump_height *= 2;
+        }
     } else if (player->can_double_jump) {
         player->can_double_jump = 0;
         player->remaining_jump_height += PLAYER_JUMPING_HEIGHT / 2;
+        if (player->perk == PERK_POWER_SUPER_JUMP) {
+            player->remaining_jump_height *= 2;
+        }
     }
 }
 
