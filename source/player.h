@@ -29,7 +29,9 @@ typedef struct Player {
 } Player;
 
 /**
- * Returns a Player object with the provided name.
+ * Returns an initialized Player object with the provided name.
+ *
+ * An initialized Player object is an object which is ready to start a game.
  */
 Player make_player(char *name);
 
