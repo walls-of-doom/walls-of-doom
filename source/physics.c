@@ -331,6 +331,12 @@ void update_player(Game * const game, const Command command) {
     }
     if (player->physics) {
         game->played_frames++;
+        // Check for expiration of the player's perk.
+        if (player->perk != PERK_NONE) {
+            if (game->played_frames == player->perk_end_frame) {
+                player->perk = PERK_NONE;
+            }
+        }
         if (game->perk != PERK_NONE) {
             if (game->perk_x == player->x && game->perk_y == player->y) {
                 // Copy the Perk to transfer it to the Player
@@ -384,9 +390,11 @@ void update_player(Game * const game, const Command command) {
             player->y++;
         }
     }
+    // Enable double jump if the player is standing over a platform.
     if (is_standing_on_platform(player, platforms, platform_count)) {
         player->can_double_jump = 1;
     }
+    // Kill the player if it is touching a wall.
     if (is_touching_a_wall(player, box)) {
         player->lives--;
         reposition_player(player, box);
