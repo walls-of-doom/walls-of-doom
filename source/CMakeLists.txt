@@ -4,7 +4,6 @@ configure_file (version.h.in version.h)
 
 add_library (walls-of-doom-source
     about.h about.c
-    box.h box.c
     command.h
     constants.h
     data.h data.c
@@ -21,7 +20,7 @@ add_library (walls-of-doom-source
     record.h record.c
     rest.h rest.c
     sort.h sort.c
-    vector.h vector.c
+    types.h
     version.h)
 
 set_target_properties (walls-of-doom-source PROPERTIES LINKER_LANGUAGE C)

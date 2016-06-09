@@ -2,7 +2,6 @@
 #include "logger.h"
 #include "physics.h"
 #include "random.h"
-#include "vector.h"
 
 #include <stdio.h>
 

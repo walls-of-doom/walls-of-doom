@@ -1,11 +1,12 @@
 #ifndef PHYSICS_H
 #define PHYSICS_H
 
-#include "box.h"
 #include "command.h"
 #include "game.h"
 #include "platform.h"
 #include "player.h"
+#include "types.h"
+
 #include "stdlib.h"
 
 int bounding_box_equals(const BoundingBox * const a, const BoundingBox * const b);

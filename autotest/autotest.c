@@ -7,7 +7,6 @@
 #include "random.h"
 #include "rest.h"
 #include "sort.h"
-#include "vector.h"
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -26,17 +25,6 @@ void test_normalize(void) {
     TEST_ASSERT_EQUAL_INT(0, normalize(0));
     TEST_ASSERT_EQUAL_INT(1, normalize(1));
     TEST_ASSERT_EQUAL_INT(1, normalize(INT_MAX));
-}
-
-void test_vector_add(void) {
-    Vector a;
-    a.x = 1.0;
-    a.y = 2.0;
-    Vector b;
-    b.x = 3.0;
-    b.y = 4.0;
-    TEST_ASSERT_EQUAL_FLOAT(4.0, vector_add(a, b).x);
-    TEST_ASSERT_EQUAL_FLOAT(6.0, vector_add(a, b).y);
 }
 
 void test_trim_string_works_with_empty_strings(void) {
@@ -419,7 +407,6 @@ int main(void) {
     UNITY_BEGIN();
     log_message("Started running tests");
     RUN_TEST(test_normalize);
-    RUN_TEST(test_vector_add);
     RUN_TEST(test_trim_string_works_with_empty_strings);
     RUN_TEST(test_trim_string_works_with_already_trimmed_strings);
     RUN_TEST(test_trim_string_properly_trims_preceding_spaces);

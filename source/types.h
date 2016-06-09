@@ -1,7 +1,5 @@
-#ifndef BOX_H
-#define BOX_H
-
-#include "vector.h"
+#ifndef TYPES_H
+#define TYPES_H
 
 typedef struct BoundingBox {
     int min_x;
@@ -9,7 +7,5 @@ typedef struct BoundingBox {
     int max_x;
     int max_y;
 } BoundingBox;
-
-Vector bounding_box_center(const BoundingBox * const box);
 
 #endif
