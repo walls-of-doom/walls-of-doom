@@ -67,7 +67,9 @@ int is_over_platform(const int x, const int y, const Platform * const platform) 
  */
 void shove_player(Player * const player, const Vector displacement) {
     if (player->physics) {
-        player->x += displacement.x;
+        if (player->perk != PERK_POWER_LEVITATION) {
+            player->x += displacement.x;
+        }
         player->y += displacement.y;
     }
 }
@@ -217,7 +219,7 @@ int is_valid_move(const int x, const int y, const Platform *platforms, const siz
  * Evaluates whether or not the Player is falling. Takes the physics field into account.
  */
 int is_falling(const Player * const player, const Platform *platforms, const size_t platform_count) {
-    if (!player->physics) {
+    if (!player->physics || player->perk == PERK_POWER_LEVITATION) {
         return 0;
     }
     size_t i;
