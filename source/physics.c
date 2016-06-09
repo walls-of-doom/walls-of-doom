@@ -61,16 +61,22 @@ int is_over_platform(const int x, const int y, const Platform * const platform) 
 }
 
 /**
+ * Moves the player by the provided x and y direcitions. This moves the player
+ * at most one position on each axis.
+ */
+void move_player(Game *game, int x, int y);
+
+/**
  * Attempts to force the Player to move according to the provided displacement.
  *
  * If the player does not have physics enabled, this is a no-op.
  */
-void shove_player(Player * const player, const Vector displacement) {
-    if (player->physics) {
-        if (player->perk != PERK_POWER_LEVITATION) {
-            player->x += displacement.x;
+void shove_player(Game * const game, int x, int y) {
+    if (game->player->physics) {
+        if (game->player->perk != PERK_POWER_LEVITATION) {
+            move_player(game, x, 0);
         }
-        player->y += displacement.y;
+        move_player(game, 0, y);
     }
 }
 
@@ -102,24 +108,15 @@ void move_platform_horizontally(Game * const game, Platform * const platform) {
         if (player->y == platform->y) { // Fail fast if the platform is not on the same line
             if (normalize(platform->speed_x) == 1) {
                 if (player->x == platform->x + platform->width) {
-                    Vector displacement;
-                    displacement.x = 1;
-                    displacement.y = 0;
-                    shove_player(player, displacement);
+                    shove_player(game, 1, 0);
                 }
             } else if (normalize(platform->speed_x) == -1) {
                 if (player->x == platform->x - 1) {
-                    Vector displacement;
-                    displacement.x = -1;
-                    displacement.y = 0;
-                    shove_player(player, displacement);
+                    shove_player(game, -1, 0);
                 }
             }
         } else if (is_over_platform(player->x, player->y, platform)) {  // If the player is over the platform
-            Vector displacement;
-            displacement.x = normalize(platform->speed_x);
-            displacement.y = 0;
-            shove_player(player, displacement);
+            shove_player(game, normalize(platform->speed_x), 0);
         }
         platform->x += normalize(platform->speed_x);
     }
@@ -131,17 +128,10 @@ void move_platform_vertically(Game * const game, Platform * const platform) {
             if (player->x >= platform->x && player->x < platform->x + platform->width) {
             if (normalize(platform->speed_y) == 1) {
                 if (player->y == platform->y + 1) {
-                    Vector displacement;
-                    displacement.x = 0;
-                    displacement.y = 1;
-                    shove_player(player, displacement);
                 }
             } else if (normalize(platform->speed_y) == -1) {
                 if (player->y == platform->y - 1) {
-                    Vector displacement;
-                    displacement.x = 0;
-                    displacement.y = -1;
-                    shove_player(player, displacement);
+                    shove_player(game, 0, -1);
                 }
             }
         }
@@ -205,18 +195,9 @@ void update_platforms(Game * const game) {
     }
 }
 
-int is_valid_move(const int x, const int y, const Platform *platforms, const size_t platform_count) {
-    size_t i;
-    for (i = 0; i < platform_count; i++) {
-        if (is_within_platform(x, y, platforms + i)) {
-            return 0;
-        }
-    }
-    return 1;
-}
-
 /**
- * Evaluates whether or not the Player is falling. Takes the physics field into account.
+ * Evaluates whether or not the Player is falling. Takes the physics field into
+ * account.
  */
 int is_falling(const Player * const player, const Platform *platforms, const size_t platform_count) {
     if (!player->physics || player->perk == PERK_POWER_LEVITATION) {
@@ -279,16 +260,55 @@ void update_perk(Game * const game) {
 }
 
 /**
- * Moves the player according to the sign of its current speed if it can move in that direction.
+ * Evaluates whether or not the given x and y pair is a valid position for the
+ * player to occupy.
  */
-void move_player(Player * const player, const Platform *platforms, const size_t platform_count) {
-    if (normalize(player->speed_x) == 1) {
-        if (is_valid_move(player->x + 1, player->y, platforms, platform_count)) {
-            player->x += 1;
+int is_valid_move(Game *game, const int x, const int y) {
+    if (game->player->perk == PERK_POWER_INVINCIBILITY) {
+        if ((game->box->min_x - 1 == x || game->box->max_x + 1 == x)
+             || (game->box->min_y - 1 == y || game->box->max_y + 1 == y)) {
+            // If it is invincible, it shouldn't move into walls.
+            return 0;
         }
-    } else if (normalize(player->speed_x) == -1) {
-        if (is_valid_move(player->x - 1, player->y, platforms, platform_count)) {
-            player->x -= 1;
+    }
+    // If the player is ascending, skip platform collision check.
+    if (game->player->x != x || game->player->y != y + 1) {
+        size_t i;
+        for (i = 0; i < game->platform_count; i++) {
+            if (is_within_platform(x, y, game->platforms + i)) {
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+/**
+ * Moves the player by the provided x and y direcitions. This moves the player
+ * at most one position on each axis.
+ */
+void move_player(Game *game, int x, int y) {
+    // Ignore magnitude, take just -1, 0, or 1.
+    // It is good to reuse these variables to prevent mistakes by having
+    // multiple integers for the same axis.
+    x = normalize(x);
+    y = normalize(y);
+    if (is_valid_move(game, game->player->x + x, game->player->y + y)) {
+        game->player->x += x;
+        game->player->y += y;
+    }
+}
+
+/**
+ * Moves the player according to the sign of its current speed if it can move
+ * in that direction.
+ */
+void update_player_horizontally(Game *game) {
+    if (should_move_at_current_frame(game, game->player->speed_x)) {
+        if (game->player->speed_x > 0) {
+            move_player(game, 1, 0);
+        } else if ((game->player->speed_x) < 0) {
+            move_player(game, -1, 0);
         }
     }
 }
@@ -299,28 +319,34 @@ int is_jumping(const Player * const player) {
 
 /**
  * Evaluates whether or not the player is standing on a platform.
+ *
+ * This function takes into account the Invincibility perk, which makes the
+ * bottom border to be treated as a platform.
  */
-int is_standing_on_platform(const Player * const player, const Platform * platforms, const size_t platform_count) {
+int is_standing_on_platform(const Game * const game) {
+    if (game->player->perk == PERK_POWER_INVINCIBILITY && game->player->y == game->box->max_y) {
+        return 1;
+    }
     size_t i;
-    for (i = 0; i < platform_count; i++) {
-        if (is_over_platform(player->x, player->y, platforms + i)) {
+    for (i = 0; i < game->platform_count; i++) {
+        if (is_over_platform(game->player->x, game->player->y, game->platforms + i)) {
             return 1;
         }
     }
     return 0;
 }
 
-void process_jump(Player * const player, const Platform * platforms, const size_t platform_count) {
-    if (is_standing_on_platform(player, platforms, platform_count)) {
-        player->remaining_jump_height = PLAYER_JUMPING_HEIGHT;
-        if (player->perk == PERK_POWER_SUPER_JUMP) {
-            player->remaining_jump_height *= 2;
+void process_jump(Game * const game) {
+    if (is_standing_on_platform(game)) {
+        game->player->remaining_jump_height = PLAYER_JUMPING_HEIGHT;
+        if (game->player->perk == PERK_POWER_SUPER_JUMP) {
+            game->player->remaining_jump_height *= 2;
         }
-    } else if (player->can_double_jump) {
-        player->can_double_jump = 0;
-        player->remaining_jump_height += PLAYER_JUMPING_HEIGHT / 2;
-        if (player->perk == PERK_POWER_SUPER_JUMP) {
-            player->remaining_jump_height *= 2;
+    } else if (game->player->can_double_jump) {
+        game->player->can_double_jump = 0;
+        game->player->remaining_jump_height += PLAYER_JUMPING_HEIGHT / 2;
+        if (game->player->perk == PERK_POWER_SUPER_JUMP) {
+            game->player->remaining_jump_height *= 2;
         }
     }
 }
@@ -379,17 +405,15 @@ void update_player(Game * const game, const Command command) {
             player->speed_x = 0;
         }
     } else if (command == COMMAND_JUMP) {
-        process_jump(player, platforms, platform_count);
+        process_jump(game);
     }
     // This ordering makes the player run horizontally before falling, which
     // seems the right thing to do to improve user experience.
-    if (should_move_at_current_frame(game, player->speed_x)) {
-        move_player(player, platforms, platform_count);
-    }
+    update_player_horizontally(game);
     // After moving, if it even happened, simulate gravity.
     if (is_jumping(player)) {
         if (should_move_at_current_frame(game, PLAYER_JUMPING_SPEED)) {
-            player->y--;
+            move_player(game, 0, -1);
             player->remaining_jump_height--;
         }
     } else if (is_falling(player, platforms, platform_count)) {
@@ -398,11 +422,11 @@ void update_player(Game * const game, const Command command) {
             falling_speed /= 2;
         }
         if (should_move_at_current_frame(game, falling_speed)) {
-            player->y++;
+            move_player(game, 0, 1);
         }
     }
     // Enable double jump if the player is standing over a platform.
-    if (is_standing_on_platform(player, platforms, platform_count)) {
+    if (is_standing_on_platform(game)) {
         player->can_double_jump = 1;
     }
     // Kill the player if it is touching a wall.
