@@ -161,7 +161,7 @@ void reposition(Game * const game, Platform * const platform) {
         platform->x = box->max_x;
         platform->y = random_integer(box->min_y, box->max_y);
     } else if (platform->y < box->min_y) { // Above the box
-        platform->x = random_integer(box->min_x, box->max_x);
+        platform->x = random_integer(box->min_x, box->max_x - platform->width);
         // Must work when the player is in the last line
         platform->y = box->max_y + 1; // Create it under the bounding box
         move_platform_vertically(game, platform); // Use the move function to keep the game in a valid state
