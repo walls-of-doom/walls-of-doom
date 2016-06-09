@@ -23,13 +23,13 @@ int initialize_color_schemes(void) {
     init_pair(COLOR_BOTTOM_BAR, COLOR_BLACK, COLOR_YELLOW);
     init_pair(COLOR_PLATFORMS, COLOR_WHITE, COLOR_WHITE);
     init_pair(COLOR_PLAYER, COLOR_WHITE, COLOR_BLACK);
-    init_pair(COLOR_INVINCIBILITY, COLOR_YELLOW, COLOR_BLACK);
-    init_pair(COLOR_LEVITATION, COLOR_WHITE, COLOR_BLACK); // Requested was grey
-    init_pair(COLOR_LOW_GRAVITY, COLOR_BLUE, COLOR_BLACK); // Requested was purple
-    init_pair(COLOR_SUPER_JUMP, COLOR_CYAN, COLOR_BLACK);
-    init_pair(COLOR_TIME_STOP, COLOR_MAGENTA, COLOR_BLACK);
-    init_pair(COLOR_EXTRA_LIFE, COLOR_GREEN, COLOR_BLACK);
-    init_pair(COLOR_EXTRA_POINTS, COLOR_RED, COLOR_BLACK); // Requested was brown
+    init_pair(COLOR_INVINCIBILITY, COLOR_BLACK, COLOR_YELLOW);
+    init_pair(COLOR_LEVITATION, COLOR_BLACK, COLOR_WHITE); // Requested was grey
+    init_pair(COLOR_LOW_GRAVITY, COLOR_BLACK, COLOR_BLUE); // Requested was purple
+    init_pair(COLOR_SUPER_JUMP, COLOR_BLACK, COLOR_CYAN);
+    init_pair(COLOR_TIME_STOP, COLOR_BLACK, COLOR_MAGENTA);
+    init_pair(COLOR_EXTRA_LIFE, COLOR_BLACK, COLOR_GREEN);
+    init_pair(COLOR_EXTRA_POINTS, COLOR_BLACK, COLOR_RED); // Requested was brown
     return 0;
 }
 

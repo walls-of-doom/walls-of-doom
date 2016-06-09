@@ -27,6 +27,11 @@ Perk get_random_perk(void);
 
 int is_bonus_perk(Perk perk);
 
+/**
+ * Returns the name of the provided Perk. 
+ *
+ * The biggest string this function returns has 13 printable characters.
+ */
 char *get_perk_name(Perk perk);
 
 # endif
