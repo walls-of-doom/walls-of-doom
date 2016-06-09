@@ -391,7 +391,11 @@ void update_player(Game * const game, const Command command) {
             player->remaining_jump_height--;
         }
     } else if (is_falling(player, platforms, platform_count)) {
-        if (should_move_at_current_frame(game, PLAYER_FALLING_SPEED)) {
+        int falling_speed = PLAYER_FALLING_SPEED;
+        if (player->perk == PERK_POWER_LOW_GRAVITY) {
+            falling_speed /= 2;
+        }
+        if (should_move_at_current_frame(game, falling_speed)) {
             player->y++;
         }
     }
