@@ -54,6 +54,7 @@ CMakeCache.txt
 
 # Walls of Doom
 build/
+sulzbach-ferrazza.zip
 
 # Code::Blocks
 *.layout
