@@ -195,9 +195,11 @@ void update_platform(Game * const game, Platform * const platform) {
 }
 
 void update_platforms(Game * const game) {
-    size_t i;
-    for (i = 0; i < game->platform_count; i++) {
-        update_platform(game, game->platforms + i);
+    if (game->player->perk != PERK_POWER_TIME_STOP) {
+        size_t i;
+        for (i = 0; i < game->platform_count; i++) {
+            update_platform(game, game->platforms + i);
+        }
     }
 }
 
