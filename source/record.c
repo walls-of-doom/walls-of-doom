@@ -7,8 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 
-// Get as close to 64 KiB as possible.
-#define RECORD_ARRAY_SIZE 963
+#define RECORD_ARRAY_SIZE 5
 #define RECORD_TABLE_FILENAME "records.bin"
 
 typedef struct RecordTable {
