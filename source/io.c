@@ -343,7 +343,7 @@ int draw_top_bar(const Player * const player) {
 
     char power_buffer[MAXIMUM_STRING_SIZE];
     if (player->perk != PERK_NONE) {
-        sprintf(power_buffer, "Power: %s", get_perk_name(player->perk));
+        sprintf(power_buffer, "%s", get_perk_name(player->perk));
     } else {
         sprintf(power_buffer, "No Power");
     }
@@ -508,7 +508,8 @@ void print_game_result(const char *name, const unsigned int score, const int pos
 }
 
 /**
- * Returns a BoundingBox that represents the playable area after removing bars and margins.
+ * Returns a BoundingBox that represents the playable area after removing bars
+ * and margins.
  */
 BoundingBox bounding_box_from_screen(void) {
     BoundingBox box;
