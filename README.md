@@ -15,7 +15,8 @@ See [the Bitbucket issue tracker](https://bitbucket.org/mafagafogigante/walls-of
 
 This build server uses Ubuntu 14.04 64-bit, CMake 2.8, and GCC 4.8.4.
 
-Everyone can see the [build status](https://semaphoreci.com/mafagafogigante/walls-of-doom).
+The [build status](https://semaphoreci.com/mafagafogigante/walls-of-doom) can
+be seen by some developers.
 
 # Building and Running
 
