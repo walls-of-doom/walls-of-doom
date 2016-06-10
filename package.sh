@@ -22,6 +22,6 @@ zip -q -j $NAME $HELPER/game/walls-of-doom
 rm -rf $HELPER
 
 # Create a PDF from the README using Pandoc
-pandoc -f markdown_github -t latex README.md -o README.pdf
+bash readme-to-pdf.sh
 zip -q $NAME README.pdf
 rm README.pdf
