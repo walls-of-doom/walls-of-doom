@@ -17,7 +17,7 @@ cmake ..
 make
 cd ..
 # Add the executable to the archive
-zip -q -j $NAME $HELPER/game/walls-of-doom
+zip -q -j $NAME $HELPER/game/game
 # Clean the helper directory up
 rm -rf $HELPER
 
