@@ -59,6 +59,7 @@ sulzbach-ferrazza.zip
 
 # Code::Blocks
 *.layout
+walls-of-doom.cbp
 
 # Blender
 blender/output/
