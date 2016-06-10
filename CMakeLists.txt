@@ -20,7 +20,6 @@ elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
     set (CMAKE_C_FLAGS "-Wall -Wextra")
 endif ()
 
-add_subdirectory (source)
 add_subdirectory (unity)
-add_subdirectory (autotest)
+add_subdirectory (tests)
 add_subdirectory (game)

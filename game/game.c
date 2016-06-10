@@ -106,3 +106,11 @@ int run_game(Game * const game) {
     register_score(game);
     return 0;
 }
+
+int main(void) {
+    initialize();
+    seed_random();
+    int result = main_menu();
+    finalize();
+    return result;
+}

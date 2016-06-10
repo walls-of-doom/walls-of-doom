@@ -37,13 +37,15 @@ $ make
 ### Running the tests
 
 ```bash
-$ ./autotest/autotest
+$ cd tests
+$ ./tests
 ```
 
 ### Running the game
 
 ```bash
-$ ./game/walls-of-doom
+$ cd game
+$ ./game
 ```
 
 ## Code::Blocks
@@ -75,38 +77,56 @@ $ bash render.sh
 
 And they should be written in to the output subdirectory.
 
+## Links
+
+All these images are posted on the [Imgur album of the project](http://imgur.com/a/kiOY2).
+
 # Implementation Notes
 
-Before using the I/O capabilities of WoD, initialize() must be called.
-Before quitting the game, finalize() must be called to free associated
+## IO
+
+Before using the IO capabilities of Walls of Doom, `initialize()` must be
+called. Before quitting the game, `finalize()` must be called to free associated
 resources.
 
-Similarly, before using the logging capabilities, initialize_logger() should be
-called and finalize_logger() should be called after quitting. Note, however,
-that if the program makes use of the I/O capabilities, the calls to initialize()
-and finalize() will also properly initialize and finalize the logger, so
-handling logger initialization and finalization is only required if the I/O
-initialization and finalization are not performed.
+If one must use the logger without initializing the other IO functions, the
+logger module may be independently initialized by calling `initialize_logger()`
+and finalized by calling `finalize_logger()`.
 
-## **insertion-sort.h**
+## Business Logic
 
-+ Our generic insertion sort implementation
+### Menu
 
-We only need to keep track of the five best scores. Therefore, insertion sort is
-a good enough algorithm for our requirements.
+Under the Menu name is grouped most of the logic that deals with handling user
+interactions outside of the game. This includes menu item selection, the top
+scores functionality and the auxiliary functions of these parts of the
+application.
 
-## **random.h**
+### Physics
 
-We are using the **[xoroshiro+](http://xoroshiro.di.unimi.it/)** algorithm to
-efficiently generate pseudo-random numbers with a big period.
+The Physics module is where most of the calculations and checks take place.
+Walking, falling, jumping, the fetching of perks, and death are some of the
+things that fall under the scope of this module.
+
+## Sorting
+
+This project has its own generic insertion sort implementation.
+
+It is a generic function because it uses void pointers and function pointers to
+comparators in order to be reused for different data types without any code
+duplication.
+
+## Pseudorandom Number Generator
+
+Before using the PRNG, you can initialize it with the current time by calling
+`seed_random()`.
+
+This project uses the **[xoroshiro+](http://xoroshiro.di.unimi.it/)** algorithm
+to efficiently generate pseudo-random numbers with a big period.
 
 The convenience function that returns an integer in the specified range uses
 multiple random numbers modulo the next power of two to prevent the modulo bias
 that comes with more naive approaches.
-
-# Links
-
-[Imgur album of the project](http://imgur.com/a/kiOY2).
 
 # License
 

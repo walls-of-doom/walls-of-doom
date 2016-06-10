@@ -136,23 +136,23 @@ int read_platforms(Platform *platforms) {
             platform->speed_y = -speed;
         }
     }
-    
+
     return platform_count;
 }
 
 int game(void) {
     char name[PLAYER_NAME_MAXIMUM_SIZE];
     read_player_name(name, PLAYER_NAME_MAXIMUM_SIZE);
-    
+
     Player player = make_player(name);
     player.x = COLS / 2;
     player.y = LINES / 2;
-    
+
     BoundingBox box = bounding_box_from_screen();
 
     Platform platforms[MAXIMUM_PLATFORM_COUNT];
     const size_t platform_count = read_platforms(platforms);
-    
+
     Game game = create_game(&player, platforms, platform_count, &box);
 
     run_game(&game);
