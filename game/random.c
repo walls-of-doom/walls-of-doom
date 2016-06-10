@@ -28,7 +28,7 @@
 uint64_t s[2] = {0x7c87b3fced63be76, 0x4ec3c3191d40a751};
 
 uint64_t random_time_seed(void) {
-    // If tloc is a null pointer, no value is stored.
+    /* If tloc is a null pointer, no value is stored. */
     return (uint64_t) time(NULL);
 }
 
@@ -46,8 +46,8 @@ uint64_t next(void) {
     const uint64_t result = s0 + s1;
 
     s1 ^= s0;
-    s[0] = rotl(s0, 55) ^ s1 ^ (s1 << 14); // a, b
-    s[1] = rotl(s1, 36); // c
+    s[0] = rotl(s0, 55) ^ s1 ^ (s1 << 14); /* a, b */
+    s[1] = rotl(s1, 36); /* c */
 
     return result;
 }

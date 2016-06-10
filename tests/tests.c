@@ -29,7 +29,7 @@ void test_normalize(void) {
 
 void test_trim_string_works_with_empty_strings(void) {
     const char *input = "";
-    const char *expected = input; // Use a more meaningful name.
+    const char *expected = input; /* Use a more meaningful name. */
     char buffer[64];
     strcpy(buffer, input);
     trim_string(buffer);
@@ -38,7 +38,7 @@ void test_trim_string_works_with_empty_strings(void) {
 
 void test_trim_string_works_with_already_trimmed_strings(void) {
     const char *input = "a b";
-    const char *expected = input; // Use a more meaningful name.
+    const char *expected = input; /* Use a more meaningful name. */
     char buffer[64];
     strcpy(buffer, input);
     trim_string(buffer);

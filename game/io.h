@@ -7,11 +7,11 @@
 #include "physics.h"
 
 typedef enum ColorScheme {
-    // Color pair 0 is assumed to be white on black, but is actually whatever
-    // the terminal implements before color is initialized. It cannot be
-    // modified by the application, therefore we must start at 1.
-    COLOR_TOP_BAR = 1, // Set the first enum constant to one
-    COLOR_BOTTOM_BAR,  // Becomes two, and so on
+    /* Color pair 0 is assumed to be white on black, but is actually whatever */
+    /* the terminal implements before color is initialized. It cannot be */
+    /* modified by the application, therefore we must start at 1. */
+    COLOR_TOP_BAR = 1, /* Set the first enum constant to one */
+    COLOR_BOTTOM_BAR,  /* Becomes two, and so on */
     COLOR_PLATFORMS,
     COLOR_PLAYER,
     COLOR_INVINCIBILITY,

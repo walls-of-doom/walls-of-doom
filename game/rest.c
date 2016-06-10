@@ -12,9 +12,9 @@ int_least64_t elapsed_time_in_nanoseconds(const struct timespec * const start, c
         log_message("elapsed_time_in_nanoseconds got an end time greater than the start time");
         return 0;
     }
-    // Let x = (end->tv_sec - start->tv_sec) * NANOSECONDS_IN_ONE_SECOND
-    // If x is 0, then end->tv_nsec >= start->tv_nsec and subtracting is safe even for unsigned types.
-    // Otherwise, then it is bigger than start->tv_nsec and subtracting is fine even for unsigned types.
+    /* Let x = (end->tv_sec - start->tv_sec) * NANOSECONDS_IN_ONE_SECOND */
+    /* If x is 0, then end->tv_nsec >= start->tv_nsec and subtracting is safe even for unsigned types. */
+    /* Otherwise, then it is bigger than start->tv_nsec and subtracting is fine even for unsigned types. */
     return (end->tv_sec - start->tv_sec) * NANOSECONDS_IN_ONE_SECOND + end->tv_nsec - start->tv_nsec;
 }
 
@@ -27,7 +27,7 @@ void rest_for_nanoseconds(int_least64_t nanoseconds) {
     sleep_duration.tv_nsec = nanoseconds % NANOSECONDS_IN_ONE_SECOND;
     struct timespec remaining;
     nanosleep(&sleep_duration, &remaining);
-    // Currently we quietly ignore if the sleep was interrupted.
+    /* Currently we quietly ignore if the sleep was interrupted. */
 }
 
 /**

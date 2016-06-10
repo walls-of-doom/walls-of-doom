@@ -24,9 +24,9 @@ typedef struct RecordTable {
 Record make_record(const char * name, const int score) {
     Record record;
     
-    // Safely copy the provided name into the array.
+    /* Safely copy the provided name into the array. */
     strncpy(record.name, name, PLAYER_NAME_MAXIMUM_SIZE - 1);
-    // We must manually assure that the last char is a null character.
+    /* We must manually assure that the last char is a null character. */
     record.name[PLAYER_NAME_MAXIMUM_SIZE - 1] = '\0';
 
     record.score = score;
@@ -75,10 +75,10 @@ void read_table(RecordTable * const table) {
             char message[512];
             sprintf(message, "Failed to read a RecordTable from %s", RECORD_TABLE_FILENAME);
             log_message(message);
-            read_error = 1; // Set the error flag to trigger the creation of a new table.
+            read_error = 1; /* Set the error flag to trigger the creation of a new table. */
         }
     } else {
-        read_error = 1; // Set the error flag to trigger the creation of a new table.
+        read_error = 1; /* Set the error flag to trigger the creation of a new table. */
     }
     if (read_error) {
         populate_table_with_default_records(table);
@@ -94,11 +94,11 @@ void write_table(const RecordTable * const table) {
  * Writes the specified Record to to the system.
  */
 int save_record(const Record * const record) {
-    // Add 1 to the maximum size as we need to store the newest record.
+    /* Add 1 to the maximum size as we need to store the newest record. */
     RecordTable table;
     read_table(&table);
 
-    // If the table is full, overwrite the last record if this record is greater.
+    /* If the table is full, overwrite the last record if this record is greater. */
     if (table.record_count == RECORD_ARRAY_SIZE) {
         if (compare_records(record, table.records + (table.record_count - 1)) > 0) {
             table.records[table.record_count - 1] = *record;
@@ -111,14 +111,14 @@ int save_record(const Record * const record) {
     }
     log_message("Added the record to the record table");
 
-    // Sort the table records.
+    /* Sort the table records. */
     insertion_sort((void *)table.records, table.record_count, sizeof(Record), compare_void_record_pointers);
     reverse((void *)table.records, table.record_count, sizeof(Record));
     log_message("Sorted the record table");
 
-    // Write the table to disk.
+    /* Write the table to disk. */
     write_table(&table);
-    // Find the index of the provided record.
+    /* Find the index of the provided record. */
     int record_index = table.record_count - 1;
     while (compare_records(record, table.records + record_index) != 0) {
         record_index--;

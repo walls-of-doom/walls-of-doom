@@ -77,14 +77,14 @@ int read_characters(const char * const filename, char *destination, const size_t
     if (file_exists(filename)) {
         FILE *file = fopen(filename, "r");
         size_t copied = 0;
-        int c; // Must be an integer because it may be EOF
-        // Check copied + 1 against destination size because we need a null character at the end.
+        int c; /* Must be an integer because it may be EOF */
+        /* Check copied + 1 against destination size because we need a null character at the end. */
         while (copied + 1 < destination_size && (c = fgetc(file)) != EOF) {
             destination[copied] = (char)c;
             copied++;
         }
-        // Done copying, place a null character if we can.
-        if (destination_size > 0) { // Provided size may be 0.
+        /* Done copying, place a null character if we can. */
+        if (destination_size > 0) { /* Provided size may be 0. */
             destination[copied] = '\0';
         }
         fclose(file);
@@ -107,6 +107,6 @@ size_t read_integers(const char * const filename, int *integer_array, const size
         next_index++;
     }
     fclose(file);
-    return next_index; // number of elements == index of next element
+    return next_index; /* number of elements == index of next element */
 }
 

@@ -20,19 +20,19 @@ void insertion_sort(void *start, size_t count, size_t width, int (*compare)(cons
     unsigned char *pointer = (unsigned char *)start;
     size_t i;
     for (i = 0; i + 1 < count; i++) {
-        size_t j = i + 1; // j is always positive here
+        size_t j = i + 1; /* j is always positive here */
         void *pointer_to_element = (void *)(pointer + j * width);
         void *pointer_to_predecessor = (void *)(pointer + (j - 1) * width);
-        // While the element is not the first one and is smaller than the predecessor.
+        /* While the element is not the first one and is smaller than the predecessor. */
         while (j > 0 && (*compare)(pointer_to_element, pointer_to_predecessor) < 0) {
-            // Swap
+            /* Swap */
             memcpy(helper, pointer_to_predecessor, width);
             memcpy(pointer_to_predecessor, pointer_to_element, width);
             memcpy(pointer_to_element, helper, width);
-            // Update the pointers
+            /* Update the pointers */
             pointer_to_element = pointer_to_predecessor;
             pointer_to_predecessor -= width;
-            // Update the index
+            /* Update the index */
             j--;
         }
     }
@@ -49,7 +49,7 @@ void reverse(void *start, size_t count, size_t width) {
     size_t i;
     for (i = 0; i < count / 2; i++) {
         size_t j = count - i - 1;
-        // Swap i and j
+        /* Swap i and j */
         void *pointer_to_i = (void *)(pointer + i * width);
         void *pointer_to_j = (void *)(pointer + j * width);
         memcpy(helper, pointer_to_i, width);

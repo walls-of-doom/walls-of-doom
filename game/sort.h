@@ -3,8 +3,8 @@
 
 #include <stdlib.h>
 
-// The maximum number of bytes insertion_sort() can handle.
-// If you change this constant, remember to update the function documentation.
+/* The maximum number of bytes insertion_sort() can handle. */
+/* If you change this constant, remember to update the function documentation. */
 #define INSERTION_SORT_MAXIMUM_SIZE 1024
 
 /**

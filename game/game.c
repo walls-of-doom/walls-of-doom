@@ -35,7 +35,7 @@ Game create_game(Player *player, Platform *platforms, const size_t platform_coun
     game.perk = PERK_NONE;
     game.perk_x = 0;
     game.perk_y = 0;
-    game.perk_end_frame = PERK_DURATION_ON_SCREEN_IN_FRAMES; // Don't start with a Perk on the screen.
+    game.perk_end_frame = PERK_DURATION_ON_SCREEN_IN_FRAMES; /* Don't start with a Perk on the screen. */
 
     return game;
 }
@@ -50,16 +50,16 @@ int check_for_screen_size_change(const Game * const game) {
 
 void register_score(const Game * const game) {
     const Player * const player = game->player;
-    // Log that we are registering the score
+    /* Log that we are registering the score */
     char buffer[MAXIMUM_STRING_SIZE];
     const char *format = "Started registering a score of %d points for %s";
     sprintf(buffer, format, player->score, player->name);
     log_message(buffer);
 
-    // The name has already been entered to make the Player object.
+    /* The name has already been entered to make the Player object. */
     Record record = make_record(player->name, player->score);
 
-    // Write the Record to disk
+    /* Write the Record to disk */
     int scoreboard_index = save_record(&record);
     int position = scoreboard_index + 1;
 
@@ -79,30 +79,30 @@ void register_score(const Game * const game) {
 int run_game(Game * const game) {
     unsigned long next_played_frames_score = FPS;
     Command command = COMMAND_NONE;
-    // Checking for any nonpositive player.lives value would be safer but could hide some bugs
+    /* Checking for any nonpositive player.lives value would be safer but could hide some bugs */
     while (command != COMMAND_QUIT && !check_for_screen_size_change(game) && game->player->lives != 0) {
-        // Game loop
-        // 1. Update the score
+        /* Game loop */
+        /* 1. Update the score */
         if (game->played_frames == next_played_frames_score) {
             game->player->score++;
             next_played_frames_score += FPS;
         }
-        // 2. Update the platforms
+        /* 2. Update the platforms */
         update_platforms(game);
-        // 3. Update the perk
+        /* 3. Update the perk */
         update_perk(game);
-        // 4. Draw everything
+        /* 4. Draw everything */
         draw_game(game);
-        // 5. Sleep
+        /* 5. Sleep */
         rest_for_second_fraction(FPS);
-        // 6. Read whatever command we got (if any)
+        /* 6. Read whatever command we got (if any) */
         command = read_next_command();
-        // 7. Update the player using the command
+        /* 7. Update the player using the command */
         update_player(game, command);
-        // 8. Increment the frame counter
+        /* 8. Increment the frame counter */
         game->frame++;
     }
-    // Ignoring how the game ended (quit command, screen resize, or death), register the score
+    /* Ignoring how the game ended (quit command, screen resize, or death), register the score */
     register_score(game);
     return 0;
 }

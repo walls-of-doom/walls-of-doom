@@ -8,7 +8,7 @@
 Player make_player(char *name) {
     Player player;
     player.name = name;
-    // Initialize the player to the corner so that it is in a valid state.
+    /* Initialize the player to the corner so that it is in a valid state. */
     player.x = 0;
     player.y = 0;
     player.speed_x = 0;

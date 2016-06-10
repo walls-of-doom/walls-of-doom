@@ -87,14 +87,14 @@ void shove_player(Game * const game, int x, int y) {
  * nonpositive integers.
  */
 int should_move_at_current_frame(const Game * const game, const int speed) {
-    // Reasoning for rounding a double
-    // Let FPS = 30 and speed = 16, if we perform integer division, we will get
-    // one. This would be much faster than a speed of 16 would actually be as
-    // ideally the object would be moved at every 1.875 frame. Therefore, it is
-    // much better to update it at every other frame than at every frame. This
-    // shows that the expected behavior is reached by rounding a precise
-    // division rather than by truncating the quotient.
-    if (speed == 0 || game->frame == 0) { // Play it safe with floating point errors
+    /* Reasoning for rounding a double */
+    /* Let FPS = 30 and speed = 16, if we perform integer division, we will get */
+    /* one. This would be much faster than a speed of 16 would actually be as */
+    /* ideally the object would be moved at every 1.875 frame. Therefore, it is */
+    /* much better to update it at every other frame than at every frame. This */
+    /* shows that the expected behavior is reached by rounding a precise */
+    /* division rather than by truncating the quotient. */
+    if (speed == 0 || game->frame == 0) { /* Play it safe with floating point errors */
         return 0;
     } else {
         return game->frame % ((unsigned long) ((FPS / (double) abs(speed)) + 0.5)) == 0;
@@ -104,7 +104,7 @@ int should_move_at_current_frame(const Game * const game, const int speed) {
 void move_platform_horizontally(Game * const game, Platform * const platform) {
     Player * const player = game->player;
     if (should_move_at_current_frame(game, platform->speed_x)) {
-        if (player->y == platform->y) { // Fail fast if the platform is not on the same line
+        if (player->y == platform->y) { /* Fail fast if the platform is not on the same line */
             if (normalize(platform->speed_x) == 1) {
                 if (player->x == platform->x + platform->width) {
                     shove_player(game, 1, 0);
@@ -114,7 +114,7 @@ void move_platform_horizontally(Game * const game, Platform * const platform) {
                     shove_player(game, -1, 0);
                 }
             }
-        } else if (is_over_platform(player->x, player->y, platform)) {  // If the player is over the platform
+        } else if (is_over_platform(player->x, player->y, platform)) {  /* If the player is over the platform */
             shove_player(game, normalize(platform->speed_x), 0);
         }
         platform->x += normalize(platform->speed_x);
@@ -143,19 +143,19 @@ void move_platform_vertically(Game * const game, Platform * const platform) {
  */
 void reposition(Game * const game, Platform * const platform) {
     const BoundingBox * const box = game->box;
-    if (platform->x > box->max_x) { // To the right of the box
+    if (platform->x > box->max_x) { /* To the right of the box */
         platform->x = 1 - platform->width;
         platform->y = random_integer(box->min_y, box->max_y);
-    } else if (platform->x + platform->width < box->min_x) { // To the left of the box
+    } else if (platform->x + platform->width < box->min_x) { /* To the left of the box */
         platform->x = box->max_x;
         platform->y = random_integer(box->min_y, box->max_y);
-    } else if (platform->y < box->min_y) { // Above the box
+    } else if (platform->y < box->min_y) { /* Above the box */
         platform->x = random_integer(box->min_x, box->max_x - platform->width);
-        // Must work when the player is in the last line
-        platform->y = box->max_y + 1; // Create it under the bounding box
-        move_platform_vertically(game, platform); // Use the move function to keep the game in a valid state
+        /* Must work when the player is in the last line */
+        platform->y = box->max_y + 1; /* Create it under the bounding box */
+        move_platform_vertically(game, platform); /* Use the move function to keep the game in a valid state */
     }
-    // We don't have to deal with platforms below the box.
+    /* We don't have to deal with platforms below the box. */
 }
 
 /**
@@ -247,10 +247,10 @@ void conceive_bonus(Player * const player, Perk perk) {
 
 void update_perk(Game * const game) {
     if (game->played_frames == game->perk_end_frame) {
-        // Current Perk (if any) must end.
+        /* Current Perk (if any) must end. */
         game->perk = PERK_NONE;
     } else if (game->played_frames == game->perk_end_frame - PERK_DURATION_ON_SCREEN_IN_FRAMES + PERK_INTERVAL_IN_FRAMES) {
-        // If the frame count since the current perk was created is equal to the perk interval, create a new Perk.
+        /* If the frame count since the current perk was created is equal to the perk interval, create a new Perk. */
         game->perk = get_random_perk();
         game->perk_x = random_integer(game->box->min_x, game->box->max_x);
         game->perk_y = random_integer(game->box->min_y, game->box->max_y);
@@ -266,11 +266,11 @@ int is_valid_move(Game *game, const int x, const int y) {
     if (game->player->perk == PERK_POWER_INVINCIBILITY) {
         if ((game->box->min_x - 1 == x || game->box->max_x + 1 == x)
              || (game->box->min_y - 1 == y || game->box->max_y + 1 == y)) {
-            // If it is invincible, it shouldn't move into walls.
+            /* If it is invincible, it shouldn't move into walls. */
             return 0;
         }
     }
-    // If the player is ascending, skip platform collision check.
+    /* If the player is ascending, skip platform collision check. */
     if (game->player->x != x || game->player->y != y + 1) {
         size_t i;
         for (i = 0; i < game->platform_count; i++) {
@@ -287,9 +287,9 @@ int is_valid_move(Game *game, const int x, const int y) {
  * at most one position on each axis.
  */
 void move_player(Game *game, int x, int y) {
-    // Ignore magnitude, take just -1, 0, or 1.
-    // It is good to reuse these variables to prevent mistakes by having
-    // multiple integers for the same axis.
+    /* Ignore magnitude, take just -1, 0, or 1. */
+    /* It is good to reuse these variables to prevent mistakes by having */
+    /* multiple integers for the same axis. */
     x = normalize(x);
     y = normalize(y);
     if (is_valid_move(game, game->player->x + x, game->player->y + y)) {
@@ -360,7 +360,7 @@ void update_player(Game * const game, const Command command) {
     }
     if (player->physics) {
         game->played_frames++;
-        // Check for expiration of the player's perk.
+        /* Check for expiration of the player's perk. */
         if (player->perk != PERK_NONE) {
             if (game->played_frames == player->perk_end_frame) {
                 player->perk = PERK_NONE;
@@ -368,21 +368,21 @@ void update_player(Game * const game, const Command command) {
         }
         if (game->perk != PERK_NONE) {
             if (game->perk_x == player->x && game->perk_y == player->y) {
-                // Copy the Perk to transfer it to the Player
+                /* Copy the Perk to transfer it to the Player */
                 Perk perk = game->perk;
 
-                // Remove the Perk from the screen
+                /* Remove the Perk from the screen */
                 game->perk = PERK_NONE;
-                // Do not update game->perk_end_frame as it is used to
-                // calculate when the next perk is going to be created
+                /* Do not update game->perk_end_frame as it is used to */
+                /* calculate when the next perk is going to be created */
 
-                // Attribute the Perk to the Player
+                /* Attribute the Perk to the Player */
                 player->perk = perk;
                 if (is_bonus_perk(perk)) {
                     conceive_bonus(player, perk);
-                    player->perk_end_frame = game->played_frames; // The perk ended now.
-                    // Could set it to the next frame so that the check above
-                    // this part would removed it, but this seems more correct.
+                    player->perk_end_frame = game->played_frames; /* The perk ended now. */
+                    /* Could set it to the next frame so that the check above */
+                    /* this part would removed it, but this seems more correct. */
                     player->perk = PERK_NONE;
                 } else {
                     player->perk_end_frame = game->played_frames + PERK_DURATION_ON_PLAYER_IN_FRAMES;
@@ -390,7 +390,7 @@ void update_player(Game * const game, const Command command) {
             }
         }
     }
-    // Update the player running state
+    /* Update the player running state */
     if (command == COMMAND_LEFT) {
         if (player->speed_x == 0) {
             player->speed_x = -PLAYER_RUNNING_SPEED;
@@ -406,10 +406,10 @@ void update_player(Game * const game, const Command command) {
     } else if (command == COMMAND_JUMP) {
         process_jump(game);
     }
-    // This ordering makes the player run horizontally before falling, which
-    // seems the right thing to do to improve user experience.
+    /* This ordering makes the player run horizontally before falling, which */
+    /* seems the right thing to do to improve user experience. */
     update_player_horizontally(game);
-    // After moving, if it even happened, simulate gravity.
+    /* After moving, if it even happened, simulate gravity. */
     if (is_jumping(player)) {
         if (should_move_at_current_frame(game, PLAYER_JUMPING_SPEED)) {
             move_player(game, 0, -1);
@@ -424,15 +424,15 @@ void update_player(Game * const game, const Command command) {
             move_player(game, 0, 1);
         }
     }
-    // Enable double jump if the player is standing over a platform.
+    /* Enable double jump if the player is standing over a platform. */
     if (is_standing_on_platform(game)) {
         player->can_double_jump = 1;
     }
-    // Kill the player if it is touching a wall.
+    /* Kill the player if it is touching a wall. */
     if (is_touching_a_wall(player, box)) {
         player->lives--;
         reposition_player(player, box);
-        // Unset physics collisions for the player.
+        /* Unset physics collisions for the player. */
         player->physics = 0;
         player->speed_x = 0;
         player->can_double_jump = 0;

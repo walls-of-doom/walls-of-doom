@@ -1,7 +1,6 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
-
 typedef struct Platform {
     int x;
     int y;

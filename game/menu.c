@@ -18,7 +18,7 @@
 
 #include <curses.h>
 
-#define PLATFORM_BASE_SPEED 2 // Platforms will get speeds up to 3 times this value
+#define PLATFORM_BASE_SPEED 2 /* Platforms will get speeds up to 3 times this value */
 #define MAXIMUM_RECORD_ARRAY_SIZE 128
 
 typedef struct Menu {
@@ -128,11 +128,11 @@ int read_platforms(Platform *platforms) {
         platform->speed_y = 0;
         const int speed = input_integers[1 + 2 * i + 1] * PLATFORM_BASE_SPEED;
         const int movement_type = random_integer(0, 4);
-        if (movement_type < 2) { // 40%
+        if (movement_type < 2) { /* 40% */
             platform->speed_x = speed;
-        } else if (movement_type < 4) { // 40%
+        } else if (movement_type < 4) { /* 40% */
             platform->speed_x = -speed;
-        } else { // 20%
+        } else { /* 20% */
             platform->speed_y = -speed;
         }
     }

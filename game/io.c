@@ -24,12 +24,12 @@ int initialize_color_schemes(void) {
     init_pair(COLOR_PLATFORMS, COLOR_WHITE, COLOR_WHITE);
     init_pair(COLOR_PLAYER, COLOR_WHITE, COLOR_BLACK);
     init_pair(COLOR_INVINCIBILITY, COLOR_BLACK, COLOR_YELLOW);
-    init_pair(COLOR_LEVITATION, COLOR_BLACK, COLOR_WHITE); // Requested was grey
-    init_pair(COLOR_LOW_GRAVITY, COLOR_BLACK, COLOR_BLUE); // Requested was purple
+    init_pair(COLOR_LEVITATION, COLOR_BLACK, COLOR_WHITE); /* Requested was grey */
+    init_pair(COLOR_LOW_GRAVITY, COLOR_BLACK, COLOR_BLUE); /* Requested was purple */
     init_pair(COLOR_SUPER_JUMP, COLOR_BLACK, COLOR_CYAN);
     init_pair(COLOR_TIME_STOP, COLOR_BLACK, COLOR_MAGENTA);
     init_pair(COLOR_EXTRA_LIFE, COLOR_BLACK, COLOR_GREEN);
-    init_pair(COLOR_EXTRA_POINTS, COLOR_BLACK, COLOR_RED); // Requested was brown
+    init_pair(COLOR_EXTRA_POINTS, COLOR_BLACK, COLOR_RED); /* Requested was brown */
     return 0;
 }
 
@@ -48,15 +48,15 @@ void log_terminal_color_support(void) {
  */
 void initialize(void) {
     initialize_logger();
-    // Initialize the screen.
+    /* Initialize the screen. */
     initscr();
-    // Prevent terminal echo.
+    /* Prevent terminal echo. */
     noecho();
-    // Prevent delay from getch().
+    /* Prevent delay from getch(). */
     nodelay(stdscr, TRUE);
-    // Do not display the cursor.
+    /* Do not display the cursor. */
     curs_set(FALSE);
-    // Initialize the coloring functionality.
+    /* Initialize the coloring functionality. */
     start_color();
     log_terminal_color_support();
     initialize_color_schemes();
@@ -65,14 +65,14 @@ void initialize(void) {
 void enable_string_input(void) {
     fflush(stdin);
     echo();
-    // Display the cursor.
+    /* Display the cursor. */
     curs_set(TRUE);
     nodelay(stdscr, FALSE);
 }
 
 void disable_string_input(void) {
     noecho();
-    // Do not display the cursor.
+    /* Do not display the cursor. */
     curs_set(FALSE);
     nodelay(stdscr, TRUE);
 }
@@ -96,7 +96,7 @@ int read_string(char *destination, const size_t maximum_size) {
     enable_string_input();
     const int result = getnstr(destination, maximum_size - 1);
     disable_string_input();
-    if (result == ERR) { // Got curses error code.
+    if (result == ERR) { /* Got curses error code. */
         log_message("Got an error when reading string");
         return 1;
     } else {
@@ -142,7 +142,7 @@ void trim_string(char *string) {
     int copying = 0;
     char *write = string;
     char *read = string;
-    // Copy everthing from the first not space up to the end.
+    /* Copy everthing from the first not space up to the end. */
     while (*read != '\0') {
         if (!copying) {
             copying = !isspace(*read);
@@ -154,8 +154,8 @@ void trim_string(char *string) {
         read++;
     }
     *write = '\0';
-    // Replace all trailing spaces by the null character.
-    if (write != string) { // At the first position there is not a space.
+    /* Replace all trailing spaces by the null character. */
+    if (write != string) { /* At the first position there is not a space. */
         write--;
         while (isspace(*write)) {
             *write = '\0';
@@ -179,7 +179,7 @@ int is_valid_player_name(const char *player_name) {
 void read_player_name(char *destination, const size_t maximum_size) {
     int read_error = 0;
     int valid_name = 0;
-    // While there is not a read error or a valid name.
+    /* While there is not a read error or a valid name. */
     while (!read_error && !valid_name) {
         clear();
         const char message[] = "Name your character: ";
@@ -194,13 +194,13 @@ void read_player_name(char *destination, const size_t maximum_size) {
         read_error = read_string(destination, maximum_size);
         if (read_error) {
             log_message("Failed to read player name");
-            // Cope with it by providing a name for the player.
+            /* Cope with it by providing a name for the player. */
             strcpy(destination, "ERROR READING PLAYER NAME");
         } else {
             char buffer[MAXIMUM_STRING_SIZE + maximum_size];
             sprintf(buffer, "Read '%s' from the user", destination);
             log_message(buffer);
-            // Trim the name the user entered.
+            /* Trim the name the user entered. */
             trim_string(destination);
             sprintf(buffer, "Trimmed the input to '%s'", destination);
             log_message(buffer);
@@ -213,7 +213,7 @@ void read_player_name(char *destination, const size_t maximum_size) {
  * Prints the provided string on the screen starting at (x, y).
  */
 void print(const int x, const int y, const char *string) {
-    // Validate that x and y are nonnegative.
+    /* Validate that x and y are nonnegative. */
     if (x < 0 || y < 0) {
         return;
     }
@@ -250,8 +250,8 @@ void wrap_at_right_margin(char *string, const size_t columns) {
         while (string[next_line_start] != ' ') {
             next_line_start--;
             if (next_line_start == last_line_start) {
-               // There are no spaces in this line, so we can't do anything.
-               // Abort, simply.
+               /* There are no spaces in this line, so we can't do anything. */
+               /* Abort, simply. */
                break;
             }
             next_line_start--;
@@ -305,7 +305,7 @@ void print_long_text(char *string) {
     wrap_at_right_margin(string, width);
     int line_count = count_lines(string);
     clear();
-    // Print each line.
+    /* Print each line. */
     char line[MAXIMUM_LINE_WIDTH];
     char *cursor = string;
     size_t lines_copied = 0;
@@ -338,7 +338,7 @@ void print_platform(const Platform * const platform, const BoundingBox * const b
  * Returns 0 if successful.
  */
 int draw_top_bar(const Player * const player) {
-    const int padding = 1; // How many spaces should surround the value (at least).
+    const int padding = 1; /* How many spaces should surround the value (at least). */
     const size_t columns_per_value = COLS / TOP_BAR_STRING_COUNT;
 
     char power_buffer[MAXIMUM_STRING_SIZE];
@@ -358,7 +358,7 @@ int draw_top_bar(const Player * const player) {
 
     size_t i = 0;
 
-    // Check that there are enough columns.
+    /* Check that there are enough columns. */
     const size_t maximum_columns_per_string = columns_per_value - 2 * padding;
     for (i = 0; i < TOP_BAR_STRING_COUNT; i++) {
         if (strlen(strings[i]) > maximum_columns_per_string) {
@@ -366,8 +366,8 @@ int draw_top_bar(const Player * const player) {
         }
     }
 
-    // Effectively write the strings.
-    // Build a buffer with everything, this is best as it will give us the colored background for empty spaces easily.
+    /* Effectively write the strings. */
+    /* Build a buffer with everything, this is best as it will give us the colored background for empty spaces easily. */
     char final_buffer[COLS + 1];
     memset(final_buffer, ' ', COLS);
     final_buffer[COLS] = '\0';
@@ -514,9 +514,9 @@ void print_game_result(const char *name, const unsigned int score, const int pos
 BoundingBox bounding_box_from_screen(void) {
     BoundingBox box;
     box.min_x = 1;
-    box.min_y = 2; // Top bar.
+    box.min_y = 2; /* Top bar. */
     box.max_x = COLS - 2;
-    box.max_y = LINES - 3; // Bottom bar.
+    box.max_y = LINES - 3; /* Bottom bar. */
     return box;
 }
 

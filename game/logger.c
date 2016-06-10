@@ -9,7 +9,7 @@
  * Initializes the logger. Should only be called once.
  */
 void initialize_logger(void) {
-    // Currently, the logger does not need initialization.
+    /* Currently, the logger does not need initialization. */
     log_message("Initialized the logger");
 }
 
@@ -17,7 +17,7 @@ void initialize_logger(void) {
  * Terminates the logger. Should only be called once.
  */
 void finalize_logger(void) {
-    // Currently, the logger does not need termination.
+    /* Currently, the logger does not need termination. */
     log_message("Finalized the logger");
 }
 
