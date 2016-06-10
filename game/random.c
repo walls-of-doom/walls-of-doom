@@ -78,7 +78,6 @@ void jump(void) {
     s[1] = s1;
 }
 
-
 /**
  * Returns the next power of two bigger than the provided number.
  */
@@ -90,7 +89,11 @@ uint64_t find_next_power_of_two(uint64_t number) {
     }
     return result;
 }
-/** * Returns a random number in the range [minimum, maximum].  */ int random_integer(const int minimum, const int maximum) {
+
+/**
+ * Returns a random number in the range [minimum, maximum].
+ */
+ int random_integer(const int minimum, const int maximum) {
     const uint64_t range = maximum - minimum + 1;
     const uint64_t next_power_of_two = find_next_power_of_two(range);
     uint64_t value;
