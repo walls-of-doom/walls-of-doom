@@ -26,16 +26,16 @@ void write_timestamp(char *buffer, const size_t buffer_size) {
     struct tm *time_info;
     time(&current_time);
     time_info = localtime(&current_time);
-    strftime(buffer, buffer_size, "%F %T", time_info);
+    strftime(buffer, buffer_size, "%Y-%m-%d %H:%M:%S", time_info);
 }
 
 /**
  * Logs the provided message to the current log file.
  */
 void log_message(const char *message) {
+    char buffer[TIMESTAMP_BUFFER_SIZE];
     FILE *file = fopen("log.txt", "a");
     if (file) {
-        char buffer[TIMESTAMP_BUFFER_SIZE];
         write_timestamp(buffer, TIMESTAMP_BUFFER_SIZE);
         fprintf(file, "[%s] %s\n", buffer, message);
         fclose(file);
