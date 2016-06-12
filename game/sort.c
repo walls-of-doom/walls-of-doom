@@ -19,10 +19,13 @@ void insertion_sort(void *start, size_t count, size_t width, int (*compare)(cons
     unsigned char helper[INSERTION_SORT_MAXIMUM_SIZE];
     unsigned char *pointer = (unsigned char *)start;
     size_t i;
+    size_t j;
+    void *pointer_to_element;
+    void *pointer_to_predecessor;
     for (i = 0; i + 1 < count; i++) {
-        size_t j = i + 1; /* j is always positive here */
-        void *pointer_to_element = (void *)(pointer + j * width);
-        void *pointer_to_predecessor = (void *)(pointer + (j - 1) * width);
+        j = i + 1; /* j is always positive here */
+        pointer_to_element = (void *)(pointer + j * width);
+        pointer_to_predecessor = (void *)(pointer + (j - 1) * width);
         /* While the element is not the first one and is smaller than the predecessor. */
         while (j > 0 && (*compare)(pointer_to_element, pointer_to_predecessor) < 0) {
             /* Swap */
@@ -31,7 +34,12 @@ void insertion_sort(void *start, size_t count, size_t width, int (*compare)(cons
             memcpy(pointer_to_element, helper, width);
             /* Update the pointers */
             pointer_to_element = pointer_to_predecessor;
-            pointer_to_predecessor -= width;
+            /*
+             * Avoid void pointer arithmetic by casting the pointer to a byte
+             * pointer before subtracting and casting it back to void pointer
+             * afterwards.
+             */
+            pointer_to_predecessor = (void *)((unsigned char *)(pointer_to_predecessor) - width);
             /* Update the index */
             j--;
         }
