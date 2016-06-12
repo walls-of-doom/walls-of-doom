@@ -1,5 +1,6 @@
 #include "data.h"
 
+#include "constants.h"
 #include "logger.h"
 
 #include <stdio.h>
@@ -22,7 +23,7 @@ typedef enum Operation {
 } Operation;
 
 void log_access(Operation operation, const size_t byte_count, const char *filename) {
-    char message[512];
+    char message[MAXIMUM_STRING_SIZE];
     if (operation == READ) {
         sprintf(message, "Reading %lu bytes from %s", (unsigned long) byte_count, filename); 
     } else {
@@ -37,8 +38,9 @@ void log_access(Operation operation, const size_t byte_count, const char *filena
  * Returns 0 in case of success.
  */
 int write_bytes(const char *filename, const void *source, const size_t size, const size_t count) {
+    FILE *file;
     log_access(WRITE, size * count, filename);
-    FILE *file = fopen(filename, "wb");
+    file = fopen(filename, "wb");
     fwrite(source, size, count, file);
     fclose(file);
     return 0;
@@ -50,15 +52,17 @@ int write_bytes(const char *filename, const void *source, const size_t size, con
  * Returns 0 in case of success.
  */
 int read_bytes(const char *filename, void *destination, const size_t size, const size_t count) {
+    FILE *file;
+    size_t read_items;
+    char log_buffer[MAXIMUM_STRING_SIZE];
     log_access(READ, size * count, filename);
     if (file_exists(filename)) {
-        FILE *file = fopen(filename, "rb");
-        const size_t read_items = fread(destination, size, count, file);
+        file = fopen(filename, "rb");
+        read_items = fread(destination, size, count, file);
         fclose(file);
         if (read_items != count) {
-            char message[512];
-            sprintf(message, "Expected to read %lu but actually read %lu", (unsigned long) count, (unsigned long) read_items);
-            log_message(message);
+            sprintf(log_buffer, "Expected to read %lu but actually read %lu", (unsigned long) count, (unsigned long) read_items);
+            log_message(log_buffer);
             return 2;
         }
         return 0;
@@ -73,25 +77,27 @@ int read_bytes(const char *filename, void *destination, const size_t size, const
  * Returns 0 in case of success.
  */
 int read_characters(const char * const filename, char *destination, const size_t destination_size) {
+    FILE *file;
+    size_t copied = 0;
+    int c; /* Must be an integer because it may be EOF */
     log_access(READ, destination_size, filename);
     if (file_exists(filename)) {
-        FILE *file = fopen(filename, "r");
-        size_t copied = 0;
-        int c; /* Must be an integer because it may be EOF */
-        /* Check copied + 1 against destination size because we need a null character at the end. */
-        while (copied + 1 < destination_size && (c = fgetc(file)) != EOF) {
-            destination[copied] = (char)c;
-            copied++;
+        file = fopen(filename, "r");
+        if (file) {
+            /* Check copied + 1 against destination size because we need a null character at the end. */
+            while (copied + 1 < destination_size && (c = fgetc(file)) != EOF) {
+                destination[copied] = (char)c;
+                copied++;
+            }
+            /* Done copying, place a null character if we can. */
+            if (destination_size > 0) { /* Provided size may be 0. */
+                destination[copied] = '\0';
+            }
+            fclose(file);
+            return 0;
         }
-        /* Done copying, place a null character if we can. */
-        if (destination_size > 0) { /* Provided size may be 0. */
-            destination[copied] = '\0';
-        }
-        fclose(file);
-        return 0;
-    } else {
-        return 1;
     }
+    return 1;
 }
 
 /**

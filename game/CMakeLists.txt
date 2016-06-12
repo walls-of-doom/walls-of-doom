@@ -14,7 +14,7 @@ add_library (walls-of-doom-source
     menu.h menu.c
     perks.h perks.c
     physics.h physics.c
-    platform.h
+    platform.h platform.c
     player.h player.c
     random.h random.c
     record.h record.c

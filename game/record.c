@@ -83,11 +83,11 @@ void populate_table_with_default_records(RecordTable * table) {
  */
 void read_table(RecordTable * table) {
     int read_error = 0;
+    char log_buffer[MAXIMUM_STRING_SIZE];
     if (file_exists(RECORD_TABLE_FILENAME)) {
         if (read_bytes(RECORD_TABLE_FILENAME, table, sizeof(RecordTable), 1)) {
-            char message[512];
-            sprintf(message, "Failed to read a RecordTable from %s", RECORD_TABLE_FILENAME);
-            log_message(message);
+            sprintf(log_buffer, "Failed to read a RecordTable from %s", RECORD_TABLE_FILENAME);
+            log_message(log_buffer);
             read_error = 1; /* Set the error flag to trigger the creation of a new table. */
         }
     } else {
@@ -107,7 +107,7 @@ void write_table(const RecordTable * const table) {
  * Writes the specified Record to to the system.
  */
 int save_record(const Record * const record) {
-    /* Add 1 to the maximum size as we need to store the newest record. */
+    int record_index;
     RecordTable table;
     read_table(&table);
 
@@ -132,7 +132,7 @@ int save_record(const Record * const record) {
     /* Write the table to disk. */
     write_table(&table);
     /* Find the index of the provided record. */
-    int record_index = table.record_count - 1;
+    record_index = table.record_count - 1;
     while (compare_records(record, table.records + record_index) != 0) {
         record_index--;
     }
@@ -171,11 +171,12 @@ int count_digits(int number) {
 }
 
 void record_to_string(const Record * const record, char *buffer, const int expected_width) {
+    const char format[] = "%s%*.*s%d";
     char padding_string[MAXIMUM_STRING_SIZE];
+    int padding_length;
     memset(padding_string, '.', MAXIMUM_STRING_SIZE - 1);
     padding_string[MAXIMUM_STRING_SIZE - 1] = '\0';
-    const char format[] = "%s%*.*s%d";
-    int padding_length = expected_width - strlen(record->name) - count_digits(record->score);
+    padding_length = expected_width - strlen(record->name) - count_digits(record->score);
     sprintf(buffer, format, record->name, padding_length, padding_length, padding_string, record->score);
 }
 
@@ -189,7 +190,7 @@ void top_scores(void) {
     const int line_count = LINES - 2 * y;
     size_t maximum_read_records = MAXIMUM_DISPLAYED_RECORDS;
     size_t actually_read_records = read_records(records, maximum_read_records);
-    char line[COLS];
+    char line[MAXIMUM_STRING_SIZE];
     size_t i;
     if (COLS < 16) {
         return;

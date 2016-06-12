@@ -5,12 +5,6 @@
 
 #include <stdio.h>
 
-#define PLAYER_RUNNING_SPEED 4
-#define PLAYER_FALLING_SPEED 8
-#define PLAYER_JUMPING_SPEED PLAYER_FALLING_SPEED
-
-#define PLAYER_JUMPING_HEIGHT 2 * PLAYER_JUMPING_SPEED
-
 /**
  * Repositions a Platform in the vicinity of a BoundingBox.
  */
@@ -186,8 +180,8 @@ void update_platform(Game * const game, Platform * const platform) {
 }
 
 void update_platforms(Game * const game) {
+    size_t i;
     if (game->player->perk != PERK_POWER_TIME_STOP) {
-        size_t i;
         for (i = 0; i < game->platform_count; i++) {
             update_platform(game, game->platforms + i);
         }
@@ -199,10 +193,10 @@ void update_platforms(Game * const game) {
  * account.
  */
 int is_falling(const Player * const player, const Platform *platforms, const size_t platform_count) {
+    size_t i;
     if (!player->physics || player->perk == PERK_POWER_LEVITATION) {
         return 0;
     }
-    size_t i;
     for (i = 0; i < platform_count; i++) {
         if (player->y == platforms[i].y - 1) {
             if (player->x >= platforms[i].x && player->x < platforms[i].x + platforms[i].width) {
@@ -263,6 +257,7 @@ void update_perk(Game * const game) {
  * player to occupy.
  */
 int is_valid_move(Game *game, const int x, const int y) {
+    size_t i;
     if (game->player->perk == PERK_POWER_INVINCIBILITY) {
         if ((game->box->min_x - 1 == x || game->box->max_x + 1 == x)
              || (game->box->min_y - 1 == y || game->box->max_y + 1 == y)) {
@@ -272,7 +267,6 @@ int is_valid_move(Game *game, const int x, const int y) {
     }
     /* If the player is ascending, skip platform collision check. */
     if (game->player->x != x || game->player->y != y + 1) {
-        size_t i;
         for (i = 0; i < game->platform_count; i++) {
             if (is_within_platform(x, y, game->platforms + i)) {
                 return 0;
@@ -323,10 +317,10 @@ int is_jumping(const Player * const player) {
  * bottom border to be treated as a platform.
  */
 int is_standing_on_platform(const Game * const game) {
+    size_t i;
     if (game->player->perk == PERK_POWER_INVINCIBILITY && game->player->y == game->box->max_y) {
         return 1;
     }
-    size_t i;
     for (i = 0; i < game->platform_count; i++) {
         if (is_over_platform(game->player->x, game->player->y, game->platforms + i)) {
             return 1;

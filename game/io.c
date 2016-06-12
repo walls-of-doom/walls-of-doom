@@ -93,8 +93,9 @@ void finalize(void) {
  * Returns 0 in case of success.
  */
 int read_string(char *destination, const size_t maximum_size) {
+    int result;
     enable_string_input();
-    const int result = getnstr(destination, maximum_size - 1);
+    result = getnstr(destination, maximum_size - 1);
     disable_string_input();
     if (result == ERR) { /* Got curses error code. */
         log_message("Got an error when reading string");
@@ -179,12 +180,13 @@ int is_valid_player_name(const char *player_name) {
 void read_player_name(char *destination, const size_t maximum_size) {
     int read_error = 0;
     int valid_name = 0;
+    const char message[] = "Name your character: ";
+    const int message_size = strlen(message);
+    const int maximum_width = message_size + maximum_size;
+    char log_buffer[MAXIMUM_STRING_SIZE];
     /* While there is not a read error or a valid name. */
     while (!read_error && !valid_name) {
         clear();
-        const char message[] = "Name your character: ";
-        const int message_size = strlen(message);
-        const int maximum_width = message_size + maximum_size;
         if (maximum_width <= COLS) {
             print((COLS - maximum_width) / 2, LINES / 2, message);
         } else {
@@ -197,13 +199,12 @@ void read_player_name(char *destination, const size_t maximum_size) {
             /* Cope with it by providing a name for the player. */
             strcpy(destination, "ERROR READING PLAYER NAME");
         } else {
-            char buffer[MAXIMUM_STRING_SIZE + maximum_size];
-            sprintf(buffer, "Read '%s' from the user", destination);
-            log_message(buffer);
+            sprintf(log_buffer, "Read '%s' from the user", destination);
+            log_message(log_buffer);
             /* Trim the name the user entered. */
             trim_string(destination);
-            sprintf(buffer, "Trimmed the input to '%s'", destination);
-            log_message(buffer);
+            sprintf(log_buffer, "Trimmed the input to '%s'", destination);
+            log_message(log_buffer);
             valid_name = is_valid_player_name(destination);
         }
     }
@@ -297,18 +298,20 @@ void pad_line_right(char *line, const size_t width) {
  * Prints the provided string after formatting it to increase readability.
  */
 void print_long_text(char *string) {
-    normalize_whitespaces(string);
+    size_t lines_copied = 0;
+    char line[MAXIMUM_LINE_WIDTH];
+    char *cursor;
     int width = MAXIMUM_LINE_WIDTH;
+    int line_count;
+    normalize_whitespaces(string);
     if (MAXIMUM_LINE_WIDTH > COLS - 2) {
         width = COLS - 2;
     }
     wrap_at_right_margin(string, width);
-    int line_count = count_lines(string);
+    line_count = count_lines(string);
     clear();
     /* Print each line. */
-    char line[MAXIMUM_LINE_WIDTH];
-    char *cursor = string;
-    size_t lines_copied = 0;
+    cursor = string;
     while (*cursor != '\0') {
         cursor = copy_first_line(cursor, line);
         pad_line_right(line, width);
@@ -323,9 +326,11 @@ void print_long_text(char *string) {
  */
 void print_platform(const Platform * const platform, const BoundingBox * const box) {
     int i;
+    int x;
+    int y;
     for (i = 0; i < platform->width; i++) {
-        const int x = platform->x + i;
-        const int y = platform->y;
+        x = platform->x + i;
+        y = platform->y;
         if (x >= box->min_x && x <= box->max_x && y >= box->min_y && y <= box->max_y) {
             print(x, y, " ");
         }
@@ -338,28 +343,34 @@ void print_platform(const Platform * const platform, const BoundingBox * const b
  * Returns 0 if successful.
  */
 int draw_top_bar(const Player * const player) {
+    char power_buffer[MAXIMUM_STRING_SIZE];
+    char lives_buffer[MAXIMUM_STRING_SIZE];
+    char score_buffer[MAXIMUM_STRING_SIZE];
+    char final_buffer[MAXIMUM_STRING_SIZE];
+    char *strings[TOP_BAR_STRING_COUNT];
     const int padding = 1; /* How many spaces should surround the value (at least). */
     const size_t columns_per_value = COLS / TOP_BAR_STRING_COUNT;
-
-    char power_buffer[MAXIMUM_STRING_SIZE];
+    const size_t maximum_columns_per_string = columns_per_value - 2 * padding;
+    size_t centering_padding;
+    size_t x;
+    size_t i;
+    
     if (player->perk != PERK_NONE) {
         sprintf(power_buffer, "%s", get_perk_name(player->perk));
     } else {
         sprintf(power_buffer, "No Power");
     }
 
-    char lives_buffer[MAXIMUM_STRING_SIZE];
     sprintf(lives_buffer, "Lives: %d", player->lives);
 
-    char score_buffer[MAXIMUM_STRING_SIZE];
     sprintf(score_buffer, "Score: %d", player->score);
 
-    char *strings[TOP_BAR_STRING_COUNT] = {GAME_NAME, power_buffer, lives_buffer, score_buffer};
-
-    size_t i = 0;
+    strings[0] = GAME_NAME;
+    strings[1] = power_buffer;
+    strings[2] = lives_buffer;
+    strings[3] = score_buffer;
 
     /* Check that there are enough columns. */
-    const size_t maximum_columns_per_string = columns_per_value - 2 * padding;
     for (i = 0; i < TOP_BAR_STRING_COUNT; i++) {
         if (strlen(strings[i]) > maximum_columns_per_string) {
             return 1;
@@ -368,13 +379,12 @@ int draw_top_bar(const Player * const player) {
 
     /* Effectively write the strings. */
     /* Build a buffer with everything, this is best as it will give us the colored background for empty spaces easily. */
-    char final_buffer[COLS + 1];
-    memset(final_buffer, ' ', COLS);
-    final_buffer[COLS] = '\0';
+    memset(final_buffer, ' ', MAXIMUM_STRING_SIZE);
+    final_buffer[MAXIMUM_STRING_SIZE - 1] = '\0';
 
     for (i = 0; i < TOP_BAR_STRING_COUNT; i++) {
-        const size_t centering_padding = (maximum_columns_per_string - strlen(strings[i])) / 2;
-        const size_t x = i * columns_per_value + padding + centering_padding;
+        centering_padding = (maximum_columns_per_string - strlen(strings[i])) / 2;
+        x = i * columns_per_value + padding + centering_padding;
         memcpy(final_buffer + x, strings[i], strlen(strings[i]));
     }
 
@@ -393,10 +403,10 @@ int draw_top_bar(const Player * const player) {
  * Returns 0 if successful.
  */
 int draw_bottom_bar(void) {
-    char final_buffer[COLS + 1];
-    memset(final_buffer, ' ', COLS);
+    char buffer[MAXIMUM_STRING_SIZE];
+    memset(buffer, ' ', COLS);
     attron(COLOR_PAIR(COLOR_BOTTOM_BAR));
-    mvprintw(LINES - 1, 0, final_buffer);
+    mvprintw(LINES - 1, 0, buffer);
     attroff(COLOR_PAIR(COLOR_BOTTOM_BAR));
     return 0;
 }
@@ -493,9 +503,8 @@ int draw_game(const Game * const game) {
 
 void print_game_result(const char *name, const unsigned int score, const int position) {
     char first_line[MAXIMUM_STRING_SIZE];
-    sprintf(first_line, "%s died after making %d points.", name, score);
-
     char second_line[MAXIMUM_STRING_SIZE];
+    sprintf(first_line, "%s died after making %d points.", name, score);
     if (position > 0) {
         sprintf(second_line, "%s got to position %d!", name, position);
     } else {
