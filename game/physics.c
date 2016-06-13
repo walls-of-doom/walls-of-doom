@@ -26,15 +26,6 @@ int is_within_platform(const int x, const int y, const Platform * const platform
 
 void update_platform(Game * const game, Platform * const platform);
 
-void log_if_not_normalized(const int value) {
-    if (value < -1 && value > 1) {
-        char buffer[256];
-        char *format = "Expected a normalized value, but got %d instead\n";
-        sprintf(buffer, format, value);
-        log_message(buffer);
-    }
-}
-
 int bounding_box_equals(const BoundingBox * const a, const BoundingBox * const b) {
     return a->min_x == b->min_x
         && a->min_y == b->min_y
@@ -344,8 +335,8 @@ void process_jump(Game * const game) {
     }
 }
 
-void update_player(Game * const game, const Command command) {
-    Player * const player = game->player;
+void update_player(Game *game, const Command command) {
+    Player *player = game->player;
     Platform *platforms = game->platforms;
     const size_t platform_count = game->platform_count;
     BoundingBox *box = game->box;

@@ -1,13 +1,11 @@
 #include "about.h"
 
+#include "constants.h"
 #include "data.h"
 #include "io.h"
 #include "rest.h"
 
 #include <string.h>
-
-#define ABOUT_PAGE_PATH "assets/about.txt"
-#define ABOUT_PAGE_BUFFER_SIZE 1024
 
 /**
  * Presents information about the game to the player.

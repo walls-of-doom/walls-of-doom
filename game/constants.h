@@ -22,10 +22,12 @@
  */
 #define MAXIMUM_STRING_SIZE 256
 
+#define MAXIMUM_PLAYER_NAME_SIZE 64
+
 /**
  * The maximum number of platforms the game loads.
  */
-#define MAXIMUM_PLATFORM_COUNT 32
+#define MAXIMUM_PLATFORM_COUNT 256
 
 /**
  * The number of frames per second the engine renders.
@@ -44,5 +46,19 @@
 #define PLAYER_JUMPING_SPEED PLAYER_FALLING_SPEED
 
 #define PLAYER_JUMPING_HEIGHT 2 * PLAYER_JUMPING_SPEED
+
+#define RECORD_ARRAY_SIZE 5
+
+/*
+ * The maximum number of records that will be displayed to the player.
+ *
+ * May be more than the maximum available.
+ */
+#define MAXIMUM_DISPLAYED_RECORDS 64
+
+#define RECORD_TABLE_FILENAME "records.bin"
+
+#define ABOUT_PAGE_BUFFER_SIZE 1024
+#define ABOUT_PAGE_PATH "assets/about.txt"
 
 #endif

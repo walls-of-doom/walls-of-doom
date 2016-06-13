@@ -3,8 +3,6 @@
 
 #include "perks.h"
 
-#define PLAYER_NAME_MAXIMUM_SIZE 64
-
 typedef struct Player {
 
     char *name;

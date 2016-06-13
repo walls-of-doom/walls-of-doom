@@ -12,17 +12,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#define RECORD_ARRAY_SIZE 5
-
-/*
- * The maximum number of records that will be displayed to the player.
- *
- * May be more than the maximum available.
- */
-#define MAXIMUM_DISPLAYED_RECORDS 64
-
-#define RECORD_TABLE_FILENAME "records.bin"
-
 typedef struct RecordTable {
     size_t record_count;
     Record records[RECORD_ARRAY_SIZE];
@@ -38,9 +27,9 @@ Record make_record(const char * name, const int score) {
     Record record;
     
     /* Safely copy the provided name into the array. */
-    strncpy(record.name, name, PLAYER_NAME_MAXIMUM_SIZE - 1);
+    strncpy(record.name, name, MAXIMUM_PLAYER_NAME_SIZE - 1);
     /* We must manually assure that the last char is a null character. */
-    record.name[PLAYER_NAME_MAXIMUM_SIZE - 1] = '\0';
+    record.name[MAXIMUM_PLAYER_NAME_SIZE - 1] = '\0';
 
     record.score = score;
     

@@ -61,14 +61,14 @@ void write_menu(const Menu * const menu) {
  * Enters the game.
  */
 int game(void) {
-    char name[PLAYER_NAME_MAXIMUM_SIZE];
+    char name[MAXIMUM_PLAYER_NAME_SIZE];
     size_t platform_count;
     Player player;
     Platform platforms[MAXIMUM_PLATFORM_COUNT];
     BoundingBox box;
     Game game;
 
-    read_player_name(name, PLAYER_NAME_MAXIMUM_SIZE);
+    read_player_name(name, MAXIMUM_PLAYER_NAME_SIZE);
 
     player = make_player(name);
     player.x = COLS / 2;

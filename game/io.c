@@ -3,6 +3,7 @@
 #include "constants.h"
 #include "game.h"
 #include "logger.h"
+#include "math.h"
 #include "physics.h"
 #include "player.h"
 #include "rest.h"
@@ -34,11 +35,11 @@ int initialize_color_schemes(void) {
 }
 
 void log_terminal_color_support(void) {
-    char message[256];
-    sprintf(message, "Current terminal supports %d colors", COLORS);
-    log_message(message);
-    sprintf(message, "Current terminal supports %d color pairs", COLOR_PAIRS);
-    log_message(message);
+    char log_buffer[MAXIMUM_STRING_SIZE];
+    sprintf(log_buffer, "Current terminal supports %d colors", COLORS);
+    log_message(log_buffer);
+    sprintf(log_buffer, "Current terminal supports %d color pairs", COLOR_PAIRS);
+    log_message(log_buffer);
 }
 
 /**
@@ -171,7 +172,7 @@ void trim_string(char *string) {
  * A name is considered to be valid if it has at least two characters after being trimmed.
  */
 int is_valid_player_name(const char *player_name) {
-    char buffer[PLAYER_NAME_MAXIMUM_SIZE];
+    char buffer[MAXIMUM_PLAYER_NAME_SIZE];
     strcpy(buffer, player_name);
     trim_string(buffer);
     return strlen(buffer) >= 2;
@@ -346,14 +347,20 @@ int draw_top_bar(const Player * const player) {
     char power_buffer[MAXIMUM_STRING_SIZE];
     char lives_buffer[MAXIMUM_STRING_SIZE];
     char score_buffer[MAXIMUM_STRING_SIZE];
-    char final_buffer[MAXIMUM_STRING_SIZE];
+
     char *strings[TOP_BAR_STRING_COUNT];
-    const int padding = 1; /* How many spaces should surround the value (at least). */
-    const size_t columns_per_value = COLS / TOP_BAR_STRING_COUNT;
-    const size_t maximum_columns_per_string = columns_per_value - 2 * padding;
-    size_t centering_padding;
-    size_t x;
-    size_t i;
+
+    const int columns_per_string = COLS / TOP_BAR_STRING_COUNT;
+
+    int begin_x;
+    int after_x;
+    int begin_text_x;
+    int after_text_x;
+
+    int string_length;
+
+    int x;
+    int i;
     
     if (player->perk != PERK_NONE) {
         sprintf(power_buffer, "%s", get_perk_name(player->perk));
@@ -370,43 +377,51 @@ int draw_top_bar(const Player * const player) {
     strings[2] = lives_buffer;
     strings[3] = score_buffer;
 
-    /* Check that there are enough columns. */
-    for (i = 0; i < TOP_BAR_STRING_COUNT; i++) {
-        if (strlen(strings[i]) > maximum_columns_per_string) {
-            return 1;
-        }
-    }
-
-    /* Effectively write the strings. */
-    /* Build a buffer with everything, this is best as it will give us the colored background for empty spaces easily. */
-    memset(final_buffer, ' ', MAXIMUM_STRING_SIZE);
-    final_buffer[MAXIMUM_STRING_SIZE - 1] = '\0';
-
-    for (i = 0; i < TOP_BAR_STRING_COUNT; i++) {
-        centering_padding = (maximum_columns_per_string - strlen(strings[i])) / 2;
-        x = i * columns_per_value + padding + centering_padding;
-        memcpy(final_buffer + x, strings[i], strlen(strings[i]));
-    }
-
     attron(COLOR_PAIR(COLOR_TOP_BAR));
     attron(A_BOLD);
-    print(0, 0, final_buffer);
+    for (i = 0; i < TOP_BAR_STRING_COUNT; i++) {
+        begin_x = i * columns_per_string;
+        after_x = (i + 1) * columns_per_string;
+        string_length = strlen(strings[i]);
+        if (string_length < columns_per_string) {
+            /*
+             * Write the string because it fits.
+             */
+            begin_text_x = begin_x + (columns_per_string - string_length) / 2;
+            after_text_x = begin_text_x + string_length;
+            for (x = begin_x; x < begin_text_x; x++) {
+                print(x, 0, " ");
+            }
+            print(begin_text_x, 0, strings[i]);
+            for (x = after_text_x; x < after_x; x++) {
+                print(x, 0, " ");
+            }
+        } else {
+            /*
+             * String does not fit, do not write it.
+             */
+            for (x = begin_x; x < after_x; x++) {
+                print(x, 0, " ");
+            }
+        }
+    }
     attroff(A_BOLD);
     attroff(COLOR_PAIR(COLOR_TOP_BAR));
 
     return 0;
 }
 
-/**
+/*
  * Draws the bottom status bar on the screen for a given Player.
  *
  * Returns 0 if successful.
  */
 int draw_bottom_bar(void) {
-    char buffer[MAXIMUM_STRING_SIZE];
-    memset(buffer, ' ', COLS);
+    int i;
     attron(COLOR_PAIR(COLOR_BOTTOM_BAR));
-    mvprintw(LINES - 1, 0, buffer);
+    for (i = 0; i < COLS; i++) {
+        print(i, LINES - 1, " ");
+    }
     attroff(COLOR_PAIR(COLOR_BOTTOM_BAR));
     return 0;
 }

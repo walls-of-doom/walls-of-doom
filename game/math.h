@@ -5,6 +5,11 @@
  * Normalizes a scalar by returning either -1, 0 or 1 if this scalar is
  * negative, zero, or positive, respectively.
  */
-int normalize(int value);
+int normalize(const int value);
+
+/**
+ * Returns the smallest of two integers.
+ */
+int min(const int a, const int b);
 
 #endif

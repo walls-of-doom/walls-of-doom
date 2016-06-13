@@ -33,7 +33,7 @@ void initialize(void);
 /**
  * Finalizes the acquired resources.
  *
- * Should only be called once, right before exitting.
+ * Should only be called once, right before exiting.
  */
 void finalize(void);
 
