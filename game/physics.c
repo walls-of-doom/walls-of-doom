@@ -45,7 +45,7 @@ int is_over_platform(const int x, const int y, const Platform * const platform) 
 }
 
 /**
- * Moves the player by the provided x and y direcitions. This moves the player
+ * Moves the player by the provided x and y directions. This moves the player
  * at most one position on each axis.
  */
 void move_player(Game *game, int x, int y);
@@ -138,9 +138,9 @@ void reposition(Game * const game, Platform * const platform) {
         platform->x = random_integer(box->min_x, box->max_x - platform->width);
         /* Must work when the player is in the last line */
         platform->y = box->max_y + 1; /* Create it under the bounding box */
-        move_platform_vertically(game, platform); /* Use the move function to keep the game in a valid state */
+        /* Use the move function to keep the game in a valid state */
+        move_platform_vertically(game, platform);
     }
-    /* We don't have to deal with platforms below the box. */
 }
 
 /**
@@ -268,7 +268,7 @@ int is_valid_move(Game *game, const int x, const int y) {
 }
 
 /**
- * Moves the player by the provided x and y direcitions. This moves the player
+ * Moves the player by the provided x and y directions. This moves the player
  * at most one position on each axis.
  */
 void move_player(Game *game, int x, int y) {
@@ -335,11 +335,48 @@ void process_jump(Game * const game) {
     }
 }
 
+void process_command(Game *game, const Command command) {
+    Player *player = game->player;
+    /* Update the player running state */
+    if (command == COMMAND_LEFT) {
+        if (player->speed_x == 0) {
+            player->speed_x = -PLAYER_RUNNING_SPEED;
+        } else if (player->speed_x > 0) {
+            player->speed_x = 0;
+        }
+    } else if (command == COMMAND_RIGHT) {
+        if (player->speed_x == 0) {
+            player->speed_x = PLAYER_RUNNING_SPEED;
+        } else if (player->speed_x < 0) {
+            player->speed_x = 0;
+        }
+    } else if (command == COMMAND_JUMP) {
+        process_jump(game);
+    }
+}
+
+/**
+ * Checks if the character should die and kills it if this is the case.
+ */
+void check_for_player_death(Game *game) {
+    Player *player = game->player;
+    BoundingBox *box = game->box;
+    /* Kill the player if it is touching a wall. */
+    if (is_touching_a_wall(player, box)) {
+        player->lives--;
+        reposition_player(player, box);
+        /* Unset physics collisions for the player. */
+        player->physics = 0;
+        player->speed_x = 0;
+        player->can_double_jump = 0;
+        player->remaining_jump_height = 0;
+    }
+}
+
 void update_player(Game *game, const Command command) {
     Player *player = game->player;
     Platform *platforms = game->platforms;
     const size_t platform_count = game->platform_count;
-    BoundingBox *box = game->box;
     if (command != COMMAND_NONE) {
         player->physics = 1;
     }
@@ -375,22 +412,7 @@ void update_player(Game *game, const Command command) {
             }
         }
     }
-    /* Update the player running state */
-    if (command == COMMAND_LEFT) {
-        if (player->speed_x == 0) {
-            player->speed_x = -PLAYER_RUNNING_SPEED;
-        } else if (player->speed_x > 0) {
-            player->speed_x = 0;
-        }
-    } else if (command == COMMAND_RIGHT) {
-        if (player->speed_x == 0) {
-            player->speed_x = PLAYER_RUNNING_SPEED;
-        } else if (player->speed_x < 0) {
-            player->speed_x = 0;
-        }
-    } else if (command == COMMAND_JUMP) {
-        process_jump(game);
-    }
+    process_command(game, command);
     /* This ordering makes the player run horizontally before falling, which */
     /* seems the right thing to do to improve user experience. */
     update_player_horizontally(game);
@@ -413,14 +435,5 @@ void update_player(Game *game, const Command command) {
     if (is_standing_on_platform(game)) {
         player->can_double_jump = 1;
     }
-    /* Kill the player if it is touching a wall. */
-    if (is_touching_a_wall(player, box)) {
-        player->lives--;
-        reposition_player(player, box);
-        /* Unset physics collisions for the player. */
-        player->physics = 0;
-        player->speed_x = 0;
-        player->can_double_jump = 0;
-        player->remaining_jump_height = 0;
-    }
+    check_for_player_death(game);
 }
