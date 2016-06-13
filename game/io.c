@@ -55,6 +55,8 @@ void initialize(void) {
     noecho();
     /* Prevent delay from getch(). */
     nodelay(stdscr, TRUE);
+    /* Enable function keys such as F1 and the arrow keys */
+    keypad(stdscr, TRUE);
     /* Do not display the cursor. */
     curs_set(FALSE);
     /* Initialize the coloring functionality. */
@@ -382,6 +384,16 @@ int draw_top_bar(const Player * const player) {
     for (i = 0; i < TOP_BAR_STRING_COUNT; i++) {
         begin_x = i * columns_per_string;
         after_x = (i + 1) * columns_per_string;
+        if (i + 1 == TOP_BAR_STRING_COUNT) {
+            /*
+             * If this is the last string on the top, make sure that we will
+             * write enough colored spaces. Integer division truncates, which
+             * can make 4 * (COLS / 4) != COLS. Therefore, some spaces may be
+             * left uncolored at the end if we do not ensure that all columns
+             * are painted.
+             */
+            after_x = COLS;
+        }
         string_length = strlen(strings[i]);
         if (string_length < columns_per_string) {
             /*
@@ -544,17 +556,19 @@ BoundingBox bounding_box_from_screen(void) {
     return box;
 }
 
-
+/**
+ * Returns the Command value corresponding to the provided input code.
+ */
 Command command_from_input(const int input) {
-    if (input == '8') {
+    if (input == '8' || input == KEY_UP) {
         return COMMAND_UP;
-    } else if (input == '4') {
+    } else if (input == '4' || input == KEY_LEFT) {
         return COMMAND_LEFT;
     } else if (input == '5') {
         return COMMAND_CENTER;
-    } else if (input == '6') {
+    } else if (input == '6' || input == KEY_RIGHT) {
         return COMMAND_RIGHT;
-    } else if (input == '2') {
+    } else if (input == '2' || input == KEY_DOWN) {
         return COMMAND_DOWN;
     } else if (input == 'q' || input == 'Q') {
         return COMMAND_QUIT;
@@ -578,13 +592,15 @@ Command command_from_input(const int input) {
  */
 Command read_next_command(void) {
     Command last_valid_command = COMMAND_NONE;
+    Command current;
     int input;
-    for (input = getch(); input != ERR; input = getch()) {
-        const Command current = command_from_input(input);
+    do {
+        input = getch();
+        current = command_from_input(input);
         if (current != COMMAND_NONE) {
             last_valid_command = current;
         }
-    }
+    } while (input != ERR);
     return last_valid_command;
 }
 
