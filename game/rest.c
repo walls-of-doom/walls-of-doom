@@ -1,3 +1,14 @@
+/*
+ * On some UNIX operating systems, usleep() has been deprecated.
+ *
+ * As we compile with the "-ansi" option, we need to enable it.
+ *
+ * This is done by defining the _DEFAULT_SOURCE macro.
+ *
+ * There is no simple alternative solution to this problem.
+ */
+#define _DEFAULT_SOURCE
+
 #include "rest.h"
 
 #include "logger.h"
