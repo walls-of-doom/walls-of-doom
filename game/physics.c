@@ -401,8 +401,6 @@ void update_double_jump(Game *game) {
 
 void update_player(Game *game, const Command command) {
     Player *player = game->player;
-    Platform *platforms = game->platforms;
-    const size_t platform_count = game->platform_count;
     if (command != COMMAND_NONE) {
         player->physics = 1;
     }
