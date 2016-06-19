@@ -337,6 +337,9 @@ void process_jump(Game * const game) {
 
 void process_command(Game *game, const Command command) {
     Player *player = game->player;
+    if (command != COMMAND_NONE) {
+        player->physics = 1;
+    }
     /* Update the player running state */
     if (command == COMMAND_LEFT) {
         if (player->speed_x == 0) {
@@ -399,11 +402,8 @@ void update_double_jump(Game *game) {
     }
 }
 
-void update_player(Game *game, const Command command) {
+void update_player_perk(Game *game) {
     Player *player = game->player;
-    if (command != COMMAND_NONE) {
-        player->physics = 1;
-    }
     if (player->physics) {
         game->played_frames++;
         /* Check for expiration of the player's perk. */
@@ -436,6 +436,10 @@ void update_player(Game *game, const Command command) {
             }
         }
     }
+}
+
+void update_player(Game *game, const Command command) {
+    update_player_perk(game);
     process_command(game, command);
     /* This ordering makes the player run horizontally before falling.
      * This seems to be the expected order from an user point-of-view. */
