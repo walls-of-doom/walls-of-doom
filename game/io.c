@@ -340,20 +340,7 @@ void print_platform(const Platform * const platform, const BoundingBox * const b
     }
 }
 
-/**
- * Draws the top status bar on the screen for a given Player.
- *
- * Returns 0 if successful.
- */
-int draw_top_bar(const Player * const player) {
-    char power_buffer[MAXIMUM_STRING_SIZE];
-    char lives_buffer[MAXIMUM_STRING_SIZE];
-    char score_buffer[MAXIMUM_STRING_SIZE];
-
-    char *strings[TOP_BAR_STRING_COUNT];
-
-    const int columns_per_string = COLS / TOP_BAR_STRING_COUNT;
-
+void write_top_bar_strings(char *strings[]) {
     int begin_x;
     int after_x;
     int begin_text_x;
@@ -363,21 +350,8 @@ int draw_top_bar(const Player * const player) {
 
     int x;
     int i;
-    
-    if (player->perk != PERK_NONE) {
-        sprintf(power_buffer, "%s", get_perk_name(player->perk));
-    } else {
-        sprintf(power_buffer, "No Power");
-    }
 
-    sprintf(lives_buffer, "Lives: %d", player->lives);
-
-    sprintf(score_buffer, "Score: %d", player->score);
-
-    strings[0] = GAME_NAME;
-    strings[1] = power_buffer;
-    strings[2] = lives_buffer;
-    strings[3] = score_buffer;
+    const int columns_per_string = COLS / TOP_BAR_STRING_COUNT;
 
     attron(COLOR_PAIR(COLOR_TOP_BAR));
     attron(A_BOLD);
@@ -419,7 +393,36 @@ int draw_top_bar(const Player * const player) {
     }
     attroff(A_BOLD);
     attroff(COLOR_PAIR(COLOR_TOP_BAR));
+}
 
+/**
+ * Draws the top status bar on the screen for a given Player.
+ *
+ * Returns 0 if successful.
+ */
+int draw_top_bar(const Player * const player) {
+    char power_buffer[MAXIMUM_STRING_SIZE];
+    char lives_buffer[MAXIMUM_STRING_SIZE];
+    char score_buffer[MAXIMUM_STRING_SIZE];
+
+    char *strings[TOP_BAR_STRING_COUNT];
+
+    if (player->perk != PERK_NONE) {
+        sprintf(power_buffer, "%s", get_perk_name(player->perk));
+    } else {
+        sprintf(power_buffer, "No Power");
+    }
+
+    sprintf(lives_buffer, "Lives: %d", player->lives);
+
+    sprintf(score_buffer, "Score: %d", player->score);
+
+    strings[0] = GAME_NAME;
+    strings[1] = power_buffer;
+    strings[2] = lives_buffer;
+    strings[3] = score_buffer;
+
+    write_top_bar_strings(strings);
     return 0;
 }
 
@@ -515,7 +518,7 @@ int draw_player(const Player * const player) {
  */
 int draw_game(const Game * const game) {
     clear();
-  
+
     draw_top_bar(game->player);
     draw_bottom_bar();
     draw_borders();
