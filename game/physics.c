@@ -287,7 +287,7 @@ void move_player(Game *game, int x, int y) {
  * Moves the player according to the sign of its current speed if it can move
  * in that direction.
  */
-void update_player_horizontally(Game *game) {
+void update_player_horizontal_position(Game *game) {
     if (should_move_at_current_frame(game, game->player->speed_x)) {
         if (game->player->speed_x > 0) {
             move_player(game, 1, 0);
@@ -373,6 +373,32 @@ void check_for_player_death(Game *game) {
     }
 }
 
+/**
+ * Updates the vertical position of the player.
+ */
+void update_player_vertical_position(Game *game) {
+    if (is_jumping(game->player)) {
+        if (should_move_at_current_frame(game, PLAYER_JUMPING_SPEED)) {
+            move_player(game, 0, -1);
+            game->player->remaining_jump_height--;
+        }
+    } else if (is_falling(game->player, game->platforms, game->platform_count)) {
+        int falling_speed = PLAYER_FALLING_SPEED;
+        if (game->player->perk == PERK_POWER_LOW_GRAVITY) {
+            falling_speed /= 2;
+        }
+        if (should_move_at_current_frame(game, falling_speed)) {
+            move_player(game, 0, 1);
+        }
+    }
+}
+
+void update_double_jump(Game *game) {
+    if (is_standing_on_platform(game)) {
+        game->player->can_double_jump = 1;
+    }
+}
+
 void update_player(Game *game, const Command command) {
     Player *player = game->player;
     Platform *platforms = game->platforms;
@@ -413,27 +439,12 @@ void update_player(Game *game, const Command command) {
         }
     }
     process_command(game, command);
-    /* This ordering makes the player run horizontally before falling, which */
-    /* seems the right thing to do to improve user experience. */
-    update_player_horizontally(game);
-    /* After moving, if it even happened, simulate gravity. */
-    if (is_jumping(player)) {
-        if (should_move_at_current_frame(game, PLAYER_JUMPING_SPEED)) {
-            move_player(game, 0, -1);
-            player->remaining_jump_height--;
-        }
-    } else if (is_falling(player, platforms, platform_count)) {
-        int falling_speed = PLAYER_FALLING_SPEED;
-        if (player->perk == PERK_POWER_LOW_GRAVITY) {
-            falling_speed /= 2;
-        }
-        if (should_move_at_current_frame(game, falling_speed)) {
-            move_player(game, 0, 1);
-        }
-    }
+    /* This ordering makes the player run horizontally before falling.
+     * This seems to be the expected order from an user point-of-view. */
+    update_player_horizontal_position(game);
+    /* After moving, if it even happened, simulate jumping and falling. */
+    update_player_vertical_position(game);
     /* Enable double jump if the player is standing over a platform. */
-    if (is_standing_on_platform(game)) {
-        player->can_double_jump = 1;
-    }
+    update_double_jump(game);
     check_for_player_death(game);
 }
