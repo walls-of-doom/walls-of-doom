@@ -3,11 +3,13 @@ Walls of Doom
 
 # About
 
-Walls of Doom (WoD) is a minimalistic
-[platformer](https://en.wikipedia.org/wiki/Platform_game) written in C by
-Bernardo Sulzbach and Leonardo Ferrazza.
+Walls of Doom is a minimalistic
+[platformer](https://en.wikipedia.org/wiki/Platform_game) written in C for a
+university class that is still being maintained and played.
 
-See [the Bitbucket issue tracker](https://bitbucket.org/mafagafogigante/walls-of-doom/issues?status=new&status=open&sort=-priority).
+See [the GitHub issue
+tracker](https://github.com/walls-of-doom/walls-of-doom/issues) and have a look
+at the [releases](https://github.com/walls-of-doom/walls-of-doom/releases).
 
 # Continuous Integration Status
 
