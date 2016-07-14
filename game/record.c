@@ -50,6 +50,11 @@ int compare_void_record_pointers(const void *a, const void *b) {
     return compare_records((const Record *) a, (const Record *) b);
 }
 
+/**
+ * Writes the default records to the RecordTable.
+ *
+ * All records are properly initialized, independently of the table size.
+ */
 void populate_table_with_default_records(RecordTable * table) {
     static char *names[] = {"Adam", "Bree", "Cora", "Dave", "Elmo"};
     static int scores[] =  {    18,     14,     10,      8,      2};
@@ -62,6 +67,14 @@ void populate_table_with_default_records(RecordTable * table) {
     for (i = 0; i < end; i++) {
         table->records[i] = make_record(names[i], scores[i]);
         table->record_count++;
+    }
+    // Safely fill the rest of the table with the empty record.
+    Record empty_record;
+    memset(empty_record.name, '\0', MAXIMUM_PLAYER_NAME_SIZE);
+    empty_record.score = 0;
+    while (i < RECORD_ARRAY_SIZE) {
+        table->records[i] = empty_record;
+        i++;
     }
 }
 

@@ -47,7 +47,7 @@
 
 #define PLAYER_JUMPING_HEIGHT PLAYER_JUMPING_SPEED
 
-#define RECORD_ARRAY_SIZE 5
+#define RECORD_ARRAY_SIZE 512
 
 /*
  * The maximum number of records that will be displayed to the player.
