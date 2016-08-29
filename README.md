@@ -14,8 +14,8 @@ at [the releases page](https://github.com/walls-of-doom/walls-of-doom/releases).
 
 This build server uses Ubuntu 14.04 64-bit, CMake 2.8, and GCC 4.8.4.
 
-The [build status](https://semaphoreci.com/mafagafogigante/walls-of-doom) can
-be seen by some developers.
+The [build status](https://semaphoreci.com/walls-of-doom/walls-of-doom) is
+visible to everyone.
 
 # Building and Running
 
