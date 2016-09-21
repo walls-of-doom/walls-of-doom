@@ -36,8 +36,7 @@ int read_platforms(Platform *platforms) {
   actually_read = read_integers("assets/platforms.txt", input_integers,
                                 READ_PLATFORMS_INTEGER_ARRAY_SIZE);
 
-  sprintf(log_message_buffer, "Read %lu integers",
-          (unsigned long)actually_read);
+  sprintf(log_message_buffer, "Read %lu integers", actually_read);
   log_message(log_message_buffer);
 
   if (actually_read > 0) {
@@ -47,8 +46,7 @@ int read_platforms(Platform *platforms) {
   } else {
     platform_count = 0;
   }
-  sprintf(log_message_buffer, "Platform count is %lu",
-          (unsigned long)platform_count);
+  sprintf(log_message_buffer, "Platform count is %lu", platform_count);
   log_message(log_message_buffer);
 
   for (i = 0; i < platform_count; i++) {

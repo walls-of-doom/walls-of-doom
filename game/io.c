@@ -193,7 +193,7 @@ void trim_string(char *string) {
  */
 int is_valid_player_name(const char *player_name) {
   char buffer[MAXIMUM_PLAYER_NAME_SIZE];
-  strcpy(buffer, player_name);
+  safe_strcpy(buffer, player_name, MAXIMUM_PLAYER_NAME_SIZE);
   trim_string(buffer);
   return strlen(buffer) >= 2;
 }
@@ -218,7 +218,7 @@ void read_player_name(char *destination, const size_t maximum_size) {
     if (read_error) {
       log_message("Failed to read player name");
       /* Cope with it by providing a name for the player. */
-      strcpy(destination, "ERROR READING PLAYER NAME");
+      safe_strcpy(destination, "ERROR READING PLAYER NAME", maximum_size);
     } else {
       sprintf(log_buffer, "Read '%s' from the user", destination);
       log_message(log_buffer);
