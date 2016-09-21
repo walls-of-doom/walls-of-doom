@@ -1,6 +1,8 @@
 #ifndef SAFE_H
 #define SAFE_H
 
+#include <stdlib.h>
+
 /*
  * Copy from the source string to the destination string, using at most size
  * characters.

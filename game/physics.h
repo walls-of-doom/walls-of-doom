@@ -9,7 +9,7 @@
 
 #include "stdlib.h"
 
-int bounding_box_equals(BoundingBox *a, BoundingBox *b);
+int bounding_box_equals(const BoundingBox *const a, const BoundingBox *const b);
 
 void update_platforms(Game *game);
 

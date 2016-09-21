@@ -6,6 +6,8 @@
 
 #include <stdlib.h>
 
+#include <SDL.h>
+
 /**
  * A Record is a structure that stores the outcome of a game.
  */
@@ -41,6 +43,6 @@ size_t read_records(Record *destination, size_t destination_size);
 /**
  * Loads and presents the top scores on the screen.
  */
-void top_scores(void);
+void top_scores(SDL_Renderer *renderer);
 
 #endif

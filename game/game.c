@@ -52,7 +52,7 @@ int check_for_screen_size_change(const Game *const game) {
   return !bounding_box_equals(&current_box, game->box);
 }
 
-void register_score(const Game *const game) {
+void register_score(const Game *const game, SDL_Renderer *renderer) {
   const Player *const player = game->player;
   /* Log that we are registering the score */
   char buffer[MAXIMUM_STRING_SIZE];
@@ -60,7 +60,7 @@ void register_score(const Game *const game) {
   Record record;
   int scoreboard_index;
   int position;
-  sprintf(buffer, format, player->score, player->name);
+  sprintf(buffer, format, player->score, player->name, renderer);
   log_message(buffer);
 
   /* The name has already been entered to make the Player object. */
@@ -73,7 +73,7 @@ void register_score(const Game *const game) {
   sprintf(buffer, "Saved the record successfully");
   log_message(buffer);
 
-  print_game_result(player->name, player->score, position);
+  print_game_result(player->name, player->score, position, renderer);
 
   rest_for_seconds(2);
 }
@@ -84,7 +84,7 @@ void register_score(const Game *const game) {
  *
  * Returns 0 if successful.
  */
-int run_game(Game *const game) {
+int run_game(Game *const game, SDL_Renderer *renderer) {
   unsigned long next_played_frames_score = FPS;
   Command command = COMMAND_NONE;
   /* Checking for any nonpositive player.lives value would be safer but could
@@ -102,7 +102,7 @@ int run_game(Game *const game) {
     /* 3. Update the perk */
     update_perk(game);
     /* 4. Draw everything */
-    draw_game(game);
+    draw_game(game, renderer);
     /* 5. Sleep */
     rest_for_second_fraction(FPS);
     /* 6. Read whatever command we got (if any) */
@@ -114,16 +114,17 @@ int run_game(Game *const game) {
   }
   /* Ignoring how the game ended (quit command, screen resize, or death),
    * register the score */
-  register_score(game);
+  register_score(game, renderer);
   return 0;
 }
 
 int main(void) {
   int result;
   SDL_Window *window;
+  SDL_Renderer *renderer;
   seed_random();
-  initialize(&window);
-  result = main_menu(window);
-  finalize(&window);
+  initialize(&window, &renderer);
+  result = main_menu(renderer);
+  finalize(&window, &renderer);
   return result;
 }

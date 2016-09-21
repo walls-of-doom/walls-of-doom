@@ -19,6 +19,9 @@
  * All stack character buffers default to this size.
  *
  * This is the maximum size which the application strings should have.
+ *
+ * Several functions hold arrays of this size. Therefore, increasing it will
+ * likely dramatically increase the usage of the stack.
  */
 #define MAXIMUM_STRING_SIZE 256
 
@@ -49,7 +52,7 @@
 
 #define RECORD_ARRAY_SIZE 512
 
-/*
+/**
  * The maximum number of records that will be displayed to the player.
  *
  * May be more than the maximum available.
@@ -60,5 +63,12 @@
 
 #define ABOUT_PAGE_BUFFER_SIZE 1024
 #define ABOUT_PAGE_PATH "assets/about.txt"
+
+/**
+ * Information required for font loading.
+ */
+#define DEFAULT_MONOSPACED_FONT_PATH                                           \
+  "assets/fonts/roboto-mono/RobotoMono-Regular.ttf"
+#define DEFAULT_MONOSPACED_FONT_SIZE 14
 
 #endif

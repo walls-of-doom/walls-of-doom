@@ -193,7 +193,7 @@ void record_to_string(const Record *const record, char *buffer,
 /**
  * Loads and presents the top scores on the screen.
  */
-void top_scores(void) {
+void top_scores(SDL_Renderer *renderer) {
   const int line_width = COLS - 6;
   Record records[MAXIMUM_DISPLAYED_RECORDS];
   int y = 2;
@@ -210,11 +210,9 @@ void top_scores(void) {
   } else {
     maximum_read_records = line_count;
   }
-  clear();
   for (i = 0; i < actually_read_records; i++) {
     record_to_string(records + i, line, line_width);
-    print_centered(y + i, line);
+    print_centered(y + i, line, renderer);
   }
-  refresh();
   rest_for_seconds(3);
 }

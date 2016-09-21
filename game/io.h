@@ -32,7 +32,7 @@ typedef enum ColorScheme {
  *
  * Returns 0 in case of success.
  */
-int initialize(SDL_Window **window);
+int initialize(SDL_Window **window, SDL_Renderer **renderer);
 
 /**
  * Finalizes the acquired resources.
@@ -41,7 +41,7 @@ int initialize(SDL_Window **window);
  *
  * Returns 0 in case of success.
  */
-int finalize(SDL_Window **window);
+int finalize(SDL_Window **window, SDL_Renderer **renderer);
 
 /**
  * Returns a pointer to the start of the text of the string.
@@ -67,38 +67,42 @@ void trim_string(char *string);
  *
  * Returns 0 in case of success.
  */
-int read_string(char *destination, const size_t maximum_size);
+int read_string(char *destination, const size_t maximum_size,
+                SDL_Renderer *renderer);
 
-void read_player_name(char *destination, const size_t maximum_size);
+void read_player_name(char *destination, const size_t maximum_size,
+                      SDL_Renderer *renderer);
 
 /**
  * Draws a full game to the screen.
  */
-int draw_game(const Game *const game);
+int draw_game(const Game *const game, SDL_Renderer *renderer);
 
 /**
  * Prints the provided string on the screen starting at (x, y).
+ *
+ * Returns 0 in case of success.
  */
-void print(const int x, const int y, const char *string);
+int print(const int x, const int y, const char *string, SDL_Renderer *renderer);
 
 /**
  * Prints the provided string centered on the screen at the provided line.
  */
-void print_centered(const int y, const char *string);
+void print_centered(const int y, const char *string, SDL_Renderer *renderer);
 
 /**
  * Prints the provided string after formatting it to increase readability.
  */
-void print_long_text(char *string);
+void print_long_text(char *string, SDL_Renderer *renderer);
 
 /**
  * Prints the provided Platform, respecting the BoundingBox.
  */
 void print_platform(const Platform *const platform,
-                    const BoundingBox *const box);
+                    const BoundingBox *const box, SDL_Renderer *renderer);
 
 void print_game_result(const char *name, const unsigned int score,
-                       const int position);
+                       const int position, SDL_Renderer *renderer);
 
 ColorScheme get_perk_color(Perk perk);
 

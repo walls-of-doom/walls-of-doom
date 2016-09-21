@@ -13,6 +13,7 @@
 #include <string.h>
 
 #include <SDL.h>
+#include <SDL_ttf.h>
 #include <curses.h>
 
 #define MAXIMUM_LINE_WIDTH 80
@@ -53,17 +54,27 @@ void log_terminal_color_support(void) {
  *
  * Returns 0 in case of success.
  */
-int initialize(SDL_Window **window) {
+int initialize(SDL_Window **window, SDL_Renderer **renderer) {
   char log_buffer[MAXIMUM_STRING_SIZE];
-  SDL_Surface *screenSurface = NULL;
+  SDL_Renderer *rendererSurface = NULL;
+
   /* Experimental constants. */
   int WIDTH = 640;
   int HEIGHT = 480;
   initialize_logger();
+  /* Initialize SDL. */
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
     sprintf(log_buffer, "SDL initialization error: %s", SDL_GetError());
     log_message(log_buffer);
     return 1;
+  }
+  /* Initialize TTF. */
+  if (!TTF_WasInit()) {
+    if (TTF_Init() != 0) {
+      sprintf(log_buffer, "TTF initialization error: %s", SDL_GetError());
+      log_message(log_buffer);
+      return 1;
+    }
   }
   *window = SDL_CreateWindow(GAME_NAME, SDL_WINDOWPOS_UNDEFINED,
                              SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT,
@@ -73,7 +84,7 @@ int initialize(SDL_Window **window) {
     log_message(log_buffer);
     return 1;
   }
-  screenSurface = SDL_GetWindowSurface(*window);
+  *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED);
   return 0;
 }
 
@@ -99,9 +110,12 @@ void disable_string_input(void) {
  *
  * Returns 0 in case of success.
  */
-int finalize(SDL_Window **window) {
+int finalize(SDL_Window **window, SDL_Renderer **renderer) {
   SDL_DestroyWindow(*window);
   *window = NULL;
+  if (TTF_WasInit()) {
+    TTF_Quit();
+  }
   SDL_Quit();
   finalize_logger();
   return 0;
@@ -112,7 +126,8 @@ int finalize(SDL_Window **window) {
  *
  * Returns 0 in case of success.
  */
-int read_string(char *destination, const size_t maximum_size) {
+int read_string(char *destination, const size_t maximum_size,
+                SDL_Renderer *renderer) {
   int result;
   enable_string_input();
   result = getnstr(destination, maximum_size - 1);
@@ -198,7 +213,8 @@ int is_valid_player_name(const char *player_name) {
   return strlen(buffer) >= 2;
 }
 
-void read_player_name(char *destination, const size_t maximum_size) {
+void read_player_name(char *destination, const size_t maximum_size,
+                      SDL_Renderer *renderer) {
   int read_error = 0;
   int valid_name = 0;
   const char message[] = "Name your character: ";
@@ -209,12 +225,12 @@ void read_player_name(char *destination, const size_t maximum_size) {
   while (!read_error && !valid_name) {
     clear();
     if (maximum_width <= COLS) {
-      print((COLS - maximum_width) / 2, LINES / 2, message);
+      print((COLS - maximum_width) / 2, LINES / 2, message, renderer);
     } else {
-      print(0, LINES / 2, message);
+      print(0, LINES / 2, message, renderer);
     }
     refresh();
-    read_error = read_string(destination, maximum_size);
+    read_error = read_string(destination, maximum_size, renderer);
     if (read_error) {
       log_message("Failed to read player name");
       /* Cope with it by providing a name for the player. */
@@ -232,22 +248,74 @@ void read_player_name(char *destination, const size_t maximum_size) {
 }
 
 /**
- * Prints the provided string on the screen starting at (x, y).
+ * Retrieves a monospaced font. The result should be cached.
+ *
+ * Returns NULL on errors.
  */
-void print(const int x, const int y, const char *string) {
+static TTF_Font *get_monospaced_font(void) {
+  char log_buffer[MAXIMUM_STRING_SIZE];
+  TTF_Font *font;
+  font =
+      TTF_OpenFont(DEFAULT_MONOSPACED_FONT_PATH, DEFAULT_MONOSPACED_FONT_SIZE);
+  if (font == NULL) {
+    sprintf(log_buffer, "TTF font opening error: %s", SDL_GetError());
+    log_message(log_buffer);
+  }
+  return font;
+}
+
+static SDL_Color get_light_grey(void) {
+  SDL_Color grey;
+  /* #D3D7CF */
+  grey.r = 0xD3;
+  grey.g = 0xD7;
+  grey.b = 0xCF;
+  grey.a = 0xFF;
+  return grey;
+}
+
+static SDL_Color get_text_color(void) {
+  SDL_Color text_color = get_light_grey();
+  return text_color;
+}
+
+/**
+ * Prints the provided string on the screen starting at (x, y).
+ *
+ * Returns 0 in case of success.
+ */
+int print(const int x, const int y, const char *string,
+          SDL_Renderer *renderer) {
+  TTF_Font *font = get_monospaced_font();
+  SDL_Rect destination;
+  destination.x = x;
+  destination.y = y;
+  destination.w = 0;
+  destination.h = 0;
+  SDL_Surface *surface;
+  SDL_Texture *texture;
   /* Validate that x and y are nonnegative. */
   if (x < 0 || y < 0) {
-    return;
+    return 1;
   }
-  mvprintw(y, x, string);
+  surface = TTF_RenderText_Blended(font, string, get_text_color());
+  if (surface == NULL) {
+    log_message("Failed to allocate text surface in print()");
+    return 1;
+  }
+  texture = SDL_CreateTextureFromSurface(renderer, surface);
+  SDL_RenderCopy(renderer, texture, NULL, NULL);
+  SDL_DestroyTexture(texture);
+  SDL_FreeSurface(surface);
+  return 0;
 }
 
 /**
  * Prints the provided string centered on the screen at the provided line.
  */
-void print_centered(const int y, const char *string) {
+void print_centered(const int y, const char *string, SDL_Renderer *renderer) {
   const int x = (COLS - strlen(string)) / 2;
-  print(x, y, string);
+  print(x, y, string, renderer);
 }
 
 /**
@@ -318,7 +386,7 @@ void pad_line_right(char *line, const size_t width) {
 /**
  * Prints the provided string after formatting it to increase readability.
  */
-void print_long_text(char *string) {
+void print_long_text(char *string, SDL_Renderer *renderer) {
   size_t lines_copied = 0;
   char line[MAXIMUM_LINE_WIDTH];
   char *cursor;
@@ -336,7 +404,7 @@ void print_long_text(char *string) {
   while (*cursor != '\0') {
     cursor = copy_first_line(cursor, line);
     pad_line_right(line, width);
-    print_centered((LINES - line_count) / 2 + lines_copied, line);
+    print_centered((LINES - line_count) / 2 + lines_copied, line, renderer);
     lines_copied++;
   }
   refresh();
@@ -346,7 +414,7 @@ void print_long_text(char *string) {
  * Prints the provided Platform, respecting the BoundingBox.
  */
 void print_platform(const Platform *const platform,
-                    const BoundingBox *const box) {
+                    const BoundingBox *const box, SDL_Renderer *renderer) {
   int i;
   int x;
   int y;
@@ -355,12 +423,12 @@ void print_platform(const Platform *const platform,
     y = platform->y;
     if (x >= box->min_x && x <= box->max_x && y >= box->min_y &&
         y <= box->max_y) {
-      print(x, y, " ");
+      print(x, y, " ", renderer);
     }
   }
 }
 
-void write_top_bar_strings(char *strings[]) {
+void write_top_bar_strings(char *strings[], SDL_Renderer *renderer) {
   int begin_x;
   int after_x;
   int begin_text_x;
@@ -396,18 +464,18 @@ void write_top_bar_strings(char *strings[]) {
       begin_text_x = begin_x + (columns_per_string - string_length) / 2;
       after_text_x = begin_text_x + string_length;
       for (x = begin_x; x < begin_text_x; x++) {
-        print(x, 0, " ");
+        print(x, 0, " ", renderer);
       }
-      print(begin_text_x, 0, strings[i]);
+      print(begin_text_x, 0, strings[i], renderer);
       for (x = after_text_x; x < after_x; x++) {
-        print(x, 0, " ");
+        print(x, 0, " ", renderer);
       }
     } else {
       /*
        * String does not fit, do not write it.
        */
       for (x = begin_x; x < after_x; x++) {
-        print(x, 0, " ");
+        print(x, 0, " ", renderer);
       }
     }
   }
@@ -420,7 +488,7 @@ void write_top_bar_strings(char *strings[]) {
  *
  * Returns 0 if successful.
  */
-int draw_top_bar(const Player *const player) {
+int draw_top_bar(const Player *const player, SDL_Renderer *renderer) {
   char power_buffer[MAXIMUM_STRING_SIZE];
   char lives_buffer[MAXIMUM_STRING_SIZE];
   char score_buffer[MAXIMUM_STRING_SIZE];
@@ -442,7 +510,7 @@ int draw_top_bar(const Player *const player) {
   strings[2] = lives_buffer;
   strings[3] = score_buffer;
 
-  write_top_bar_strings(strings);
+  write_top_bar_strings(strings, renderer);
   return 0;
 }
 
@@ -451,39 +519,39 @@ int draw_top_bar(const Player *const player) {
  *
  * Returns 0 if successful.
  */
-int draw_bottom_bar(void) {
+int draw_bottom_bar(SDL_Renderer *renderer) {
   int i;
   attron(COLOR_PAIR(COLOR_BOTTOM_BAR));
   for (i = 0; i < COLS; i++) {
-    print(i, LINES - 1, " ");
+    print(i, LINES - 1, " ", renderer);
   }
   attroff(COLOR_PAIR(COLOR_BOTTOM_BAR));
   return 0;
 }
 
-int draw_borders(void) {
+int draw_borders(SDL_Renderer *renderer) {
   int i;
   for (i = 1; i < COLS - 1; i++) {
-    print(i, 1, "+");
+    print(i, 1, "+", renderer);
   }
   for (i = 1; i < LINES - 1; i++) {
-    print(0, i, "+");
+    print(0, i, "+", renderer);
   }
   for (i = 1; i < COLS - 1; i++) {
-    print(i, LINES - 2, "+");
+    print(i, LINES - 2, "+", renderer);
   }
   for (i = 1; i < LINES - 1; i++) {
-    print(COLS - 1, i, "+");
+    print(COLS - 1, i, "+", renderer);
   }
   return 0;
 }
 
 int draw_platforms(const Platform *platforms, const size_t platform_count,
-                   const BoundingBox *const box) {
+                   const BoundingBox *const box, SDL_Renderer *renderer) {
   size_t i;
   attron(COLOR_PAIR(COLOR_PLATFORMS));
   for (i = 0; i < platform_count; i++) {
-    print_platform(&platforms[i], box);
+    print_platform(&platforms[i], box, renderer);
   }
   attroff(COLOR_PAIR(COLOR_PLATFORMS));
   return 0;
@@ -514,20 +582,20 @@ ColorScheme get_perk_color(Perk perk) {
   }
 }
 
-int draw_perk(const Game *const game) {
+int draw_perk(const Game *const game, SDL_Renderer *renderer) {
   if (has_active_perk(game)) {
     attron(COLOR_PAIR(get_perk_color(game->perk)));
     attron(A_BOLD);
-    print(game->perk_x, game->perk_y, get_perk_symbol());
+    print(game->perk_x, game->perk_y, get_perk_symbol(), renderer);
     attroff(A_BOLD);
     attroff(COLOR_PAIR(get_perk_color(game->perk)));
   }
   return 0;
 }
 
-int draw_player(const Player *const player) {
+int draw_player(const Player *const player, SDL_Renderer *renderer) {
   attron(COLOR_PAIR(COLOR_PLAYER));
-  print(player->x, player->y, PLAYER_SYMBOL);
+  print(player->x, player->y, PLAYER_SYMBOL, renderer);
   attroff(COLOR_PAIR(COLOR_PLAYER));
   return 0;
 }
@@ -535,23 +603,19 @@ int draw_player(const Player *const player) {
 /**
  * Draws a full game to the screen.
  */
-int draw_game(const Game *const game) {
-  clear();
-
-  draw_top_bar(game->player);
-  draw_bottom_bar();
-  draw_borders();
-  draw_platforms(game->platforms, game->platform_count, game->box);
-  draw_perk(game);
-  draw_player(game->player);
-
-  refresh();
-
+int draw_game(const Game *const game, SDL_Renderer *renderer) {
+  draw_top_bar(game->player, renderer);
+  draw_bottom_bar(renderer);
+  draw_borders(renderer);
+  draw_platforms(game->platforms, game->platform_count, game->box, renderer);
+  draw_perk(game, renderer);
+  draw_player(game->player, renderer);
+  SDL_RenderPresent(renderer);
   return 0;
 }
 
 void print_game_result(const char *name, const unsigned int score,
-                       const int position) {
+                       const int position, SDL_Renderer *renderer) {
   char first_line[MAXIMUM_STRING_SIZE];
   char second_line[MAXIMUM_STRING_SIZE];
   sprintf(first_line, "%s died after making %d points.", name, score);
@@ -561,8 +625,8 @@ void print_game_result(const char *name, const unsigned int score,
     sprintf(second_line, "%s didn't make it to the top scores.", name);
   }
   clear();
-  print_centered(LINES / 2 - 1, first_line);
-  print_centered(LINES / 2 + 1, second_line);
+  print_centered(LINES / 2 - 1, first_line, renderer);
+  print_centered(LINES / 2 + 1, second_line, renderer);
   refresh();
 }
 

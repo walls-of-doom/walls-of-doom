@@ -29,7 +29,7 @@ typedef struct Menu {
 /**
  * Writes the provided Menu for the user.
  */
-void write_menu(const Menu *const menu, SDL_Window *window) {
+void write_menu(const Menu *const menu, SDL_Renderer *renderer) {
   const size_t entries = menu->option_count + 1;
   const unsigned int ENTRY_HEIGHT = 3;
   const unsigned int height = entries * ENTRY_HEIGHT;
@@ -39,7 +39,7 @@ void write_menu(const Menu *const menu, SDL_Window *window) {
   size_t i;
   char buffer[MAXIMUM_STRING_SIZE];
   clear();
-  print((COLS - strlen(menu->title)) / 2, y, menu->title);
+  print((COLS - strlen(menu->title)) / 2, y, menu->title, renderer);
   for (i = 0; i < menu->option_count; i++) {
     char *string = menu->options[i];
     if (i == menu->selected_option) {
@@ -51,8 +51,7 @@ void write_menu(const Menu *const menu, SDL_Window *window) {
     if (i == menu->selected_option) {
       attron(A_BOLD);
     }
-
-    print(x, y, string);
+    print(x, y, string, renderer);
     if (i == menu->selected_option) {
       attroff(A_BOLD);
     }
@@ -62,7 +61,7 @@ void write_menu(const Menu *const menu, SDL_Window *window) {
 /**
  * Enters the game.
  */
-int game(void) {
+int game(SDL_Renderer *renderer) {
   char name[MAXIMUM_PLAYER_NAME_SIZE];
   size_t platform_count;
   Player player;
@@ -70,7 +69,7 @@ int game(void) {
   BoundingBox box;
   Game game;
 
-  read_player_name(name, MAXIMUM_PLAYER_NAME_SIZE);
+  read_player_name(name, MAXIMUM_PLAYER_NAME_SIZE, renderer);
 
   player = make_player(name);
   player.x = COLS / 2;
@@ -82,11 +81,11 @@ int game(void) {
 
   game = create_game(&player, platforms, platform_count, &box);
 
-  run_game(&game);
+  run_game(&game, renderer);
   return 0;
 }
 
-int main_menu(SDL_Window *window) {
+int main_menu(SDL_Renderer *renderer) {
   int got_quit = 0;
   Menu menu;
   char title[MAXIMUM_STRING_SIZE];
@@ -99,7 +98,7 @@ int main_menu(SDL_Window *window) {
   menu.selected_option = 0;
 
   while (!got_quit) {
-    write_menu(&menu, window);
+    write_menu(&menu, renderer);
     command = wait_for_next_command();
     if (command == COMMAND_UP) {
       if (menu.selected_option > 0) {
@@ -111,11 +110,11 @@ int main_menu(SDL_Window *window) {
       }
     } else if (command == COMMAND_ENTER || command == COMMAND_CENTER) {
       if (menu.selected_option == 0) {
-        game();
+        game(renderer);
       } else if (menu.selected_option == 1) {
-        top_scores();
+        top_scores(renderer);
       } else if (menu.selected_option == 2) {
-        info();
+        info(renderer);
       } else if (menu.selected_option == 3) {
         got_quit = 1;
       }

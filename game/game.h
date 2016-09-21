@@ -11,6 +11,8 @@
 
 #include <stdlib.h>
 
+#include <SDL.h>
+
 typedef struct Game {
 
   Player *player;
@@ -51,6 +53,6 @@ void update_game(Game *const game);
  *
  * Returns 0 if successful.
  */
-int run_game(Game *const game);
+int run_game(Game *const game, SDL_Renderer *renderer);
 
 #endif

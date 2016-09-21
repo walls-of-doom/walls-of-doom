@@ -2,6 +2,8 @@ cmake_minimum_required (VERSION 2.8.7)
 
 configure_file (version.h.in version.h)
 
+set (CMAKE_MODULE_PATH ../cmake)
+
 add_library (walls-of-doom-source
     about.h about.c
     command.h
@@ -30,11 +32,10 @@ find_package (Curses REQUIRED)
 include_directories (${CURSES_INCLUDE_DIRS})
 target_link_libraries (walls-of-doom-source ${CURSES_LIBRARIES})
 
-include (FindPkgConfig)
-
-pkg_search_module (SDL2 REQUIRED sdl2)
-include_directories (${SDL2_INCLUDE_DIRS})
-target_link_libraries (walls-of-doom-source ${SDL2_LIBRARIES})
+find_package (SDL2 REQUIRED)
+find_package (SDL2TTF REQUIRED)
+include_directories (${SDL2_INCLUDE_DIR} ${SDL2TTF_INCLUDE_DIR})
+target_link_libraries (walls-of-doom-source ${SDL2_LIBRARY} ${SDL2TTF_LIBRARY})
 
 target_include_directories (walls-of-doom-source PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

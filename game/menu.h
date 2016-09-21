@@ -3,6 +3,6 @@
 
 #include <SDL.h>
 
-int main_menu(SDL_Window *window);
+int main_menu(SDL_Renderer *renderer);
 
 #endif
