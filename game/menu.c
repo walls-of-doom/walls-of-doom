@@ -80,7 +80,7 @@ int game(SDL_Renderer *renderer) {
 }
 
 int main_menu(SDL_Renderer *renderer) {
-  int got_quit = 0;
+  int should_quit = 0;
   Menu menu;
   char title[MAXIMUM_STRING_SIZE];
   char *options[] = {"Play", "Top Scores", "Info", "Quit"};
@@ -91,7 +91,7 @@ int main_menu(SDL_Renderer *renderer) {
   menu.option_count = 4;
   menu.selected_option = 0;
 
-  while (!got_quit) {
+  while (!should_quit) {
     write_menu(&menu, renderer);
     command = wait_for_next_command();
     if (command == COMMAND_UP) {
@@ -110,10 +110,11 @@ int main_menu(SDL_Renderer *renderer) {
       } else if (menu.selected_option == 2) {
         info(renderer);
       } else if (menu.selected_option == 3) {
-        got_quit = 1;
+        should_quit = 1;
       }
     }
-    got_quit = command == COMMAND_QUIT;
+    /* Quit if the user selected the Quit option or closed the window. */
+    should_quit = should_quit || command == COMMAND_QUIT;
   }
   return 0;
 }

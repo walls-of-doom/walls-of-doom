@@ -309,7 +309,6 @@ int print(const int x, const int y, const char *string,
   }
   /* Copy destination width and height from the texture. */
   SDL_QueryTexture(texture, NULL, NULL, &position.w, &position.h);
-  printf("%d, %d, %d, %d\n", position.x, position.y, position.w, position.h);
   SDL_RenderCopy(renderer, texture, NULL, &position);
   SDL_DestroyTexture(texture);
   SDL_FreeSurface(surface);
@@ -357,7 +356,7 @@ void wrap_at_right_margin(char *string, const size_t columns) {
   }
 }
 
-int count_lines(char *buffer) {
+int count_lines(char * const buffer) {
   size_t counter = 0;
   size_t i = 0;
   while (buffer[i] != '\0') {

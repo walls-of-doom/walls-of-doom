@@ -12,7 +12,7 @@
  *
  * 1 for the platform count and 2 for each platform.
  */
-#define READ_PLATFORMS_INTEGER_ARRAY_SIZE 1 + 2 * MAXIMUM_PLATFORM_COUNT
+#define READ_PLATFORMS_INTEGER_ARRAY_SIZE (1 + 2 * MAXIMUM_PLATFORM_COUNT)
 
 /**
  * Reads platforms from the text file into the provided buffer.
