@@ -54,16 +54,16 @@ uint64_t next(void) {
  * non-overlapping subsequences for parallel computations.
  */
 void jump(void) {
-  static const uint64_t JUMP[] = {0xbeac0467eba5facb, 0xd86b048b86aa9922};
+  static const uint64_t jump[] = {0xbeac0467eba5facb, 0xd86b048b86aa9922};
 
   uint64_t s0 = 0;
   uint64_t s1 = 0;
   size_t i;
-  for (i = 0; i < sizeof(JUMP) / sizeof(*JUMP); i++) {
+  for (i = 0; i < sizeof(jump) / sizeof(*jump); i++) {
     int b;
     for (b = 0; b < 64; b++) {
       /* Was 1ULL, but ISO C90 does not allow it. */
-      if (JUMP[i] & 1UL << b) {
+      if (jump[i] & 1UL << b) {
         s0 ^= s[0];
         s1 ^= s[1];
       }
@@ -89,11 +89,17 @@ uint64_t find_next_power_of_two(uint64_t number) {
 
 /**
  * Returns a random number in the range [minimum, maximum].
+ *
+ * Always returns 0 if maximum < minimum.
  */
 int random_integer(const int minimum, const int maximum) {
-  const uint64_t range = maximum - minimum + 1;
-  const uint64_t next_power_of_two = find_next_power_of_two(range);
+  int range = maximum - minimum;
+  uint64_t next_power_of_two;
   uint64_t value;
+  if (maximum < minimum) {
+    return 0;
+  }
+  next_power_of_two = find_next_power_of_two(range);
   do {
     value = next() % next_power_of_two;
   } while (value >= range);
