@@ -30,7 +30,7 @@ int read_bytes(const char *filename, void *destination, const size_t size,
  * Returns 0 in case of success.
  */
 int read_characters(const char *const filename, char *destination,
-                    const size_t size);
+                    const size_t destination_size);
 
 /**
  * Reads integers from the indicated file into the provided array.
