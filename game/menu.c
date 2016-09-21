@@ -18,11 +18,6 @@
 
 #include <SDL.h>
 
-#undef COLS
-#define COLS 24
-#undef ROWS
-#define ROWS 80
-
 typedef struct Menu {
   char *title;
   char **options;
@@ -43,14 +38,14 @@ void write_menu(const Menu *const menu, SDL_Renderer *renderer) {
   size_t i;
   char buffer[MAXIMUM_STRING_SIZE];
   SDL_RenderClear(renderer);
-  print((COLS - strlen(menu->title)) / 2, y, menu->title, renderer);
+  print((COLUMNS - strlen(menu->title)) / 2, y, menu->title, renderer);
   for (i = 0; i < menu->option_count; i++) {
     char *string = menu->options[i];
     if (i == menu->selected_option) {
       sprintf(buffer, "> %s <", string);
       string = buffer;
     }
-    x = (COLS - strlen(string)) / 2;
+    x = (COLUMNS - strlen(string)) / 2;
     y += ENTRY_HEIGHT;
     print(x, y, string, renderer);
   }
@@ -71,7 +66,7 @@ int game(SDL_Renderer *renderer) {
   read_player_name(name, MAXIMUM_PLAYER_NAME_SIZE, renderer);
 
   player = make_player(name);
-  player.x = COLS / 2;
+  player.x = COLUMNS / 2;
   player.y = LINES / 2;
 
   box = bounding_box_from_screen();
