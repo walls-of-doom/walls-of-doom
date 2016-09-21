@@ -48,11 +48,10 @@ void log_terminal_color_support(void) {
  *
  * Should only be called once, right after starting.
  *
- * Returns a nonzero value if initialization failed.
+ * Returns 0 in case of success.
  */
-int initialize(void) {
+int initialize(SDL_Window **window) {
     char log_buffer[MAXIMUM_STRING_SIZE];
-    SDL_Window *window = NULL;
     SDL_Surface *screenSurface = NULL;
     /* Experimental constants. */
     int WIDTH = 640;
@@ -63,18 +62,13 @@ int initialize(void) {
         log_message(log_buffer);
         return 1;
     }
-    window = SDL_CreateWindow(GAME_NAME, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
-    if (window == NULL) {
+    *window = SDL_CreateWindow(GAME_NAME, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
+    if (*window == NULL) {
       sprintf(log_buffer, "SDL initialization error: %s", SDL_GetError());
       log_message(log_buffer);
       return 1;
     }
-    screenSurface = SDL_GetWindowSurface(window);
-    SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0xFF, 0xFF, 0xFF));
-    SDL_UpdateWindowSurface(window);
-    SDL_Delay(2 * 1000);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    screenSurface = SDL_GetWindowSurface(*window);
     return 0;
 }
 
@@ -97,10 +91,15 @@ void disable_string_input(void) {
  * Finalizes the acquired resources.
  *
  * Should only be called once, right before exiting.
+ *
+ * Returns 0 in case of success.
  */
-void finalize(void) {
+int finalize(SDL_Window **window) {
+    SDL_DestroyWindow(*window);
+    *window = NULL;
+    SDL_Quit();
     finalize_logger();
-    endwin();
+    return 0;
 }
 
 /**
@@ -575,31 +574,36 @@ BoundingBox bounding_box_from_screen(void) {
 /**
  * Returns the Command value corresponding to the provided input code.
  */
-Command command_from_input(const int input) {
-    if (input == '8' || input == KEY_UP) {
-        return COMMAND_UP;
-    } else if (input == '4' || input == KEY_LEFT) {
-        return COMMAND_LEFT;
-    } else if (input == '5') {
-        return COMMAND_CENTER;
-    } else if (input == '6' || input == KEY_RIGHT) {
-        return COMMAND_RIGHT;
-    } else if (input == '2' || input == KEY_DOWN) {
-        return COMMAND_DOWN;
-    } else if (input == 'q' || input == 'Q') {
+Command command_from_event(const SDL_Event event) {
+    SDL_Keycode keycode;
+    if (event.type == SDL_QUIT) {
         return COMMAND_QUIT;
-    } else if (input == ' ') {
-        return COMMAND_JUMP;
-    } else if (input == '\n') {
-        return COMMAND_ENTER;
-    } else {
-        return COMMAND_NONE;
     }
+    if (event.type == SDL_KEYDOWN) {
+        keycode = event.key.keysym.sym;
+        if (keycode == SDLK_KP_8 || keycode == SDLK_UP) {
+            return COMMAND_UP;
+        } else if (keycode == SDLK_KP_4 || keycode == SDLK_LEFT) {
+            return COMMAND_LEFT;
+        } else if (keycode == SDLK_KP_5) {
+            return COMMAND_CENTER;
+        } else if (keycode == SDLK_KP_6 || keycode == SDLK_RIGHT) {
+            return COMMAND_RIGHT;
+        } else if (keycode == SDLK_KP_2 || keycode == SDLK_DOWN) {
+            return COMMAND_DOWN;
+        } else if (keycode == SDLK_SPACE) {
+            return COMMAND_JUMP;
+        } else if (keycode == SDLK_RETURN) {
+            return COMMAND_ENTER;
+        }
+    }
+    return COMMAND_NONE;
 }
 
 /**
- * Reads the next command that needs to be processed. This is the last command
- * on the input buffer.
+ * Reads the next command that needs to be processed.
+ *
+ * This is the last command on the input buffer.
  *
  * This function consumes the whole input buffer and returns either
  * COMMAND_NONE (if no other Command could be produced by what was in the input
@@ -609,14 +613,14 @@ Command command_from_input(const int input) {
 Command read_next_command(void) {
     Command last_valid_command = COMMAND_NONE;
     Command current;
-    int input;
+    SDL_Event event;
     do {
-        input = getch();
-        current = command_from_input(input);
+        SDL_PollEvent(&event);
+        current = command_from_event(event);
         if (current != COMMAND_NONE) {
             last_valid_command = current;
         }
-    } while (input != ERR);
+    } while (SDL_PollEvent(&event) != 0);
     return last_valid_command;
 }
 

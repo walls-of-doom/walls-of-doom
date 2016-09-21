@@ -6,6 +6,8 @@
 #include "perks.h"
 #include "physics.h"
 
+#include <SDL.h>
+
 typedef enum ColorScheme {
     /* Color pair 0 is assumed to be white on black, but is actually whatever */
     /* the terminal implements before color is initialized. It cannot be */
@@ -28,16 +30,18 @@ typedef enum ColorScheme {
  *
  * Should only be called once, right after starting.
  *
- * Returns a nonzero value if initialization failed.
+ * Returns 0 in case of success.
  */
-int initialize(void);
+int initialize(SDL_Window **window);
 
 /**
  * Finalizes the acquired resources.
  *
  * Should only be called once, right before exiting.
+ *
+ * Returns 0 in case of success.
  */
-void finalize(void);
+int finalize(SDL_Window **window);
 
 /**
  * Returns a pointer to the start of the text of the string.

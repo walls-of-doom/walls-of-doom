@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <SDL.h>
 #include <curses.h>
 
 typedef struct Menu {
@@ -28,7 +29,7 @@ typedef struct Menu {
 /**
  * Writes the provided Menu for the user.
  */
-void write_menu(const Menu * const menu) {
+void write_menu(const Menu * const menu, SDL_Window *window) {
     const size_t entries = menu->option_count + 1;
     const unsigned int ENTRY_HEIGHT = 3;
     const unsigned int height = entries * ENTRY_HEIGHT;
@@ -50,6 +51,7 @@ void write_menu(const Menu * const menu) {
         if (i == menu->selected_option) {
             attron(A_BOLD);
         }
+
         print(x, y, string);
         if (i == menu->selected_option) {
             attroff(A_BOLD);
@@ -84,7 +86,7 @@ int game(void) {
     return 0;
 }
 
-int main_menu(void) {
+int main_menu(SDL_Window *window) {
     int got_quit = 0;
     Menu menu;
     char title[MAXIMUM_STRING_SIZE];
@@ -97,7 +99,7 @@ int main_menu(void) {
     menu.selected_option = 0;
 
     while (!got_quit) {
-        write_menu(&menu);
+        write_menu(&menu, window);
         command = wait_for_next_command();
         if (command == COMMAND_UP) {
             if (menu.selected_option > 0) {
@@ -118,6 +120,7 @@ int main_menu(void) {
                 got_quit = 1;
             }
         }
+        got_quit = command == COMMAND_QUIT;
     }
     return 0;
 }

@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <SDL.h>
+
 /**
  * Creates a new Game object with the provided objects.
  */
@@ -110,9 +112,10 @@ int run_game(Game * const game) {
 
 int main(void) {
     int result;
-    initialize();
+    SDL_Window *window;
     seed_random();
-    result = main_menu();
-    finalize();
+    initialize(&window);
+    result = main_menu(window);
+    finalize(&window);
     return result;
 }

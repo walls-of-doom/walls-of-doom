@@ -1,6 +1,8 @@
 #ifndef MENU_H
 #define MENU_H
 
-int main_menu(void);
+#include <SDL.h>
+
+int main_menu(SDL_Window *window);
 
 #endif
