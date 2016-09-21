@@ -210,24 +210,24 @@ void trim_string(char *string) {
   int copying = 0;
   char *write = string;
   char *read = string;
-  /* Copy everthing from the first not space up to the end. */
-  while (*read != '\0') {
-    if (!copying) {
-      copying = !isspace(*read);
-    }
-    if (copying) {
-      *write = *read;
-      write++;
-    }
+  /* Find the first not space. */
+  while (*read != '\0' && isspace(*read)) {
     read++;
   }
-  *write = '\0';
-  /* Replace all trailing spaces by the null character. */
-  if (write != string) { /* At the first position there is not a space. */
-    write--;
-    while (isspace(*write)) {
-      *write = '\0';
-      write--;
+  /* Copy everthing from the first not space up to the end. */
+  while (*read != '\0') {
+    *write++ = *read++;
+  }
+  /* Now proceed to trim the end of the string. */
+  /* read points to NUL here. */
+  if (read != string) { /* If we can march back. */
+    read--;             /* Point to the last character. */
+    while (isspace(*read) || read > write) {
+      *read = '\0';
+      if (read == string) {
+        break; /* Do not write before the start of the string. */
+      }
+      read--;
     }
   }
 }
@@ -356,7 +356,7 @@ void wrap_at_right_margin(char *string, const size_t columns) {
   }
 }
 
-int count_lines(char * const buffer) {
+int count_lines(char *const buffer) {
   size_t counter = 0;
   size_t i = 0;
   while (buffer[i] != '\0') {

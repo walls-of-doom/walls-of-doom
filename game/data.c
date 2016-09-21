@@ -9,12 +9,15 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#define WRITE_BYTES_COUNT_FORMAT "Expected to write %lu but actually wrote %lu"
+#define READ_BYTES_COUNT_FORMAT "Expected to read %lu but actually read %lu"
+
 /**
  * Assesses whether or not a file with the provided filename exists.
  */
 int file_exists(const char *filename) {
   struct stat buffer;
-  return (stat(filename, &buffer) == 0);
+  return stat(filename, &buffer) == 0;
 }
 
 typedef enum Operation { READ, WRITE } Operation;
@@ -40,10 +43,20 @@ void log_access(Operation operation, const size_t byte_count,
 int write_bytes(const char *filename, const void *source, const size_t size,
                 const size_t count) {
   FILE *file;
+  size_t written_items;
+  char log_buffer[MAXIMUM_STRING_SIZE];
   log_access(WRITE, size * count, filename);
   file = fopen(filename, "wb");
-  fwrite(source, size, count, file);
+  if (file == NULL) {
+    return 1;
+  }
+  written_items = fwrite(source, size, count, file);
   fclose(file);
+  if (written_items != count) {
+    sprintf(log_buffer, WRITE_BYTES_COUNT_FORMAT, count, written_items);
+    log_message(log_buffer);
+    return 2;
+  }
   return 0;
 }
 
@@ -58,20 +71,21 @@ int read_bytes(const char *filename, void *destination, const size_t size,
   size_t read_items;
   char log_buffer[MAXIMUM_STRING_SIZE];
   log_access(READ, size * count, filename);
-  if (file_exists(filename)) {
-    file = fopen(filename, "rb");
-    read_items = fread(destination, size, count, file);
-    fclose(file);
-    if (read_items != count) {
-      sprintf(log_buffer, "Expected to read %lu but actually read %lu",
-              (unsigned long)count, (unsigned long)read_items);
-      log_message(log_buffer);
-      return 2;
-    }
-    return 0;
-  } else {
+  if (!file_exists(filename)) {
     return 1;
   }
+  file = fopen(filename, "rb");
+  if (file == NULL) {
+    return 2;
+  }
+  read_items = fread(destination, size, count, file);
+  fclose(file);
+  if (read_items != count) {
+    sprintf(log_buffer, READ_BYTES_COUNT_FORMAT, count, read_items);
+    log_message(log_buffer);
+    return 3;
+  }
+  return 0;
 }
 
 /**
