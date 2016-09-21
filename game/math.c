@@ -5,22 +5,22 @@
  * negative, zero, or positive, respectively.
  */
 int normalize(const int value) {
-    if (value < 0) {
-        return -1;
-    } else if (value == 0) {
-        return 0;
-    } else {
-        return 1;
-    }
+  if (value < 0) {
+    return -1;
+  } else if (value == 0) {
+    return 0;
+  } else {
+    return 1;
+  }
 }
 
 /**
  * Returns the smallest of two integers.
  */
 int min(const int a, const int b) {
-    if (b > a) {
-        return a;
-    } else {
-        return b;
-    }
+  if (b > a) {
+    return a;
+  } else {
+    return b;
+  }
 }

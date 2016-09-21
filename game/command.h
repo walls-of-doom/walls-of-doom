@@ -2,18 +2,19 @@
 #define COMMAND_H
 
 /**
- * The Command enumerated type represents the different commands the user may issue.
+ * The Command enumerated type represents the different commands the user may
+ * issue.
  */
 typedef enum Command {
-    COMMAND_NONE,
-    COMMAND_UP,
-    COMMAND_LEFT,
-    COMMAND_CENTER,
-    COMMAND_RIGHT,
-    COMMAND_DOWN,
-    COMMAND_JUMP,
-    COMMAND_ENTER,
-    COMMAND_QUIT
+  COMMAND_NONE,
+  COMMAND_UP,
+  COMMAND_LEFT,
+  COMMAND_CENTER,
+  COMMAND_RIGHT,
+  COMMAND_DOWN,
+  COMMAND_JUMP,
+  COMMAND_ENTER,
+  COMMAND_QUIT
 } Command;
 
 #endif

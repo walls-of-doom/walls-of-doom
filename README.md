@@ -30,21 +30,29 @@ The following C compilers are known to work perfectly with the project:
 ```bash
 $ mkdir build
 $ cd build
-$ cmake ..
+$ cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
 $ make
+$ cd ..
+$ ln -s build/compile_commands.json
+```
+
+### Running formatting and static analysis
+
+```bash
+$ bash reformat.sh
 ```
 
 ### Running the tests
 
 ```bash
-$ cd tests
+$ cd build/tests
 $ ./tests
 ```
 
 ### Running the game
 
 ```bash
-$ cd game
+$ cd build/game
 $ ./game
 ```
 

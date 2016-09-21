@@ -13,42 +13,44 @@
 
 typedef struct Game {
 
-    Player *player;
+  Player *player;
 
-    Platform *platforms;
-    size_t platform_count;
+  Platform *platforms;
+  size_t platform_count;
 
-    /**
-     * In which frame - starting at 0 - we are now.
-     */
-    unsigned long frame;
+  /**
+   * In which frame - starting at 0 - we are now.
+   */
+  unsigned long frame;
 
-    /**
-     * Count of frames on which the player was active (not in the initial state).
-     */
-    unsigned long played_frames;
+  /**
+   * Count of frames on which the player was active (not in the initial state).
+   */
+  unsigned long played_frames;
 
-    Perk perk;
-    int perk_x;
-    int perk_y;
-    unsigned long perk_end_frame;
+  Perk perk;
+  int perk_x;
+  int perk_y;
+  unsigned long perk_end_frame;
 
-    BoundingBox *box;
+  BoundingBox *box;
 
 } Game;
 
 /**
  * Creates a new Game object with the provided objects.
  */
-Game create_game(Player *player, Platform *platforms, const size_t platform_count, BoundingBox *box);
+Game create_game(Player *player, Platform *platforms,
+                 const size_t platform_count, BoundingBox *box);
 
-void update_game(Game * const game);
+void update_game(Game *const game);
 
 /**
- * Runs the main loop of the provided game and registers the player score at the end.
+ * Runs the main loop of the provided game and registers the player score at the
+ * end.
  *
  * Returns 0 if successful.
  */
-int run_game(Game * const game);
+int run_game(Game *const game);
 
 #endif

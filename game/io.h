@@ -9,20 +9,20 @@
 #include <SDL.h>
 
 typedef enum ColorScheme {
-    /* Color pair 0 is assumed to be white on black, but is actually whatever */
-    /* the terminal implements before color is initialized. It cannot be */
-    /* modified by the application, therefore we must start at 1. */
-    COLOR_TOP_BAR = 1, /* Set the first enum constant to one */
-    COLOR_BOTTOM_BAR,  /* Becomes two, and so on */
-    COLOR_PLATFORMS,
-    COLOR_PLAYER,
-    COLOR_INVINCIBILITY,
-    COLOR_LEVITATION,
-    COLOR_LOW_GRAVITY,
-    COLOR_SUPER_JUMP,
-    COLOR_TIME_STOP,
-    COLOR_EXTRA_LIFE,
-    COLOR_EXTRA_POINTS
+  /* Color pair 0 is assumed to be white on black, but is actually whatever */
+  /* the terminal implements before color is initialized. It cannot be */
+  /* modified by the application, therefore we must start at 1. */
+  COLOR_TOP_BAR = 1, /* Set the first enum constant to one */
+  COLOR_BOTTOM_BAR,  /* Becomes two, and so on */
+  COLOR_PLATFORMS,
+  COLOR_PLAYER,
+  COLOR_INVINCIBILITY,
+  COLOR_LEVITATION,
+  COLOR_LOW_GRAVITY,
+  COLOR_SUPER_JUMP,
+  COLOR_TIME_STOP,
+  COLOR_EXTRA_LIFE,
+  COLOR_EXTRA_POINTS
 } ColorScheme;
 
 /**
@@ -74,7 +74,7 @@ void read_player_name(char *destination, const size_t maximum_size);
 /**
  * Draws a full game to the screen.
  */
-int draw_game(const Game * const game);
+int draw_game(const Game *const game);
 
 /**
  * Prints the provided string on the screen starting at (x, y).
@@ -94,14 +94,17 @@ void print_long_text(char *string);
 /**
  * Prints the provided Platform, respecting the BoundingBox.
  */
-void print_platform(const Platform * const platform, const BoundingBox * const box);
+void print_platform(const Platform *const platform,
+                    const BoundingBox *const box);
 
-void print_game_result(const char *name, const unsigned int score, const int position);
+void print_game_result(const char *name, const unsigned int score,
+                       const int position);
 
 ColorScheme get_perk_color(Perk perk);
 
 /**
- * Returns a BoundingBox that represents the playable area after removing bars and margins.
+ * Returns a BoundingBox that represents the playable area after removing bars
+ * and margins.
  */
 BoundingBox bounding_box_from_screen(void);
 

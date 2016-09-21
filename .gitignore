@@ -57,6 +57,7 @@ build/
 README.pdf
 sulzbach-ferrazza.zip
 game/version.h
+compile_commands.json
 
 # Code::Blocks
 *.layout

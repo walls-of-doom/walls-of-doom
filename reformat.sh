@@ -1,0 +1,6 @@
+echo Reformatting...
+clang-format -i game/*.[hc]
+clang-format -i tests/tests.c
+
+echo Analyzing...
+clang-tidy game/*.[hc]

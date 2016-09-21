@@ -5,24 +5,24 @@
 
 typedef struct Player {
 
-    char *name;
-    
-    int x;
-    int y;
-    int speed_x;
-    int speed_y;
+  char *name;
 
-    /* Whether or not the player is being affected by physics. */
-    int physics;
-    
-    int can_double_jump;
-    int remaining_jump_height;
+  int x;
+  int y;
+  int speed_x;
+  int speed_y;
 
-    int lives;
-    int score;
+  /* Whether or not the player is being affected by physics. */
+  int physics;
 
-    Perk perk;
-    unsigned long perk_end_frame;
+  int can_double_jump;
+  int remaining_jump_height;
+
+  int lives;
+  int score;
+
+  Perk perk;
+  unsigned long perk_end_frame;
 
 } Player;
 
