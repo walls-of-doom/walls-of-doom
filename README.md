@@ -1,8 +1,9 @@
 # Walls of Doom
 
 Walls of Doom is a minimalistic
-[platformer](https://en.wikipedia.org/wiki/Platform_game) written in C for a
-university class. The game is still under development but is already playable.
+[platformer](https://en.wikipedia.org/wiki/Platform_game) written in [ANSI
+C](https://en.wikipedia.org/wiki/ANSI_C). The game is still under development
+but is already playable.
 
 See [the GitHub issue
 tracker](https://github.com/walls-of-doom/walls-of-doom/issues) and have a look
@@ -19,11 +20,12 @@ visible to everyone.
 
 # Building and Running
 
+This project uses SDL 2.0 and you must have it in order to build the game.
+
 The following C compilers are known to work perfectly with the project:
 
-+ GCC 4.8
-+ GCC 5.3
-+ Clang 3.7
++ GCC 4.8.4 (or newer)
++ Clang 3.7 (or newer)
 
 ## Terminal
 
