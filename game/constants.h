@@ -72,6 +72,6 @@
  */
 #define DEFAULT_MONOSPACED_FONT_PATH                                           \
   "assets/fonts/roboto-mono/RobotoMono-Regular.ttf"
-#define DEFAULT_MONOSPACED_FONT_SIZE 14
+#define DEFAULT_MONOSPACED_FONT_SIZE 16
 
 #endif
