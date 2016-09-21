@@ -18,9 +18,6 @@
 #define COLUMNS 80
 #define LINES 30
 
-#define SCREEN_WIDTH (COLUMNS * 14)
-#define SCREEN_HEIGHT (LINES * 8)
-
 /**
  * All stack character buffers default to this size.
  *
