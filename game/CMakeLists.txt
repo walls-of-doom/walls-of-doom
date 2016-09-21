@@ -25,9 +25,9 @@ add_library (walls-of-doom-source
 
 set_target_properties (walls-of-doom-source PROPERTIES LINKER_LANGUAGE C)
 
-find_package(Curses REQUIRED)
-include_directories(${CURSES_INCLUDE_DIRS})
-target_link_libraries(walls-of-doom-source ${CURSES_LIBRARIES})
+find_package (Curses REQUIRED)
+include_directories (${CURSES_INCLUDE_DIRS})
+target_link_libraries (walls-of-doom-source ${CURSES_LIBRARIES})
 
 target_include_directories (walls-of-doom-source PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -35,6 +35,7 @@ add_executable (game game.c)
 target_link_libraries (game walls-of-doom-source)
 set_target_properties (game PROPERTIES LINKER_LANGUAGE C)
 
+# Copy the assets to the binary directory.
 add_custom_command (TARGET game POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_SOURCE_DIR}/assets/ ${CMAKE_CURRENT_BINARY_DIR}/assets/)
