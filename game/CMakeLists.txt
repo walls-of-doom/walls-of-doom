@@ -29,6 +29,12 @@ find_package (Curses REQUIRED)
 include_directories (${CURSES_INCLUDE_DIRS})
 target_link_libraries (walls-of-doom-source ${CURSES_LIBRARIES})
 
+include (FindPkgConfig)
+
+pkg_search_module (SDL2 REQUIRED sdl2)
+include_directories (${SDL2_INCLUDE_DIRS})
+target_link_libraries (walls-of-doom-source ${SDL2_LIBRARIES})
+
 target_include_directories (walls-of-doom-source PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable (game game.c)
