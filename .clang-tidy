@@ -1,10 +1,10 @@
 ---
-Checks:          'clang-diagnostic-*,clang-analyzer-*,-clang-analyzer-alpha*,*'
+Checks:          'clang-diagnostic-*,clang-analyzer-*,clang-analyzer-alpha.*,-clang-analyzer-alpha.clone.CloneChecker'
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false
 User:            mg
-CheckOptions:    
+CheckOptions:
   - key:             cert-dcl59-cpp.HeaderFileExtensions
     value:           h,hh,hpp,hxx
   - key:             cert-err61-cpp.CheckThrowTemporaries
@@ -24,7 +24,7 @@ CheckOptions:
   - key:             google-global-names-in-headers.HeaderFileExtensions
     value:           h
   - key:             google-readability-braces-around-statements.ShortStatementLines
-    value:           '1'
+    value:           '0'
   - key:             google-readability-function-size.BranchThreshold
     value:           '4294967295'
   - key:             google-readability-function-size.LineThreshold
@@ -116,7 +116,7 @@ CheckOptions:
   - key:             performance-unnecessary-value-param.IncludeStyle
     value:           llvm
   - key:             readability-braces-around-statements.ShortStatementLines
-    value:           '0'
+    value:           '1'
   - key:             readability-function-size.BranchThreshold
     value:           '4294967295'
   - key:             readability-function-size.LineThreshold
