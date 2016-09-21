@@ -27,8 +27,10 @@ typedef enum ColorScheme {
  * Initializes the required resources.
  *
  * Should only be called once, right after starting.
+ *
+ * Returns a nonzero value if initialization failed.
  */
-void initialize(void);
+int initialize(void);
 
 /**
  * Finalizes the acquired resources.

@@ -12,6 +12,7 @@
 #include <string.h>
 #include <ctype.h>
 
+#include <SDL.h>
 #include <curses.h>
 
 #define MAXIMUM_LINE_WIDTH 80
@@ -46,23 +47,35 @@ void log_terminal_color_support(void) {
  * Initializes the required resources.
  *
  * Should only be called once, right after starting.
+ *
+ * Returns a nonzero value if initialization failed.
  */
-void initialize(void) {
+int initialize(void) {
+    char log_buffer[MAXIMUM_STRING_SIZE];
+    SDL_Window *window = NULL;
+    SDL_Surface *screenSurface = NULL;
+    /* Experimental constants. */
+    int WIDTH = 640;
+    int HEIGHT = 480;
     initialize_logger();
-    /* Initialize the screen. */
-    initscr();
-    /* Prevent terminal echo. */
-    noecho();
-    /* Prevent delay from getch(). */
-    nodelay(stdscr, TRUE);
-    /* Enable function keys such as F1 and the arrow keys */
-    keypad(stdscr, TRUE);
-    /* Do not display the cursor. */
-    curs_set(FALSE);
-    /* Initialize the coloring functionality. */
-    start_color();
-    log_terminal_color_support();
-    initialize_color_schemes();
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+        sprintf(log_buffer, "SDL initialization error: %s", SDL_GetError());
+        log_message(log_buffer);
+        return 1;
+    }
+    window = SDL_CreateWindow(GAME_NAME, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
+    if (window == NULL) {
+      sprintf(log_buffer, "SDL initialization error: %s", SDL_GetError());
+      log_message(log_buffer);
+      return 1;
+    }
+    screenSurface = SDL_GetWindowSurface(window);
+    SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0xFF, 0xFF, 0xFF));
+    SDL_UpdateWindowSurface(window);
+    SDL_Delay(2 * 1000);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+    return 0;
 }
 
 void enable_string_input(void) {
