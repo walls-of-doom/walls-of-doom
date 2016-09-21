@@ -5,8 +5,6 @@
 #include "logger.h"
 #include "random.h"
 
-#include "curses.h"
-
 #include <stdlib.h>
 
 /**
@@ -54,7 +52,7 @@ int read_platforms(Platform *platforms) {
 
     platform->width = input_integers[1 + 2 * i];
 
-    platform->x = random_integer(1, COLS - 1);
+    platform->x = random_integer(1, COLUMNS - 1);
     platform->y = random_integer(4, LINES - 4);
 
     platform->speed_x = 0;

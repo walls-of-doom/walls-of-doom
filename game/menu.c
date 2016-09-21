@@ -17,7 +17,11 @@
 #include <string.h>
 
 #include <SDL.h>
-#include <curses.h>
+
+#undef COLS
+#define COLS 24
+#undef ROWS
+#define ROWS 80
 
 typedef struct Menu {
   char *title;
@@ -38,7 +42,7 @@ void write_menu(const Menu *const menu, SDL_Renderer *renderer) {
   int x;
   size_t i;
   char buffer[MAXIMUM_STRING_SIZE];
-  clear();
+  SDL_RenderClear(renderer);
   print((COLS - strlen(menu->title)) / 2, y, menu->title, renderer);
   for (i = 0; i < menu->option_count; i++) {
     char *string = menu->options[i];
@@ -48,14 +52,9 @@ void write_menu(const Menu *const menu, SDL_Renderer *renderer) {
     }
     x = (COLS - strlen(string)) / 2;
     y += ENTRY_HEIGHT;
-    if (i == menu->selected_option) {
-      attron(A_BOLD);
-    }
     print(x, y, string, renderer);
-    if (i == menu->selected_option) {
-      attroff(A_BOLD);
-    }
   }
+  SDL_RenderPresent(renderer);
 }
 
 /**

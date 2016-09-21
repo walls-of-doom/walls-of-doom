@@ -7,8 +7,6 @@
 #include "rest.h"
 #include "sort.h"
 
-#include "curses.h"
-
 #include <stdio.h>
 #include <string.h>
 
@@ -194,7 +192,7 @@ void record_to_string(const Record *const record, char *buffer,
  * Loads and presents the top scores on the screen.
  */
 void top_scores(SDL_Renderer *renderer) {
-  const int line_width = COLS - 6;
+  const int line_width = COLUMNS - 6;
   Record records[MAXIMUM_DISPLAYED_RECORDS];
   int y = 2;
   const int line_count = LINES - 2 * y;
@@ -202,7 +200,7 @@ void top_scores(SDL_Renderer *renderer) {
   size_t actually_read_records = read_records(records, maximum_read_records);
   char line[MAXIMUM_STRING_SIZE];
   size_t i;
-  if (COLS < 16) {
+  if (COLUMNS < 16) {
     return;
   }
   if (line_count > MAXIMUM_DISPLAYED_RECORDS) {

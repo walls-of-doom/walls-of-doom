@@ -14,37 +14,54 @@
 
 #include <SDL.h>
 #include <SDL_ttf.h>
-#include <curses.h>
 
 #define MAXIMUM_LINE_WIDTH 80
 
 /**
- * Initializes the color schemes used to render the game.
+ * A type that describes the basic metrics of a character.
  */
-int initialize_color_schemes(void) {
-  init_pair(COLOR_TOP_BAR, COLOR_CYAN, COLOR_MAGENTA);
-  init_pair(COLOR_BOTTOM_BAR, COLOR_BLACK, COLOR_YELLOW);
-  init_pair(COLOR_PLATFORMS, COLOR_WHITE, COLOR_WHITE);
-  init_pair(COLOR_PLAYER, COLOR_WHITE, COLOR_BLACK);
-  init_pair(COLOR_INVINCIBILITY, COLOR_BLACK, COLOR_YELLOW);
-  init_pair(COLOR_LEVITATION, COLOR_BLACK,
-            COLOR_WHITE); /* Requested was grey */
-  init_pair(COLOR_LOW_GRAVITY, COLOR_BLACK,
-            COLOR_BLUE); /* Requested was purple */
-  init_pair(COLOR_SUPER_JUMP, COLOR_BLACK, COLOR_CYAN);
-  init_pair(COLOR_TIME_STOP, COLOR_BLACK, COLOR_MAGENTA);
-  init_pair(COLOR_EXTRA_LIFE, COLOR_BLACK, COLOR_GREEN);
-  init_pair(COLOR_EXTRA_POINTS, COLOR_BLACK,
-            COLOR_RED); /* Requested was brown */
-  return 0;
+typedef struct CharacterMetrics {
+  int height;
+  int advance;
+} CharacterMetrics;
+
+/**
+ *
+ * Initialization and finalization functions.
+ *
+ */
+
+/**
+ * Retrieves a monospaced font. The result should be cached.
+ *
+ * Returns NULL on errors.
+ */
+static TTF_Font *get_monospaced_font(void) {
+  char log_buffer[MAXIMUM_STRING_SIZE];
+  TTF_Font *font;
+  font =
+      TTF_OpenFont(DEFAULT_MONOSPACED_FONT_PATH, DEFAULT_MONOSPACED_FONT_SIZE);
+  if (font == NULL) {
+    sprintf(log_buffer, "TTF font opening error: %s", SDL_GetError());
+    log_message(log_buffer);
+  }
+  return font;
 }
 
-void log_terminal_color_support(void) {
-  char log_buffer[MAXIMUM_STRING_SIZE];
-  sprintf(log_buffer, "Current terminal supports %d colors", COLORS);
-  log_message(log_buffer);
-  sprintf(log_buffer, "Current terminal supports %d color pairs", COLOR_PAIRS);
-  log_message(log_buffer);
+/**
+ * Returns the CharacterMetrics corresponding to the letter 'A' of the font
+ * returned by get_monospaced_font().
+ */
+CharacterMetrics get_character_metrics(void) {
+  TTF_Font *font = get_monospaced_font();
+  int min_y;
+  int max_y;
+  int advance;
+  CharacterMetrics metrics;
+  TTF_GlyphMetrics(font, 'A', NULL, NULL, &min_y, &max_y, &advance);
+  metrics.height = max_y - min_y;
+  metrics.advance = advance;
+  return metrics;
 }
 
 /**
@@ -57,10 +74,8 @@ void log_terminal_color_support(void) {
 int initialize(SDL_Window **window, SDL_Renderer **renderer) {
   char log_buffer[MAXIMUM_STRING_SIZE];
   SDL_Renderer *rendererSurface = NULL;
-
-  /* Experimental constants. */
-  int WIDTH = 640;
-  int HEIGHT = 480;
+  int width = 1;
+  int height = 1;
   initialize_logger();
   /* Initialize SDL. */
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -76,8 +91,19 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
       return 1;
     }
   }
+  /**
+   * The number of columns and the number of lines are fixed. However, the
+   * number of pixels we need for the screen is not. We find this number by
+   * experimenting before creating the window.
+   */
+  CharacterMetrics metrics = get_character_metrics();
+  width = metrics.advance * COLUMNS;
+  height = metrics.height * LINES;
+  /* Log the size of the window we are going to create. */
+  sprintf(log_buffer, "Creating a %dx%d window", width, height);
+  log_message(log_buffer);
   *window = SDL_CreateWindow(GAME_NAME, SDL_WINDOWPOS_UNDEFINED,
-                             SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT,
+                             SDL_WINDOWPOS_UNDEFINED, width, height,
                              SDL_WINDOW_SHOWN);
   if (*window == NULL) {
     sprintf(log_buffer, "SDL initialization error: %s", SDL_GetError());
@@ -85,22 +111,9 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
     return 1;
   }
   *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED);
+  SDL_SetRenderDrawColor(*renderer, 0x33, 0x33, 0x33, 0xFF);
+  SDL_RenderClear(*renderer);
   return 0;
-}
-
-void enable_string_input(void) {
-  fflush(stdin);
-  echo();
-  /* Display the cursor. */
-  curs_set(TRUE);
-  nodelay(stdscr, FALSE);
-}
-
-void disable_string_input(void) {
-  noecho();
-  /* Do not display the cursor. */
-  curs_set(FALSE);
-  nodelay(stdscr, TRUE);
 }
 
 /**
@@ -122,22 +135,41 @@ int finalize(SDL_Window **window, SDL_Renderer **renderer) {
 }
 
 /**
+ * Initializes the color schemes used to render the game.
+ */
+int initialize_color_schemes(void) {
+  /* Nothing to do for now. */
+  return 0;
+}
+
+/**
+ *
+ * Colors.
+ *
+ */
+static SDL_Color get_light_grey(void) {
+  SDL_Color grey;
+  /* #D3D7CF */
+  grey.r = 0xD3;
+  grey.g = 0xD7;
+  grey.b = 0xCF;
+  grey.a = 0xFF;
+  return grey;
+}
+
+static SDL_Color get_text_color(void) {
+  SDL_Color text_color = get_light_grey();
+  return text_color;
+}
+
+/**
  * Enables echo and reads a string from the user.
  *
  * Returns 0 in case of success.
  */
 int read_string(char *destination, const size_t maximum_size,
                 SDL_Renderer *renderer) {
-  int result;
-  enable_string_input();
-  result = getnstr(destination, maximum_size - 1);
-  disable_string_input();
-  if (result == ERR) { /* Got curses error code. */
-    log_message("Got an error when reading string");
-    return 1;
-  } else {
-    return 0;
-  }
+  return 1;
 }
 
 /**
@@ -224,8 +256,8 @@ void read_player_name(char *destination, const size_t maximum_size,
   /* While there is not a read error or a valid name. */
   while (!read_error && !valid_name) {
     clear();
-    if (maximum_width <= COLS) {
-      print((COLS - maximum_width) / 2, LINES / 2, message, renderer);
+    if (maximum_width <= COLUMNS) {
+      print((COLUMNS - maximum_width) / 2, LINES / 2, message, renderer);
     } else {
       print(0, LINES / 2, message, renderer);
     }
@@ -248,38 +280,6 @@ void read_player_name(char *destination, const size_t maximum_size,
 }
 
 /**
- * Retrieves a monospaced font. The result should be cached.
- *
- * Returns NULL on errors.
- */
-static TTF_Font *get_monospaced_font(void) {
-  char log_buffer[MAXIMUM_STRING_SIZE];
-  TTF_Font *font;
-  font =
-      TTF_OpenFont(DEFAULT_MONOSPACED_FONT_PATH, DEFAULT_MONOSPACED_FONT_SIZE);
-  if (font == NULL) {
-    sprintf(log_buffer, "TTF font opening error: %s", SDL_GetError());
-    log_message(log_buffer);
-  }
-  return font;
-}
-
-static SDL_Color get_light_grey(void) {
-  SDL_Color grey;
-  /* #D3D7CF */
-  grey.r = 0xD3;
-  grey.g = 0xD7;
-  grey.b = 0xCF;
-  grey.a = 0xFF;
-  return grey;
-}
-
-static SDL_Color get_text_color(void) {
-  SDL_Color text_color = get_light_grey();
-  return text_color;
-}
-
-/**
  * Prints the provided string on the screen starting at (x, y).
  *
  * Returns 0 in case of success.
@@ -287,13 +287,12 @@ static SDL_Color get_text_color(void) {
 int print(const int x, const int y, const char *string,
           SDL_Renderer *renderer) {
   TTF_Font *font = get_monospaced_font();
-  SDL_Rect destination;
-  destination.x = x;
-  destination.y = y;
-  destination.w = 0;
-  destination.h = 0;
   SDL_Surface *surface;
   SDL_Texture *texture;
+  SDL_Rect position;
+  CharacterMetrics metrics = get_character_metrics();
+  position.x = metrics.advance * x;
+  position.y = metrics.height * y;
   /* Validate that x and y are nonnegative. */
   if (x < 0 || y < 0) {
     return 1;
@@ -304,7 +303,14 @@ int print(const int x, const int y, const char *string,
     return 1;
   }
   texture = SDL_CreateTextureFromSurface(renderer, surface);
-  SDL_RenderCopy(renderer, texture, NULL, NULL);
+  if (texture == NULL) {
+    log_message("Failed to create texture from surface in print()");
+    return 1;
+  }
+  /* Copy destination width and height from the texture. */
+  SDL_QueryTexture(texture, NULL, NULL, &position.w, &position.h);
+  printf("%d, %d, %d, %d\n", position.x, position.y, position.w, position.h);
+  SDL_RenderCopy(renderer, texture, NULL, &position);
   SDL_DestroyTexture(texture);
   SDL_FreeSurface(surface);
   return 0;
@@ -314,7 +320,7 @@ int print(const int x, const int y, const char *string,
  * Prints the provided string centered on the screen at the provided line.
  */
 void print_centered(const int y, const char *string, SDL_Renderer *renderer) {
-  const int x = (COLS - strlen(string)) / 2;
+  const int x = (COLUMNS - strlen(string)) / 2;
   print(x, y, string, renderer);
 }
 
@@ -388,14 +394,11 @@ void pad_line_right(char *line, const size_t width) {
  */
 void print_long_text(char *string, SDL_Renderer *renderer) {
   size_t lines_copied = 0;
-  char line[MAXIMUM_LINE_WIDTH];
+  char line[COLUMNS];
   char *cursor;
-  int width = MAXIMUM_LINE_WIDTH;
+  int width = COLUMNS;
   int line_count;
   normalize_whitespaces(string);
-  if (MAXIMUM_LINE_WIDTH > COLS - 2) {
-    width = COLS - 2;
-  }
   wrap_at_right_margin(string, width);
   line_count = count_lines(string);
   clear();
@@ -439,10 +442,8 @@ void write_top_bar_strings(char *strings[], SDL_Renderer *renderer) {
   int x;
   int i;
 
-  const int columns_per_string = COLS / TOP_BAR_STRING_COUNT;
+  const int columns_per_string = COLUMNS / TOP_BAR_STRING_COUNT;
 
-  attron(COLOR_PAIR(COLOR_TOP_BAR));
-  attron(A_BOLD);
   for (i = 0; i < TOP_BAR_STRING_COUNT; i++) {
     begin_x = i * columns_per_string;
     after_x = (i + 1) * columns_per_string;
@@ -450,11 +451,11 @@ void write_top_bar_strings(char *strings[], SDL_Renderer *renderer) {
       /*
        * If this is the last string on the top, make sure that we will
        * write enough colored spaces. Integer division truncates, which
-       * can make 4 * (COLS / 4) != COLS. Therefore, some spaces may be
+       * can make 4 * (COLUMNS / 4) != COLUMNS. Therefore, some spaces may be
        * left uncolored at the end if we do not ensure that all columns
        * are painted.
        */
-      after_x = COLS;
+      after_x = COLUMNS;
     }
     string_length = strlen(strings[i]);
     if (string_length < columns_per_string) {
@@ -479,8 +480,6 @@ void write_top_bar_strings(char *strings[], SDL_Renderer *renderer) {
       }
     }
   }
-  attroff(A_BOLD);
-  attroff(COLOR_PAIR(COLOR_TOP_BAR));
 }
 
 /**
@@ -522,7 +521,7 @@ int draw_top_bar(const Player *const player, SDL_Renderer *renderer) {
 int draw_bottom_bar(SDL_Renderer *renderer) {
   int i;
   attron(COLOR_PAIR(COLOR_BOTTOM_BAR));
-  for (i = 0; i < COLS; i++) {
+  for (i = 0; i < COLUMNS; i++) {
     print(i, LINES - 1, " ", renderer);
   }
   attroff(COLOR_PAIR(COLOR_BOTTOM_BAR));
@@ -531,17 +530,17 @@ int draw_bottom_bar(SDL_Renderer *renderer) {
 
 int draw_borders(SDL_Renderer *renderer) {
   int i;
-  for (i = 1; i < COLS - 1; i++) {
+  for (i = 1; i < COLUMNS - 1; i++) {
     print(i, 1, "+", renderer);
   }
   for (i = 1; i < LINES - 1; i++) {
     print(0, i, "+", renderer);
   }
-  for (i = 1; i < COLS - 1; i++) {
+  for (i = 1; i < COLUMNS - 1; i++) {
     print(i, LINES - 2, "+", renderer);
   }
   for (i = 1; i < LINES - 1; i++) {
-    print(COLS - 1, i, "+", renderer);
+    print(COLUMNS - 1, i, "+", renderer);
   }
   return 0;
 }
@@ -584,19 +583,13 @@ ColorScheme get_perk_color(Perk perk) {
 
 int draw_perk(const Game *const game, SDL_Renderer *renderer) {
   if (has_active_perk(game)) {
-    attron(COLOR_PAIR(get_perk_color(game->perk)));
-    attron(A_BOLD);
     print(game->perk_x, game->perk_y, get_perk_symbol(), renderer);
-    attroff(A_BOLD);
-    attroff(COLOR_PAIR(get_perk_color(game->perk)));
   }
   return 0;
 }
 
 int draw_player(const Player *const player, SDL_Renderer *renderer) {
-  attron(COLOR_PAIR(COLOR_PLAYER));
   print(player->x, player->y, PLAYER_SYMBOL, renderer);
-  attroff(COLOR_PAIR(COLOR_PLAYER));
   return 0;
 }
 
@@ -604,6 +597,7 @@ int draw_player(const Player *const player, SDL_Renderer *renderer) {
  * Draws a full game to the screen.
  */
 int draw_game(const Game *const game, SDL_Renderer *renderer) {
+  SDL_RenderClear(renderer);
   draw_top_bar(game->player, renderer);
   draw_bottom_bar(renderer);
   draw_borders(renderer);
@@ -624,10 +618,8 @@ void print_game_result(const char *name, const unsigned int score,
   } else {
     sprintf(second_line, "%s didn't make it to the top scores.", name);
   }
-  clear();
   print_centered(LINES / 2 - 1, first_line, renderer);
   print_centered(LINES / 2 + 1, second_line, renderer);
-  refresh();
 }
 
 /**
@@ -638,7 +630,7 @@ BoundingBox bounding_box_from_screen(void) {
   BoundingBox box;
   box.min_x = 1;
   box.min_y = 2; /* Top bar. */
-  box.max_x = COLS - 2;
+  box.max_x = COLUMNS - 2;
   box.max_y = LINES - 3; /* Bottom bar. */
   return box;
 }
