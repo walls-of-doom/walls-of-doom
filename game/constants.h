@@ -15,8 +15,18 @@
  */
 #define TOP_BAR_STRING_COUNT 4
 
+/**
+ * The number of columns and lines of the window.
+ */
+
 #define COLUMNS 80
+
 #define LINES 30
+
+/**
+ * How many spaces should be left from the margins when printing text.
+ */
+#define PADDING 2
 
 /**
  * All stack character buffers default to this size.
@@ -29,6 +39,8 @@
 #define MAXIMUM_STRING_SIZE 256
 
 #define MAXIMUM_PLAYER_NAME_SIZE 64
+
+#define FALLBACK_PLAYER_NAME "Player"
 
 /**
  * The maximum number of platforms the game loads.

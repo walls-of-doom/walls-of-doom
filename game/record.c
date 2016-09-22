@@ -196,9 +196,8 @@ void record_to_string(const Record *const record, char *buffer,
 void top_scores(SDL_Renderer *renderer) {
   Record records[MAXIMUM_DISPLAYED_RECORDS];
   char line[MAXIMUM_STRING_SIZE];
-  const int padding = 2;
-  const int line_width = COLUMNS - 6;
-  const int line_count = LINES - 2 * padding;
+  const int line_width = COLUMNS - 2 * PADDING;
+  const int line_count = LINES - 2 * PADDING;
   const int record_width = min(line_width, MAXIMUM_STRING_SIZE - 1);
   const size_t record_count = read_records(records, MAXIMUM_DISPLAYED_RECORDS);
   size_t i;
@@ -208,7 +207,7 @@ void top_scores(SDL_Renderer *renderer) {
   clean(renderer);
   for (i = 0; i < record_count && i < line_count; i++) {
     record_to_string(records + i, line, record_width);
-    print_centered(padding + i, line, renderer);
+    print_centered(PADDING + i, line, renderer);
   }
   present(renderer);
   rest_for_seconds(3);

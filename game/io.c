@@ -15,8 +15,6 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 
-#define FALLBACK_PLAYER_NAME "Player"
-
 static TTF_Font *global_monospaced_font = NULL;
 static int global_monospaced_font_width = 0;
 static int global_monospaced_font_height = 0;
@@ -409,22 +407,14 @@ char *copy_first_line(char *source, char *destination) {
   }
 }
 
-void pad_line_right(char *line, const size_t width) {
-  size_t i;
-  for (i = strlen(line); i < width; i++) {
-    line[i] = ' ';
-  }
-  line[width] = '\0';
-}
-
 /**
  * Prints the provided string after formatting it to increase readability.
  */
 void print_long_text(char *string, SDL_Renderer *renderer) {
   size_t lines_copied = 0;
-  char line[COLUMNS];
+  char line[COLUMNS + 1];
   char *cursor;
-  int width = COLUMNS;
+  int width = COLUMNS - PADDING;
   int line_count;
   normalize_whitespaces(string);
   wrap_at_right_margin(string, width);
@@ -434,8 +424,7 @@ void print_long_text(char *string, SDL_Renderer *renderer) {
   cursor = string;
   while (*cursor != '\0') {
     cursor = copy_first_line(cursor, line);
-    pad_line_right(line, width);
-    print_centered((LINES - line_count) / 2 + lines_copied, line, renderer);
+    print(PADDING, (LINES - line_count) / 2 + lines_copied, line, renderer);
     lines_copied++;
   }
   present(renderer);
