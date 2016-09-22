@@ -15,7 +15,7 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 
-#define MAXIMUM_LINE_WIDTH 80
+#define FALLBACK_PLAYER_NAME "Player"
 
 /**
  * A type that describes the basic metrics of a character.
@@ -24,6 +24,10 @@ typedef struct CharacterMetrics {
   int height;
   int advance;
 } CharacterMetrics;
+
+void clean(SDL_Renderer *renderer) { SDL_RenderClear(renderer); }
+
+void present(SDL_Renderer *renderer) { SDL_RenderPresent(renderer); }
 
 /**
  *
@@ -112,7 +116,7 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
   }
   *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED);
   SDL_SetRenderDrawColor(*renderer, 0x33, 0x33, 0x33, 0xFF);
-  SDL_RenderClear(*renderer);
+  clean(*renderer);
   return 0;
 }
 
@@ -160,16 +164,6 @@ static SDL_Color get_light_grey(void) {
 static SDL_Color get_text_color(void) {
   SDL_Color text_color = get_light_grey();
   return text_color;
-}
-
-/**
- * Enables echo and reads a string from the user.
- *
- * Returns 0 in case of success.
- */
-int read_string(char *destination, const size_t maximum_size,
-                SDL_Renderer *renderer) {
-  return 1;
 }
 
 /**
@@ -247,26 +241,27 @@ int is_valid_player_name(const char *player_name) {
 
 void read_player_name(char *destination, const size_t maximum_size,
                       SDL_Renderer *renderer) {
-  int read_error = 0;
+  int x;
+  int y;
+  int error = 0;
   int valid_name = 0;
   const char message[] = "Name your character: ";
   const int message_size = strlen(message);
   const int maximum_width = message_size + maximum_size;
   char log_buffer[MAXIMUM_STRING_SIZE];
   /* While there is not a read error or a valid name. */
-  while (!read_error && !valid_name) {
-    clear();
+  while (!error && !valid_name) {
     if (maximum_width <= COLUMNS) {
-      print((COLUMNS - maximum_width) / 2, LINES / 2, message, renderer);
+      x = (COLUMNS - maximum_width);
     } else {
-      print(0, LINES / 2, message, renderer);
+      x = 0;
     }
-    refresh();
-    read_error = read_string(destination, maximum_size, renderer);
-    if (read_error) {
+    y = LINES / 2;
+    error = read_string(x, y, message, destination, maximum_size, renderer);
+    if (error) {
       log_message("Failed to read player name");
       /* Cope with it by providing a name for the player. */
-      safe_strcpy(destination, "ERROR READING PLAYER NAME", maximum_size);
+      safe_strcpy(destination, FALLBACK_PLAYER_NAME, maximum_size);
     } else {
       sprintf(log_buffer, "Read '%s' from the user", destination);
       log_message(log_buffer);
@@ -596,14 +591,14 @@ int draw_player(const Player *const player, SDL_Renderer *renderer) {
  * Draws a full game to the screen.
  */
 int draw_game(const Game *const game, SDL_Renderer *renderer) {
-  SDL_RenderClear(renderer);
+  clean(renderer);
   draw_top_bar(game->player, renderer);
   draw_bottom_bar(renderer);
   draw_borders(renderer);
   draw_platforms(game->platforms, game->platform_count, game->box, renderer);
   draw_perk(game, renderer);
   draw_player(game->player, renderer);
-  SDL_RenderPresent(renderer);
+  present(renderer);
   return 0;
 }
 
@@ -661,6 +656,85 @@ Command command_from_event(const SDL_Event event) {
     }
   }
   return COMMAND_NONE;
+}
+
+/**
+ * Asserts whether or not a character is a valid input character.
+ *
+ * For simplicity, the user should only be able to enter letters and numbers.
+ */
+int is_valid_input_character(char c) { return isalnum(c); }
+
+/**
+ * Reads a string from the user of up to size characters (including NUL).
+ *
+ * The string will be echoed after the prompt, which starts at (x, y).
+ *
+ * Returns 0 if successful.
+ * Returns 1 if the user tried to quit.
+ */
+int read_string(const int x, const int y, const char *prompt, char *destination,
+                const size_t size, SDL_Renderer *renderer) {
+  const int buffer_x = x + strlen(prompt) + 1;
+  int is_done = 0;
+  int should_rerender = 1;
+  /* The x coordinate of the user input buffer. */
+  size_t written = 0;
+  char *write = destination;
+  char character = '\0';
+  SDL_Event event;
+  /* Make sure that we always have a valid string for printing. */
+  /* Throughout the loop, the write pointer always points to a '\0'. */
+  *destination = '\0';
+  /* Start listening for text input. */
+  SDL_StartTextInput();
+  while (!is_done) {
+    if (should_rerender) {
+      clean(renderer);
+      print(x, y, prompt, renderer);
+      if (written == 0) {
+        /* We must write a single space, or SDL will not render anything. */
+        print(buffer_x, y, " ", renderer);
+      } else {
+        print(buffer_x, y, destination, renderer);
+      }
+      present(renderer);
+      should_rerender = 0;
+    }
+    if (SDL_PollEvent(&event)) {
+      /* Check for user quit and return 1. */
+      /* This is OK because the destination string is always a valid C string.
+       */
+      if (event.type == SDL_QUIT) {
+        return 1;
+      } else if (event.type == SDL_KEYDOWN) {
+        /* Handle backspace. */
+        if (event.key.keysym.sym == SDLK_BACKSPACE && written > 0) {
+          write--;
+          *write = '\0';
+          written--;
+          should_rerender = 1;
+        } else if (event.key.keysym.sym == SDLK_RETURN) {
+          is_done = 1;
+        }
+      } else if (event.type == SDL_TEXTINPUT) {
+        character = event.text.text[0];
+        if (is_valid_input_character(character) && written + 1 < size) {
+          *write = character;
+          write++;
+          written++;
+          /* Terminate the string with NIL to ensure it is valid. */
+          *write = '\0';
+          should_rerender = 1;
+        }
+        /* We could handle copying and pasting by checking for Control-C. */
+        /* SDL_*ClipboardText() allows us to access the clipboard text. */
+      }
+    }
+  }
+  /* Stop listening for text input. */
+  SDL_StopTextInput();
+  return 0;
 }
 
 /**

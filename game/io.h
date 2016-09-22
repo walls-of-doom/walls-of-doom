@@ -63,12 +63,15 @@ char *find_end_of_text(char *string);
 void trim_string(char *string);
 
 /**
- * Enables echo and reads a string from the user.
+ * Reads a string from the user of up to size characters (including NUL).
  *
- * Returns 0 in case of success.
+ * The string will be echoed after the prompt, which starts at (x, y).
+ *
+ * Returns 0 if successful.
+ * Returns 1 if the user tried to quit.
  */
-int read_string(char *destination, const size_t maximum_size,
-                SDL_Renderer *renderer);
+int read_string(const int x, const int y, const char *prompt, char *destination,
+                size_t size, SDL_Renderer *renderer);
 
 void read_player_name(char *destination, const size_t maximum_size,
                       SDL_Renderer *renderer);
