@@ -17,15 +17,9 @@
 
 #define FALLBACK_PLAYER_NAME "Player"
 
-TTF_Font *global_monospaced_font = NULL;
-
-/**
- * A type that describes the basic metrics of a character.
- */
-typedef struct CharacterMetrics {
-  int height;
-  int advance;
-} CharacterMetrics;
+static TTF_Font *global_monospaced_font = NULL;
+static int global_monospaced_font_width = 0;
+static int global_monospaced_font_height = 0;
 
 void clean(SDL_Renderer *renderer) { SDL_RenderClear(renderer); }
 
@@ -62,25 +56,22 @@ static int initialize_fonts(void) {
 }
 
 /**
- * Returns the CharacterMetrics corresponding to the letter 'A' of the font
- * returned by global_monospaced_font.
+ * Initializes the required font metrics.
+ *
+ * Returns 0 in case of success.
  */
-CharacterMetrics get_character_metrics(void) {
-  int min_y;
-  int max_y;
-  int advance;
-  CharacterMetrics metrics;
+static int initialize_font_metrics(void) {
+  int width;
+  int height;
   TTF_Font *font = global_monospaced_font;
-  if (TTF_GlyphMetrics(font, 'A', NULL, NULL, &min_y, &max_y, &advance)) {
-    /* An error occurred. We log it and return an empty CharacterMetrics. */
-    metrics.height = 0;
-    metrics.advance = 0;
-    log_message("An error occurred within get_character_metrics()");
-  } else {
-    metrics.height = max_y - min_y;
-    metrics.advance = advance;
+  if (TTF_GlyphMetrics(font, 'A', NULL, NULL, NULL, NULL, &width)) {
+    log_message("Could not assess the width of a font");
+    return 1;
   }
-  return metrics;
+  height = TTF_FontHeight(font);
+  global_monospaced_font_width = width;
+  global_monospaced_font_height = height;
+  return 0;
 }
 
 static SDL_Window *create_window(int width, int height) {
@@ -123,14 +114,18 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
     log_message(log_buffer);
     return 1;
   }
+  if (initialize_font_metrics()) {
+    sprintf(log_buffer, "Failed to initialize font metrics");
+    log_message(log_buffer);
+    return 1;
+  }
   /**
    * The number of columns and the number of lines are fixed. However, the
    * number of pixels we need for the screen is not. We find this number by
    * experimenting before creating the window.
    */
-  CharacterMetrics metrics = get_character_metrics();
-  width = metrics.advance * COLUMNS;
-  height = metrics.height * LINES;
+  width = global_monospaced_font_width * COLUMNS;
+  height = global_monospaced_font_height * LINES;
   /* Log the size of the window we are going to create. */
   sprintf(log_buffer, "Creating a %dx%d window", width, height);
   log_message(log_buffer);
@@ -325,9 +320,8 @@ int print(const int x, const int y, const char *string,
   SDL_Surface *surface;
   SDL_Texture *texture;
   SDL_Rect position;
-  CharacterMetrics metrics = get_character_metrics();
-  position.x = metrics.advance * x;
-  position.y = metrics.height * y;
+  position.x = global_monospaced_font_width * x;
+  position.y = global_monospaced_font_height * y;
   /* Validate that x and y are nonnegative. */
   if (x < 0 || y < 0) {
     return 1;
