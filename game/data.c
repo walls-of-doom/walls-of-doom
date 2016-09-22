@@ -9,6 +9,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#define LOG_ACCESS_WRITE_FORMAT "Writing %lu bytes (%.2lf KiB) to %s"
+#define LOG_ACCESS_READ_FORMAT "Reading %lu bytes (%.2lf KiB) from %s"
+
 #define WRITE_BYTES_COUNT_FORMAT "Expected to write %lu but actually wrote %lu"
 #define READ_BYTES_COUNT_FORMAT "Expected to read %lu but actually read %lu"
 
@@ -22,16 +25,16 @@ int file_exists(const char *filename) {
 
 typedef enum Operation { READ, WRITE } Operation;
 
-void log_access(Operation operation, const size_t byte_count,
-                const char *filename) {
+void log_access(Operation operation, const size_t bytes, const char *filename) {
   char message[MAXIMUM_STRING_SIZE];
+  double kibibytes = bytes / 1024;
+  char *format = NULL;
   if (operation == READ) {
-    sprintf(message, "Reading %lu bytes from %s", (unsigned long)byte_count,
-            filename);
+    format = LOG_ACCESS_READ_FORMAT;
   } else {
-    sprintf(message, "Writing %lu bytes to %s", (unsigned long)byte_count,
-            filename);
+    format = LOG_ACCESS_WRITE_FORMAT;
   }
+  sprintf(message, format, bytes, kibibytes, filename);
   log_message(message);
 }
 
