@@ -15,6 +15,10 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 
+#define ELLIPSIS_STRING "..."
+#define ELLIPSIS_LENGTH (strlen(ELLIPSIS_STRING))
+#define MINIMUM_STRING_SIZE_FOR_ELLIPSIS (2 * ELLIPSIS_LENGTH)
+
 static TTF_Font *global_monospaced_font = NULL;
 static int global_monospaced_font_width = 0;
 static int global_monospaced_font_height = 0;
@@ -279,16 +283,10 @@ void read_player_name(char *destination, const size_t maximum_size,
   int error = 0;
   int valid_name = 0;
   const char message[] = "Name your character: ";
-  const int message_size = strlen(message);
-  const int maximum_width = message_size + maximum_size;
   char log_buffer[MAXIMUM_STRING_SIZE];
   /* While there is not a read error or a valid name. */
   while (!error && !valid_name) {
-    if (maximum_width <= COLUMNS) {
-      x = (COLUMNS - maximum_width);
-    } else {
-      x = 0;
-    }
+    x = PADDING;
     y = LINES / 2;
     error = read_string(x, y, message, destination, maximum_size, renderer);
     if (error) {
@@ -685,6 +683,37 @@ Command command_from_event(const SDL_Event event) {
 int is_valid_input_character(char c) { return isalnum(c); }
 
 /**
+ * Prints a string starting from (x, y) but limits to its first limit
+ * characters.
+ */
+static void print_limited(const int x, const int y, const char *string,
+                          const int limit, SDL_Renderer *renderer) {
+  /* No-op. */
+  if (limit < 1) {
+    return;
+  }
+  const size_t string_length = strlen(string);
+  /*
+   * As only two calls to print suffice to solve this problem for any possible
+   * input size, we avoid using a dynamically allocated buffer to prepare the
+   * output.
+   */
+  /* String length is less than the limit. */
+  if (string_length < limit) {
+    print(x, y, string, renderer);
+    return;
+  }
+  /* String is longer than the limit. */
+  /* Write the ellipsis if we need to. */
+  if (limit >= MINIMUM_STRING_SIZE_FOR_ELLIPSIS) {
+    print(x, y, ELLIPSIS_STRING, renderer);
+  }
+  /* Write the tail of the input string. */
+  string += string_length - limit + ELLIPSIS_LENGTH;
+  print(x + ELLIPSIS_LENGTH, y, string, renderer);
+}
+
+/**
  * Reads a string from the user of up to size characters (including NUL).
  *
  * The string will be echoed after the prompt, which starts at (x, y).
@@ -695,6 +724,7 @@ int is_valid_input_character(char c) { return isalnum(c); }
 int read_string(const int x, const int y, const char *prompt, char *destination,
                 const size_t size, SDL_Renderer *renderer) {
   const int buffer_x = x + strlen(prompt) + 1;
+  const int buffer_view_limit = COLUMNS - PADDING - buffer_x;
   int is_done = 0;
   int should_rerender = 1;
   /* The x coordinate of the user input buffer. */
@@ -715,7 +745,14 @@ int read_string(const int x, const int y, const char *prompt, char *destination,
         /* We must write a single space, or SDL will not render anything. */
         print(buffer_x, y, " ", renderer);
       } else {
-        print(buffer_x, y, destination, renderer);
+        /*
+         * Must care about how much we write, PADDING should be respected.
+         *
+         * Simply enough, we print the tail of the string and omit the
+         * beginning with an ellipsis.
+         *
+         */
+        print_limited(buffer_x, y, destination, buffer_view_limit, renderer);
       }
       present(renderer);
       should_rerender = 0;
