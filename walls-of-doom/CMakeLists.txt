@@ -1,10 +1,10 @@
 cmake_minimum_required (VERSION 2.8.7)
 
-configure_file (version.h.in version.h)
-
 set (CMAKE_MODULE_PATH ../cmake)
 
-add_library (walls-of-doom-source
+configure_file (version.h.in version.h)
+
+add_library (walls-of-doom-base
     about.h about.c
     command.h
     constants.h
@@ -26,20 +26,21 @@ add_library (walls-of-doom-source
     types.h
     version.h)
 
-set_target_properties (walls-of-doom-source PROPERTIES LINKER_LANGUAGE C)
-
 find_package (SDL2 REQUIRED)
 find_package (SDL2TTF REQUIRED)
 include_directories (${SDL2_INCLUDE_DIR} ${SDL2TTF_INCLUDE_DIR})
-target_link_libraries (walls-of-doom-source ${SDL2_LIBRARY} ${SDL2TTF_LIBRARY})
+target_link_libraries (walls-of-doom-base ${SDL2_LIBRARY} ${SDL2TTF_LIBRARY})
 
-target_include_directories (walls-of-doom-source PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories (walls-of-doom-base PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable (game game.c)
-target_link_libraries (game walls-of-doom-source)
-set_target_properties (game PROPERTIES LINKER_LANGUAGE C)
+add_executable (walls-of-doom game.c)
+target_link_libraries (walls-of-doom walls-of-doom-base)
+
+add_executable (tests tests.c)
+target_link_libraries (tests unity)
+target_link_libraries (tests walls-of-doom-base)
 
 # Copy the assets to the binary directory.
-add_custom_command (TARGET game POST_BUILD
+add_custom_command (TARGET walls-of-doom POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_SOURCE_DIR}/assets/ ${CMAKE_CURRENT_BINARY_DIR}/assets/)

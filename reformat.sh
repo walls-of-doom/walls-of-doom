@@ -1,6 +1,6 @@
 echo Reformatting...
-clang-format -i game/*.[hc]
-clang-format -i tests/tests.c
+clang-format -i walls-of-doom/*.[hc]
+clang-format -i tests/*.c
 
 echo Analyzing...
-clang-tidy game/*.[hc]
+clang-tidy walls-of-doom/*.[hc]

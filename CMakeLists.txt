@@ -1,7 +1,5 @@
 cmake_minimum_required (VERSION 2.8.7)
 
-set (CMAKE_MODULE_PATH ./cmake)
-
 project (walls-of-doom)
 
 set (walls-of-doom_VERSION_MAJOR 0)
@@ -25,5 +23,4 @@ elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
 endif ()
 
 add_subdirectory (unity)
-add_subdirectory (tests)
-add_subdirectory (game)
+add_subdirectory (walls-of-doom)
