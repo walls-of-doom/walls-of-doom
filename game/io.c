@@ -38,13 +38,18 @@ void present(SDL_Renderer *renderer) { SDL_RenderPresent(renderer); }
 /**
  * Retrieves a monospaced font. The result should be cached.
  *
+ * Do not free the returned TTF_Font pointer.
+ *
  * Returns NULL on errors.
  */
 static TTF_Font *get_monospaced_font(void) {
   char log_buffer[MAXIMUM_STRING_SIZE];
-  TTF_Font *font;
-  font =
-      TTF_OpenFont(DEFAULT_MONOSPACED_FONT_PATH, DEFAULT_MONOSPACED_FONT_SIZE);
+  static TTF_Font *font = NULL;
+  /* We try to open the font. */
+  if (font == NULL) {
+    font = TTF_OpenFont(MONOSPACED_FONT_PATH, MONOSPACED_FONT_SIZE);
+  }
+  /* If it failed, we log an error. */
   if (font == NULL) {
     sprintf(log_buffer, "TTF font opening error: %s", SDL_GetError());
     log_message(log_buffer);
@@ -57,14 +62,20 @@ static TTF_Font *get_monospaced_font(void) {
  * returned by get_monospaced_font().
  */
 CharacterMetrics get_character_metrics(void) {
-  TTF_Font *font = get_monospaced_font();
   int min_y;
   int max_y;
   int advance;
   CharacterMetrics metrics;
-  TTF_GlyphMetrics(font, 'A', NULL, NULL, &min_y, &max_y, &advance);
-  metrics.height = max_y - min_y;
-  metrics.advance = advance;
+  TTF_Font *font = get_monospaced_font();
+  if (TTF_GlyphMetrics(font, 'A', NULL, NULL, &min_y, &max_y, &advance)) {
+    /* An error occurred. We log it and return an empty CharacterMetrics. */
+    metrics.height = 0;
+    metrics.advance = 0;
+    log_message("An error occurred within get_character_metrics()");
+  } else {
+    metrics.height = max_y - min_y;
+    metrics.advance = advance;
+  }
   return metrics;
 }
 
@@ -395,7 +406,7 @@ void print_long_text(char *string, SDL_Renderer *renderer) {
   normalize_whitespaces(string);
   wrap_at_right_margin(string, width);
   line_count = count_lines(string);
-  clear();
+  clean(renderer);
   /* Print each line. */
   cursor = string;
   while (*cursor != '\0') {
@@ -404,7 +415,7 @@ void print_long_text(char *string, SDL_Renderer *renderer) {
     print_centered((LINES - line_count) / 2 + lines_copied, line, renderer);
     lines_copied++;
   }
-  refresh();
+  present(renderer);
 }
 
 /**
@@ -420,7 +431,7 @@ void print_platform(const Platform *const platform,
     y = platform->y;
     if (x >= box->min_x && x <= box->max_x && y >= box->min_y &&
         y <= box->max_y) {
-      print(x, y, " ", renderer);
+      print(x, y, "=", renderer);
     }
   }
 }
@@ -514,11 +525,9 @@ int draw_top_bar(const Player *const player, SDL_Renderer *renderer) {
  */
 int draw_bottom_bar(SDL_Renderer *renderer) {
   int i;
-  attron(COLOR_PAIR(COLOR_BOTTOM_BAR));
   for (i = 0; i < COLUMNS; i++) {
     print(i, LINES - 1, " ", renderer);
   }
-  attroff(COLOR_PAIR(COLOR_BOTTOM_BAR));
   return 0;
 }
 
@@ -542,11 +551,9 @@ int draw_borders(SDL_Renderer *renderer) {
 int draw_platforms(const Platform *platforms, const size_t platform_count,
                    const BoundingBox *const box, SDL_Renderer *renderer) {
   size_t i;
-  attron(COLOR_PAIR(COLOR_PLATFORMS));
   for (i = 0; i < platform_count; i++) {
     print_platform(&platforms[i], box, renderer);
   }
-  attroff(COLOR_PAIR(COLOR_PLATFORMS));
   return 0;
 }
 
@@ -740,7 +747,7 @@ int read_string(const int x, const int y, const char *prompt, char *destination,
 /**
  * Reads the next command that needs to be processed.
  *
- * This is the last command on the input buffer.
+ * This is the last pending command.
  *
  * This function consumes the whole input buffer and returns either
  * COMMAND_NONE (if no other Command could be produced by what was in the input
@@ -751,13 +758,12 @@ Command read_next_command(void) {
   Command last_valid_command = COMMAND_NONE;
   Command current;
   SDL_Event event;
-  do {
-    SDL_PollEvent(&event);
+  while (SDL_PollEvent(&event)) {
     current = command_from_event(event);
     if (current != COMMAND_NONE) {
       last_valid_command = current;
     }
-  } while (SDL_PollEvent(&event) != 0);
+  }
   return last_valid_command;
 }
 

@@ -6,8 +6,6 @@
 #include "perks.h"
 #include "physics.h"
 
-#include <SDL.h>
-
 typedef enum ColorScheme {
   /* Color pair 0 is assumed to be white on black, but is actually whatever */
   /* the terminal implements before color is initialized. It cannot be */
@@ -116,8 +114,9 @@ ColorScheme get_perk_color(Perk perk);
 BoundingBox bounding_box_from_screen(void);
 
 /**
- * Reads the next command that needs to be processed. This is the last command
- * on the input buffer.
+ * Reads the next command that needs to be processed.
+ *
+ * This is the last pending command.
  *
  * This function consumes the whole input buffer and returns either
  * COMMAND_NONE (if no other Command could be produced by what was in the input

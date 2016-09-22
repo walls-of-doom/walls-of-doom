@@ -28,10 +28,6 @@ add_library (walls-of-doom-source
 
 set_target_properties (walls-of-doom-source PROPERTIES LINKER_LANGUAGE C)
 
-find_package (Curses REQUIRED)
-include_directories (${CURSES_INCLUDE_DIRS})
-target_link_libraries (walls-of-doom-source ${CURSES_LIBRARIES})
-
 find_package (SDL2 REQUIRED)
 find_package (SDL2TTF REQUIRED)
 include_directories (${SDL2_INCLUDE_DIR} ${SDL2TTF_INCLUDE_DIR})

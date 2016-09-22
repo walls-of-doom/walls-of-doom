@@ -70,8 +70,7 @@
 /**
  * Information required for font loading.
  */
-#define DEFAULT_MONOSPACED_FONT_PATH                                           \
-  "assets/fonts/roboto-mono/RobotoMono-Regular.ttf"
-#define DEFAULT_MONOSPACED_FONT_SIZE 16
+#define MONOSPACED_FONT_PATH "assets/fonts/roboto-mono/RobotoMono-Regular.ttf"
+#define MONOSPACED_FONT_SIZE 20
 
 #endif
