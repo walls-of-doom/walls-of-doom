@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define READ_TABLE_FAILURE_FORMAT "Failed to read a RecordTable from %s"
+
 typedef struct RecordTable {
   size_t record_count;
   Record records[RECORD_ARRAY_SIZE];
@@ -86,15 +88,14 @@ void read_table(RecordTable *table) {
   char log_buffer[MAXIMUM_STRING_SIZE];
   if (file_exists(RECORD_TABLE_FILENAME)) {
     if (read_bytes(RECORD_TABLE_FILENAME, table, sizeof(RecordTable), 1)) {
-      sprintf(log_buffer, "Failed to read a RecordTable from %s",
-              RECORD_TABLE_FILENAME);
+      sprintf(log_buffer, READ_TABLE_FAILURE_FORMAT, RECORD_TABLE_FILENAME);
       log_message(log_buffer);
-      read_error =
-          1; /* Set the error flag to trigger the creation of a new table. */
+      /* Set the error flag to trigger the creation of a new table. */
+      read_error = 1;
     }
   } else {
-    read_error =
-        1; /* Set the error flag to trigger the creation of a new table. */
+    /* Set the error flag to trigger the creation of a new table. */
+    read_error = 1;
   }
   if (read_error) {
     populate_table_with_default_records(table);
@@ -157,7 +158,8 @@ size_t read_records(Record *destination, size_t destination_size) {
   read_table(&table);
   max_i = table.record_count;
   if (destination_size < table.record_count) {
-    max_i = destination_size; /* Do not copy more than the caller asked for. */
+    /* Do not copy more than the caller asked for. */
+    max_i = destination_size;
   }
   for (i = 0; i < max_i; i++) {
     destination[i] = table.records[i];
@@ -192,25 +194,22 @@ void record_to_string(const Record *const record, char *buffer,
  * Loads and presents the top scores on the screen.
  */
 void top_scores(SDL_Renderer *renderer) {
-  const int line_width = COLUMNS - 6;
   Record records[MAXIMUM_DISPLAYED_RECORDS];
-  int y = 2;
-  const int line_count = LINES - 2 * y;
-  size_t maximum_read_records = MAXIMUM_DISPLAYED_RECORDS;
-  size_t actually_read_records = read_records(records, maximum_read_records);
   char line[MAXIMUM_STRING_SIZE];
+  const int padding = 2;
+  const int line_width = COLUMNS - 6;
+  const int line_count = LINES - 2 * padding;
+  const int record_width = min(line_width, MAXIMUM_STRING_SIZE - 1);
+  const size_t record_count = read_records(records, MAXIMUM_DISPLAYED_RECORDS);
   size_t i;
   if (COLUMNS < 16) {
     return;
   }
-  if (line_count > MAXIMUM_DISPLAYED_RECORDS) {
-    maximum_read_records = MAXIMUM_DISPLAYED_RECORDS;
-  } else {
-    maximum_read_records = line_count;
+  clean(renderer);
+  for (i = 0; i < record_count && i < line_count; i++) {
+    record_to_string(records + i, line, record_width);
+    print_centered(padding + i, line, renderer);
   }
-  for (i = 0; i < actually_read_records; i++) {
-    record_to_string(records + i, line, line_width);
-    print_centered(y + i, line, renderer);
-  }
+  present(renderer);
   rest_for_seconds(3);
 }

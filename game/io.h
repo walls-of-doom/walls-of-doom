@@ -23,6 +23,10 @@ typedef enum ColorScheme {
   COLOR_EXTRA_POINTS
 } ColorScheme;
 
+void clean(SDL_Renderer *renderer);
+
+void present(SDL_Renderer *renderer);
+
 /**
  * Initializes the required resources.
  *
