@@ -17,6 +17,8 @@
 
 #define FALLBACK_PLAYER_NAME "Player"
 
+TTF_Font *global_monospaced_font = NULL;
+
 /**
  * A type that describes the basic metrics of a character.
  */
@@ -36,37 +38,39 @@ void present(SDL_Renderer *renderer) { SDL_RenderPresent(renderer); }
  */
 
 /**
- * Retrieves a monospaced font. The result should be cached.
+ * Initializes the global fonts.
  *
- * Do not free the returned TTF_Font pointer.
- *
- * Returns NULL on errors.
+ * Returns 0 in case of success.
  */
-static TTF_Font *get_monospaced_font(void) {
+static int initialize_fonts(void) {
   char log_buffer[MAXIMUM_STRING_SIZE];
-  static TTF_Font *font = NULL;
-  /* We try to open the font. */
-  if (font == NULL) {
-    font = TTF_OpenFont(MONOSPACED_FONT_PATH, MONOSPACED_FONT_SIZE);
+  TTF_Font *font = NULL;
+  if (global_monospaced_font != NULL) {
+    return 0;
   }
+  /* We try to open the font if we need to initialize. */
+  font = TTF_OpenFont(MONOSPACED_FONT_PATH, MONOSPACED_FONT_SIZE);
   /* If it failed, we log an error. */
   if (font == NULL) {
     sprintf(log_buffer, "TTF font opening error: %s", SDL_GetError());
     log_message(log_buffer);
+    return 1;
+  } else {
+    global_monospaced_font = font;
   }
-  return font;
+  return 0;
 }
 
 /**
  * Returns the CharacterMetrics corresponding to the letter 'A' of the font
- * returned by get_monospaced_font().
+ * returned by global_monospaced_font.
  */
 CharacterMetrics get_character_metrics(void) {
   int min_y;
   int max_y;
   int advance;
   CharacterMetrics metrics;
-  TTF_Font *font = get_monospaced_font();
+  TTF_Font *font = global_monospaced_font;
   if (TTF_GlyphMetrics(font, 'A', NULL, NULL, &min_y, &max_y, &advance)) {
     /* An error occurred. We log it and return an empty CharacterMetrics. */
     metrics.height = 0;
@@ -93,18 +97,23 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
   int height = 1;
   initialize_logger();
   /* Initialize SDL. */
-  if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+  if (SDL_Init(SDL_INIT_VIDEO)) {
     sprintf(log_buffer, "SDL initialization error: %s", SDL_GetError());
     log_message(log_buffer);
     return 1;
   }
   /* Initialize TTF. */
   if (!TTF_WasInit()) {
-    if (TTF_Init() != 0) {
+    if (TTF_Init()) {
       sprintf(log_buffer, "TTF initialization error: %s", SDL_GetError());
       log_message(log_buffer);
       return 1;
     }
+  }
+  if (initialize_fonts()) {
+    sprintf(log_buffer, "Failed to initialize fonts");
+    log_message(log_buffer);
+    return 1;
   }
   /**
    * The number of columns and the number of lines are fixed. However, the
@@ -132,6 +141,19 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
 }
 
 /**
+ * Finalizes the global fonts.
+ *
+ * Returns 0 in case of success.
+ */
+static int finalize_fonts(void) {
+  if (global_monospaced_font != NULL) {
+    TTF_CloseFont(global_monospaced_font);
+    global_monospaced_font = NULL;
+  }
+  return 0;
+}
+
+/**
  * Finalizes the acquired resources.
  *
  * Should only be called once, right before exiting.
@@ -139,6 +161,7 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
  * Returns 0 in case of success.
  */
 int finalize(SDL_Window **window, SDL_Renderer **renderer) {
+  finalize_fonts();
   SDL_DestroyWindow(*window);
   *window = NULL;
   if (TTF_WasInit()) {
@@ -292,7 +315,7 @@ void read_player_name(char *destination, const size_t maximum_size,
  */
 int print(const int x, const int y, const char *string,
           SDL_Renderer *renderer) {
-  TTF_Font *font = get_monospaced_font();
+  TTF_Font *font = global_monospaced_font;
   SDL_Surface *surface;
   SDL_Texture *texture;
   SDL_Rect position;
