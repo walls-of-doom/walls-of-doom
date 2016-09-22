@@ -83,6 +83,14 @@ CharacterMetrics get_character_metrics(void) {
   return metrics;
 }
 
+static SDL_Window *create_window(int width, int height) {
+  char *title = GAME_NAME;
+  int x = SDL_WINDOWPOS_CENTERED;
+  int y = SDL_WINDOWPOS_CENTERED;
+  Uint32 flags = 0;
+  return SDL_CreateWindow(title, x, y, width, height, flags);
+}
+
 /**
  * Initializes the required resources.
  *
@@ -126,9 +134,7 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
   /* Log the size of the window we are going to create. */
   sprintf(log_buffer, "Creating a %dx%d window", width, height);
   log_message(log_buffer);
-  *window = SDL_CreateWindow(GAME_NAME, SDL_WINDOWPOS_UNDEFINED,
-                             SDL_WINDOWPOS_UNDEFINED, width, height,
-                             SDL_WINDOW_SHOWN);
+  *window = create_window(width, height);
   if (*window == NULL) {
     sprintf(log_buffer, "SDL initialization error: %s", SDL_GetError());
     log_message(log_buffer);
