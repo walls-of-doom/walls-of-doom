@@ -562,14 +562,13 @@ int draw_bottom_bar(SDL_Renderer *renderer) {
   return 0;
 }
 
-int draw_borders(SDL_Renderer *renderer) {
+/**
+ * Draws the borders of the screen.
+ */
+void draw_borders(SDL_Renderer *renderer) {
   int i;
   const size_t buffer_size = COLUMNS + 1;
-  char *buffer = malloc(buffer_size); /* NIL terminator. */
-  if (buffer == NULL) {
-    log_message("Failed to allocate buffer in draw_borders");
-    return 1;
-  }
+  char buffer[buffer_size]; /* NIL terminator. */
   /* We use memset to efficiently fill the top and bottom borders. */
   memset(buffer, '+', buffer_size);
   print(0, 1, buffer, renderer);
@@ -579,8 +578,6 @@ int draw_borders(SDL_Renderer *renderer) {
   for (i = 1; i < LINES - 1; i++) {
     print(0, i, buffer, renderer);
   }
-  free(buffer);
-  return 0;
 }
 
 int draw_platforms(const Platform *platforms, const size_t platform_count,
