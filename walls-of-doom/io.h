@@ -1,6 +1,7 @@
 #ifndef IO_H
 #define IO_H
 
+#include "codes.h"
 #include "command.h"
 #include "game.h"
 #include "perks.h"
@@ -130,8 +131,13 @@ BoundingBox bounding_box_from_screen(void);
 Command read_next_command(void);
 
 /**
- * Waits for user input, indefinitely.
+ * Waits for the next command, blocking indefinitely.
  */
 Command wait_for_next_command(void);
+
+/**
+ * Waits for any user input, blocking indefinitely.
+ */
+Code wait_for_input(void);
 
 #endif

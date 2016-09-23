@@ -81,6 +81,7 @@ int game(SDL_Renderer *renderer) {
 
 int main_menu(SDL_Renderer *renderer) {
   int should_quit = 0;
+  Code code;
   Menu menu;
   char title[MAXIMUM_STRING_SIZE];
   char *options[] = {"Play", "Top Scores", "Info", "Quit"};
@@ -97,10 +98,14 @@ int main_menu(SDL_Renderer *renderer) {
     if (command == COMMAND_UP) {
       if (menu.selected_option > 0) {
         menu.selected_option--;
+      } else {
+        menu.selected_option = menu.option_count - 1;
       }
     } else if (command == COMMAND_DOWN) {
       if (menu.selected_option + 1 < menu.option_count) {
         menu.selected_option++;
+      } else {
+        menu.selected_option = 0;
       }
     } else if (command == COMMAND_ENTER || command == COMMAND_CENTER) {
       if (menu.selected_option == 0) {
@@ -108,7 +113,8 @@ int main_menu(SDL_Renderer *renderer) {
       } else if (menu.selected_option == 1) {
         top_scores(renderer);
       } else if (menu.selected_option == 2) {
-        info(renderer);
+        code = info(renderer);
+        should_quit = code == CODE_QUIT;
       } else if (menu.selected_option == 3) {
         should_quit = 1;
       }

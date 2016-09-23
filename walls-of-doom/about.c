@@ -10,14 +10,17 @@
 /**
  * Presents information about the game to the player.
  */
-void info(SDL_Renderer *renderer) {
+Code info(SDL_Renderer *renderer) {
   char buffer[ABOUT_PAGE_BUFFER_SIZE];
-  int read_error =
-      read_characters(ABOUT_PAGE_PATH, buffer, ABOUT_PAGE_BUFFER_SIZE);
-  if (read_error) {
+  int error = read_characters(ABOUT_PAGE_PATH, buffer, ABOUT_PAGE_BUFFER_SIZE);
+  if (error) {
     log_message("Failed to read the text");
+    return CODE_ERROR;
   } else {
     print_long_text(buffer, renderer);
-    rest_for_seconds(6);
+    /*
+     * The code for this function is the code of waiting for input.
+     */
+    return wait_for_input();
   }
 }

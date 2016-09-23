@@ -693,7 +693,7 @@ Command command_from_event(const SDL_Event event) {
       return COMMAND_DOWN;
     } else if (keycode == SDLK_SPACE) {
       return COMMAND_JUMP;
-    } else if (keycode == SDLK_RETURN) {
+    } else if (keycode == SDLK_RETURN || keycode == SDLK_KP_ENTER) {
       return COMMAND_ENTER;
     }
   }
@@ -842,7 +842,7 @@ Command read_next_command(void) {
 }
 
 /**
- * Waits for user input, indefinitely.
+ * Waits for the next command, blocking indefinitely.
  */
 Command wait_for_next_command(void) {
   Command command = COMMAND_NONE;
@@ -851,4 +851,21 @@ Command wait_for_next_command(void) {
     command = read_next_command();
   }
   return command;
+}
+
+/**
+ * Waits for any user input, blocking indefinitely.
+ */
+Code wait_for_input(void) {
+  SDL_Event event;
+  while (1) {
+    while (SDL_PollEvent(&event)) {
+      if (event.type == SDL_QUIT) {
+        return CODE_QUIT;
+      }
+      if (event.type == SDL_KEYDOWN) {
+        return CODE_OK;
+      }
+    }
+  }
 }
