@@ -137,6 +137,7 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
     log_message(log_buffer);
     return 1;
   }
+  SDL_SetWindowTitle(*window, GAME_NAME);
   *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED);
   SDL_SetRenderDrawColor(*renderer, 0x33, 0x33, 0x33, 0xFF);
   clean(*renderer);
