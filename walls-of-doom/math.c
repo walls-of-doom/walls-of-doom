@@ -24,3 +24,14 @@ int min(const int a, const int b) {
     return b;
   }
 }
+
+/**
+ * Returns the biggest of two integers.
+ */
+int max(const int a, const int b) {
+  if (b < a) {
+    return a;
+  } else {
+    return b;
+  }
+}

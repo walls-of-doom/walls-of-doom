@@ -12,4 +12,9 @@ int normalize(const int value);
  */
 int min(const int a, const int b);
 
+/**
+ * Returns the biggest of two integers.
+ */
+int max(const int a, const int b);
+
 #endif

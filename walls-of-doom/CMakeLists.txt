@@ -6,6 +6,7 @@ configure_file (version.h.in version.h)
 
 add_library (walls-of-doom-base
     about.h about.c
+    clock.h clock.c
     codes.h
     command.h
     constants.h

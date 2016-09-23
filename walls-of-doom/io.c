@@ -1,5 +1,6 @@
 #include "io.h"
 
+#include "clock.h"
 #include "constants.h"
 #include "game.h"
 #include "logger.h"
@@ -8,13 +9,13 @@
 #include "player.h"
 #include "rest.h"
 
-#include <ctype.h>
-#include <stdio.h>
-#include <string.h>
-
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
+
+#include <ctype.h>
+#include <stdio.h>
+#include <string.h>
 
 #define ELLIPSIS_STRING "..."
 #define ELLIPSIS_LENGTH (strlen(ELLIPSIS_STRING))
@@ -454,15 +455,17 @@ void print_long_text(char *string, SDL_Renderer *renderer) {
  */
 void print_platform(const Platform *const platform,
                     const BoundingBox *const box, SDL_Renderer *renderer) {
-  int i;
-  int x;
-  int y;
-  for (i = 0; i < platform->width; i++) {
-    x = platform->x + i;
-    y = platform->y;
-    if (x >= box->min_x && x <= box->max_x && y >= box->min_y &&
-        y <= box->max_y) {
-      print(x, y, "=", renderer);
+  const int y = platform->y;
+  int min_x = platform->x;
+  int max_x = platform->x + platform->width - 1;
+  char buffer[COLUMNS];
+  memset(buffer, '=', COLUMNS);
+  buffer[COLUMNS - 1] = '\0';
+  if (y >= box->min_y && y <= box->max_y) {
+    if (min_x <= box->max_x && max_x >= box->min_x) {
+      min_x = max(box->min_x, min_x);
+      max_x = min(box->max_x, max_x);
+      print(min_x, y, buffer + COLUMNS - 1 - (max_x - min_x + 1), renderer);
     }
   }
 }

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <time.h>
 
+#define TIMESTAMP_FORMAT "%Y-%m-%d %H:%M:%S"
 #define TIMESTAMP_BUFFER_SIZE 64
 
 /**
@@ -26,7 +27,7 @@ void write_timestamp(char *buffer, const size_t buffer_size) {
   struct tm *time_info;
   time(&current_time);
   time_info = localtime(&current_time);
-  strftime(buffer, buffer_size, "%Y-%m-%d %H:%M:%S", time_info);
+  strftime(buffer, buffer_size, TIMESTAMP_FORMAT, time_info);
 }
 
 /**
