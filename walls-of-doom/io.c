@@ -13,11 +13,14 @@
 #include <string.h>
 
 #include <SDL.h>
+#include <SDL_image.h>
 #include <SDL_ttf.h>
 
 #define ELLIPSIS_STRING "..."
 #define ELLIPSIS_LENGTH (strlen(ELLIPSIS_STRING))
 #define MINIMUM_STRING_SIZE_FOR_ELLIPSIS (2 * ELLIPSIS_LENGTH)
+
+#define IMG_FLAGS IMG_INIT_PNG
 
 static TTF_Font *global_monospaced_font = NULL;
 static int global_monospaced_font_width = 0;
@@ -84,6 +87,18 @@ static SDL_Window *create_window(int width, int height) {
   return SDL_CreateWindow(title, x, y, width, height, flags);
 }
 
+int set_window_title_and_icon(SDL_Window *window) {
+  SDL_SetWindowTitle(window, GAME_NAME);
+  SDL_Surface *icon_surface = IMG_Load(ICON_PATH);
+  if (icon_surface == NULL) {
+    log_message("Failed to load the window icon");
+    return 1;
+  }
+  SDL_SetWindowIcon(window, icon_surface);
+  SDL_FreeSurface(icon_surface);
+  return 0;
+}
+
 /**
  * Initializes the required resources.
  *
@@ -121,6 +136,11 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
     log_message(log_buffer);
     return 1;
   }
+  if ((IMG_Init(IMG_FLAGS) & IMG_FLAGS) != IMG_FLAGS) {
+    sprintf(log_buffer, "Failed to initialize required image support");
+    log_message(log_buffer);
+    return 1;
+  }
   /**
    * The number of columns and the number of lines are fixed. However, the
    * number of pixels we need for the screen is not. We find this number by
@@ -137,7 +157,7 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
     log_message(log_buffer);
     return 1;
   }
-  SDL_SetWindowTitle(*window, GAME_NAME);
+  set_window_title_and_icon(*window);
   *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED);
   SDL_SetRenderDrawColor(*renderer, 0x33, 0x33, 0x33, 0xFF);
   clean(*renderer);
@@ -544,18 +564,22 @@ int draw_bottom_bar(SDL_Renderer *renderer) {
 
 int draw_borders(SDL_Renderer *renderer) {
   int i;
-  for (i = 1; i < COLUMNS - 1; i++) {
-    print(i, 1, "+", renderer);
+  const size_t buffer_size = COLUMNS + 1;
+  char *buffer = malloc(buffer_size); /* NIL terminator. */
+  if (buffer == NULL) {
+    log_message("Failed to allocate buffer in draw_borders");
+    return 1;
   }
+  /* We use memset to efficiently fill the top and bottom borders. */
+  memset(buffer, '+', buffer_size);
+  print(0, 1, buffer, renderer);
+  print(0, LINES - 1, buffer, renderer);
+  memset(buffer + 1, ' ', buffer_size - 3);
+  print(0, 1, buffer, renderer);
   for (i = 1; i < LINES - 1; i++) {
-    print(0, i, "+", renderer);
+    print(0, i, buffer, renderer);
   }
-  for (i = 1; i < COLUMNS - 1; i++) {
-    print(i, LINES - 2, "+", renderer);
-  }
-  for (i = 1; i < LINES - 1; i++) {
-    print(COLUMNS - 1, i, "+", renderer);
-  }
+  free(buffer);
   return 0;
 }
 

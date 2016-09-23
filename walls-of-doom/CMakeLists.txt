@@ -28,8 +28,9 @@ add_library (walls-of-doom-base
 
 find_package (SDL2 REQUIRED)
 find_package (SDL2TTF REQUIRED)
-include_directories (${SDL2_INCLUDE_DIR} ${SDL2TTF_INCLUDE_DIR})
-target_link_libraries (walls-of-doom-base ${SDL2_LIBRARY} ${SDL2TTF_LIBRARY})
+find_package (SDL2_IMAGE REQUIRED)
+include_directories (${SDL2_INCLUDE_DIR} ${SDL2TTF_INCLUDE_DIR} ${SDL2_IMAGE_INCLUDE_DIR})
+target_link_libraries (walls-of-doom-base ${SDL2_LIBRARY} ${SDL2TTF_LIBRARY} ${SDL2_IMAGE_LIBRARY})
 
 target_include_directories (walls-of-doom-base PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

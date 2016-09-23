@@ -85,4 +85,6 @@
 #define MONOSPACED_FONT_PATH "assets/fonts/roboto-mono/RobotoMono-Regular.ttf"
 #define MONOSPACED_FONT_SIZE 20
 
+#define ICON_PATH "assets/icons/icon-128.png"
+
 #endif
