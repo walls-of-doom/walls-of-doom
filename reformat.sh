@@ -1,6 +1,9 @@
+SECONDS=0
+
 echo Reformatting...
 clang-format -i walls-of-doom/*.[hc]
-clang-format -i tests/*.c
 
 echo Analyzing...
-clang-tidy walls-of-doom/*.[hc]
+clang-tidy walls-of-doom/*.[c]
+
+echo "Done after $SECONDS seconds."
