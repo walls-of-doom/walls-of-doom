@@ -7,6 +7,7 @@
 #include "math.h"
 #include "physics.h"
 #include "player.h"
+#include "profiler.h"
 #include "rest.h"
 
 #include <SDL.h>
@@ -113,6 +114,7 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
   int width = 1;
   int height = 1;
   initialize_logger();
+  initialize_profiler();
   /* Initialize SDL. */
   if (SDL_Init(SDL_INIT_VIDEO)) {
     sprintf(log_buffer, "SDL initialization error: %s", SDL_GetError());
@@ -193,6 +195,7 @@ int finalize(SDL_Window **window, SDL_Renderer **renderer) {
     TTF_Quit();
   }
   SDL_Quit();
+  finalize_profiler();
   finalize_logger();
   return 0;
 }
@@ -629,13 +632,33 @@ int draw_player(const Player *const player, SDL_Renderer *renderer) {
  * Draws a full game to the screen.
  */
 int draw_game(const Game *const game, SDL_Renderer *renderer) {
+  Milliseconds start;
   clean(renderer);
+
+  start = get_milliseconds();
   draw_top_bar(game->player, renderer);
+  update_profiler("draw_top_bar", get_milliseconds() - start);
+
+  start = get_milliseconds();
   draw_bottom_bar(renderer);
+  update_profiler("draw_bottom_bar", get_milliseconds() - start);
+
+  start = get_milliseconds();
   draw_borders(renderer);
+  update_profiler("draw_borders", get_milliseconds() - start);
+
+  start = get_milliseconds();
   draw_platforms(game->platforms, game->platform_count, game->box, renderer);
+  update_profiler("draw_platforms", get_milliseconds() - start);
+
+  start = get_milliseconds();
   draw_perk(game, renderer);
+  update_profiler("draw_perk", get_milliseconds() - start);
+
+  start = get_milliseconds();
   draw_player(game->player, renderer);
+  update_profiler("draw_player", get_milliseconds() - start);
+
   present(renderer);
   return 0;
 }

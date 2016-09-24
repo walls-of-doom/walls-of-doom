@@ -20,6 +20,7 @@ add_library (walls-of-doom-base
     physics.h physics.c
     platform.h platform.c
     player.h player.c
+    profiler.h profiler.c
     random.h random.c
     record.h record.c
     rest.h rest.c
