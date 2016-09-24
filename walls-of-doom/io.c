@@ -778,7 +778,7 @@ int read_string(const int x, const int y, const char *prompt, char *destination,
       present(renderer);
       should_rerender = 0;
     }
-    if (SDL_PollEvent(&event)) {
+    if (SDL_WaitEvent(&event)) {
       /* Check for user quit and return 1. */
       /* This is OK because the destination string is always a valid C string.
        */
@@ -855,13 +855,16 @@ Command wait_for_next_command(void) {
 Code wait_for_input(void) {
   SDL_Event event;
   while (1) {
-    while (SDL_PollEvent(&event)) {
+    if (SDL_WaitEvent(&event)) {
       if (event.type == SDL_QUIT) {
         return CODE_QUIT;
       }
       if (event.type == SDL_KEYDOWN) {
         return CODE_OK;
       }
+    } else {
+      /* WaitEvent returns 0 to indicate errors. */
+      return CODE_ERROR;
     }
   }
 }
