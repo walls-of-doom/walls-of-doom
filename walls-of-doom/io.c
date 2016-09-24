@@ -309,6 +309,7 @@ void read_player_name(char *destination, const size_t maximum_size,
   int valid_name = 0;
   const char message[] = "Name your character: ";
   char log_buffer[MAXIMUM_STRING_SIZE];
+  random_name(destination);
   /* While there is not a read error or a valid name. */
   while (!error && !valid_name) {
     x = PADDING;
@@ -673,8 +674,10 @@ void print_game_result(const char *name, const unsigned int score,
   } else {
     sprintf(second_line, "%s didn't make it to the top scores.", name);
   }
+  clean(renderer);
   print_centered(LINES / 2 - 1, first_line, renderer);
   print_centered(LINES / 2 + 1, second_line, renderer);
+  present(renderer);
 }
 
 /**
@@ -772,13 +775,10 @@ int read_string(const int x, const int y, const char *prompt, char *destination,
   int is_done = 0;
   int should_rerender = 1;
   /* The x coordinate of the user input buffer. */
-  size_t written = 0;
-  char *write = destination;
+  size_t written = strlen(destination);
   char character = '\0';
+  char *write = destination + written;
   SDL_Event event;
-  /* Make sure that we always have a valid string for printing. */
-  /* Throughout the loop, the write pointer always points to a '\0'. */
-  *destination = '\0';
   /* Start listening for text input. */
   SDL_StartTextInput();
   while (!is_done) {
@@ -801,6 +801,7 @@ int read_string(const int x, const int y, const char *prompt, char *destination,
       present(renderer);
       should_rerender = 0;
     }
+    /* Throughout the loop, the write pointer always points to a '\0'. */
     if (SDL_WaitEvent(&event)) {
       /* Check for user quit and return 1. */
       /* This is OK because the destination string is always a valid C string.

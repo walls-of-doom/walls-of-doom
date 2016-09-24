@@ -1,6 +1,8 @@
 #include "random.h"
 
+#include <ctype.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -112,24 +114,52 @@ int random_integer(const int minimum, const int maximum) {
   return minimum + value;
 }
 
-void random_word(char *destination, const char *path) {}
-
-void random_adjective(char *destination) {
-  random_word(destination, ADJECTIVES_FILE_PATH);
-}
-
-void random_noun(char *destination) {
-  random_word(destination, NOUNS_FILE_PATH);
+/**
+ * Copies the first word of a random line of the file to the destination.
+ */
+void random_word(char *destination, const char *filename) {
+  int read;
+  int chosen_line;
+  int current_line;
+  const int line_count = file_line_count(filename);
+  FILE *file;
+  if (line_count > 0) {
+    chosen_line = random_integer(0, line_count - 1);
+    file = fopen(filename, "r");
+    if (file) {
+      current_line = 0;
+      while (current_line != chosen_line) {
+        read = fgetc(file);
+        if (read == '\n') {
+          current_line++;
+        }
+      }
+      /* Got to the line we want to copy. */
+      while ((read = fgetc(file)) != EOF) {
+        if (isspace((char)read)) {
+          break;
+        }
+        *destination++ = (char)read;
+      }
+      fclose(file);
+    }
+  }
+  *destination = '\0';
 }
 
 /**
  * Writes a pseudorandom name to the destination.
  *
- * Destination should have at least 32 bytes.
+ * The destination should have at least 2 * MAXIMUM_WORD_SIZE bytes.
  */
 void random_name(char *destination) {
   char buffer[MAXIMUM_WORD_SIZE];
-  random_adjective(buffer);
-  safe_strcpy(destination, buffer, 32);
-  safe_strcpy(destination + strlen(buffer), buffer, 32);
+  size_t first_word_size;
+  random_word(buffer, ADJECTIVES_FILE_PATH);
+  first_word_size = strlen(buffer);
+  buffer[0] = toupper(buffer[0]);
+  safe_strcpy(destination, buffer, MAXIMUM_WORD_SIZE);
+  random_word(buffer, NOUNS_FILE_PATH);
+  buffer[0] = toupper(buffer[0]);
+  safe_strcpy(destination + first_word_size, buffer, MAXIMUM_WORD_SIZE);
 }

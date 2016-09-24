@@ -75,8 +75,7 @@ void register_score(const Game *const game, SDL_Renderer *renderer) {
   log_message(buffer);
 
   print_game_result(player->name, player->score, position, renderer);
-
-  rest_for_seconds(2);
+  wait_for_input();
 }
 
 /**

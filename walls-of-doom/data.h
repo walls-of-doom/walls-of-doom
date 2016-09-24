@@ -9,6 +9,13 @@
 int file_exists(const char *filename);
 
 /**
+ * Returns the number of lines in a file.
+ *
+ * This is the count of occurrences of '\n'.
+ */
+int file_line_count(const char *filename);
+
+/**
  * Writes bytes to the indicated file from the provided source.
  *
  * Returns 0 in case of success.

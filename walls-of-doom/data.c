@@ -25,6 +25,26 @@ int file_exists(const char *filename) {
 
 typedef enum Operation { READ, WRITE } Operation;
 
+/**
+ * Returns the number of lines in a file.
+ *
+ * This is the count of occurrences of '\n'.
+ */
+int file_line_count(const char *filename) {
+  int line_count = 0;
+  int read;
+  FILE *file = fopen(filename, "r");
+  if (file) {
+    while ((read = fgetc(file)) != EOF) {
+      if (read == '\n') {
+        line_count++;
+      }
+    }
+    fclose(file);
+  }
+  return line_count;
+}
+
 void log_access(Operation operation, const size_t bytes, const char *filename) {
   char message[MAXIMUM_STRING_SIZE];
   double kibibytes = bytes / 1024;
