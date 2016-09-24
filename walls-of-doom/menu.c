@@ -111,7 +111,8 @@ int main_menu(SDL_Renderer *renderer) {
       if (menu.selected_option == 0) {
         game(renderer);
       } else if (menu.selected_option == 1) {
-        top_scores(renderer);
+        code = top_scores(renderer);
+        should_quit = code == CODE_QUIT;
       } else if (menu.selected_option == 2) {
         code = info(renderer);
         should_quit = code == CODE_QUIT;

@@ -1,6 +1,7 @@
 #ifndef RECORD_H
 #define RECORD_H
 
+#include "codes.h"
 #include "constants.h"
 #include "player.h"
 
@@ -43,6 +44,6 @@ size_t read_records(Record *destination, size_t destination_size);
 /**
  * Loads and presents the top scores on the screen.
  */
-void top_scores(SDL_Renderer *renderer);
+Code top_scores(SDL_Renderer *renderer);
 
 #endif

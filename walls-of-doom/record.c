@@ -1,5 +1,6 @@
 #include "record.h"
 
+#include "codes.h"
 #include "constants.h"
 #include "data.h"
 #include "io.h"
@@ -193,7 +194,7 @@ void record_to_string(const Record *const record, char *buffer,
 /**
  * Loads and presents the top scores on the screen.
  */
-void top_scores(SDL_Renderer *renderer) {
+Code top_scores(SDL_Renderer *renderer) {
   Record records[MAXIMUM_DISPLAYED_RECORDS];
   char line[MAXIMUM_STRING_SIZE];
   const int line_width = COLUMNS - 2 * PADDING;
@@ -202,7 +203,7 @@ void top_scores(SDL_Renderer *renderer) {
   const size_t record_count = read_records(records, MAXIMUM_DISPLAYED_RECORDS);
   size_t i;
   if (COLUMNS < 16) {
-    return;
+    return CODE_ERROR;
   }
   clean(renderer);
   for (i = 0; i < record_count && i < line_count; i++) {
@@ -210,5 +211,5 @@ void top_scores(SDL_Renderer *renderer) {
     print_centered(PADDING + i, line, renderer);
   }
   present(renderer);
-  rest_for_seconds(3);
+  return wait_for_input();
 }
