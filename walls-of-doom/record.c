@@ -129,8 +129,8 @@ int save_record(const Record *const record) {
   log_message("Added the record to the record table");
 
   /* Sort the table records. */
-  qsort((void *)table.records, table.record_count, sizeof(Record),
-        compare_void_record_pointers);
+  sort((void *)table.records, table.record_count, sizeof(Record),
+       compare_void_record_pointers);
   reverse((void *)table.records, table.record_count, sizeof(Record));
   log_message("Sorted the record table");
 

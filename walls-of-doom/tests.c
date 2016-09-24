@@ -121,27 +121,25 @@ void test_compare_unsigned_char(void) {
   TEST_ASSERT_EQUAL_INT8(1, compare_unsigned_char((void *)(&c), (void *)(&b)));
 }
 
-void test_insertion_sort_with_empty_range(void) {
+void test_sort_with_empty_range(void) {
   unsigned char source[] = {0};
-  insertion_sort(source, 0, sizeof(unsigned char), compare_unsigned_char);
+  sort(source, 0, sizeof(unsigned char), compare_unsigned_char);
 }
 
-void test_insertion_sort_with_an_odd_number_of_single_bytes(void) {
+void test_sort_with_an_odd_number_of_single_bytes(void) {
   unsigned char source[] = {2, 3, 1};
   const unsigned char sorted[] = {1, 2, 3};
   const size_t array_size = sizeof(source) / sizeof(unsigned char);
-  insertion_sort(source, array_size, sizeof(unsigned char),
-                 compare_unsigned_char);
+  sort(source, array_size, sizeof(unsigned char), compare_unsigned_char);
   TEST_ASSERT_EQUAL_INT8_ARRAY_MESSAGE(
       sorted, source, array_size, "Insertion sort failed to sort the input");
 }
 
-void test_insertion_sort_with_an_even_number_of_single_bytes(void) {
+void test_sort_with_an_even_number_of_single_bytes(void) {
   unsigned char source[] = {4, 2, 3, 1};
   const unsigned char sorted[] = {1, 2, 3, 4};
   const size_t array_size = sizeof(source) / sizeof(unsigned char);
-  insertion_sort(source, array_size, sizeof(unsigned char),
-                 compare_unsigned_char);
+  sort(source, array_size, sizeof(unsigned char), compare_unsigned_char);
   TEST_ASSERT_EQUAL_INT8_ARRAY_MESSAGE(
       sorted, source, array_size, "Insertion sort failed to sort the input");
 }
@@ -219,9 +217,9 @@ int main(void) {
   RUN_TEST(test_trim_string_works_with_strings_of_whitespaces);
   RUN_TEST(test_read_integers);
   RUN_TEST(test_compare_unsigned_char);
-  RUN_TEST(test_insertion_sort_with_empty_range);
-  RUN_TEST(test_insertion_sort_with_an_odd_number_of_single_bytes);
-  RUN_TEST(test_insertion_sort_with_an_even_number_of_single_bytes);
+  RUN_TEST(test_sort_with_empty_range);
+  RUN_TEST(test_sort_with_an_odd_number_of_single_bytes);
+  RUN_TEST(test_sort_with_an_even_number_of_single_bytes);
   RUN_TEST(test_reverse_with_empty_range);
   RUN_TEST(test_reverse_with_an_odd_number_of_single_bytes);
   RUN_TEST(test_reverse_with_an_even_number_of_single_bytes);

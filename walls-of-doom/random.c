@@ -2,7 +2,13 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
+
+#define MAXIMUM_WORD_SIZE 32
+
+#define ADJECTIVES_FILE_PATH "assets/data/adjectives.txt"
+#define NOUNS_FILE_PATH "assets/data/nouns.txt"
 
 /**
  * This is the successor to xorshift128+. It is the fastest full-period
@@ -104,4 +110,26 @@ int random_integer(const int minimum, const int maximum) {
     value = next() % next_power_of_two;
   } while (value >= range);
   return minimum + value;
+}
+
+void random_word(char *destination, const char *path) {}
+
+void random_adjective(char *destination) {
+  random_word(destination, ADJECTIVES_FILE_PATH);
+}
+
+void random_noun(char *destination) {
+  random_word(destination, NOUNS_FILE_PATH);
+}
+
+/**
+ * Writes a pseudorandom name to the destination.
+ *
+ * Destination should have at least 32 bytes.
+ */
+void random_name(char *destination) {
+  char buffer[MAXIMUM_WORD_SIZE];
+  random_adjective(buffer);
+  safe_strcpy(destination, buffer, 32);
+  safe_strcpy(destination + strlen(buffer), buffer, 32);
 }
