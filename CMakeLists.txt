@@ -14,6 +14,7 @@ set (CMAKE_INCLUDE_CURRENT_DIR_IN_INTERFACE ON)
 set (C_STANDARD 90)
 
 set (CMAKE_BUILD_TYPE Release)
+set (CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # C standard is enforced with compiler-specific flags.
 if ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")

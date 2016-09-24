@@ -32,7 +32,7 @@ The following C compilers are known to work perfectly with the project:
 ```bash
 $ mkdir build
 $ cd build
-$ cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+$ cmake ..
 $ make
 $ cd ..
 $ ln -s build/compile_commands.json
