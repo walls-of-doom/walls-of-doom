@@ -450,26 +450,6 @@ void print_long_text(char *string, SDL_Renderer *renderer) {
   present(renderer);
 }
 
-/**
- * Prints the provided Platform, respecting the BoundingBox.
- */
-void print_platform(const Platform *const platform,
-                    const BoundingBox *const box, SDL_Renderer *renderer) {
-  const int y = platform->y;
-  int min_x = platform->x;
-  int max_x = platform->x + platform->width - 1;
-  char buffer[COLUMNS];
-  memset(buffer, '=', COLUMNS);
-  buffer[COLUMNS - 1] = '\0';
-  if (y >= box->min_y && y <= box->max_y) {
-    if (min_x <= box->max_x && max_x >= box->min_x) {
-      min_x = max(box->min_x, min_x);
-      max_x = min(box->max_x, max_x);
-      print(min_x, y, buffer + COLUMNS - 1 - (max_x - min_x + 1), renderer);
-    }
-  }
-}
-
 void write_top_bar_strings(char *strings[], SDL_Renderer *renderer) {
   int begin_x;
   int after_x;
@@ -482,6 +462,10 @@ void write_top_bar_strings(char *strings[], SDL_Renderer *renderer) {
   int i;
 
   const int columns_per_string = COLUMNS / TOP_BAR_STRING_COUNT;
+
+  char buffer[COLUMNS + 1];
+  memset(buffer, ' ', COLUMNS);
+  buffer[COLUMNS] = '\0';
 
   for (i = 0; i < TOP_BAR_STRING_COUNT; i++) {
     begin_x = i * columns_per_string;
@@ -504,21 +488,22 @@ void write_top_bar_strings(char *strings[], SDL_Renderer *renderer) {
       begin_text_x = begin_x + (columns_per_string - string_length) / 2;
       after_text_x = begin_text_x + string_length;
       for (x = begin_x; x < begin_text_x; x++) {
-        print(x, 0, " ", renderer);
+        buffer[x] = ' ';
       }
-      print(begin_text_x, 0, strings[i], renderer);
+      safe_strcpy(buffer + x, strings[i], COLUMNS + 1 - x);
       for (x = after_text_x; x < after_x; x++) {
-        print(x, 0, " ", renderer);
+        buffer[x] = ' ';
       }
     } else {
       /*
        * String does not fit, do not write it.
        */
       for (x = begin_x; x < after_x; x++) {
-        print(x, 0, " ", renderer);
+        buffer[x] = ' ';
       }
     }
   }
+  print(0, 0, buffer, renderer);
 }
 
 /**
@@ -554,15 +539,12 @@ int draw_top_bar(const Player *const player, SDL_Renderer *renderer) {
 
 /*
  * Draws the bottom status bar on the screen for a given Player.
- *
- * Returns 0 if successful.
  */
-int draw_bottom_bar(SDL_Renderer *renderer) {
-  int i;
-  for (i = 0; i < COLUMNS; i++) {
-    print(i, LINES - 1, " ", renderer);
-  }
-  return 0;
+void draw_bottom_bar(SDL_Renderer *renderer) {
+  char buffer[COLUMNS + 1];
+  memset(buffer, ' ', COLUMNS);
+  buffer[COLUMNS] = '\0';
+  print(0, LINES - 1, buffer, renderer);
 }
 
 /**
@@ -570,14 +552,12 @@ int draw_bottom_bar(SDL_Renderer *renderer) {
  */
 void draw_borders(SDL_Renderer *renderer) {
   int i;
-  const size_t buffer_size = COLUMNS + 1;
-  char buffer[buffer_size]; /* NIL terminator. */
-  /* We use memset to efficiently fill the top and bottom borders. */
-  memset(buffer, '+', buffer_size);
+  char buffer[COLUMNS + 1];
+  memset(buffer, '+', COLUMNS);
+  buffer[COLUMNS] = '\0';
   print(0, 1, buffer, renderer);
   print(0, LINES - 1, buffer, renderer);
-  memset(buffer + 1, ' ', buffer_size - 3);
-  print(0, 1, buffer, renderer);
+  memset(buffer + 1, ' ', COLUMNS - 2);
   for (i = 1; i < LINES - 1; i++) {
     print(0, i, buffer, renderer);
   }
@@ -585,9 +565,25 @@ void draw_borders(SDL_Renderer *renderer) {
 
 int draw_platforms(const Platform *platforms, const size_t platform_count,
                    const BoundingBox *const box, SDL_Renderer *renderer) {
+  int y;
+  int min_x;
+  int max_x;
   size_t i;
+  /* We make the assumption that the biggest box is COLUMNS wide. */
+  char buffer[COLUMNS + 1];
+  memset(buffer, '=', COLUMNS + 1);
+  buffer[COLUMNS] = '\0';
   for (i = 0; i < platform_count; i++) {
-    print_platform(&platforms[i], box, renderer);
+    y = platforms[i].y;
+    min_x = platforms[i].x;
+    max_x = platforms[i].x + platforms[i].width - 1;
+    if (y >= box->min_y && y <= box->max_y) {
+      if (min_x <= box->max_x && max_x >= box->min_x) {
+        min_x = max(box->min_x, min_x);
+        max_x = min(box->max_x, max_x);
+        print(min_x, y, buffer + COLUMNS - (max_x - min_x + 1), renderer);
+      }
+    }
   }
   return 0;
 }
