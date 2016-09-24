@@ -52,6 +52,9 @@ cmake_install.cmake
 CMakeFiles/
 CMakeCache.txt
 
+# Python
+*.pyc
+
 # Walls of Doom
 build/
 README.pdf
