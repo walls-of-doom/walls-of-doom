@@ -607,7 +607,7 @@ int draw_platforms(const Platform *platforms, const size_t platform_count,
 
 int has_active_perk(const Game *const game) { return game->perk != PERK_NONE; }
 
-ColorPair get_perk_color(Perk perk) { return DEFAULT_COLOR; }
+ColorPair get_perk_color(Perk perk) { return PERK_COLOR; }
 
 int draw_perk(const Game *const game, SDL_Renderer *renderer) {
   ColorPair perk_color;
