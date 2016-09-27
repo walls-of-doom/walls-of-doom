@@ -8,6 +8,7 @@ add_library (walls-of-doom-base
     about.h about.c
     clock.h clock.c
     codes.h
+    color.h color.c
     command.h
     constants.h
     data.h data.c

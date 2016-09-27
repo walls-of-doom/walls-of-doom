@@ -2,29 +2,11 @@
 #define IO_H
 
 #include "codes.h"
+#include "color.h"
 #include "command.h"
 #include "game.h"
 #include "perks.h"
 #include "physics.h"
-
-typedef enum ColorScheme {
-  /* Color pair 0 is assumed to be white on black, but is actually whatever */
-  /* the terminal implements before color is initialized. It cannot be */
-  /* modified by the application, therefore we must start at 1. */
-  COLOR_TOP_BAR = 1, /* Set the first enum constant to one */
-  COLOR_BOTTOM_BAR,  /* Becomes two, and so on */
-  COLOR_PLATFORMS,
-  COLOR_PLAYER,
-  COLOR_INVINCIBILITY,
-  COLOR_LEVITATION,
-  COLOR_LOW_GRAVITY,
-  COLOR_SUPER_JUMP,
-  COLOR_TIME_STOP,
-  COLOR_EXTRA_LIFE,
-  COLOR_EXTRA_POINTS
-} ColorScheme;
-
-void clean(SDL_Renderer *renderer);
 
 void present(SDL_Renderer *renderer);
 
@@ -89,12 +71,14 @@ int draw_game(const Game *const game, SDL_Renderer *renderer);
  *
  * Returns 0 in case of success.
  */
-int print(const int x, const int y, const char *string, SDL_Renderer *renderer);
+int print(const int x, const int y, const char *string, ColorPair color_pair,
+          SDL_Renderer *renderer);
 
 /**
  * Prints the provided string centered on the screen at the provided line.
  */
-void print_centered(const int y, const char *string, SDL_Renderer *renderer);
+void print_centered(const int y, const char *string, ColorPair color_pair,
+                    SDL_Renderer *renderer);
 
 /**
  * Prints the provided string after formatting it to increase readability.
@@ -110,7 +94,7 @@ void print_platform(const Platform *const platform,
 void print_game_result(const char *name, const unsigned int score,
                        const int position, SDL_Renderer *renderer);
 
-ColorScheme get_perk_color(Perk perk);
+ColorPair get_perk_color(Perk perk);
 
 /**
  * Returns a BoundingBox that represents the playable area after removing bars

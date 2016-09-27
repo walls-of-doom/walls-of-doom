@@ -38,7 +38,8 @@ void write_menu(const Menu *const menu, SDL_Renderer *renderer) {
   size_t i;
   char buffer[MAXIMUM_STRING_SIZE];
   SDL_RenderClear(renderer);
-  print((COLUMNS - strlen(menu->title)) / 2, y, menu->title, renderer);
+  x = (COLUMNS - strlen(menu->title)) / 2;
+  print(x, y, menu->title, DEFAULT_COLOR, renderer);
   for (i = 0; i < menu->option_count; i++) {
     char *string = menu->options[i];
     if (i == menu->selected_option) {
@@ -47,7 +48,7 @@ void write_menu(const Menu *const menu, SDL_Renderer *renderer) {
     }
     x = (COLUMNS - strlen(string)) / 2;
     y += ENTRY_HEIGHT;
-    print(x, y, string, renderer);
+    print(x, y, string, DEFAULT_COLOR, renderer);
   }
   SDL_RenderPresent(renderer);
 }

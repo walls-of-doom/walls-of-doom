@@ -206,7 +206,7 @@ Code top_scores(SDL_Renderer *renderer) {
   clean(renderer);
   for (i = 0; i < record_count && i < line_count; i++) {
     record_to_string(records + i, line, record_width);
-    print_centered(PADDING + i, line, renderer);
+    print_centered(PADDING + i, line, DEFAULT_COLOR, renderer);
   }
   present(renderer);
   return wait_for_input();
