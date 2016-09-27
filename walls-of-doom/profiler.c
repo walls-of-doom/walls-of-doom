@@ -98,6 +98,7 @@ void write_statistics(void) {
       average = profiler_data_mean(table + i);
       fprintf(file, OUTPUT_FORMAT, average, table[i].identifier);
     }
+    fprintf(file, "\n");
     fclose(file);
   }
 }
