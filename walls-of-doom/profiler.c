@@ -1,5 +1,6 @@
 #include "clock.h"
 #include "codes.h"
+#include "memory.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,7 +35,7 @@ ProfilerData *get_empty_data(const char *identifier) {
   safe_strcpy(&empty_data.identifier, identifier, MAXIMUM_DATA_IDENTIFIER_SIZE);
   empty_data.sum = 0;
   empty_data.frequency = 0;
-  reallocated_table = realloc(table, new_size);
+  reallocated_table = resize_memory(table, new_size);
   if (reallocated_table != NULL) {
     table = reallocated_table;
     table_size++;
@@ -106,7 +107,7 @@ void write_statistics(void) {
  */
 Code finalize_profiler(void) {
   write_statistics();
-  free(table);
+  table = resize_memory(table, 0);
   table_size = 0;
   log_message("Freed the profiler table");
   return CODE_OK;
