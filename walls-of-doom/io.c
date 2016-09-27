@@ -629,7 +629,7 @@ void draw_bottom_bar(SDL_Renderer *renderer) {
   char buffer[COLUMNS + 1];
   memset(buffer, ' ', COLUMNS);
   buffer[COLUMNS] = '\0';
-  print(0, LINES - 1, buffer, DEFAULT_COLOR, renderer);
+  print(0, LINES - 1, buffer, BOTTOM_BAR_COLOR, renderer);
 }
 
 /**
@@ -648,7 +648,7 @@ int draw_platforms(const Platform *platforms, const size_t platform_count,
   /* We make the assumption that the biggest box is COLUMNS wide. */
   char buffer[COLUMNS + 1];
   char *iter;
-  memset(buffer, '=', COLUMNS + 1);
+  memset(buffer, ' ', COLUMNS + 1);
   buffer[COLUMNS] = '\0';
   for (i = 0; i < platform_count; i++) {
     y = platforms[i].y;
@@ -659,7 +659,7 @@ int draw_platforms(const Platform *platforms, const size_t platform_count,
         min_x = max(box->min_x, min_x);
         max_x = min(box->max_x, max_x);
         iter = buffer + COLUMNS - (max_x - min_x + 1);
-        print(min_x, y, iter, DEFAULT_COLOR, renderer);
+        print(min_x, y, iter, PLATFORM_COLOR, renderer);
       }
     }
   }

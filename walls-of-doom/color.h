@@ -21,6 +21,7 @@ extern const Color BACKGROUND_COLOR;
 extern const ColorPair DEFAULT_COLOR;
 extern const ColorPair TOP_BAR_COLOR;
 extern const ColorPair BOTTOM_BAR_COLOR;
+extern const ColorPair PLATFORM_COLOR;
 
 int color_equals(Color a, Color b);
 
