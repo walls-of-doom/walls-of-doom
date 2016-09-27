@@ -1,13 +1,13 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "box.h"
 #include "logger.h"
 #include "math.h"
-#include "perks.h"
+#include "perk.h"
 #include "platform.h"
 #include "player.h"
 #include "random.h"
-#include "types.h"
 
 #include <stdlib.h>
 

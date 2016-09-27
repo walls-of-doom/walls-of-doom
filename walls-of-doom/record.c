@@ -1,6 +1,6 @@
 #include "record.h"
 
-#include "codes.h"
+#include "code.h"
 #include "constants.h"
 #include "data.h"
 #include "io.h"

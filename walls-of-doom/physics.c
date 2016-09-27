@@ -245,19 +245,19 @@ void conceive_bonus(Player *const player, Perk perk) {
 }
 
 void update_perk(Game *const game) {
+
   if (game->played_frames == game->perk_end_frame) {
     /* Current Perk (if any) must end. */
     game->perk = PERK_NONE;
   } else if (game->played_frames ==
-             game->perk_end_frame - PERK_DURATION_ON_SCREEN_IN_FRAMES +
+             game->perk_end_frame - PERK_SCREEN_DURATION_IN_FRAMES +
                  PERK_INTERVAL_IN_FRAMES) {
     /* If the frame count since the current perk was created is equal to the
      * perk interval, create a new Perk. */
     game->perk = get_random_perk();
     game->perk_x = random_integer(game->box->min_x, game->box->max_x);
     game->perk_y = random_integer(game->box->min_y, game->box->max_y);
-    game->perk_end_frame =
-        game->played_frames + PERK_DURATION_ON_SCREEN_IN_FRAMES;
+    game->perk_end_frame = game->played_frames + PERK_SCREEN_DURATION_IN_FRAMES;
   }
 }
 
@@ -453,7 +453,7 @@ void update_player_perk(Game *game) {
           player->perk = PERK_NONE;
         } else {
           player->perk_end_frame =
-              game->played_frames + PERK_DURATION_ON_PLAYER_IN_FRAMES;
+              game->played_frames + PERK_PLAYER_DURATION_IN_FRAMES;
         }
       }
     }

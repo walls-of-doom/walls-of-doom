@@ -1,11 +1,11 @@
 #ifndef IO_H
 #define IO_H
 
-#include "codes.h"
+#include "code.h"
 #include "color.h"
 #include "command.h"
 #include "game.h"
-#include "perks.h"
+#include "perk.h"
 #include "physics.h"
 
 void present(SDL_Renderer *renderer);
@@ -27,25 +27,6 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer);
  * Returns 0 in case of success.
  */
 int finalize(SDL_Window **window, SDL_Renderer **renderer);
-
-/**
- * Returns a pointer to the start of the text of the string.
- *
- * This is either the first character which is not a space or '\0'.
- */
-char *find_start_of_text(char *string);
-
-/**
- * Returns a pointer to the end of the text of the string.
- *
- * This is either the first trailing space or '\0'.
- */
-char *find_end_of_text(char *string);
-
-/**
- * Trims a string by removing whitespace from its start and from its end.
- */
-void trim_string(char *string);
 
 /**
  * Reads a string from the user of up to size characters (including NUL).

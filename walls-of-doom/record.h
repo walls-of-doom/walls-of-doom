@@ -1,7 +1,7 @@
 #ifndef RECORD_H
 #define RECORD_H
 
-#include "codes.h"
+#include "code.h"
 #include "constants.h"
 #include "player.h"
 

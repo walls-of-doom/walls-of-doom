@@ -37,7 +37,7 @@ Game create_game(Player *player, Platform *platforms,
   game.perk_x = 0;
   game.perk_y = 0;
   /* Don't start with a Perk on the screen. */
-  game.perk_end_frame = PERK_DURATION_ON_SCREEN_IN_FRAMES;
+  game.perk_end_frame = PERK_SCREEN_DURATION_IN_FRAMES;
 
   log_message("Finished creating the game");
 

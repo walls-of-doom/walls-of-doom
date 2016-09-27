@@ -2,7 +2,7 @@
 #define PROFILER_H
 
 #include "clock.h"
-#include "codes.h"
+#include "code.h"
 
 Code initialize_profiler(void);
 

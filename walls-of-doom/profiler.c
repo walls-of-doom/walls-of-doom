@@ -1,5 +1,5 @@
 #include "clock.h"
-#include "codes.h"
+#include "code.h"
 #include "memory.h"
 
 #include <stdio.h>

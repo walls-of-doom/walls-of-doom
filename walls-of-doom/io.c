@@ -219,66 +219,6 @@ int initialize_color_schemes(void) {
 }
 
 /**
- * Returns a pointer to the start of the text of the string.
- *
- * This is either the first character which is not a space or '\0'.
- */
-char *find_start_of_text(char *string) {
-  while (*string != '\0' && isspace(*string)) {
-    string++;
-  }
-  return string;
-}
-
-/**
- * Returns a pointer to the end of the text of the string.
- *
- * This is either the first trailing space or '\0'.
- */
-char *find_end_of_text(char *string) {
-  char *last_not_space = string;
-  while (*string != '\0') {
-    if (!isspace(*string)) {
-      last_not_space = string;
-    }
-    string++;
-  }
-  if (*last_not_space != '\0') {
-    last_not_space++;
-  }
-  return last_not_space;
-}
-
-/**
- * Trims a string by removing all leading and trailing spaces.
- */
-void trim_string(char *string) {
-  int copying = 0;
-  char *write = string;
-  char *read = string;
-  /* Find the first not space. */
-  while (*read != '\0' && isspace(*read)) {
-    read++;
-  }
-  /* Copy everthing from the first not space up to the end. */
-  while (*read != '\0') {
-    *write++ = *read++;
-  }
-  /* Now proceed to trim the end of the string. */
-  /* read points to NUL here. */
-  if (read != string) { /* If we can march back. */
-    read--;             /* Point to the last character. */
-    while (isspace(*read) || read > write) {
-      *read = '\0';
-      if (read == string) {
-        break; /* Do not write before the start of the string. */
-      }
-      read--;
-    }
-  }
-}
-
-/**
  * Evaluates whether or not a Player name is a valid name.
  *
  * A name is considered to be valid if it has at least two characters after

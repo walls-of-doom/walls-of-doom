@@ -1,5 +1,5 @@
-#ifndef CODES_H
-#define CODES_H
+#ifndef CODE_H
+#define CODE_H
 
 /*
  * Codes passed between functions.

@@ -6,8 +6,9 @@ configure_file (version.h.in version.h)
 
 add_library (walls-of-doom-base
     about.h about.c
+    box.h
     clock.h clock.c
-    codes.h
+    code.h
     color.h color.c
     command.h
     constants.h
@@ -18,7 +19,7 @@ add_library (walls-of-doom-base
     math.h math.c
     memory.h memory.c
     menu.h menu.c
-    perks.h perks.c
+    perk.h perk.c
     physics.h physics.c
     platform.h platform.c
     player.h player.c
@@ -26,9 +27,8 @@ add_library (walls-of-doom-base
     random.h random.c
     record.h record.c
     rest.h rest.c
-    safe.h safe.c
     sort.h sort.c
-    types.h
+    text.h text.c
     version.h)
 
 find_package (SDL2 REQUIRED)

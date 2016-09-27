@@ -1,7 +1,7 @@
 #ifndef ABOUT_H
 #define ABOUT_H
 
-#include "codes.h"
+#include "code.h"
 
 #include <SDL.h>
 
