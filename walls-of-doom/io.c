@@ -28,7 +28,7 @@ static TTF_Font *global_monospaced_font = NULL;
 static int global_monospaced_font_width = 0;
 static int global_monospaced_font_height = 0;
 
-void clean(SDL_Renderer *renderer) { SDL_RenderClear(renderer); }
+void clear(SDL_Renderer *renderer) { SDL_RenderClear(renderer); }
 
 void present(SDL_Renderer *renderer) { SDL_RenderPresent(renderer); }
 
@@ -167,7 +167,7 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
   set_window_title_and_icon(*window);
   *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED);
   set_render_color(*renderer, BACKGROUND_COLOR);
-  clean(*renderer);
+  clear(*renderer);
   return 0;
 }
 
@@ -432,7 +432,7 @@ void print_long_text(char *string, SDL_Renderer *renderer) {
   wrap_at_right_margin(string, width);
   line_count = count_lines(string);
   y = (LINES - line_count) / 2 + lines_copied;
-  clean(renderer);
+  clear(renderer);
   /* Print each line. */
   cursor = string;
   while (*cursor != '\0') {
@@ -606,7 +606,7 @@ int draw_player(const Player *const player, SDL_Renderer *renderer) {
  */
 int draw_game(const Game *const game, SDL_Renderer *renderer) {
   Milliseconds start;
-  clean(renderer);
+  clear(renderer);
 
   start = get_milliseconds();
   draw_top_bar(game->player, renderer);
@@ -646,7 +646,7 @@ void print_game_result(const char *name, const unsigned int score,
   } else {
     sprintf(second_line, "%s didn't make it to the top scores.", name);
   }
-  clean(renderer);
+  clear(renderer);
   print_centered(LINES / 2 - 1, first_line, DEFAULT_COLOR, renderer);
   print_centered(LINES / 2 + 1, second_line, DEFAULT_COLOR, renderer);
   present(renderer);
@@ -755,7 +755,7 @@ int read_string(const int x, const int y, const char *prompt, char *destination,
   SDL_StartTextInput();
   while (!is_done) {
     if (should_rerender) {
-      clean(renderer);
+      clear(renderer);
       print(x, y, prompt, DEFAULT_COLOR, renderer);
       if (written == 0) {
         /* We must write a single space, or SDL will not render anything. */

@@ -203,7 +203,7 @@ Code top_scores(SDL_Renderer *renderer) {
   if (COLUMNS < 16) {
     return CODE_ERROR;
   }
-  clean(renderer);
+  clear(renderer);
   for (i = 0; i < record_count && i < line_count; i++) {
     record_to_string(records + i, line, record_width);
     print_centered(PADDING + i, line, DEFAULT_COLOR, renderer);
