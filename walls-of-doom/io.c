@@ -496,7 +496,7 @@ void write_top_bar_strings(char *strings[], SDL_Renderer *renderer) {
       }
     }
   }
-  print(0, 0, buffer, DEFAULT_COLOR, renderer);
+  print(0, 0, buffer, TOP_BAR_COLOR, renderer);
 }
 
 /**
@@ -551,7 +551,7 @@ void draw_borders(SDL_Renderer *renderer) {
   print(0, 1, buffer, DEFAULT_COLOR, renderer);
   print(0, LINES - 1, buffer, DEFAULT_COLOR, renderer);
   memset(buffer + 1, ' ', COLUMNS - 2);
-  for (i = 1; i < LINES - 1; i++) {
+  for (i = 2; i < LINES - 1; i++) {
     print(0, i, buffer, DEFAULT_COLOR, renderer);
   }
 }
