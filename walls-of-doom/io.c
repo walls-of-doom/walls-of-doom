@@ -454,7 +454,6 @@ char *copy_first_line(char *source, char *destination) {
  * Prints the provided string after formatting it to increase readability.
  */
 void print_long_text(char *string, SDL_Renderer *renderer) {
-  size_t lines_copied = 0;
   char line[COLUMNS + 1];
   char *cursor;
   int width = COLUMNS - PADDING;
@@ -463,14 +462,14 @@ void print_long_text(char *string, SDL_Renderer *renderer) {
   normalize_whitespaces(string);
   wrap_at_right_margin(string, width);
   line_count = count_lines(string);
-  y = (LINES - line_count) / 2 + lines_copied;
   clear(renderer);
   /* Print each line. */
   cursor = string;
+  y = (LINES - line_count) / 2;
   while (*cursor != '\0') {
     cursor = copy_first_line(cursor, line);
     print(PADDING, y, line, DEFAULT_COLOR, renderer);
-    lines_copied++;
+    y++;
   }
   present(renderer);
 }
