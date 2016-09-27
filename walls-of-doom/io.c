@@ -353,6 +353,66 @@ int print(const int x, const int y, const char *string,
 }
 
 /**
+ * Prints a rectangle from (min_x, min_y) to (max_x, max_y) using the specified
+ * symbol and color pair.
+ */
+Code print_rectangle(const int min_x, const int max_x, const int min_y,
+                     const int max_y, const char symbol,
+                     const ColorPair color_pair, SDL_Renderer *renderer) {
+  const int x_step = global_monospaced_font_width;
+  const int y_step = global_monospaced_font_height;
+  const SDL_Color foreground = to_sdl_color(color_pair.foreground);
+  const SDL_Color background = to_sdl_color(color_pair.background);
+  /* The coordinates of the (x, y) corner SDL needs, in pixels. */
+  int x;
+  int y;
+  TTF_Font *font = global_monospaced_font;
+  SDL_Surface *surface;
+  SDL_Texture *texture;
+  SDL_Rect position;
+  if (min_x < 0 || min_y < 0 || min_x > max_x || min_y > max_y) {
+    return CODE_ERROR;
+  }
+  surface = TTF_RenderGlyph_Shaded(font, symbol, foreground, background);
+  if (surface == NULL) {
+    log_message("Failed to allocate text surface in print()");
+    return CODE_ERROR;
+  }
+  texture = SDL_CreateTextureFromSurface(renderer, surface);
+  if (texture == NULL) {
+    log_message("Failed to create texture from surface in print()");
+    return CODE_ERROR;
+  }
+  /* Copy destination width and height from the texture. */
+  SDL_QueryTexture(texture, NULL, NULL, &position.w, &position.h);
+  /*
+   * This is the optimized step.
+   *
+   * We have a texture of a single symbol, so we just copy it to all the places
+   * where the symbol should appear.
+   */
+  /* Write the top and bottom borders. */
+  for (x = x_step * min_x; x <= x_step * max_x; x += x_step) {
+    position.x = x;
+    position.y = y_step * min_y;
+    SDL_RenderCopy(renderer, texture, NULL, &position);
+    position.y = y_step * max_y;
+    SDL_RenderCopy(renderer, texture, NULL, &position);
+  }
+  /* Write the left and right borders. */
+  for (y = y_step * (min_y + 1); y <= y_step * (max_y - 1); y += y_step) {
+    position.y = y;
+    position.x = x_step * min_x;
+    SDL_RenderCopy(renderer, texture, NULL, &position);
+    position.x = x_step * max_x;
+    SDL_RenderCopy(renderer, texture, NULL, &position);
+  }
+  SDL_DestroyTexture(texture);
+  SDL_FreeSurface(surface);
+  return CODE_OK;
+}
+
+/**
  * Prints the provided string centered on the screen at the provided line.
  */
 void print_centered(const int y, const char *string, const ColorPair color_pair,
@@ -544,16 +604,7 @@ void draw_bottom_bar(SDL_Renderer *renderer) {
  * Draws the borders of the screen.
  */
 void draw_borders(SDL_Renderer *renderer) {
-  int i;
-  char buffer[COLUMNS + 1];
-  memset(buffer, '+', COLUMNS);
-  buffer[COLUMNS] = '\0';
-  print(0, 1, buffer, DEFAULT_COLOR, renderer);
-  print(0, LINES - 1, buffer, DEFAULT_COLOR, renderer);
-  memset(buffer + 1, ' ', COLUMNS - 2);
-  for (i = 2; i < LINES - 1; i++) {
-    print(0, i, buffer, DEFAULT_COLOR, renderer);
-  }
+  print_rectangle(0, COLUMNS - 1, 1, LINES - 2, '+', DEFAULT_COLOR, renderer);
 }
 
 int draw_platforms(const Platform *platforms, const size_t platform_count,
@@ -605,7 +656,9 @@ int draw_player(const Player *const player, SDL_Renderer *renderer) {
  * Draws a full game to the screen.
  */
 int draw_game(const Game *const game, SDL_Renderer *renderer) {
+  Milliseconds draw_game_start = get_milliseconds();
   Milliseconds start;
+
   clear(renderer);
 
   start = get_milliseconds();
@@ -633,6 +686,8 @@ int draw_game(const Game *const game, SDL_Renderer *renderer) {
   update_profiler("draw_player", get_milliseconds() - start);
 
   present(renderer);
+
+  update_profiler("draw_game", get_milliseconds() - draw_game_start);
   return 0;
 }
 
