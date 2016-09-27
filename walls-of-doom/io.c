@@ -5,6 +5,7 @@
 #include "game.h"
 #include "logger.h"
 #include "math.h"
+#include "memory.h"
 #include "physics.h"
 #include "player.h"
 #include "profiler.h"
@@ -27,6 +28,8 @@
 static TTF_Font *global_monospaced_font = NULL;
 static int global_monospaced_font_width = 0;
 static int global_monospaced_font_height = 0;
+
+static SDL_Texture *print_rectangle_cached_texture = NULL;
 
 void clear(SDL_Renderer *renderer) { SDL_RenderClear(renderer); }
 
@@ -171,17 +174,19 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
   return 0;
 }
 
+static void finalize_print_rectangle_cache(void) {
+  SDL_DestroyTexture(print_rectangle_cached_texture);
+  print_rectangle_cached_texture = NULL;
+}
+
 /**
  * Finalizes the global fonts.
- *
- * Returns 0 in case of success.
  */
-static int finalize_fonts(void) {
+static void finalize_fonts(void) {
   if (global_monospaced_font != NULL) {
     TTF_CloseFont(global_monospaced_font);
     global_monospaced_font = NULL;
   }
-  return 0;
 }
 
 /**
@@ -192,6 +197,7 @@ static int finalize_fonts(void) {
  * Returns 0 in case of success.
  */
 int finalize(SDL_Window **window, SDL_Renderer **renderer) {
+  finalize_print_rectangle_cache();
   finalize_fonts();
   SDL_DestroyWindow(*window);
   *window = NULL;
@@ -352,27 +358,14 @@ int print(const int x, const int y, const char *string,
   return 0;
 }
 
-/**
- * Prints a rectangle from (min_x, min_y) to (max_x, max_y) using the specified
- * symbol and color pair.
- */
-Code print_rectangle(const int min_x, const int max_x, const int min_y,
-                     const int max_y, const char symbol,
-                     const ColorPair color_pair, SDL_Renderer *renderer) {
-  const int x_step = global_monospaced_font_width;
-  const int y_step = global_monospaced_font_height;
+static Code make_print_rectangle_cached_texture(const char symbol,
+                                                const ColorPair color_pair,
+                                                SDL_Renderer *renderer) {
   const SDL_Color foreground = to_sdl_color(color_pair.foreground);
   const SDL_Color background = to_sdl_color(color_pair.background);
-  /* The coordinates of the (x, y) corner SDL needs, in pixels. */
-  int x;
-  int y;
   TTF_Font *font = global_monospaced_font;
   SDL_Surface *surface;
   SDL_Texture *texture;
-  SDL_Rect position;
-  if (min_x < 0 || min_y < 0 || min_x > max_x || min_y > max_y) {
-    return CODE_ERROR;
-  }
   surface = TTF_RenderGlyph_Shaded(font, symbol, foreground, background);
   if (surface == NULL) {
     log_message("Failed to allocate text surface in print()");
@@ -383,6 +376,47 @@ Code print_rectangle(const int min_x, const int max_x, const int min_y,
     log_message("Failed to create texture from surface in print()");
     return CODE_ERROR;
   }
+  /* Free the old texture before copying the address of the new one. */
+  SDL_DestroyTexture(print_rectangle_cached_texture);
+  print_rectangle_cached_texture = texture;
+  SDL_FreeSurface(surface);
+  return CODE_OK;
+}
+
+/**
+ * Prints a rectangle from (min_x, min_y) to (max_x, max_y) using the specified
+ * symbol and color pair.
+ */
+Code print_rectangle(const int min_x, const int max_x, const int min_y,
+                     const int max_y, const char symbol,
+                     const ColorPair color_pair, SDL_Renderer *renderer) {
+  static int cache_initialized = 0;
+  static char cached_symbol;
+  static ColorPair cached_color_pair;
+
+  const int x_step = global_monospaced_font_width;
+  const int y_step = global_monospaced_font_height;
+  int color_is_different;
+  /* The coordinates of the (x, y) corner SDL needs, in pixels. */
+  SDL_Texture *texture;
+  SDL_Rect position;
+  int x;
+  int y;
+
+  if (min_x < 0 || min_y < 0 || min_x > max_x || min_y > max_y) {
+    return CODE_ERROR;
+  }
+
+  color_is_different = !color_pair_equals(cached_color_pair, color_pair);
+  /* We have to make the texture and update the cache. */
+  if (!cache_initialized || cached_symbol != symbol || color_is_different) {
+    cache_initialized = 1;
+    cached_symbol = symbol;
+    cached_color_pair = color_pair;
+    make_print_rectangle_cached_texture(symbol, color_pair, renderer);
+  }
+
+  texture = print_rectangle_cached_texture;
   /* Copy destination width and height from the texture. */
   SDL_QueryTexture(texture, NULL, NULL, &position.w, &position.h);
   /*
@@ -407,8 +441,6 @@ Code print_rectangle(const int min_x, const int max_x, const int min_y,
     position.x = x_step * max_x;
     SDL_RenderCopy(renderer, texture, NULL, &position);
   }
-  SDL_DestroyTexture(texture);
-  SDL_FreeSurface(surface);
   return CODE_OK;
 }
 

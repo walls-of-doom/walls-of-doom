@@ -10,6 +10,16 @@ const ColorPair TOP_BAR_COLOR = {{0xBB, 0xBB, 0xBB, 0xFF},
 const ColorPair BOTTOM_BAR_COLOR = {{0xBB, 0xBB, 0xBB, 0xFF},
                                     {0xC4, 0x00, 0x00, 0xFF}};
 
+int color_equals(Color a, Color b) {
+  return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
+}
+
+int color_pair_equals(ColorPair a, ColorPair b) {
+  const int fore_equals = color_equals(a.foreground, b.foreground);
+  const int back_equals = color_equals(a.background, b.background);
+  return fore_equals && back_equals;
+}
+
 Color color_from_rgb(uint8_t r, uint8_t g, uint8_t b) {
   Color color;
   color.r = r;
