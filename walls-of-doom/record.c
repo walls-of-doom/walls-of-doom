@@ -85,9 +85,11 @@ void populate_table_with_default_records(RecordTable *table) {
 void read_table(RecordTable *table) {
   int read_error = 0;
   char log_buffer[MAXIMUM_STRING_SIZE];
-  if (file_exists(RECORD_TABLE_FILENAME)) {
-    if (read_bytes(RECORD_TABLE_FILENAME, table, sizeof(RecordTable), 1)) {
-      sprintf(log_buffer, READ_TABLE_FAILURE_FORMAT, RECORD_TABLE_FILENAME);
+  char path[MAXIMUM_PATH_SIZE];
+  get_full_path(path, RECORD_TABLE_FILE_NAME);
+  if (file_exists(path)) {
+    if (read_bytes(path, table, sizeof(RecordTable), 1)) {
+      sprintf(log_buffer, READ_TABLE_FAILURE_FORMAT, path);
       log_message(log_buffer);
       /* Set the error flag to trigger the creation of a new table. */
       read_error = 1;
@@ -103,7 +105,9 @@ void read_table(RecordTable *table) {
 }
 
 void write_table(const RecordTable *const table) {
-  write_bytes(RECORD_TABLE_FILENAME, table, sizeof(RecordTable), 1);
+  char path[MAXIMUM_PATH_SIZE];
+  get_full_path(path, RECORD_TABLE_FILE_NAME);
+  write_bytes(path, table, sizeof(RecordTable), 1);
 }
 
 /**

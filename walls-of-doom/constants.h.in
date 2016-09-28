@@ -65,7 +65,21 @@
 
 #define PLAYER_JUMPING_HEIGHT PLAYER_JUMPING_SPEED
 
-#define RECORD_ARRAY_SIZE 512
+#define ABOUT_PAGE_PATH "@ASSETS_DIR@/about/about.txt"
+#define ABOUT_PAGE_BUFFER_SIZE 1024
+
+/**
+ * Information required for font loading.
+ */
+#define MONOSPACED_FONT_PATH "@ASSETS_DIR@/fonts/roboto-mono.ttf"
+#define MONOSPACED_FONT_SIZE 20
+
+#define ICON_PATH "@ASSETS_DIR@/icons/icon.png"
+
+#define ADJECTIVES_FILE_PATH "@ASSETS_DIR@/data/adjectives.txt"
+#define NOUNS_FILE_PATH "@ASSETS_DIR@/data/nouns.txt"
+
+#define PLATFORMS_FILE_PATH "@ASSETS_DIR@/platforms/platforms.txt"
 
 /**
  * The maximum number of records that will be displayed to the player.
@@ -74,17 +88,11 @@
  */
 #define MAXIMUM_DISPLAYED_RECORDS 64
 
-#define RECORD_TABLE_FILENAME "records.bin"
+#define RECORD_TABLE_FILE_NAME "records.bin"
+#define RECORD_ARRAY_SIZE 512
 
-#define ABOUT_PAGE_BUFFER_SIZE 1024
-#define ABOUT_PAGE_PATH "assets/about.txt"
+#define LOG_FILE_NAME "log.txt"
 
-/**
- * Information required for font loading.
- */
-#define MONOSPACED_FONT_PATH "assets/fonts/roboto-mono/RobotoMono-Regular.ttf"
-#define MONOSPACED_FONT_SIZE 20
-
-#define ICON_PATH "assets/icons/icon-128.png"
+#define PROFILER_FILE_NAME "performance.txt"
 
 #endif

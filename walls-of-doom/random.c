@@ -1,5 +1,7 @@
 #include "random.h"
 
+#include "constants.h"
+
 #include <ctype.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -8,9 +10,6 @@
 #include <time.h>
 
 #define MAXIMUM_WORD_SIZE 32
-
-#define ADJECTIVES_FILE_PATH "assets/data/adjectives.txt"
-#define NOUNS_FILE_PATH "assets/data/nouns.txt"
 
 /**
  * This is the successor to xorshift128+. It is the fastest full-period

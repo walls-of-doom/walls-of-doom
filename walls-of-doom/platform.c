@@ -31,7 +31,7 @@ int read_platforms(Platform *platforms) {
   int movement_type;
 
   log_message("Started reading platform data");
-  actually_read = read_integers("assets/platforms.txt", input_integers,
+  actually_read = read_integers(PLATFORMS_FILE_PATH, input_integers,
                                 READ_PLATFORMS_INTEGER_ARRAY_SIZE);
 
   sprintf(log_message_buffer, "Read %lu integers", actually_read);

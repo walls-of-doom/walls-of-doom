@@ -1,19 +1,28 @@
 #include "data.h"
 
+#include "code.h"
 #include "constants.h"
 #include "logger.h"
 
+#include <pwd.h>
+#include <unistd.h>
+
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h>
 
 #define LOG_ACCESS_WRITE_FORMAT "Writing %lu bytes (%.2lf KiB) to %s"
 #define LOG_ACCESS_READ_FORMAT "Reading %lu bytes (%.2lf KiB) from %s"
 
 #define WRITE_BYTES_COUNT_FORMAT "Expected to write %lu but actually wrote %lu"
 #define READ_BYTES_COUNT_FORMAT "Expected to read %lu but actually read %lu"
+
+#define DATA_DIRECTORY ".walls-of-doom"
+
+/* Data directory is writable for the user, and read-only for others. */
+#define DATA_DIRECTORY_UMASK 0755
 
 /**
  * Assesses whether or not a file with the provided filename exists.
@@ -24,6 +33,34 @@ int file_exists(const char *filename) {
 }
 
 typedef enum Operation { READ, WRITE } Operation;
+
+/**
+ * Writes to buffer the full path for a file created by Walls of Doom.
+ *
+ * If one needs to access the log.txt file, one should use
+ *
+ *   char path[MAXIMUM_PATH_SIZE];
+ *   get_full_path(path, "log.txt");
+ *
+ * This is the correct way to access mutable files in any platform.
+ */
+Code get_full_path(char *buffer, char *filename) {
+  const char *home;
+  struct stat status;
+  /* Get the home directory. */
+  if ((home = getenv("HOME")) == NULL) {
+    /* Only use the user database if HOME is not available. */
+    home = getpwuid(getuid())->pw_dir;
+  }
+  /* Create the data directory if it does not exist. */
+  sprintf(buffer, "%s/%s", home, DATA_DIRECTORY);
+  if (stat(buffer, &status) == -1) {
+    mkdir(buffer, DATA_DIRECTORY_UMASK);
+  }
+  /* Should not write from one buffer to the same buffer. */
+  sprintf(buffer, "%s/%s/%s", home, DATA_DIRECTORY, filename);
+  return CODE_OK;
+}
 
 /**
  * Returns the number of lines in a file.

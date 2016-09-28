@@ -58,8 +58,8 @@ CMakeCache.txt
 # Walls of Doom
 build/
 README.pdf
-sulzbach-ferrazza.zip
-game/version.h
+walls-of-doom/constants.h
+walls-of-doom/version.h
 compile_commands.json
 
 # Code::Blocks

@@ -1,6 +1,8 @@
 #include "logger.h"
 
 #include "clock.h"
+#include "constants.h"
+#include "data.h"
 
 #include <stdio.h>
 #include <time.h>
@@ -37,7 +39,9 @@ void write_timestamp(char *buffer, const size_t buffer_size) {
  */
 void log_message(const char *message) {
   char buffer[TIMESTAMP_BUFFER_SIZE];
-  FILE *file = fopen("log.txt", "a");
+  char path[MAXIMUM_PATH_SIZE];
+  get_full_path(path, LOG_FILE_NAME);
+  FILE *file = fopen(path, "a");
   if (file) {
     write_timestamp(buffer, TIMESTAMP_BUFFER_SIZE);
     fprintf(file, "[%s] %s\n", buffer, message);

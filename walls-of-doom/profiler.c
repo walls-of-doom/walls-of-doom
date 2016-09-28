@@ -1,5 +1,7 @@
 #include "clock.h"
 #include "code.h"
+#include "constants.h"
+#include "data.h"
 #include "memory.h"
 
 #include <stdio.h>
@@ -91,8 +93,10 @@ void sort_table(void) {
 void write_statistics(void) {
   size_t i;
   double average;
+  char path[MAXIMUM_PATH_SIZE];
+  get_full_path(path, PROFILER_FILE_NAME);
   sort_table();
-  FILE *file = fopen("performance.txt", "a");
+  FILE *file = fopen(path, "a");
   if (file) {
     for (i = 0; i < table_size; i++) {
       average = profiler_data_mean(table + i);

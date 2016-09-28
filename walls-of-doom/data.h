@@ -1,7 +1,16 @@
 #ifndef DATA_H
 #define DATA_H
 
+#include "code.h"
+
+#include <linux/limits.h>
+
 #include <stdio.h>
+
+/**
+ * The maximum size a path string may have, including the null terminator.
+ */
+#define MAXIMUM_PATH_SIZE PATH_MAX
 
 /**
  * Assesses whether or not a file with the provided filename exists.
@@ -14,6 +23,18 @@ int file_exists(const char *filename);
  * This is the count of occurrences of '\n'.
  */
 int file_line_count(const char *filename);
+
+/**
+ * Writes to buffer the full path for a file created by Walls of Doom.
+ *
+ * If one needs to access the log.txt file, one should use
+ *
+ *   char path[MAXIMUM_PATH_SIZE];
+ *   get_full_path(path, "log.txt");
+ *
+ * This is the correct way to access mutable files in any platform.
+ */
+Code get_full_path(char *buffer, char *filename);
 
 /**
  * Writes bytes to the indicated file from the provided source.
