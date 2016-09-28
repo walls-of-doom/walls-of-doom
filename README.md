@@ -27,56 +27,33 @@ The following C compilers are known to work perfectly with the project:
 + GCC 4.8.4 (or newer)
 + Clang 3.7 (or newer)
 
-## Terminal
+## Building and installing
 
 ```bash
 $ mkdir build
 $ cd build
 $ cmake ..
 $ make
-$ cd ..
-$ ln -s build/compile_commands.json
+$ sudo make install
 ```
 
-### Running formatting and static analysis
+## Running the game
+
+```bash
+$ walls-of-doom
+```
+
+## Running the tests
+
+```bash
+$ ./build/walls-of-doom/tests
+```
+
+## Reformatting code and performing static analysis
 
 ```bash
 $ bash reformat.sh
 ```
-
-### Running the tests
-
-```bash
-$ cd build/tests
-$ ./tests
-```
-
-### Running the game
-
-```bash
-$ cd build/game
-$ ./game
-```
-
-## Code::Blocks
-
-```bash
-$ cmake . -G"CodeBlocks - Unix Makefiles"
-```
-
-### Running the tests
-
-+ Open Code::Blocks
-+ Open the Code::Blocks project file on the root directory
-+ Select `autotest` as the target
-+ Press "Build and run"
-
-### Running the game
-
-+ Open Code::Blocks
-+ Open the Code::Blocks project file on the root directory
-+ Select `walls-of-doom` as the target
-+ Press "Build and run"
 
 # Generating the Images
 
