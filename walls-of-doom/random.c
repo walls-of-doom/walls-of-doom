@@ -124,7 +124,7 @@ int random_integer(const int minimum, const int maximum) {
  * Copies the first word of a random line of the file to the destination.
  */
 void random_word(char *destination, const char *filename) {
-  int read;
+  int read = '\0';
   int chosen_line;
   int current_line;
   const int line_count = file_line_count(filename);
@@ -134,7 +134,7 @@ void random_word(char *destination, const char *filename) {
     file = fopen(filename, "r");
     if (file) {
       current_line = 0;
-      while (current_line != chosen_line) {
+      while (current_line != chosen_line && read != EOF) {
         read = fgetc(file);
         if (read == '\n') {
           current_line++;
