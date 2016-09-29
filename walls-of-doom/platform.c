@@ -58,13 +58,11 @@ int read_platforms(Platform *platforms) {
     platform->speed_x = 0;
     platform->speed_y = 0;
     speed = input_integers[1 + 2 * i + 1] * PLATFORM_BASE_SPEED;
-    movement_type = random_integer(0, 4);
-    if (movement_type < 2) { /* 40% */
+    movement_type = random_integer(0, 1);
+    if (movement_type == 0) { /* 50% */
       platform->speed_x = speed;
-    } else if (movement_type < 4) { /* 40% */
+    } else { /* 50% */
       platform->speed_x = -speed;
-    } else { /* 20% */
-      platform->speed_y = -speed;
     }
   }
 
