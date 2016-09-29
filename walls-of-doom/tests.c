@@ -13,10 +13,9 @@
 #include <string.h>
 #include <time.h>
 
-int compare_unsigned_char(const void *pointer_to_uchar_a,
-                          const void *pointer_to_uchar_b) {
-  unsigned char a = *(unsigned char *)(pointer_to_uchar_a);
-  unsigned char b = *(unsigned char *)(pointer_to_uchar_b);
+int compare_unsigned_char(const void *pointer_a, const void *pointer_b) {
+  unsigned char a = *(unsigned char *)(pointer_a);
+  unsigned char b = *(unsigned char *)(pointer_b);
   return a < b ? -1 : a == b ? 0 : 1;
 }
 
@@ -60,7 +59,7 @@ void test_get_random_perk_is_well_distributed(void) {
     total += count;
   }
   if (maximum_deviation > maximum_allowed_deviation) {
-    TEST_FAIL_MESSAGE("maximum deviation is bigger than the allowed maximum");
+    TEST_FAIL_MESSAGE("Maximum deviation is bigger than the allowed maximum");
   }
 }
 
@@ -167,8 +166,8 @@ void test_sort_with_an_odd_number_of_single_bytes(void) {
   const unsigned char sorted[] = {1, 2, 3};
   const size_t array_size = sizeof(source) / sizeof(unsigned char);
   sort(source, array_size, sizeof(unsigned char), compare_unsigned_char);
-  TEST_ASSERT_EQUAL_INT8_ARRAY_MESSAGE(
-      sorted, source, array_size, "Insertion sort failed to sort the input");
+  char *message = "Failed to sort the input";
+  TEST_ASSERT_EQUAL_INT8_ARRAY_MESSAGE(sorted, source, array_size, message);
 }
 
 void test_sort_with_an_even_number_of_single_bytes(void) {
@@ -176,8 +175,8 @@ void test_sort_with_an_even_number_of_single_bytes(void) {
   const unsigned char sorted[] = {1, 2, 3, 4};
   const size_t array_size = sizeof(source) / sizeof(unsigned char);
   sort(source, array_size, sizeof(unsigned char), compare_unsigned_char);
-  TEST_ASSERT_EQUAL_INT8_ARRAY_MESSAGE(
-      sorted, source, array_size, "Insertion sort failed to sort the input");
+  char *message = "Failed to sort the input";
+  TEST_ASSERT_EQUAL_INT8_ARRAY_MESSAGE(sorted, source, array_size, message);
 }
 
 void test_reverse_with_empty_range(void) {
@@ -187,20 +186,29 @@ void test_reverse_with_empty_range(void) {
 
 void test_reverse_with_an_odd_number_of_single_bytes(void) {
   unsigned char source[] = {2, 3, 1};
-  const unsigned char sorted[] = {1, 3, 2};
+  const unsigned char reversed[] = {1, 3, 2};
   const size_t array_size = sizeof(source) / sizeof(unsigned char);
   reverse(source, array_size, sizeof(unsigned char));
-  TEST_ASSERT_EQUAL_INT8_ARRAY_MESSAGE(sorted, source, array_size,
-                                       "Reverse failed to reverse the input");
+  const char *message = "Failed to reverse the input";
+  TEST_ASSERT_EQUAL_INT8_ARRAY_MESSAGE(reversed, source, array_size, message);
 }
 
 void test_reverse_with_an_even_number_of_single_bytes(void) {
   unsigned char source[] = {2, 3, 1, 4};
-  const unsigned char sorted[] = {4, 1, 3, 2};
+  const unsigned char reversed[] = {4, 1, 3, 2};
   const size_t array_size = sizeof(source) / sizeof(unsigned char);
   reverse(source, array_size, sizeof(unsigned char));
-  TEST_ASSERT_EQUAL_INT8_ARRAY_MESSAGE(sorted, source, array_size,
-                                       "Reverse failed to reverse the input");
+  const char *message = "Failed to reverse the input";
+  TEST_ASSERT_EQUAL_INT8_ARRAY_MESSAGE(reversed, source, array_size, message);
+}
+
+void test_reverse_with_words(void) {
+  int source[] = {8, 1, 7, 2, 6, 3, 5, 4};
+  const int reversed[] = {4, 5, 3, 6, 2, 7, 1, 8};
+  const size_t array_size = sizeof(source) / sizeof(int);
+  reverse(source, array_size, sizeof(int));
+  const char *message = "Failed to reverse the input";
+  TEST_ASSERT_EQUAL_INT_ARRAY_MESSAGE(reversed, source, array_size, message);
 }
 
 void test_find_next_power_of_two_works_for_zero(void) {
@@ -258,9 +266,9 @@ void test_random_integer_is_evenly_distributed(void) {
   }
   for (i = 0; i < values; i++) {
     if (counters[i] < minimum_allowed_count) {
-      TEST_FAIL_MESSAGE("counter is below minimum allowed count");
+      TEST_FAIL_MESSAGE("Counter is below minimum allowed count");
     } else if (counters[i] > maximum_allowed_count) {
-      TEST_FAIL_MESSAGE("counter is above maximum allowed count");
+      TEST_FAIL_MESSAGE("Counter is above maximum allowed count");
     }
   }
 }
@@ -284,6 +292,7 @@ int main(void) {
   RUN_TEST(test_reverse_with_empty_range);
   RUN_TEST(test_reverse_with_an_odd_number_of_single_bytes);
   RUN_TEST(test_reverse_with_an_even_number_of_single_bytes);
+  RUN_TEST(test_reverse_with_words);
   RUN_TEST(test_find_next_power_of_two_works_for_zero);
   RUN_TEST(test_find_next_power_of_two_works_for_positive_integers);
   RUN_TEST(test_random_integer_respects_the_provided_range);
