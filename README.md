@@ -2,8 +2,9 @@
 
 Walls of Doom is a minimalistic
 [platformer](https://en.wikipedia.org/wiki/Platform_game) written in [ANSI
-C](https://en.wikipedia.org/wiki/ANSI_C). The game is still under development
-but is already playable.
+C](https://en.wikipedia.org/wiki/ANSI_C) using SDL 2.
+
+The game is still under development but is already playable on Linux.
 
 See [the GitHub issue
 tracker](https://github.com/walls-of-doom/walls-of-doom/issues) and have a look
@@ -20,12 +21,34 @@ visible to everyone.
 
 # Building and Running
 
-This project uses SDL 2.0 and you must have it in order to build the game.
+## Requirements
+
+### Linux
+
+Currently, there is no Windows support. [See the relevant
+issue](https://github.com/walls-of-doom/walls-of-doom/issues/38).
+
+OS X and macOS support is unknown. [See the relevant
+issue](https://github.com/walls-of-doom/walls-of-doom/issues/39).
+
+### CMake
+
+You need an installation of CMake in order to build and install the project.
+Please note that suggested 2.8.7 version in the CMake files distributed with the
+project may not be enough for what we use.
+
+### An ANSI C compiler
 
 The following C compilers are known to work perfectly with the project:
 
 + GCC 4.8.4 (or newer)
 + Clang 3.7 (or newer)
+
+Older versions of the abovementioned compilers are **very** likely to work too.
+
+## SDL 2
+
+You will need SDL 2, with the TrueType and Image libraries.
 
 ## Building and installing
 
