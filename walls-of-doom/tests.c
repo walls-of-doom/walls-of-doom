@@ -28,6 +28,42 @@ void test_normalize(void) {
   TEST_ASSERT_EQUAL_INT(1, normalize(INT_MAX));
 }
 
+void test_get_random_perk_is_well_distributed(void) {
+  const int maximum_allowed_deviation = 1 << 10;
+  const int average = 1 << 16;
+  const int test_count = average * PERK_COUNT;
+
+  int counters[PERK_COUNT] = {0};
+
+  int minimum = INT_MAX;
+  int maximum = INT_MIN;
+  int maximum_deviation = 0;
+  double total = 0;
+
+  int count;
+  double rate;
+
+  Perk random_perk;
+  int i;
+
+  seed_random();
+
+  for (i = 0; i < test_count; i++) {
+    counters[get_random_perk()]++;
+  }
+  /* Assess the distribution of the values. */
+  for (i = 0; i < PERK_COUNT; i++) {
+    count = counters[i];
+    minimum = min(minimum, count);
+    maximum = max(maximum, count);
+    maximum_deviation = max(maximum_deviation, abs(count - average));
+    total += count;
+  }
+  if (maximum_deviation > maximum_allowed_deviation) {
+    TEST_FAIL_MESSAGE("maximum deviation is bigger than the allowed maximum");
+  }
+}
+
 void test_trim_string_works_with_empty_strings(void) {
   const char *input = "";
   const char *expected = input; /* Use a more meaningful name. */
@@ -205,10 +241,35 @@ void test_random_integer_respects_the_provided_range(void) {
   }
 }
 
+void test_random_integer_is_evenly_distributed(void) {
+  /* Use primes for the boundaries as this may help show biases. */
+  const int minimum = -227;
+  const int maximum = 233;
+  const int values = 227 + 1 + 233;
+  const int expected_count = 1 << 8;
+  const int minimum_allowed_count = 1 << 7;
+  const int maximum_allowed_count = expected_count + minimum_allowed_count;
+  int counters[227 + 1 + 233] = {0};
+  int random_result;
+  int i;
+  for (i = 0; i < values * expected_count; i++) {
+    random_result = random_integer(minimum, maximum);
+    counters[random_result - minimum]++;
+  }
+  for (i = 0; i < values; i++) {
+    if (counters[i] < minimum_allowed_count) {
+      TEST_FAIL_MESSAGE("counter is below minimum allowed count");
+    } else if (counters[i] > maximum_allowed_count) {
+      TEST_FAIL_MESSAGE("counter is above maximum allowed count");
+    }
+  }
+}
+
 int main(void) {
   UNITY_BEGIN();
   log_message("Started running tests");
   RUN_TEST(test_normalize);
+  RUN_TEST(test_get_random_perk_is_well_distributed);
   RUN_TEST(test_trim_string_works_with_empty_strings);
   RUN_TEST(test_trim_string_works_with_already_trimmed_strings);
   RUN_TEST(test_trim_string_properly_trims_preceding_spaces);
@@ -226,6 +287,7 @@ int main(void) {
   RUN_TEST(test_find_next_power_of_two_works_for_zero);
   RUN_TEST(test_find_next_power_of_two_works_for_positive_integers);
   RUN_TEST(test_random_integer_respects_the_provided_range);
+  RUN_TEST(test_random_integer_is_evenly_distributed);
   log_message("Finished running tests");
   return UNITY_END();
 }

@@ -5,6 +5,8 @@
 
 /**
  * Seeds the PRNG with the current time.
+ *
+ * This function can safely be called multiple times.
  */
 void seed_random();
 

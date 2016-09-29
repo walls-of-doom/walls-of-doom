@@ -100,7 +100,8 @@ uint64_t find_next_power_of_two(uint64_t number) {
  * Always returns 0 if maximum < minimum.
  */
 int random_integer(const int minimum, const int maximum) {
-  int range = maximum - minimum;
+  /* Range should be a bigger type because the difference may overflow int. */
+  const uint64_t range = maximum - minimum + 1;
   uint64_t next_power_of_two;
   uint64_t value;
   if (maximum < minimum) {
@@ -110,6 +111,12 @@ int random_integer(const int minimum, const int maximum) {
   do {
     value = next() % next_power_of_two;
   } while (value >= range);
+  /*
+   * Varies from
+   *   minimum + 0 == minimum
+   * to
+   *   minimum + (maximum - minimum + 1 - 1) == maximum
+   */
   return minimum + value;
 }
 

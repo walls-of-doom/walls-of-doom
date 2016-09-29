@@ -43,6 +43,8 @@ typedef enum Operation { READ, WRITE } Operation;
  *   get_full_path(path, "log.txt");
  *
  * This is the correct way to access mutable files in any platform.
+ *
+ * This function does not rely on dynamic memory allocation.
  */
 Code get_full_path(char *buffer, char *filename) {
   const char *home;
