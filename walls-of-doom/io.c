@@ -226,7 +226,7 @@ int initialize_color_schemes(void) {
  */
 int is_valid_player_name(const char *player_name) {
   char buffer[MAXIMUM_PLAYER_NAME_SIZE];
-  safe_strcpy(buffer, player_name, MAXIMUM_PLAYER_NAME_SIZE);
+  copy_string(buffer, player_name, MAXIMUM_PLAYER_NAME_SIZE);
   trim_string(buffer);
   return strlen(buffer) >= 2;
 }
@@ -248,7 +248,7 @@ void read_player_name(char *destination, const size_t maximum_size,
     if (error) {
       log_message("Failed to read player name");
       /* Cope with it by providing a name for the player. */
-      safe_strcpy(destination, FALLBACK_PLAYER_NAME, maximum_size);
+      copy_string(destination, FALLBACK_PLAYER_NAME, maximum_size);
     } else {
       sprintf(log_buffer, "Read '%s' from the user", destination);
       log_message(log_buffer);
@@ -514,7 +514,7 @@ void write_top_bar_strings(char *strings[], SDL_Renderer *renderer) {
       for (x = begin_x; x < begin_text_x; x++) {
         buffer[x] = ' ';
       }
-      safe_strcpy(buffer + x, strings[i], COLUMNS + 1 - x);
+      copy_string(buffer + x, strings[i], COLUMNS + 1 - x);
       for (x = after_text_x; x < after_x; x++) {
         buffer[x] = ' ';
       }

@@ -13,6 +13,8 @@
 #include <string.h>
 #include <time.h>
 
+#define SMALL_STRING_BUFFER_SIZE 64
+
 int compare_unsigned_char(const void *pointer_a, const void *pointer_b) {
   unsigned char a = *(unsigned char *)(pointer_a);
   unsigned char b = *(unsigned char *)(pointer_b);
@@ -66,8 +68,8 @@ void test_get_random_perk_is_well_distributed(void) {
 void test_trim_string_works_with_empty_strings(void) {
   const char *input = "";
   const char *expected = input; /* Use a more meaningful name. */
-  char buffer[64];
-  strcpy(buffer, input);
+  char buffer[SMALL_STRING_BUFFER_SIZE];
+  copy_string(buffer, input, SMALL_STRING_BUFFER_SIZE);
   trim_string(buffer);
   TEST_ASSERT_EQUAL_STRING(expected, buffer);
 }
@@ -75,8 +77,8 @@ void test_trim_string_works_with_empty_strings(void) {
 void test_trim_string_works_with_already_trimmed_strings(void) {
   const char *input = "a b";
   const char *expected = input; /* Use a more meaningful name. */
-  char buffer[64];
-  strcpy(buffer, input);
+  char buffer[SMALL_STRING_BUFFER_SIZE];
+  copy_string(buffer, input, SMALL_STRING_BUFFER_SIZE);
   trim_string(buffer);
   TEST_ASSERT_EQUAL_STRING(expected, buffer);
 }
@@ -84,8 +86,8 @@ void test_trim_string_works_with_already_trimmed_strings(void) {
 void test_trim_string_properly_trims_preceding_spaces(void) {
   const char *input = "  a b";
   const char *expected = "a b";
-  char buffer[64];
-  strcpy(buffer, input);
+  char buffer[SMALL_STRING_BUFFER_SIZE];
+  copy_string(buffer, input, SMALL_STRING_BUFFER_SIZE);
   trim_string(buffer);
   TEST_ASSERT_EQUAL_STRING(expected, buffer);
 }
@@ -93,8 +95,8 @@ void test_trim_string_properly_trims_preceding_spaces(void) {
 void test_trim_string_properly_trims_trailing_spaces(void) {
   const char *input = "a b  ";
   const char *expected = "a b";
-  char buffer[64];
-  strcpy(buffer, input);
+  char buffer[SMALL_STRING_BUFFER_SIZE];
+  copy_string(buffer, input, SMALL_STRING_BUFFER_SIZE);
   trim_string(buffer);
   TEST_ASSERT_EQUAL_STRING(expected, buffer);
 }
@@ -102,8 +104,8 @@ void test_trim_string_properly_trims_trailing_spaces(void) {
 void test_trim_string_properly_trims_space_padded_strings(void) {
   const char *input = "  a b  ";
   const char *expected = "a b";
-  char buffer[64];
-  strcpy(buffer, input);
+  char buffer[SMALL_STRING_BUFFER_SIZE];
+  copy_string(buffer, input, SMALL_STRING_BUFFER_SIZE);
   trim_string(buffer);
   TEST_ASSERT_EQUAL_STRING(expected, buffer);
 }
@@ -111,8 +113,8 @@ void test_trim_string_properly_trims_space_padded_strings(void) {
 void test_trim_string_works_with_strings_of_whitespaces(void) {
   const char *input = " \t \n ";
   const char *expected = "";
-  char buffer[64];
-  strcpy(buffer, input);
+  char buffer[SMALL_STRING_BUFFER_SIZE];
+  copy_string(buffer, input, SMALL_STRING_BUFFER_SIZE);
   trim_string(buffer);
   TEST_ASSERT_EQUAL_STRING(expected, buffer);
 }

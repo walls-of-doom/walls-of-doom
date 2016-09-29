@@ -164,8 +164,8 @@ void random_name(char *destination) {
   random_word(buffer, ADJECTIVES_FILE_PATH);
   first_word_size = strlen(buffer);
   buffer[0] = toupper(buffer[0]);
-  safe_strcpy(destination, buffer, MAXIMUM_WORD_SIZE);
+  copy_string(destination, buffer, MAXIMUM_WORD_SIZE);
   random_word(buffer, NOUNS_FILE_PATH);
   buffer[0] = toupper(buffer[0]);
-  safe_strcpy(destination + first_word_size, buffer, MAXIMUM_WORD_SIZE);
+  copy_string(destination + first_word_size, buffer, MAXIMUM_WORD_SIZE);
 }

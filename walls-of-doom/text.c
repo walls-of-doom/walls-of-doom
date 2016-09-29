@@ -10,9 +10,9 @@
  * NUL terminates the destination string, unless size == 0.
  *
  * This function behaves similarly to strlcpy. However, because the latter may
- * not be available on all platforms, safe_strcpy is used.
+ * not be available on all platforms, copy_string is used.
  */
-size_t safe_strcpy(char *destination, const char *source, size_t size) {
+size_t copy_string(char *destination, const char *source, size_t size) {
   char *d = destination;
   const char *s = source;
   size_t n = size;
