@@ -3,7 +3,7 @@
 
 #include "box.h"
 #include "logger.h"
-#include "math.h"
+#include "numeric.h"
 #include "perk.h"
 #include "platform.h"
 #include "player.h"

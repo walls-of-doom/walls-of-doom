@@ -3,14 +3,14 @@
 
 #include "code.h"
 
-#include <linux/limits.h>
-
 #include <stdio.h>
 
 /**
- * The maximum size a path string may have, including the null terminator.
+ * The maximum size a file path can have, including the NUL terminator.
+ *
+ * This is a project-specific limit.
  */
-#define MAXIMUM_PATH_SIZE PATH_MAX
+#define MAXIMUM_PATH_SIZE 512
 
 /**
  * Assesses whether or not a file with the provided filename exists.

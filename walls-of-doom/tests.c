@@ -3,7 +3,7 @@
 #include "data.h"
 #include "io.h"
 #include "logger.h"
-#include "math.h"
+#include "numeric.h"
 #include "random.h"
 #include "rest.h"
 #include "sort.h"

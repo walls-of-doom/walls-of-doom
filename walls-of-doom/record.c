@@ -5,6 +5,7 @@
 #include "data.h"
 #include "io.h"
 #include "logger.h"
+#include "numeric.h"
 #include "rest.h"
 #include "sort.h"
 
@@ -168,16 +169,6 @@ size_t read_records(Record *destination, size_t destination_size) {
     destination[i] = table.records[i];
   }
   return i;
-}
-
-/**
- * Returns the number of characters used to represent the provided number on
- * base 10.
- */
-int count_digits(int number) {
-  char buffer[MAXIMUM_STRING_SIZE];
-  sprintf(buffer, "%d", number);
-  return strlen(buffer);
 }
 
 void record_to_string(const Record *const record, char *buffer,

@@ -4,8 +4,8 @@
 #include "constants.h"
 #include "game.h"
 #include "logger.h"
-#include "math.h"
 #include "memory.h"
+#include "numeric.h"
 #include "physics.h"
 #include "player.h"
 #include "profiler.h"
@@ -630,33 +630,37 @@ int draw_game(const Game *const game, SDL_Renderer *renderer) {
   Milliseconds draw_game_start = get_milliseconds();
   Milliseconds start;
 
+  start = get_milliseconds();
   clear(renderer);
+  update_profiler("draw_game:clear", get_milliseconds() - start);
 
   start = get_milliseconds();
   draw_top_bar(game->player, renderer);
-  update_profiler("draw_top_bar", get_milliseconds() - start);
+  update_profiler("draw_game:draw_top_bar", get_milliseconds() - start);
 
   start = get_milliseconds();
   draw_bottom_bar(renderer);
-  update_profiler("draw_bottom_bar", get_milliseconds() - start);
+  update_profiler("draw_game:draw_bottom_bar", get_milliseconds() - start);
 
   start = get_milliseconds();
   draw_borders(renderer);
-  update_profiler("draw_borders", get_milliseconds() - start);
+  update_profiler("draw_game:draw_borders", get_milliseconds() - start);
 
   start = get_milliseconds();
   draw_platforms(game->platforms, game->platform_count, game->box, renderer);
-  update_profiler("draw_platforms", get_milliseconds() - start);
+  update_profiler("draw_game:draw_platforms", get_milliseconds() - start);
 
   start = get_milliseconds();
   draw_perk(game, renderer);
-  update_profiler("draw_perk", get_milliseconds() - start);
+  update_profiler("draw_game:draw_perk", get_milliseconds() - start);
 
   start = get_milliseconds();
   draw_player(game->player, renderer);
-  update_profiler("draw_player", get_milliseconds() - start);
+  update_profiler("draw_game:draw_player", get_milliseconds() - start);
 
+  start = get_milliseconds();
   present(renderer);
+  update_profiler("draw_game:present", get_milliseconds() - start);
 
   update_profiler("draw_game", get_milliseconds() - draw_game_start);
   return 0;

@@ -1,11 +1,16 @@
-#ifndef MATH_H
-#define MATH_H
+#ifndef NUMERIC_H
+#define NUMERIC_H
 
 /**
  * Normalizes a scalar by returning either -1, 0 or 1 if this scalar is
  * negative, zero, or positive, respectively.
  */
 int normalize(const int value);
+
+/**
+ * Returns the number of digits in the provided value.
+ */
+int count_digits(long value);
 
 /**
  * Returns the smallest of two integers.

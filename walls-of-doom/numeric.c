@@ -1,4 +1,6 @@
-#include "math.h"
+#include "numeric.h"
+
+#include <stdlib.h>
 
 /**
  * Normalizes a scalar by returning either -1, 0 or 1 if this scalar is
@@ -12,6 +14,20 @@ int normalize(const int value) {
   } else {
     return 1;
   }
+}
+
+/**
+ * Returns the number of digits in the provided value.
+ */
+int count_digits(long value) {
+  /* Could use log(), which is ISO 90, but this seems cleaner. */
+  int digits = 1;
+  value = labs(value);
+  while (value >= 10) {
+    digits++;
+    value /= 10;
+  }
+  return digits;
 }
 
 /**

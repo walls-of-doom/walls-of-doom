@@ -19,9 +19,9 @@ add_library (walls-of-doom-base
     game.h game.c
     io.h io.c
     logger.h logger.c
-    math.h math.c
     memory.h memory.c
     menu.h menu.c
+    numeric.h numeric.c
     perk.h perk.c
     physics.h physics.c
     platform.h platform.c
