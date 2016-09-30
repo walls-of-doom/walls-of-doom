@@ -7,64 +7,29 @@
 
 #include <stdlib.h>
 
-/**
- * How many integers the array must have.
- *
- * 1 for the platform count and 2 for each platform.
- */
-#define READ_PLATFORMS_INTEGER_ARRAY_SIZE (1 + 2 * MAXIMUM_PLATFORM_COUNT)
+#define MINIMUM_WIDTH 4
+#define MAXIMUM_WIDTH 16
 
-/**
- * Reads platforms from the text file into the provided buffer.
- *
- * Returning the number of platforms read.
- *
- * This number is guaranteed to be less than MAXIMUM_PLATFORM_COUNT.
- */
-int read_platforms(Platform *platforms) {
-  int input_integers[READ_PLATFORMS_INTEGER_ARRAY_SIZE];
-  size_t actually_read;
-  size_t platform_count;
-  char log_message_buffer[256];
-  size_t i;
+/* The platform speed bounds, these are multiplied by the base speed. */
+#define MINIMUM_SPEED 1
+#define MAXIMUM_SPEED 4
+
+void generate_platforms(Platform *platforms, int count) {
   int speed;
-  int movement_type;
-
-  log_message("Started reading platform data");
-  actually_read = read_integers(PLATFORMS_FILE_PATH, input_integers,
-                                READ_PLATFORMS_INTEGER_ARRAY_SIZE);
-
-  sprintf(log_message_buffer, "Read %lu integers", actually_read);
-  log_message(log_message_buffer);
-
-  if (actually_read > 0) {
-    platform_count = input_integers[0] < MAXIMUM_PLATFORM_COUNT
-                         ? input_integers[0]
-                         : MAXIMUM_PLATFORM_COUNT;
-  } else {
-    platform_count = 0;
-  }
-  sprintf(log_message_buffer, "Platform count is %lu", platform_count);
-  log_message(log_message_buffer);
-
-  for (i = 0; i < platform_count; i++) {
+  int i;
+  for (i = 0; i < count; i++) {
     Platform *platform = platforms + i;
-
-    platform->width = input_integers[1 + 2 * i];
-
+    platform->width = random_integer(MINIMUM_WIDTH, MAXIMUM_WIDTH);
     platform->x = random_integer(1, COLUMNS - 1);
     platform->y = random_integer(4, LINES - 4);
-
     platform->speed_x = 0;
     platform->speed_y = 0;
-    speed = input_integers[1 + 2 * i + 1] * PLATFORM_BASE_SPEED;
-    movement_type = random_integer(0, 1);
-    if (movement_type == 0) { /* 50% */
+    speed = PLATFORM_BASE_SPEED * random_integer(MINIMUM_SPEED, MAXIMUM_SPEED);
+    /* Make about half the platforms go left and about half go right. */
+    if (random_integer(0, 1)) {
       platform->speed_x = speed;
-    } else { /* 50% */
+    } else {
       platform->speed_x = -speed;
     }
   }
-
-  return platform_count;
 }

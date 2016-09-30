@@ -58,9 +58,8 @@ void write_menu(const Menu *const menu, SDL_Renderer *renderer) {
  */
 int game(SDL_Renderer *renderer) {
   char name[MAXIMUM_PLAYER_NAME_SIZE];
-  size_t platform_count;
   Player player;
-  Platform platforms[MAXIMUM_PLATFORM_COUNT];
+  Platform platforms[PLATFORM_COUNT];
   BoundingBox box;
   Game game;
 
@@ -72,9 +71,9 @@ int game(SDL_Renderer *renderer) {
 
   box = bounding_box_from_screen();
 
-  platform_count = read_platforms(platforms);
+  generate_platforms(platforms, PLATFORM_COUNT);
 
-  game = create_game(&player, platforms, platform_count, &box);
+  game = create_game(&player, platforms, PLATFORM_COUNT, &box);
 
   run_game(&game, renderer);
   return 0;
