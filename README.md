@@ -25,6 +25,8 @@ visible to everyone.
 
 ### Linux
 
+Any Linux or BSD operating system with a desktop environment should work.
+
 Currently, there is no Windows support. [See the relevant
 issue](https://github.com/walls-of-doom/walls-of-doom/issues/38).
 
