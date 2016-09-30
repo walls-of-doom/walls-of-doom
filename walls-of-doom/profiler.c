@@ -9,13 +9,9 @@
 #include <string.h>
 
 #define MAXIMUM_DATA_IDENTIFIER_SIZE 32
-/**
- * This meta format is used to derive the properly aligned format.
- *
- * It should get a single int specifying the number of digits of the integer
- * part of the maximum average in base 10.
- */
-#define OUTPUT_META_FORMAT "%%%d.2f ms  %%s\n"
+
+#define OUTPUT_HEADER "Mean,Frequency,Identifier\n"
+#define OUTPUT_FORMAT "%.2f,%ld,%s\n"
 #define OUTPUT_FORMAT_SIZE 128
 
 typedef struct ProfilerData {
@@ -98,27 +94,23 @@ void sort_table(void) {
 }
 
 void write_statistics(void) {
-  char format[OUTPUT_FORMAT_SIZE];
   char path[MAXIMUM_PATH_SIZE];
-  double maximum_average = 0.0;
-  double average;
+  unsigned long frequency;
+  double mean;
   size_t i;
+  char *identifier;
   FILE *file;
   get_full_path(path, PROFILER_FILE_NAME);
   file = fopen(path, "a");
   if (file) {
     /* Sort the table if we can write output. */
     sort_table();
+    fprintf(file, OUTPUT_HEADER);
     for (i = 0; i < table_size; i++) {
-      average = profiler_data_mean(table + i);
-      if (average > maximum_average) {
-        maximum_average = average;
-      }
-    }
-    sprintf(format, OUTPUT_META_FORMAT, count_digits((long)maximum_average));
-    for (i = 0; i < table_size; i++) {
-      average = profiler_data_mean(table + i);
-      fprintf(file, format, average, table[i].identifier);
+      mean = profiler_data_mean(table + i);
+      frequency = table[i].frequency;
+      identifier = table[i].identifier;
+      fprintf(file, OUTPUT_FORMAT, mean, frequency, identifier);
     }
     fprintf(file, "\n");
     fclose(file);
