@@ -28,18 +28,11 @@
 static TTF_Font *global_monospaced_font = NULL;
 static int global_monospaced_font_width = 0;
 static int global_monospaced_font_height = 0;
-
-static SDL_Texture *print_rectangle_cached_texture = NULL;
+static SDL_Texture *borders_texture = NULL;
 
 void clear(SDL_Renderer *renderer) { SDL_RenderClear(renderer); }
 
 void present(SDL_Renderer *renderer) { SDL_RenderPresent(renderer); }
-
-/**
- *
- * Initialization and finalization functions.
- *
- */
 
 /**
  * Initializes the global fonts.
@@ -174,9 +167,9 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
   return 0;
 }
 
-static void finalize_print_rectangle_cache(void) {
-  SDL_DestroyTexture(print_rectangle_cached_texture);
-  print_rectangle_cached_texture = NULL;
+static void finalize_cached_textures(void) {
+  SDL_DestroyTexture(borders_texture);
+  borders_texture = NULL;
 }
 
 /**
@@ -197,7 +190,7 @@ static void finalize_fonts(void) {
  * Returns 0 in case of success.
  */
 int finalize(SDL_Window **window, SDL_Renderer **renderer) {
-  finalize_print_rectangle_cache();
+  finalize_cached_textures();
   finalize_fonts();
   SDL_DestroyWindow(*window);
   *window = NULL;
@@ -301,67 +294,53 @@ int print(const int x, const int y, const char *string,
   return 0;
 }
 
-static Code make_print_rectangle_cached_texture(const char symbol,
-                                                const ColorPair color_pair,
-                                                SDL_Renderer *renderer) {
-  const SDL_Color foreground = to_sdl_color(color_pair.foreground);
-  const SDL_Color background = to_sdl_color(color_pair.background);
-  TTF_Font *font = global_monospaced_font;
-  SDL_Surface *surface;
-  SDL_Texture *texture;
-  surface = TTF_RenderGlyph_Shaded(font, symbol, foreground, background);
-  if (surface == NULL) {
-    log_message("Failed to allocate text surface in print()");
-    return CODE_ERROR;
-  }
-  texture = SDL_CreateTextureFromSurface(renderer, surface);
-  if (texture == NULL) {
-    log_message("Failed to create texture from surface in print()");
-    return CODE_ERROR;
-  }
-  /* Free the old texture before copying the address of the new one. */
-  SDL_DestroyTexture(print_rectangle_cached_texture);
-  print_rectangle_cached_texture = texture;
-  SDL_FreeSurface(surface);
-  return CODE_OK;
+static SDL_Texture *renderable_texture(int w, int h, SDL_Renderer *renderer) {
+  const int access = SDL_TEXTUREACCESS_TARGET;
+  return SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, access, w, h);
 }
 
-/**
- * Prints a rectangle from (min_x, min_y) to (max_x, max_y) using the specified
- * symbol and color pair.
- */
-Code print_rectangle(const int min_x, const int max_x, const int min_y,
-                     const int max_y, const char symbol,
-                     const ColorPair color_pair, SDL_Renderer *renderer) {
-  static int cache_initialized = 0;
-  static char cached_symbol;
-  static ColorPair cached_color_pair;
-
+static Code cache_borders_texture(BoundingBox borders, SDL_Renderer *renderer) {
+  const SDL_Color foreground = to_sdl_color(DEFAULT_COLOR.foreground);
+  const SDL_Color background = to_sdl_color(DEFAULT_COLOR.background);
   const int x_step = global_monospaced_font_width;
   const int y_step = global_monospaced_font_height;
-  int color_is_different;
-  /* The coordinates of the (x, y) corner SDL needs, in pixels. */
-  SDL_Texture *texture;
+  const int min_x = borders.min_x;
+  const int max_x = borders.max_x;
+  const int min_y = borders.min_y;
+  const int max_y = borders.max_y;
+  const int full_width = (max_x - min_x + 1) * x_step;
+  const int full_height = (max_y - min_y + 1) * y_step;
+  SDL_Surface *surface;
+  SDL_Texture *glyph_texture;
+  SDL_Texture *full_texture;
   SDL_Rect position;
+  TTF_Font *font = global_monospaced_font;
   int x;
   int y;
-
-  if (min_x < 0 || min_y < 0 || min_x > max_x || min_y > max_y) {
+  if (borders_texture != NULL) {
     return CODE_ERROR;
   }
-
-  color_is_different = !color_pair_equals(cached_color_pair, color_pair);
-  /* We have to make the texture and update the cache. */
-  if (!cache_initialized || cached_symbol != symbol || color_is_different) {
-    cache_initialized = 1;
-    cached_symbol = symbol;
-    cached_color_pair = color_pair;
-    make_print_rectangle_cached_texture(symbol, color_pair, renderer);
+  if (min_x < 0 || min_y < 0 || min_x > max_x || min_y > max_y) {
+    log_message("Got invalid border limits");
+    return CODE_ERROR;
   }
-
-  texture = print_rectangle_cached_texture;
+  /* All preconditions are valid. */
+  /* Now we create a texture for a single glyph. */
+  surface = TTF_RenderGlyph_Shaded(font, '+', foreground, background);
+  glyph_texture = SDL_CreateTextureFromSurface(renderer, surface);
+  /* Free surface now because we may return before the end. */
+  SDL_FreeSurface(surface);
+  /* Create the target texture. */
+  full_texture = renderable_texture(full_width, full_height, renderer);
+  if (!full_texture) {
+    log_message("Failed to create cached borders texture");
+    return CODE_ERROR;
+  }
+  /* Change the renderer target to the texture which will be cached. */
+  SDL_SetRenderTarget(renderer, full_texture);
+  SDL_RenderClear(renderer);
   /* Copy destination width and height from the texture. */
-  SDL_QueryTexture(texture, NULL, NULL, &position.w, &position.h);
+  SDL_QueryTexture(glyph_texture, NULL, NULL, &position.w, &position.h);
   /*
    * This is the optimized step.
    *
@@ -369,21 +348,44 @@ Code print_rectangle(const int min_x, const int max_x, const int min_y,
    * where the symbol should appear.
    */
   /* Write the top and bottom borders. */
-  for (x = x_step * min_x; x <= x_step * max_x; x += x_step) {
+  for (x = 0; x < full_width; x += x_step) {
     position.x = x;
-    position.y = y_step * min_y;
-    SDL_RenderCopy(renderer, texture, NULL, &position);
-    position.y = y_step * max_y;
-    SDL_RenderCopy(renderer, texture, NULL, &position);
+    position.y = 0;
+    SDL_RenderCopy(renderer, glyph_texture, NULL, &position);
+    position.y = full_height - y_step;
+    SDL_RenderCopy(renderer, glyph_texture, NULL, &position);
   }
   /* Write the left and right borders. */
-  for (y = y_step * (min_y + 1); y <= y_step * (max_y - 1); y += y_step) {
+  for (y = 0; y < full_height; y += y_step) {
     position.y = y;
-    position.x = x_step * min_x;
-    SDL_RenderCopy(renderer, texture, NULL, &position);
-    position.x = x_step * max_x;
-    SDL_RenderCopy(renderer, texture, NULL, &position);
+    position.x = 0;
+    SDL_RenderCopy(renderer, glyph_texture, NULL, &position);
+    position.x = full_width - x_step;
+    SDL_RenderCopy(renderer, glyph_texture, NULL, &position);
   }
+  /* Change the renderer target back to the window. */
+  SDL_DestroyTexture(glyph_texture);
+  SDL_SetRenderTarget(renderer, NULL);
+  /* Note that the texture is not destroyed here (obviosly). */
+  borders_texture = full_texture;
+  return CODE_OK;
+}
+
+static Code render_borders(BoundingBox borders, SDL_Renderer *renderer) {
+  const int x_step = global_monospaced_font_width;
+  const int y_step = global_monospaced_font_height;
+  SDL_Rect pos;
+  pos.x = borders.min_x * x_step;
+  pos.y = borders.min_y * y_step;
+  if (borders_texture == NULL) {
+    cache_borders_texture(borders, renderer);
+    if (borders_texture == NULL) {
+      /* Failed to cache the texture. */
+      return CODE_ERROR;
+    }
+  }
+  SDL_QueryTexture(borders_texture, NULL, NULL, &pos.w, &pos.h);
+  SDL_RenderCopy(renderer, borders_texture, NULL, &pos);
   return CODE_OK;
 }
 
@@ -579,7 +581,12 @@ void draw_bottom_bar(const char *message, SDL_Renderer *renderer) {
  * Draws the borders of the screen.
  */
 void draw_borders(SDL_Renderer *renderer) {
-  print_rectangle(0, COLUMNS - 1, 1, LINES - 2, '+', DEFAULT_COLOR, renderer);
+  BoundingBox borders;
+  borders.min_x = 0;
+  borders.max_x = COLUMNS - 1;
+  borders.min_y = 1;
+  borders.max_y = LINES - 2;
+  render_borders(borders, renderer);
 }
 
 int draw_platforms(const Platform *platforms, const size_t platform_count,
