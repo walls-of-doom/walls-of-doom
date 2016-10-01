@@ -5,10 +5,7 @@
 
 #include <stdio.h>
 
-/**
- * Repositions a Platform in the vicinity of a BoundingBox.
- */
-void reposition(Game *const game, Platform *const platform);
+static void reposition(Game *const game, Platform *const platform);
 
 /**
  * Evaluates whether or not a Platform is completely outside of a BoundingBox.
@@ -133,21 +130,47 @@ void move_platform_vertically(Game *const game, Platform *const platform) {
 
 /**
  * Repositions a Platform in the vicinity of a BoundingBox.
+ *
+ * This function attempts to place the Platform in an empty row.
  */
-void reposition(Game *const game, Platform *const platform) {
+static void reposition(Game *const game, Platform *const platform) {
   const BoundingBox *const box = game->box;
-  if (platform->x > box->max_x) { /* To the right of the box */
-    platform->x = 1 - platform->width;
-    platform->y = random_integer(box->min_y, box->max_y);
-  } else if (platform->x + platform->width <
-             box->min_x) { /* To the left of the box */
+  const int box_height = box->max_y - box->min_y + 1;
+  const int random_line = random_integer(box->min_y, box->max_y);
+  int occupied[LINES - 2] = {0};
+  int line = random_line % box_height;
+  int i;
+  /* Build a table of occupied rows. */
+  for (i = 0; i < game->platform_count; i++) {
+    occupied[game->platforms[i].y - box->min_y] = 1;
+  }
+  /* Linearly probe for an empty line. */
+  for (i = 0; i < LINES - 2; i++) {
+    if (line >= 0 && line < LINES - 2) {
+      if (!occupied[line]) {
+        break;
+      }
+    }
+    line = (line + 1) % box_height;
+  }
+  /* To the right of the box. */
+  if (platform->x > box->max_x) {
+    /* The platform should be one tick inside the box. */
+    platform->x = box->min_x - platform->width + 1;
+    platform->y = line + box->min_y;
+    /* To the left of the box. */
+  } else if (platform->x + platform->width < box->min_x) {
+    /* The platform should be one tick inside the box. */
     platform->x = box->max_x;
-    platform->y = random_integer(box->min_y, box->max_y);
-  } else if (platform->y < box->min_y) { /* Above the box */
+    platform->y = line + box->min_y;
+    /* Above the box. */
+  } else if (platform->y < box->min_y) {
     platform->x = random_integer(box->min_x, box->max_x - platform->width);
     /* Must work when the player is in the last line */
-    platform->y = box->max_y + 1; /* Create it under the bounding box */
+    /* Create it under the bounding box */
+    platform->y = box->max_y + 1;
     /* Use the move function to keep the game in a valid state */
+    /* This is done this way to prevent superposition. */
     move_platform_vertically(game, platform);
   }
 }
