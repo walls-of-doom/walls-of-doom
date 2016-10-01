@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include "box.h"
+#include "constants.h"
 #include "logger.h"
 #include "numeric.h"
 #include "perk.h"
@@ -36,6 +37,8 @@ typedef struct Game {
   unsigned long perk_end_frame;
 
   BoundingBox *box;
+
+  char message[MAXIMUM_STRING_SIZE];
 
 } Game;
 

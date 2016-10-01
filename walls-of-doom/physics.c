@@ -245,7 +245,6 @@ void conceive_bonus(Player *const player, Perk perk) {
 }
 
 void update_perk(Game *const game) {
-
   if (game->played_frames == game->perk_end_frame) {
     /* Current Perk (if any) must end. */
     game->perk = PERK_NONE;
@@ -422,7 +421,12 @@ void update_double_jump(Game *game) {
   }
 }
 
+static void write_perk_message(char *message, const Perk perk) {
+  sprintf(message, "Got %s!", get_perk_name(perk));
+}
+
 void update_player_perk(Game *game) {
+  unsigned long end_frame;
   Player *player = game->player;
   if (player->physics) {
     game->played_frames++;
@@ -446,15 +450,16 @@ void update_player_perk(Game *game) {
         player->perk = perk;
         if (is_bonus_perk(perk)) {
           conceive_bonus(player, perk);
-          player->perk_end_frame =
-              game->played_frames; /* The perk ended now. */
+          /* The perk ended now. */
+          player->perk_end_frame = game->played_frames;
           /* Could set it to the next frame so that the check above */
           /* this part would removed it, but this seems more correct. */
           player->perk = PERK_NONE;
         } else {
-          player->perk_end_frame =
-              game->played_frames + PERK_PLAYER_DURATION_IN_FRAMES;
+          end_frame = game->played_frames + PERK_PLAYER_DURATION_IN_FRAMES;
+          player->perk_end_frame = end_frame;
         }
+        write_perk_message(game->message, perk);
       }
     }
   }

@@ -564,11 +564,12 @@ int draw_top_bar(const Player *const player, SDL_Renderer *renderer) {
 /*
  * Draws the bottom status bar on the screen for a given Player.
  */
-void draw_bottom_bar(SDL_Renderer *renderer) {
+void draw_bottom_bar(const char *message, SDL_Renderer *renderer) {
   char buffer[COLUMNS + 1];
   memset(buffer, ' ', COLUMNS);
   buffer[COLUMNS] = '\0';
   print(0, LINES - 1, buffer, BOTTOM_BAR_COLOR, renderer);
+  print(0, LINES - 1, message, BOTTOM_BAR_COLOR, renderer);
 }
 
 /**
@@ -639,7 +640,7 @@ int draw_game(const Game *const game, SDL_Renderer *renderer) {
   update_profiler("draw_game:draw_top_bar", get_milliseconds() - start);
 
   start = get_milliseconds();
-  draw_bottom_bar(renderer);
+  draw_bottom_bar(game->message, renderer);
   update_profiler("draw_game:draw_bottom_bar", get_milliseconds() - start);
 
   start = get_milliseconds();
