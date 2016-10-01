@@ -100,6 +100,9 @@ void write_statistics(void) {
   size_t i;
   char *identifier;
   FILE *file;
+  if (table == NULL) {
+    return;
+  }
   get_full_path(path, PROFILER_FILE_NAME);
   file = fopen(path, "a");
   if (file) {
