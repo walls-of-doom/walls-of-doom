@@ -276,6 +276,9 @@ int print(const int x, const int y, const char *string,
   SDL_Rect position;
   position.x = global_monospaced_font_width * x;
   position.y = global_monospaced_font_height * y;
+  if (string == NULL || string[0] == '\0') {
+    return 0;
+  }
   /* Validate that x and y are nonnegative. */
   if (x < 0 || y < 0) {
     return 1;
