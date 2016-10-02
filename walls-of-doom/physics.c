@@ -36,8 +36,10 @@ int bounding_box_equals(const BoundingBox *const a,
  */
 int is_within_platform(const int x, const int y,
                        const Platform *const platform) {
-  return y == platform->y && x >= platform->x &&
-         x < platform->x + platform->width;
+  const int p_min_x = platform->x;
+  const int p_max_x = platform->x + platform->width - 1;
+  const int p_y = platform->y;
+  return y == p_y && x >= p_min_x && x <= p_max_x;
 }
 
 int is_over_platform(const int x, const int y, const Platform *const platform) {
@@ -72,19 +74,21 @@ void shove_player(Game *const game, int x, int y) {
  * nonpositive integers.
  */
 int should_move_at_current_frame(const Game *const game, const int speed) {
-  /* Reasoning for rounding a double */
+  /* Reasoning for rounding a double. */
   /* Let FPS = 30 and speed = 16, if we perform integer division, we will get */
   /* one. This would be much faster than a speed of 16 would actually be as */
   /* ideally the object would be moved at every 1.875 frame. Therefore, it is */
   /* much better to update it at every other frame than at every frame. This */
   /* shows that the expected behavior is reached by rounding a precise */
   /* division rather than by truncating the quotient. */
-  if (speed == 0 ||
-      game->frame == 0) { /* Play it safe with floating point errors */
+  /* Play it safe with floating point errors. */
+  unsigned long multiple;
+  if (speed == 0 || game->frame == 0) {
     return 0;
   } else {
-    return game->frame % ((unsigned long)((FPS / (double)abs(speed)) + 0.5)) ==
-           0;
+    /* Only divide by abs(speed) after checking that speed != 0. */
+    multiple = FPS / (double)abs(speed) + 0.5;
+    return game->frame % multiple == 0;
   }
 }
 
