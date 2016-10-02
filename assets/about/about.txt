@@ -1,6 +1,4 @@
-Walls of Doom - WoD for short - is a minimalistic platformer written in C by
-Bernardo Sulzbach and Leonardo Ferrazza for a programming course they had to
-take at university.
-
-The game is released under the BSD 3-Clause license for anyone to be able to
-play and modify it.
+Walls of Doom is a minimalistic platformer written ANSI C by Bernardo Sulzbach
+and others. The player gets points for surviving in a space enclosed by deadly
+walls with constantly moving platforms. The game is released under the BSD
+3-Clause license for anyone to be able to play and modify it.
