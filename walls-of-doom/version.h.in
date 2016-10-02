@@ -1,8 +1,9 @@
 #ifndef VERSION_H
 #define VERSION_H
 
-#define WALLS_OF_DOOM_VERSION_MAJOR "@walls-of-doom_VERSION_MAJOR@"
-#define WALLS_OF_DOOM_VERSION_MINOR "@walls-of-doom_VERSION_MINOR@"
-#define WALLS_OF_DOOM_VERSION "@walls-of-doom_VERSION_MAJOR@.@walls-of-doom_VERSION_MINOR@"
+#define WALLS_OF_DOOM_VERSION_MAJOR "@walls-of-doom-version-major@"
+#define WALLS_OF_DOOM_VERSION_MINOR "@walls-of-doom-version-minor@"
+#define WALLS_OF_DOOM_VERSION_PATCH "@walls-of-doom-version-patch@"
+#define WALLS_OF_DOOM_VERSION "@version-major@.@version-minor@.@version-patch@"
 
 #endif

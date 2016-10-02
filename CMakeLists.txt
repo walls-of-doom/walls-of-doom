@@ -2,8 +2,11 @@ cmake_minimum_required (VERSION 2.8.7)
 
 project (walls-of-doom)
 
-set (walls-of-doom_VERSION_MAJOR 0)
-set (walls-of-doom_VERSION_MINOR 8)
+set (CMAKE_MODULE_PATH cmake)
+
+set (version-major 0)
+set (version-minor 8)
+set (version-patch 0)
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
 set (CMAKE_INCLUDE_CURRENT_DIR_IN_INTERFACE ON)
