@@ -33,4 +33,9 @@ char *find_end_of_text(char *string);
  */
 void trim_string(char *string);
 
+/**
+ * Wraps the input string at the right margin respecting a limit of COLUMNS.
+ */
+void wrap_at_right_margin(char *string, const size_t columns);
+
 #endif

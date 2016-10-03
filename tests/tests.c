@@ -7,6 +7,7 @@
 #include "random.h"
 #include "rest.h"
 #include "sort.h"
+#include "text.h"
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -14,6 +15,14 @@
 #include <time.h>
 
 #define SMALL_STRING_BUFFER_SIZE 64
+/* Should be big enoguh for the wrap_at_right_margin tests. */
+#define LARGE_STRING_BUFFER_SIZE 2048
+
+#define WRAP_TEST_SOURCE "assets/tests/wrap-test-source.txt"
+#define WRAP_TEST_WIDTH_10 "assets/tests/wrap-test-width-10.txt"
+#define WRAP_TEST_WIDTH_20 "assets/tests/wrap-test-width-20.txt"
+#define WRAP_TEST_WIDTH_40 "assets/tests/wrap-test-width-40.txt"
+#define WRAP_TEST_WIDTH_80 "assets/tests/wrap-test-width-80.txt"
 
 int compare_unsigned_char(const void *pointer_a, const void *pointer_b) {
   unsigned char a = *(unsigned char *)(pointer_a);
@@ -117,6 +126,63 @@ void test_trim_string_works_with_strings_of_whitespaces(void) {
   copy_string(buffer, input, SMALL_STRING_BUFFER_SIZE);
   trim_string(buffer);
   TEST_ASSERT_EQUAL_STRING(expected, buffer);
+}
+
+void test_wrap_at_right_margin_with_width_10(void) {
+  char expected[LARGE_STRING_BUFFER_SIZE];
+  char actual[LARGE_STRING_BUFFER_SIZE];
+  read_characters(WRAP_TEST_SOURCE, actual, LARGE_STRING_BUFFER_SIZE);
+  TEST_ASSERT_TRUE_MESSAGE(strlen(actual) != 0, "Test assets not found");
+
+  read_characters(WRAP_TEST_WIDTH_10, expected, LARGE_STRING_BUFFER_SIZE);
+  wrap_at_right_margin(actual, 10);
+  TEST_ASSERT_EQUAL_STRING(expected, actual);
+}
+
+void test_wrap_at_right_margin_with_width_20(void) {
+  char expected[LARGE_STRING_BUFFER_SIZE];
+  char actual[LARGE_STRING_BUFFER_SIZE];
+  read_characters(WRAP_TEST_SOURCE, actual, LARGE_STRING_BUFFER_SIZE);
+  TEST_ASSERT_TRUE_MESSAGE(strlen(actual) != 0, "Test assets not found");
+
+  read_characters(WRAP_TEST_WIDTH_20, expected, LARGE_STRING_BUFFER_SIZE);
+  wrap_at_right_margin(actual, 20);
+  TEST_ASSERT_EQUAL_STRING(expected, actual);
+}
+
+void test_wrap_at_right_margin_with_width_40(void) {
+  char expected[LARGE_STRING_BUFFER_SIZE];
+  char actual[LARGE_STRING_BUFFER_SIZE];
+  read_characters(WRAP_TEST_SOURCE, actual, LARGE_STRING_BUFFER_SIZE);
+  TEST_ASSERT_TRUE_MESSAGE(strlen(actual) != 0, "Test assets not found");
+
+  read_characters(WRAP_TEST_WIDTH_40, expected, LARGE_STRING_BUFFER_SIZE);
+  wrap_at_right_margin(actual, 40);
+  TEST_ASSERT_EQUAL_STRING(expected, actual);
+}
+
+void test_wrap_at_right_margin_with_width_80(void) {
+  char expected[LARGE_STRING_BUFFER_SIZE];
+  char actual[LARGE_STRING_BUFFER_SIZE];
+  read_characters(WRAP_TEST_SOURCE, actual, LARGE_STRING_BUFFER_SIZE);
+  TEST_ASSERT_TRUE_MESSAGE(strlen(actual) != 0, "Test assets not found");
+
+  read_characters(WRAP_TEST_WIDTH_80, expected, LARGE_STRING_BUFFER_SIZE);
+  wrap_at_right_margin(actual, 80);
+  TEST_ASSERT_EQUAL_STRING(expected, actual);
+}
+
+void test_wrap_at_right_margin_with_maximum_width(void) {
+  char expected[LARGE_STRING_BUFFER_SIZE];
+  char actual[LARGE_STRING_BUFFER_SIZE];
+  read_characters(WRAP_TEST_SOURCE, actual, LARGE_STRING_BUFFER_SIZE);
+  TEST_ASSERT_TRUE_MESSAGE(strlen(actual) != 0, "Test assets not found");
+
+  /* This should NOT wrap the input, even on 32-bit implementations. */
+  /* This is wrapping to (at least) 4,294,967,295 columns. */
+  copy_string(expected,actual,LARGE_STRING_BUFFER_SIZE);
+  wrap_at_right_margin(actual, SIZE_MAX);
+  TEST_ASSERT_EQUAL_STRING(expected, actual);
 }
 
 void test_read_integers(void) {
@@ -286,6 +352,11 @@ int main(void) {
   RUN_TEST(test_trim_string_properly_trims_trailing_spaces);
   RUN_TEST(test_trim_string_properly_trims_space_padded_strings);
   RUN_TEST(test_trim_string_works_with_strings_of_whitespaces);
+  RUN_TEST(test_wrap_at_right_margin_with_width_10);
+  RUN_TEST(test_wrap_at_right_margin_with_width_20);
+  RUN_TEST(test_wrap_at_right_margin_with_width_40);
+  RUN_TEST(test_wrap_at_right_margin_with_width_80);
+  RUN_TEST(test_wrap_at_right_margin_with_maximum_width);
   RUN_TEST(test_read_integers);
   RUN_TEST(test_compare_unsigned_char);
   RUN_TEST(test_sort_with_empty_range);

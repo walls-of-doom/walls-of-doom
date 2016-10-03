@@ -28,3 +28,4 @@ endif ()
 
 add_subdirectory (unity)
 add_subdirectory (walls-of-doom)
+add_subdirectory (tests)

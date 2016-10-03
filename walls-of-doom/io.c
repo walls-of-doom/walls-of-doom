@@ -412,25 +412,6 @@ void normalize_whitespaces(char *string) {
   }
 }
 
-void wrap_at_right_margin(char *string, const size_t columns) {
-  size_t last_line_start = 0;
-  size_t next_line_start = 0;
-  size_t string_length = strlen(string);
-  while (string_length - last_line_start > columns) {
-    next_line_start = last_line_start + columns;
-    while (string[next_line_start] != ' ') {
-      next_line_start--;
-      if (next_line_start == last_line_start) {
-        /* There are no spaces in this line, so we can't do anything. */
-        /* Abort, simply. */
-        break;
-      }
-    }
-    string[next_line_start] = '\n';
-    last_line_start = next_line_start;
-  }
-}
-
 int count_lines(char *const buffer) {
   size_t counter = 0;
   size_t i = 0;

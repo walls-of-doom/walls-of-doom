@@ -2,6 +2,7 @@
 
 #include <ctype.h>
 #include <stdlib.h>
+#include <string.h>
 
 /*
  * Copy from the source string to the destination string, using at most size
@@ -81,20 +82,55 @@ void trim_string(char *string) {
   while (*read != '\0' && isspace(*read)) {
     read++;
   }
-  /* Copy everthing from the first not space up to the end. */
+  /* Copy everything from the first not space up to the end. */
   while (*read != '\0') {
     *write++ = *read++;
   }
   /* Now proceed to trim the end of the string. */
   /* read points to NUL here. */
-  if (read != string) { /* If we can march back. */
-    read--;             /* Point to the last character. */
+  /* If we can march back. */
+  if (read != string) {
+    /* Point to the last character. */
+    read--;
     while (isspace(*read) || read > write) {
       *read = '\0';
       if (read == string) {
-        break; /* Do not write before the start of the string. */
+        /* Do not write before the start of the string. */
+        break;
       }
       read--;
     }
+  }
+}
+
+/**
+ * Wraps the input string at the right margin respecting a limit of COLUMNS.
+ *
+ * If a line cannot be wrapped because it has a word with more characters than
+ * COLUMNS, the line is untouched.
+ */
+void wrap_at_right_margin(char *string, const size_t columns) {
+  const size_t string_length = strlen(string);
+  /* BEGIN should always point to the FIRST character of a line. */
+  size_t begin = 0;
+  /* We point to the maximum point where a line should end, then backtrack. */
+  size_t end = 0;
+  end = begin + columns;
+  while (end < string_length) {
+    while (begin != end && !isspace(string[end])) {
+      end--;
+    }
+    if (begin == end) {
+      /* There are no spaces in this line, so we can't break it anywhere. */
+      /* We work around this by finding the next space on the string. */
+      while (end < string_length && !isspace(string[end])) {
+        end++;
+      }
+    }
+    if (end < string_length) {
+      string[end] = '\n';
+    }
+    begin = end + 1;
+    end = begin + columns;
   }
 }
