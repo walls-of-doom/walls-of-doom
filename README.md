@@ -25,7 +25,8 @@ visible to everyone.
 
 ### Linux
 
-Any Linux or BSD operating system with a desktop environment should work.
+The game should work on any Linux or BSD operating system with a desktop
+environment.
 
 Currently, there is no Windows support. [See the relevant
 issue](https://github.com/walls-of-doom/walls-of-doom/issues/38).
@@ -36,8 +37,8 @@ issue](https://github.com/walls-of-doom/walls-of-doom/issues/39).
 ### CMake
 
 You need an installation of CMake in order to build and install the project.
-Please note that suggested 2.8.7 version in the CMake files distributed with the
-project may not be enough for what we use.
+The suggested 2.8.7 version in the CMake files distributed with the project may
+not be enough for what we use.
 
 ### An ANSI C compiler
 
@@ -71,7 +72,7 @@ $ walls-of-doom
 ## Running the tests
 
 ```bash
-$ ./build/walls-of-doom/tests
+$ ./build/tests/tests
 ```
 
 ## Reformatting code and performing static analysis
