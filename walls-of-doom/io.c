@@ -459,9 +459,9 @@ char *copy_first_line(char *source, char *destination) {
  * Prints the provided string after formatting it to increase readability.
  */
 void print_long_text(char *string, SDL_Renderer *renderer) {
+  const int width = COLUMNS - 2 * PADDING;
   char line[COLUMNS + 1];
   char *cursor;
-  int width = COLUMNS - PADDING;
   int line_count;
   int y;
   normalize_whitespaces(string);
