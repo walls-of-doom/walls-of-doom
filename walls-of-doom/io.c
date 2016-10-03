@@ -414,9 +414,10 @@ void normalize_whitespaces(char *string) {
 
 void wrap_at_right_margin(char *string, const size_t columns) {
   size_t last_line_start = 0;
+  size_t next_line_start = 0;
   size_t string_length = strlen(string);
   while (string_length - last_line_start > columns) {
-    size_t next_line_start = last_line_start + columns;
+    next_line_start = last_line_start + columns;
     while (string[next_line_start] != ' ') {
       next_line_start--;
       if (next_line_start == last_line_start) {
@@ -424,7 +425,6 @@ void wrap_at_right_margin(char *string, const size_t columns) {
         /* Abort, simply. */
         break;
       }
-      next_line_start--;
     }
     string[next_line_start] = '\n';
     last_line_start = next_line_start;
