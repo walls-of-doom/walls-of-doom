@@ -719,6 +719,8 @@ Command command_from_event(const SDL_Event event) {
       return COMMAND_JUMP;
     } else if (keycode == SDLK_RETURN || keycode == SDLK_KP_ENTER) {
       return COMMAND_ENTER;
+    } else if (keycode == SDLK_q) {
+      return COMMAND_QUIT;
     }
   }
   return COMMAND_NONE;
