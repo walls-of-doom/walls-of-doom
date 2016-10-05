@@ -27,12 +27,6 @@ int is_within_platform(const int x, const int y,
 
 void update_platform(Game *const game, Platform *const platform);
 
-int bounding_box_equals(const BoundingBox *const a,
-                        const BoundingBox *const b) {
-  return a->min_x == b->min_x && a->min_y == b->min_y && a->max_x == b->max_x &&
-         a->max_y == b->max_y;
-}
-
 /**
  * Evaluates whether or not a point is within a Platform.
  */

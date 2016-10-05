@@ -9,7 +9,7 @@ configure_file (constants.h.in constants.h)
 
 add_library (walls-of-doom-base
     about.h about.c
-    box.h
+    box.h box.c
     clock.h clock.c
     code.h
     color.h color.c

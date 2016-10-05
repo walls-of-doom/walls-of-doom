@@ -177,7 +177,7 @@ void test_wrap_at_right_margin_with_maximum_width(void) {
 
   /* This should NOT wrap the input, even on 32-bit implementations. */
   /* This is wrapping to (at least) 4,294,967,295 columns. */
-  copy_string(expected,actual,LARGE_STRING_BUFFER_SIZE);
+  copy_string(expected, actual, LARGE_STRING_BUFFER_SIZE);
   wrap_at_right_margin(actual, SIZE_MAX);
   TEST_ASSERT_EQUAL_STRING(expected, actual);
 }
@@ -275,6 +275,31 @@ void test_reverse_with_words(void) {
   TEST_ASSERT_EQUAL_INT_ARRAY_MESSAGE(reversed, source, array_size, message);
 }
 
+void test_bounding_box_equals(void) {
+  const int combinations = 1 << 4;
+  BoundingBox box_i;
+  BoundingBox box_j;
+  int i;
+  int j;
+  for (i = 0; i < combinations; i++) {
+    box_i.min_x = i >> 0 & 1;
+    box_i.max_x = i >> 1 & 1;
+    box_i.min_y = i >> 2 & 1;
+    box_i.max_y = i >> 3 & 1;
+    for (j = 0; j < combinations; j++) {
+      box_j.min_x = j >> 0 & 1;
+      box_j.max_x = j >> 1 & 1;
+      box_j.min_y = j >> 2 & 1;
+      box_j.max_y = j >> 3 & 1;
+      if (i == j) {
+        TEST_ASSERT_TRUE(bounding_box_equals(&box_i, &box_j));
+      } else {
+        TEST_ASSERT_FALSE(bounding_box_equals(&box_i, &box_j));
+      }
+    }
+  }
+}
+
 void test_find_next_power_of_two_works_for_zero(void) {
   TEST_ASSERT_EQUAL_INT64(find_next_power_of_two(0), 1);
 }
@@ -362,6 +387,7 @@ int main(void) {
   RUN_TEST(test_reverse_with_an_odd_number_of_single_bytes);
   RUN_TEST(test_reverse_with_an_even_number_of_single_bytes);
   RUN_TEST(test_reverse_with_words);
+  RUN_TEST(test_bounding_box_equals);
   RUN_TEST(test_find_next_power_of_two_works_for_zero);
   RUN_TEST(test_find_next_power_of_two_works_for_positive_integers);
   RUN_TEST(test_random_integer_respects_the_provided_range);
