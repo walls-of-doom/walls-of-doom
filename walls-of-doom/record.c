@@ -192,7 +192,7 @@ Code top_scores(SDL_Renderer *renderer) {
   Record records[MAXIMUM_DISPLAYED_RECORDS];
   char line[MAXIMUM_STRING_SIZE];
   const int line_width = COLUMNS - 2 * PADDING;
-  const int line_count = LINES - 2 * PADDING;
+  const size_t line_count = LINES - 2 * PADDING;
   const int record_width = min(line_width, MAXIMUM_STRING_SIZE - 1);
   const size_t record_count = read_records(records, MAXIMUM_DISPLAYED_RECORDS);
   size_t i;
