@@ -96,40 +96,40 @@ All these images are posted on the [Imgur album of the project](http://imgur.com
 
 # Implementation Notes
 
+These are notes on some of the modules of the project to help new developers get
+to know the project structure better without having to look into the source
+code.
+
 ## IO
 
 Before using the IO capabilities of Walls of Doom, `initialize()` must be
 called. Before quitting the game, `finalize()` must be called to free associated
 resources.
 
+## Logger
+
+Walls of Doom has a very simple logger which can be used by the `log_message()`
+function. If for some reason logging fails, it fail silently and the program is
+not interrupted.
+
 If one must use the logger without initializing the other IO functions, the
 logger module may be independently initialized by calling `initialize_logger()`
 and finalized by calling `finalize_logger()`.
 
-## Business Logic
-
-### Menu
+## Menu
 
 Under the Menu name is grouped most of the logic that deals with handling user
 interactions outside of the game. This includes menu item selection, the top
 scores functionality and the auxiliary functions of these parts of the
 application.
 
-### Physics
+## Physics
 
 The Physics module is where most of the calculations and checks take place.
 Walking, falling, jumping, the fetching of perks, and death are some of the
 things that fall under the scope of this module.
 
-## Sorting
-
-This project has its own generic insertion sort implementation.
-
-It is a generic function because it uses void pointers and function pointers to
-comparators in order to be reused for different data types without any code
-duplication.
-
-## Pseudorandom Number Generator
+## Random
 
 Before using the PRNG, you can initialize it with the current time by calling
 `seed_random()`.
