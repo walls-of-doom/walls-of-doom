@@ -75,7 +75,6 @@ char *find_end_of_text(char *string) {
  * Trims a string by removing all leading and trailing spaces.
  */
 void trim_string(char *string) {
-  int copying = 0;
   char *write = string;
   char *read = string;
   /* Find the first not space. */

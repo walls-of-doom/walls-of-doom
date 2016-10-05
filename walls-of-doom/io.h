@@ -8,6 +8,14 @@
 #include "perk.h"
 #include "physics.h"
 
+/**
+ * Clears the screen.
+ */
+void clear(SDL_Renderer *renderer);
+
+/**
+ * Updates the screen with what has been rendered.
+ */
 void present(SDL_Renderer *renderer);
 
 /**
@@ -74,8 +82,6 @@ void print_platform(const Platform *const platform,
 
 void print_game_result(const char *name, const unsigned int score,
                        const int position, SDL_Renderer *renderer);
-
-ColorPair get_perk_color(Perk perk);
 
 /**
  * Returns a BoundingBox that represents the playable area after removing bars

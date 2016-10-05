@@ -9,7 +9,9 @@
 #include "physics.h"
 #include "player.h"
 #include "profiler.h"
+#include "random.h"
 #include "rest.h"
+#include "text.h"
 
 #include <SDL.h>
 #include <SDL_image.h>
@@ -30,8 +32,14 @@ static int global_monospaced_font_width = 0;
 static int global_monospaced_font_height = 0;
 static SDL_Texture *borders_texture = NULL;
 
+/**
+ * Clears the screen.
+ */
 void clear(SDL_Renderer *renderer) { SDL_RenderClear(renderer); }
 
+/**
+ * Updates the screen with what has been rendered.
+ */
 void present(SDL_Renderer *renderer) { SDL_RenderPresent(renderer); }
 
 /**
@@ -86,8 +94,8 @@ static SDL_Window *create_window(int width, int height) {
 }
 
 int set_window_title_and_icon(SDL_Window *window) {
-  SDL_SetWindowTitle(window, GAME_NAME);
   SDL_Surface *icon_surface = IMG_Load(ICON_PATH);
+  SDL_SetWindowTitle(window, GAME_NAME);
   if (icon_surface == NULL) {
     log_message("Failed to load the window icon");
     return 1;
@@ -110,7 +118,6 @@ static void set_render_color(SDL_Renderer *renderer, Color color) {
  */
 int initialize(SDL_Window **window, SDL_Renderer **renderer) {
   char log_buffer[MAXIMUM_STRING_SIZE];
-  SDL_Renderer *rendererSurface = NULL;
   int width = 1;
   int height = 1;
   initialize_logger();
@@ -192,6 +199,7 @@ static void finalize_fonts(void) {
 int finalize(SDL_Window **window, SDL_Renderer **renderer) {
   finalize_cached_textures();
   finalize_fonts();
+  SDL_DestroyRenderer(*renderer);
   SDL_DestroyWindow(*window);
   *window = NULL;
   if (TTF_WasInit()) {
@@ -599,12 +607,12 @@ int draw_platforms(const Platform *platforms, const size_t platform_count,
 
 int has_active_perk(const Game *const game) { return game->perk != PERK_NONE; }
 
-ColorPair get_perk_color(Perk perk) { return PERK_COLOR; }
+static ColorPair get_perk_color() { return PERK_COLOR; }
 
 int draw_perk(const Game *const game, SDL_Renderer *renderer) {
   ColorPair perk_color;
   if (has_active_perk(game)) {
-    perk_color = get_perk_color(game->perk);
+    perk_color = get_perk_color();
     print(game->perk_x, game->perk_y, get_perk_symbol(), perk_color, renderer);
   }
   return 0;
@@ -728,12 +736,12 @@ int is_valid_input_character(char c) { return isalnum(c); }
  * characters.
  */
 static void print_limited(const int x, const int y, const char *string,
-                          const int limit, SDL_Renderer *renderer) {
+                          const size_t limit, SDL_Renderer *renderer) {
+  const size_t string_length = strlen(string);
   /* No-op. */
   if (limit < 1) {
     return;
   }
-  const size_t string_length = strlen(string);
   /*
    * As only two calls to print suffice to solve this problem for any possible
    * input size, we avoid using a dynamically allocated buffer to prepare the

@@ -49,11 +49,12 @@ void log_message(const char *message) {
    * Note that this function CANNOT use resize_memory because resize_memory
    * calls this function. Using resize_memory here may cause a deadlock.
    */
+  FILE *file;
   char buffer[TIMESTAMP_BUFFER_SIZE];
   char path[MAXIMUM_PATH_SIZE];
   /* get_full_path does not use dynamic memory allocation. */
   get_full_path(path, LOG_FILE_NAME);
-  FILE *file = fopen(path, "a");
+  file = fopen(path, "a");
   if (file) {
     /* write_timestamp does not use dynamic memory allocation. */
     write_timestamp(buffer, TIMESTAMP_BUFFER_SIZE);

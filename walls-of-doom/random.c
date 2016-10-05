@@ -1,6 +1,8 @@
 #include "random.h"
 
 #include "constants.h"
+#include "data.h"
+#include "text.h"
 
 #include <ctype.h>
 #include <stdint.h>

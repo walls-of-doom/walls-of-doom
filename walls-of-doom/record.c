@@ -8,6 +8,7 @@
 #include "numeric.h"
 #include "rest.h"
 #include "sort.h"
+#include "text.h"
 
 #include <stdio.h>
 #include <string.h>

@@ -10,6 +10,7 @@
 #include "random.h"
 #include "record.h"
 #include "rest.h"
+#include "text.h"
 #include "version.h"
 
 #include <stdlib.h>

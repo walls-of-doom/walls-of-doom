@@ -21,9 +21,9 @@ set (CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # C standard is enforced with compiler-specific flags.
 if ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
-    set (CMAKE_C_FLAGS "-std=c89")
+    set (CMAKE_C_FLAGS "-std=c89 -Werror -Wpedantic -Wall -Wextra")
 elseif ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
-    set (CMAKE_C_FLAGS "-std=c89 -Wpedantic -Wall -Wextra")
+    set (CMAKE_C_FLAGS "-std=c89 -Werror -Wpedantic -Wall -Wextra")
 endif ()
 
 add_subdirectory (unity)

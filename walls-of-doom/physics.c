@@ -145,7 +145,7 @@ static void reposition(Game *const game, Platform *const platform) {
   const int random_line = random_integer(box->min_y, box->max_y);
   int occupied[LINES - 2] = {0};
   int line = random_line % box_height;
-  int i;
+  size_t i;
   /* Build a table of occupied rows. */
   for (i = 0; i < game->platform_count; i++) {
     occupied[game->platforms[i].y - box->min_y] = 1;

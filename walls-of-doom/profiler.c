@@ -2,7 +2,9 @@
 #include "code.h"
 #include "constants.h"
 #include "data.h"
+#include "logger.h"
 #include "memory.h"
+#include "text.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,7 +39,7 @@ ProfilerData *get_empty_data(const char *identifier) {
   const size_t new_size = (table_size + 1) * sizeof(ProfilerData);
   ProfilerData *reallocated_table;
   ProfilerData empty_data;
-  copy_string(&empty_data.identifier, identifier, MAXIMUM_DATA_IDENTIFIER_SIZE);
+  copy_string(empty_data.identifier, identifier, MAXIMUM_DATA_IDENTIFIER_SIZE);
   empty_data.sum = 0;
   empty_data.frequency = 0;
   reallocated_table = resize_memory(table, new_size);

@@ -51,9 +51,6 @@ void test_get_random_perk_is_well_distributed(void) {
   double total = 0;
 
   int count;
-  double rate;
-
-  Perk random_perk;
   int i;
 
   seed_random();
@@ -187,16 +184,15 @@ void test_wrap_at_right_margin_with_maximum_width(void) {
 
 void test_read_integers(void) {
   char filename[] = "test_read_integers_file.txt";
-  FILE *file = fopen(filename, "w+");
+  const int expected_count = 1;
+  const int expected_value = 65535;
+  int actual_values[1];
+  int actual_count;
+  FILE *file;
+  file = fopen(filename, "w+");
   if (file == NULL) {
     TEST_FAIL_MESSAGE("Failed to create helper test file");
   }
-  const int expected_count = 1;
-  const int expected_value = 65535;
-
-  int actual_values[1];
-  int actual_count;
-
   fprintf(file, "%d", expected_value);
   fclose(file);
 
@@ -232,18 +228,18 @@ void test_sort_with_empty_range(void) {
 void test_sort_with_an_odd_number_of_single_bytes(void) {
   unsigned char source[] = {2, 3, 1};
   const unsigned char sorted[] = {1, 2, 3};
+  char *message = "Failed to sort the input";
   const size_t array_size = sizeof(source) / sizeof(unsigned char);
   sort(source, array_size, sizeof(unsigned char), compare_unsigned_char);
-  char *message = "Failed to sort the input";
   TEST_ASSERT_EQUAL_INT8_ARRAY_MESSAGE(sorted, source, array_size, message);
 }
 
 void test_sort_with_an_even_number_of_single_bytes(void) {
   unsigned char source[] = {4, 2, 3, 1};
   const unsigned char sorted[] = {1, 2, 3, 4};
+  char *message = "Failed to sort the input";
   const size_t array_size = sizeof(source) / sizeof(unsigned char);
   sort(source, array_size, sizeof(unsigned char), compare_unsigned_char);
-  char *message = "Failed to sort the input";
   TEST_ASSERT_EQUAL_INT8_ARRAY_MESSAGE(sorted, source, array_size, message);
 }
 
@@ -255,27 +251,27 @@ void test_reverse_with_empty_range(void) {
 void test_reverse_with_an_odd_number_of_single_bytes(void) {
   unsigned char source[] = {2, 3, 1};
   const unsigned char reversed[] = {1, 3, 2};
+  const char *message = "Failed to reverse the input";
   const size_t array_size = sizeof(source) / sizeof(unsigned char);
   reverse(source, array_size, sizeof(unsigned char));
-  const char *message = "Failed to reverse the input";
   TEST_ASSERT_EQUAL_INT8_ARRAY_MESSAGE(reversed, source, array_size, message);
 }
 
 void test_reverse_with_an_even_number_of_single_bytes(void) {
   unsigned char source[] = {2, 3, 1, 4};
   const unsigned char reversed[] = {4, 1, 3, 2};
+  const char *message = "Failed to reverse the input";
   const size_t array_size = sizeof(source) / sizeof(unsigned char);
   reverse(source, array_size, sizeof(unsigned char));
-  const char *message = "Failed to reverse the input";
   TEST_ASSERT_EQUAL_INT8_ARRAY_MESSAGE(reversed, source, array_size, message);
 }
 
 void test_reverse_with_words(void) {
   int source[] = {8, 1, 7, 2, 6, 3, 5, 4};
   const int reversed[] = {4, 5, 3, 6, 2, 7, 1, 8};
+  const char *message = "Failed to reverse the input";
   const size_t array_size = sizeof(source) / sizeof(int);
   reverse(source, array_size, sizeof(int));
-  const char *message = "Failed to reverse the input";
   TEST_ASSERT_EQUAL_INT_ARRAY_MESSAGE(reversed, source, array_size, message);
 }
 

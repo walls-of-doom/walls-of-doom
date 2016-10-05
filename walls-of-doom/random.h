@@ -20,4 +20,11 @@ uint64_t find_next_power_of_two(uint64_t number);
  */
 int random_integer(const int minimum, const int maximum);
 
+/**
+ * Writes a pseudorandom name to the destination.
+ *
+ * The destination should have at least 2 * MAXIMUM_WORD_SIZE bytes.
+ */
+void random_name(char *destination);
+
 #endif
