@@ -56,15 +56,6 @@ void game_set_message(Game *const game, const char *message) {
   copy_string(game->message, message, MAXIMUM_STRING_SIZE);
 }
 
-/**
- * Returns 0 if the screen size has not changed since the creation of the
- * provided Game.
- */
-int check_for_screen_size_change(const Game *const game) {
-  BoundingBox current_box = bounding_box_from_screen();
-  return !bounding_box_equals(&current_box, game->box);
-}
-
 void register_score(const Game *const game, SDL_Renderer *renderer) {
   const Player *const player = game->player;
   /* Log that we are registering the score */
@@ -101,8 +92,7 @@ int run_game(Game *const game, SDL_Renderer *renderer) {
   Command command = COMMAND_NONE;
   /* Checking for any nonpositive player.lives value would be safer but could
    * hide some bugs */
-  while (command != COMMAND_QUIT && !check_for_screen_size_change(game) &&
-         game->player->lives != 0) {
+  while (command != COMMAND_QUIT && game->player->lives != 0) {
     /* Game loop */
     /* 1. Update the score */
     if (game->played_frames == next_played_frames_score) {
