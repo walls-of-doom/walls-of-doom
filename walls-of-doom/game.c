@@ -47,6 +47,15 @@ Game create_game(Player *player, Platform *platforms,
 }
 
 /**
+ * Changes the game message to the provided text.
+ *
+ * This function prevents buffer overflow by truncating the message.
+ */
+void game_set_message(Game *const game, const char *message) {
+  copy_string(game->message, message, MAXIMUM_STRING_SIZE);
+}
+
+/**
  * Returns 0 if the screen size has not changed since the creation of the
  * provided Game.
  */

@@ -51,6 +51,13 @@ Game create_game(Player *player, Platform *platforms,
 void update_game(Game *const game);
 
 /**
+ * Changes the game message to the provided text.
+ *
+ * This function prevents buffer overflow by truncating the message.
+ */
+void game_set_message(Game *const game, const char *message);
+
+/**
  * Runs the main loop of the provided game and registers the player score at the
  * end.
  *

@@ -5,6 +5,8 @@
 
 #include <stdio.h>
 
+#define MINIMUM_REMAINING_FRAMES_FOR_MESSAGE (5 * FPS)
+
 static void reposition(Game *const game, Platform *const platform);
 
 /**
@@ -448,31 +450,58 @@ void update_double_jump(Game *game) {
   }
 }
 
-static void write_perk_message(char *message, const Perk perk) {
+static void write_got_perk_message(Game *game, const Perk perk) {
+  char message[MAXIMUM_STRING_SIZE];
   sprintf(message, "Got %s!", get_perk_name(perk));
+  game_set_message(game, message);
+}
+
+static void write_perk_faded_message(Game *game, const Perk perk) {
+  char message[MAXIMUM_STRING_SIZE];
+  sprintf(message, "%s has faded.", get_perk_name(perk));
+  game_set_message(game, message);
+}
+
+static void write_perk_fading_message(Game *game, const Perk perk,
+                                      const unsigned long remaining_frames) {
+  const int seconds = remaining_frames / FPS;
+  char message[MAXIMUM_STRING_SIZE];
+  const char *perk_name = get_perk_name(perk);
+  if (seconds < 1) {
+    sprintf(message, "%s will fade at any moment.", perk_name);
+  } else if (seconds == 1) {
+    sprintf(message, "%s will fade in %d second.", perk_name, seconds);
+  } else {
+    sprintf(message, "%s will fade in %d seconds.", perk_name, seconds);
+  }
+  game_set_message(game, message);
 }
 
 void update_player_perk(Game *game) {
   unsigned long end_frame;
+  unsigned long remaining_frames;
   Player *player = game->player;
+  Perk perk = PERK_NONE;
   if (player->physics) {
     game->played_frames++;
     /* Check for expiration of the player's perk. */
     if (player->perk != PERK_NONE) {
-      if (game->played_frames == player->perk_end_frame) {
+      remaining_frames = player->perk_end_frame - game->played_frames;
+      if (remaining_frames == 0) {
+        write_perk_faded_message(game, player->perk);
         player->perk = PERK_NONE;
+      } else if (remaining_frames <= MINIMUM_REMAINING_FRAMES_FOR_MESSAGE) {
+        write_perk_fading_message(game, player->perk, remaining_frames);
       }
     }
     if (game->perk != PERK_NONE) {
       if (game->perk_x == player->x && game->perk_y == player->y) {
         /* Copy the Perk to transfer it to the Player */
-        Perk perk = game->perk;
-
+        perk = game->perk;
         /* Remove the Perk from the screen */
         game->perk = PERK_NONE;
         /* Do not update game->perk_end_frame as it is used to */
         /* calculate when the next perk is going to be created */
-
         /* Attribute the Perk to the Player */
         player->perk = perk;
         if (is_bonus_perk(perk)) {
@@ -486,7 +515,7 @@ void update_player_perk(Game *game) {
           end_frame = game->played_frames + PERK_PLAYER_DURATION_IN_FRAMES;
           player->perk_end_frame = end_frame;
         }
-        write_perk_message(game->message, perk);
+        write_got_perk_message(game, perk);
       }
     }
   }
