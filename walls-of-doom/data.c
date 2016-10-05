@@ -49,10 +49,21 @@ typedef enum Operation { READ, WRITE } Operation;
 Code get_full_path(char *buffer, char *filename) {
   const char *home;
   struct stat status;
+  size_t path_size = 0;
   /* Get the home directory. */
   if ((home = getenv("HOME")) == NULL) {
     /* Only use the user database if HOME is not available. */
     home = getpwuid(getuid())->pw_dir;
+  }
+  /* Check if the full path fits in the buffer. */
+  path_size = strlen(home);
+  path_size += SEPARATOR_SIZE;
+  path_size += strlen(DATA_DIRECTORY);
+  path_size += SEPARATOR_SIZE;
+  path_size += strlen(filename);
+  path_size += 1;
+  if (path_size > MAXIMUM_PATH_SIZE) {
+    return CODE_ERROR;
   }
   /* Create the data directory if it does not exist. */
   sprintf(buffer, "%s/%s", home, DATA_DIRECTORY);

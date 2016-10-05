@@ -13,6 +13,11 @@
 #define MAXIMUM_PATH_SIZE 512
 
 /**
+ * Just in case a platform may have longer path separators, use a constant.
+ */
+#define SEPARATOR_SIZE 1
+
+/**
  * Assesses whether or not a file with the provided filename exists.
  */
 int file_exists(const char *filename);

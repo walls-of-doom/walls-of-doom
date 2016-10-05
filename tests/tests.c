@@ -71,6 +71,16 @@ void test_get_random_perk_is_well_distributed(void) {
   }
 }
 
+void test_get_full_path_checks_for_buffer_overflow(void) {
+  char buffer[MAXIMUM_PATH_SIZE];
+  char big_filename[MAXIMUM_PATH_SIZE];
+  Code code;
+  memset(big_filename, '0', MAXIMUM_PATH_SIZE);
+  big_filename[MAXIMUM_PATH_SIZE - 1] = '\0';
+  code = get_full_path(buffer, big_filename);
+  TEST_ASSERT_EQUAL(CODE_ERROR, code);
+}
+
 void test_trim_string_works_with_empty_strings(void) {
   const char *input = "";
   const char *expected = input; /* Use a more meaningful name. */
@@ -367,6 +377,7 @@ int main(void) {
   log_message("Started running tests");
   RUN_TEST(test_normalize);
   RUN_TEST(test_get_random_perk_is_well_distributed);
+  RUN_TEST(test_get_full_path_checks_for_buffer_overflow);
   RUN_TEST(test_trim_string_works_with_empty_strings);
   RUN_TEST(test_trim_string_works_with_already_trimmed_strings);
   RUN_TEST(test_trim_string_properly_trims_preceding_spaces);
