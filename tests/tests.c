@@ -316,19 +316,19 @@ void test_find_next_power_of_two_works_for_zero(void) {
 
 void test_find_next_power_of_two_works_for_positive_integers(void) {
   /* Ensure we are shifting a 64-bit value. */
-  const uint64_t one = 1;
-  uint64_t input;
-  uint64_t expected;
+  const long one = 1;
+  long input;
+  long expected;
   int i;
-  /* Do not get to 63, because then the loop evaluates 1 << 64. */
-  for (i = 0; i < 63; i++) {
+  /* Do not get to 31, because then the loop evaluates 1 << 32. */
+  for (i = 0; i < 31; i++) {
     expected = one << (i + 1);
     /* Test the next power for the current power. */
     input = one << i;
-    TEST_ASSERT_EQUAL_INT64(expected, find_next_power_of_two(input));
+    TEST_ASSERT_EQUAL_INT32(expected, find_next_power_of_two(input));
     /* Test the next power for the next power minus one. */
     input = (one << (i + 1)) - 1;
-    TEST_ASSERT_EQUAL_INT64(expected, find_next_power_of_two(input));
+    TEST_ASSERT_EQUAL_INT32(expected, find_next_power_of_two(input));
   }
 }
 
