@@ -5,7 +5,6 @@
 #include "logger.h"
 #include "numeric.h"
 #include "random.h"
-#include "rest.h"
 #include "sort.h"
 #include "text.h"
 

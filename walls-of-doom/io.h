@@ -1,6 +1,7 @@
 #ifndef IO_H
 #define IO_H
 
+#include "clock.h"
 #include "code.h"
 #include "color.h"
 #include "command.h"
@@ -52,8 +53,10 @@ void read_player_name(char *destination, const size_t maximum_size,
 
 /**
  * Draws a full game to the screen.
+ *
+ * Returns a Milliseconds approximation of the time this function took.
  */
-int draw_game(const Game *const game, SDL_Renderer *renderer);
+Milliseconds draw_game(const Game *const game, SDL_Renderer *renderer);
 
 /**
  * Prints the provided string on the screen starting at (x, y).

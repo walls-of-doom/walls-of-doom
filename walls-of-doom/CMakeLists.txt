@@ -29,7 +29,6 @@ add_library (walls-of-doom-base
     profiler.h profiler.c
     random.h random.c
     record.h record.c
-    rest.h rest.c
     sort.h sort.c
     text.h text.c
     version.h)

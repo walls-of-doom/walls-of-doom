@@ -10,7 +10,6 @@
 #include "player.h"
 #include "profiler.h"
 #include "random.h"
-#include "rest.h"
 #include "text.h"
 
 #include <SDL.h>
@@ -625,8 +624,10 @@ int draw_player(const Player *const player, SDL_Renderer *renderer) {
 
 /**
  * Draws a full game to the screen.
+ *
+ * Returns a Milliseconds approximation of the time this function took.
  */
-int draw_game(const Game *const game, SDL_Renderer *renderer) {
+Milliseconds draw_game(const Game *const game, SDL_Renderer *renderer) {
   Milliseconds draw_game_start = get_milliseconds();
   Milliseconds start;
 
@@ -663,7 +664,7 @@ int draw_game(const Game *const game, SDL_Renderer *renderer) {
   update_profiler("draw_game:present", get_milliseconds() - start);
 
   update_profiler("draw_game", get_milliseconds() - draw_game_start);
-  return 0;
+  return get_milliseconds() - draw_game_start;
 }
 
 void print_game_result(const char *name, const unsigned int score,

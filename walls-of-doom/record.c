@@ -6,7 +6,6 @@
 #include "io.h"
 #include "logger.h"
 #include "numeric.h"
-#include "rest.h"
 #include "sort.h"
 #include "text.h"
 

@@ -3,7 +3,6 @@
 #include "constants.h"
 #include "data.h"
 #include "io.h"
-#include "rest.h"
 
 #include <string.h>
 

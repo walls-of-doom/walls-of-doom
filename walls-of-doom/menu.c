@@ -10,7 +10,6 @@
 #include "platform.h"
 #include "random.h"
 #include "record.h"
-#include "rest.h"
 #include "version.h"
 
 #include <stdlib.h>

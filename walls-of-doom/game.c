@@ -9,7 +9,6 @@
 #include "physics.h"
 #include "random.h"
 #include "record.h"
-#include "rest.h"
 #include "text.h"
 #include "version.h"
 
@@ -89,6 +88,8 @@ void register_score(const Game *const game, SDL_Renderer *renderer) {
  */
 int run_game(Game *const game, SDL_Renderer *renderer) {
   unsigned long next_played_frames_score = FPS;
+  const Milliseconds interval = 1000 / FPS;
+  Milliseconds drawing_delta = 0;
   Command command = COMMAND_NONE;
   /* Checking for any nonpositive player.lives value would be safer but could
    * hide some bugs */
@@ -104,9 +105,11 @@ int run_game(Game *const game, SDL_Renderer *renderer) {
     /* 3. Update the perk */
     update_perk(game);
     /* 4. Draw everything */
-    draw_game(game, renderer);
-    /* 5. Sleep */
-    rest_for_second_fraction(FPS);
+    drawing_delta = draw_game(game, renderer);
+    /* 5. Delay, if needed */
+    if (drawing_delta < interval) {
+      SDL_Delay(interval - drawing_delta);
+    }
     /* 6. Read whatever command we got (if any) */
     command = read_next_command();
     /* 7. Update the player using the command */
