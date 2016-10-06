@@ -8,7 +8,6 @@
 #include "sort.h"
 #include "text.h"
 
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>

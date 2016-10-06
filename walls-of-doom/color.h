@@ -3,13 +3,11 @@
 
 #include <SDL.h>
 
-#include <stdint.h>
-
 typedef struct Color {
-  uint8_t r;
-  uint8_t g;
-  uint8_t b;
-  uint8_t a;
+  unsigned char r;
+  unsigned char g;
+  unsigned char b;
+  unsigned char a;
 } Color;
 
 typedef struct ColorPair {
@@ -29,7 +27,7 @@ int color_equals(Color a, Color b);
 int color_pair_equals(ColorPair a, ColorPair b);
 
 SDL_Color to_sdl_color(Color color);
-Color color_from_rgb(uint8_t r, uint8_t g, uint8_t b);
+Color color_from_rgb(unsigned char r, unsigned char g, unsigned char b);
 ColorPair color_pair_from_colors(Color foreground, Color background);
 
 #endif

@@ -2,8 +2,6 @@
 
 #include <SDL.h>
 
-#include <stdint.h>
-
 /**
  * Returns a number of milliseconds.
  *

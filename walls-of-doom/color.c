@@ -26,7 +26,7 @@ int color_pair_equals(ColorPair a, ColorPair b) {
   return fore_equals && back_equals;
 }
 
-Color color_from_rgb(uint8_t r, uint8_t g, uint8_t b) {
+Color color_from_rgb(unsigned char r, unsigned char g, unsigned char b) {
   Color color;
   color.r = r;
   color.g = g;

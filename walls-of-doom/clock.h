@@ -1,9 +1,7 @@
 #ifndef CLOCK_H
 #define CLOCK_H
 
-#include <stdint.h>
-
-typedef uint32_t Milliseconds;
+typedef long Milliseconds;
 
 /**
  * Returns a number of milliseconds.
