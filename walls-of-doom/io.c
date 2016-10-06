@@ -869,10 +869,14 @@ Command read_next_command(void) {
  * Waits for the next command, blocking indefinitely.
  */
 Command wait_for_next_command(void) {
-  Command command = COMMAND_NONE;
-  while (command == COMMAND_NONE) {
-    rest_for_second_fraction(FPS);
-    command = read_next_command();
+  Command command;
+  SDL_Event event;
+  int got_command = 0;
+  while (!got_command) {
+    if (SDL_WaitEvent(&event)) {
+      command = command_from_event(event);
+      got_command = command != COMMAND_NONE;
+    }
   }
   return command;
 }
