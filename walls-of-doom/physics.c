@@ -1,7 +1,10 @@
 #include "physics.h"
 #include "constants.h"
+#include "limits.h"
 #include "logger.h"
+#include "memory.h"
 #include "random.h"
+#include "settings.h"
 
 #include <stdio.h>
 
@@ -129,29 +132,94 @@ void move_platform_vertically(Game *const game, Platform *const platform) {
 }
 
 /**
- * Repositions a Platform in the vicinity of a BoundingBox.
+ * From an array of lines occupancy states, selects at random an empty line.
  *
- * This function attempts to place the Platform in an empty row.
+ * If no such line exists, returns a random line.
+ *
+ * This algorithm is O(n) with respect to the number of lines.
  */
+int select_random_empty_line(const unsigned char *lines, const int size) {
+  /* Select a random line. */
+  int line = 0;
+  int i;
+  /* Be careful not to call random_integer with invalid parameters. */
+  if (size < 1) {
+    return line;
+  }
+  line = random_integer(0, size - 1);
+  /* Cycle through all lines and return the first empty. */
+  /* If no line is empty, this returns the randomly selected one. */
+  for (i = 0; i < size && lines[line]; i++) {
+    line = (line + 1) % size;
+  }
+  return line;
+}
+
+/**
+ * From an array of lines occupancy states, selects at random one of the lines
+ * which are the furthest away from any other occupied line.
+ *
+ * This algorithm is O(n) with respect to the number of lines.
+ */
+int select_random_well_distributed(const unsigned char *lines, const int size) {
+  int *distances = NULL;
+  int maximum_distance = INT_MIN;
+  /* Select a random line. */
+  int line = 0;
+  int i;
+  /* Be careful not to call random_integer with invalid parameters. */
+  if (size < 1) {
+    return line;
+  }
+  line = random_integer(0, size - 1);
+  distances = resize_memory(distances, sizeof(int) * size);
+  /* First pass: calculate the distance to nearest occupied line above. */
+  for (i = 0; i < size; i++) {
+    if (lines[i]) {
+      distances[i] = 0;
+    } else {
+      if (i > 0) {
+        distances[i] = distances[i - 1] + 1;
+      } else {
+        distances[i] = 1;
+      }
+    }
+  }
+  /* Second pass: calculate the distance to nearest occupied line below. */
+  for (i = size - 1; i >= 0; i--) {
+    if (lines[i]) {
+      distances[i] = 0;
+    } else {
+      if (i < size - 1) {
+        /* Use the minimum distance to first occupied line above or below. */
+        distances[i] = min(distances[i], distances[i + 1] + 1);
+      } else {
+        distances[i] = 1;
+      }
+    }
+    maximum_distance = max(maximum_distance, distances[i]);
+  }
+  for (i = 0; i < size && distances[line] != maximum_distance; i++) {
+    line = (line + 1) % size;
+  }
+  distances = resize_memory(distances, 0);
+  return line;
+}
+
 static void reposition(Game *const game, Platform *const platform) {
   const BoundingBox *const box = game->box;
-  const int box_height = box->max_y - box->min_y + 1;
-  const int random_line = random_integer(box->min_y, box->max_y);
-  int occupied[LINES - 2] = {0};
-  int line = random_line % box_height;
+  const int occupied_size = LINES - 2;
+  unsigned char occupied[LINES - 2] = {0};
+  int line;
   size_t i;
   /* Build a table of occupied rows. */
   for (i = 0; i < game->platform_count; i++) {
     occupied[game->platforms[i].y - box->min_y] = 1;
   }
-  /* Linearly probe for an empty line. */
-  for (i = 0; i < LINES - 2; i++) {
-    if (line >= 0 && line < LINES - 2) {
-      if (!occupied[line]) {
-        break;
-      }
-    }
-    line = (line + 1) % box_height;
+  if (get_reposition_algorithm() == REPOSITION_RANDOM_EMPTY_LINE) {
+    line = select_random_empty_line(occupied, occupied_size);
+  } else {
+    line = select_random_well_distributed(occupied, occupied_size);
   }
   /* To the right of the box. */
   if (platform->x > box->max_x) {

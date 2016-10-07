@@ -9,7 +9,22 @@
 
 #include "stdlib.h"
 
-int bounding_box_equals(const BoundingBox *const a, const BoundingBox *const b);
+/**
+ * From an array of lines occupancy states, selects at random an empty line.
+ *
+ * If no such line exists, returns a random line.
+ *
+ * This algorithm is O(n) with respect to the number of lines.
+ */
+int select_random_empty_line(const unsigned char *lines, const int size);
+
+/**
+ * From an array of lines occupancy states, selects at random one of the lines
+ * which are the furthest away from any other occupied line.
+ *
+ * This algorithm is O(n) with respect to the number of lines.
+ */
+int select_random_well_distributed(const unsigned char *lines, const int size);
 
 void update_platforms(Game *game);
 
