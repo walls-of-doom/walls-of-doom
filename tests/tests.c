@@ -370,6 +370,129 @@ void test_random_integer_is_evenly_distributed(void) {
   }
 }
 
+void test_select_random_line_blindly_with_one_empty_line(void) {
+  const int tests = 1 << 8;
+  const unsigned char array[1] = {0};
+  int i;
+  for (i = 0; i < tests; i++) {
+    TEST_ASSERT_EQUAL(0, select_random_line_blindly(array, 1));
+  }
+}
+
+void test_select_random_line_blindly_with_one_occupied_line(void) {
+  const int tests = 1 << 8;
+  const unsigned char array[1] = {1};
+  int i;
+  for (i = 0; i < tests; i++) {
+    /* There is only one line to select, must select this one. */
+    TEST_ASSERT_EQUAL(0, select_random_line_blindly(array, 1));
+  }
+}
+
+void test_select_random_line_blindly_with_two_empty_lines(void) {
+  /* Should not overflow after a multiplication by 3. */
+  const int tests = 1 << 10;
+  const int seven_sixteenths = 7 * tests / 16;
+  const unsigned char array[2] = {0, 0};
+  int counters[2] = {0, 0};
+  int i;
+  for (i = 0; i < tests; i++) {
+    counters[select_random_line_blindly(array, 2)] += 1;
+  }
+  /* Counters should be roughly the same. */
+  TEST_ASSERT_TRUE(counters[0] > seven_sixteenths);
+  TEST_ASSERT_TRUE(counters[1] > seven_sixteenths);
+}
+
+void test_select_random_line_blindly_with_three_empty_lines(void) {
+  const int tests = 1 << 10;
+  const int five_sixteenths = 5 * tests / 16;
+  const unsigned char array[3] = {0, 0, 0};
+  int counters[3] = {0, 0, 0};
+  int i;
+  for (i = 0; i < tests; i++) {
+    counters[select_random_line_blindly(array, 3)] += 1;
+  }
+  /* Counters should be roughly the same. */
+  TEST_ASSERT_TRUE(counters[0] > five_sixteenths);
+  TEST_ASSERT_TRUE(counters[1] > five_sixteenths);
+  TEST_ASSERT_TRUE(counters[2] > five_sixteenths);
+}
+
+void test_select_random_line_blindly_with_occupied_middle_line(void) {
+  const int tests = 1 << 10;
+  const int seven_sixteenths = 7 * tests / 16;
+  const unsigned char array[3] = {0, 1, 0};
+  int counters[3] = {0, 0, 0};
+  int i;
+  for (i = 0; i < tests; i++) {
+    counters[select_random_line_blindly(array, 3)] += 1;
+  }
+  TEST_ASSERT_EQUAL(0, counters[1]);
+  TEST_ASSERT_TRUE(counters[0] > seven_sixteenths);
+  TEST_ASSERT_TRUE(counters[2] > seven_sixteenths);
+}
+
+void test_select_random_line_awarely_with_one_empty_line(void) {
+  const int tests = 1 << 8;
+  const unsigned char array[1] = {0};
+  int i;
+  for (i = 0; i < tests; i++) {
+    TEST_ASSERT_EQUAL(0, select_random_line_awarely(array, 1));
+  }
+}
+
+void test_select_random_line_awarely_with_one_occupied_line(void) {
+  const int tests = 1 << 8;
+  const unsigned char array[1] = {1};
+  int i;
+  for (i = 0; i < tests; i++) {
+    /* There is only one line to select, must select this one. */
+    TEST_ASSERT_EQUAL(0, select_random_line_awarely(array, 1));
+  }
+}
+
+void test_select_random_line_awarely_with_two_empty_lines(void) {
+  /* Should not overflow after a multiplication by 3. */
+  const int tests = 1 << 10;
+  const int seven_sixteenths = 7 * tests / 16;
+  const unsigned char array[2] = {0, 0};
+  int counters[2] = {0, 0};
+  int i;
+  for (i = 0; i < tests; i++) {
+    counters[select_random_line_awarely(array, 2)] += 1;
+  }
+  /* Counters should be roughly the same. */
+  TEST_ASSERT_TRUE(counters[0] > seven_sixteenths);
+  TEST_ASSERT_TRUE(counters[1] > seven_sixteenths);
+}
+
+void test_select_random_line_awarely_with_three_empty_lines(void) {
+  const int tests = 1 << 10;
+  const unsigned char array[3] = {0, 0, 0};
+  int counters[3] = {0, 0, 0};
+  int i;
+  for (i = 0; i < tests; i++) {
+    counters[select_random_line_awarely(array, 3)] += 1;
+  }
+  /* The middle line is the most distant one. */
+  TEST_ASSERT_EQUAL(counters[1], tests);
+}
+
+void test_select_random_line_awarely_with_occupied_middle_line(void) {
+  const int tests = 1 << 10;
+  const int seven_sixteenths = 7 * tests / 16;
+  const unsigned char array[3] = {0, 1, 0};
+  int counters[3] = {0, 0, 0};
+  int i;
+  for (i = 0; i < tests; i++) {
+    counters[select_random_line_awarely(array, 3)] += 1;
+  }
+  TEST_ASSERT_EQUAL(0, counters[1]);
+  TEST_ASSERT_TRUE(counters[0] > seven_sixteenths);
+  TEST_ASSERT_TRUE(counters[2] > seven_sixteenths);
+}
+
 int main(void) {
   UNITY_BEGIN();
   log_message("Started running tests");
@@ -401,6 +524,16 @@ int main(void) {
   RUN_TEST(test_find_next_power_of_two_works_for_positive_integers);
   RUN_TEST(test_random_integer_respects_the_provided_range);
   RUN_TEST(test_random_integer_is_evenly_distributed);
+  RUN_TEST(test_select_random_line_blindly_with_one_empty_line);
+  RUN_TEST(test_select_random_line_blindly_with_one_occupied_line);
+  RUN_TEST(test_select_random_line_blindly_with_two_empty_lines);
+  RUN_TEST(test_select_random_line_blindly_with_three_empty_lines);
+  RUN_TEST(test_select_random_line_blindly_with_occupied_middle_line);
+  RUN_TEST(test_select_random_line_awarely_with_one_empty_line);
+  RUN_TEST(test_select_random_line_awarely_with_one_occupied_line);
+  RUN_TEST(test_select_random_line_awarely_with_two_empty_lines);
+  RUN_TEST(test_select_random_line_awarely_with_three_empty_lines);
+  RUN_TEST(test_select_random_line_awarely_with_occupied_middle_line);
   log_message("Finished running tests");
   return UNITY_END();
 }

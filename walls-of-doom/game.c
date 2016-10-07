@@ -122,14 +122,3 @@ int run_game(Game *const game, SDL_Renderer *renderer) {
   register_score(game, renderer);
   return 0;
 }
-
-int main(void) {
-  int result;
-  SDL_Window *window;
-  SDL_Renderer *renderer;
-  seed_random();
-  initialize(&window, &renderer);
-  result = main_menu(renderer);
-  finalize(&window, &renderer);
-  return result;
-}

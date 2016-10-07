@@ -42,7 +42,7 @@ target_link_libraries (walls-of-doom-base ${SDL2_LIBRARY} ${SDL2TTF_LIBRARY} ${S
 
 target_include_directories (walls-of-doom-base PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable (walls-of-doom game.c)
+add_executable (walls-of-doom main.c)
 target_link_libraries (walls-of-doom walls-of-doom-base)
 
 install (TARGETS walls-of-doom RUNTIME DESTINATION bin)

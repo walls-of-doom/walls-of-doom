@@ -16,7 +16,7 @@
  *
  * This algorithm is O(n) with respect to the number of lines.
  */
-int select_random_empty_line(const unsigned char *lines, const int size);
+int select_random_line_blindly(const unsigned char *lines, const int size);
 
 /**
  * From an array of lines occupancy states, selects at random one of the lines
@@ -24,7 +24,7 @@ int select_random_empty_line(const unsigned char *lines, const int size);
  *
  * This algorithm is O(n) with respect to the number of lines.
  */
-int select_random_well_distributed(const unsigned char *lines, const int size);
+int select_random_line_awarely(const unsigned char *lines, const int size);
 
 void update_platforms(Game *game);
 

@@ -139,7 +139,7 @@ void move_platform_vertically(Game *const game, Platform *const platform) {
  *
  * This algorithm is O(n) with respect to the number of lines.
  */
-int select_random_empty_line(const unsigned char *lines, const int size) {
+int select_random_line_blindly(const unsigned char *lines, const int size) {
   /* Select a random line. */
   int line = 0;
   int i;
@@ -162,7 +162,7 @@ int select_random_empty_line(const unsigned char *lines, const int size) {
  *
  * This algorithm is O(n) with respect to the number of lines.
  */
-int select_random_well_distributed(const unsigned char *lines, const int size) {
+int select_random_line_awarely(const unsigned char *lines, const int size) {
   int *distances = NULL;
   int maximum_distance = INT_MIN;
   /* Select a random line. */
@@ -217,10 +217,10 @@ static void reposition(Game *const game, Platform *const platform) {
   for (i = 0; i < game->platform_count; i++) {
     occupied[game->platforms[i].y - box->min_y] = 1;
   }
-  if (get_reposition_algorithm() == REPOSITION_RANDOM_EMPTY_LINE) {
-    line = select_random_empty_line(occupied, occupied_size);
+  if (get_reposition_algorithm() == REPOSITION_SELECT_BLINDLY) {
+    line = select_random_line_blindly(occupied, occupied_size);
   } else {
-    line = select_random_well_distributed(occupied, occupied_size);
+    line = select_random_line_awarely(occupied, occupied_size);
   }
   /* To the right of the box. */
   if (platform->x > box->max_x) {
