@@ -9,6 +9,7 @@
 #include <stdio.h>
 
 #define MINIMUM_REMAINING_FRAMES_FOR_MESSAGE (5 * FPS)
+#define PLAYER_LIFE_COST 100
 
 static void reposition(Game *const game, Platform *const platform);
 
@@ -445,6 +446,13 @@ void process_jump(Game *const game) {
   }
 }
 
+static void convert_score_into_lifes(Game *game) {
+  if (game->player->score >= PLAYER_LIFE_COST) {
+    game->player->score -= PLAYER_LIFE_COST;
+    game->player->lives++;
+  }
+}
+
 void process_command(Game *game, const Command command) {
   Player *player = game->player;
   if (command != COMMAND_NONE) {
@@ -465,6 +473,8 @@ void process_command(Game *game, const Command command) {
     }
   } else if (command == COMMAND_JUMP) {
     process_jump(game);
+  } else if (command == COMMAND_CONVERT) {
+    convert_score_into_lifes(game);
   }
 }
 
