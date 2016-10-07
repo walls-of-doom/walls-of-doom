@@ -208,8 +208,8 @@ int select_random_well_distributed(const unsigned char *lines, const int size) {
 
 static void reposition(Game *const game, Platform *const platform) {
   const BoundingBox *const box = game->box;
-  const int occupied_size = LINES - 2;
-  unsigned char occupied[LINES - 2] = {0};
+  const int occupied_size = LINES - 4;
+  unsigned char occupied[LINES - 4] = {0};
   int line;
   size_t i;
   /* Build a table of occupied rows. */
