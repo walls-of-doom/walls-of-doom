@@ -28,6 +28,7 @@ typedef struct RecordTable {
 Record make_record(const char *name, const int score) {
   Record record;
   /* Safely copy the provided name into the array. */
+  memset(record.name, '\0', MAXIMUM_PLAYER_NAME_SIZE);
   copy_string(record.name, name, MAXIMUM_PLAYER_NAME_SIZE);
   record.score = score;
   return record;
