@@ -405,7 +405,7 @@ void test_select_random_line_blindly_with_two_empty_lines(void) {
 }
 
 void test_select_random_line_blindly_with_three_empty_lines(void) {
-  const int tests = 1 << 10;
+  const int tests = 1 << 12;
   const int five_sixteenths = 5 * tests / 16;
   const unsigned char array[3] = {0, 0, 0};
   int counters[3] = {0, 0, 0};
