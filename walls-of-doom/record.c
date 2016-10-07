@@ -27,12 +27,9 @@ typedef struct RecordTable {
  */
 Record make_record(const char *name, const int score) {
   Record record;
-
   /* Safely copy the provided name into the array. */
   copy_string(record.name, name, MAXIMUM_PLAYER_NAME_SIZE);
-
   record.score = score;
-
   return record;
 }
 
@@ -46,7 +43,7 @@ int compare_records(const Record *const a, const Record *const b) {
   };
 }
 
-int compare_void_record_pointers(const void *a, const void *b) {
+int compare_void_records(const void *a, const void *b) {
   return compare_records((const Record *)a, (const Record *)b);
 }
 
@@ -115,12 +112,11 @@ void write_table(const RecordTable *const table) {
  * Writes the specified Record to to the system.
  */
 int save_record(const Record *const record) {
+  int (*comparator)(const void *a, const void *b) = &compare_void_records;
   int record_index;
   RecordTable table;
   read_table(&table);
-
-  /* If the table is full, overwrite the last record if this record is greater.
-   */
+  /* If the table is full, overwrite the last record if this is greater. */
   if (table.record_count == RECORD_ARRAY_SIZE) {
     if (compare_records(record, table.records + (table.record_count - 1)) > 0) {
       table.records[table.record_count - 1] = *record;
@@ -132,13 +128,10 @@ int save_record(const Record *const record) {
     table.record_count++;
   }
   log_message("Added the record to the record table");
-
   /* Sort the table records. */
-  sort((void *)table.records, table.record_count, sizeof(Record),
-       compare_void_record_pointers);
+  sort((void *)table.records, table.record_count, sizeof(Record), comparator);
   reverse((void *)table.records, table.record_count, sizeof(Record));
   log_message("Sorted the record table");
-
   /* Write the table to disk. */
   write_table(&table);
   /* Find the index of the provided record. */

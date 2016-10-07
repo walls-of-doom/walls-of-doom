@@ -202,7 +202,7 @@ int select_random_well_distributed(const unsigned char *lines, const int size) {
   for (i = 0; i < size && distances[line] != maximum_distance; i++) {
     line = (line + 1) % size;
   }
-  distances = resize_memory(distances, 0);
+  resize_memory(distances, 0);
   return line;
 }
 
