@@ -97,7 +97,7 @@ int file_line_count(const char *filename) {
 
 void log_access(Operation operation, const size_t bytes, const char *filename) {
   char message[MAXIMUM_STRING_SIZE];
-  double kibibytes = bytes / 1024;
+  double kibibytes = bytes / 1024.0;
   char *format = NULL;
   if (operation == READ) {
     format = LOG_ACCESS_READ_FORMAT;
