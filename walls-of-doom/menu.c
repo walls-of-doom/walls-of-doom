@@ -85,7 +85,7 @@ int main_menu(SDL_Renderer *renderer) {
   char title[MAXIMUM_STRING_SIZE];
   char *options[] = {"Play", "Top Scores", "Info", "Quit"};
   Command command;
-  sprintf(title, "%s version %s", "Walls of Doom", WALLS_OF_DOOM_VERSION);
+  sprintf(title, "%s %s", "Walls of Doom", WALLS_OF_DOOM_VERSION);
   menu.title = title;
   menu.options = options;
   menu.option_count = 4;

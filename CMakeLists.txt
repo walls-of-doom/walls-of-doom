@@ -4,9 +4,12 @@ project (walls-of-doom)
 
 set (CMAKE_MODULE_PATH cmake)
 
-set (version-major 0)
-set (version-minor 8)
-set (version-patch 0)
+# Get Git version, if we can.
+if (EXISTS "${CMAKE_SOURCE_DIR}/.git")
+    execute_process(COMMAND git describe --abbrev=4 HEAD OUTPUT_VARIABLE version-string OUTPUT_STRIP_TRAILING_WHITESPACE)
+else ()
+    set (version-string "(Unknown Version)")
+endif ()
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
 set (CMAKE_INCLUDE_CURRENT_DIR_IN_INTERFACE ON)
