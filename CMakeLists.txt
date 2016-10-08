@@ -8,7 +8,7 @@ set (CMAKE_MODULE_PATH cmake)
 if (EXISTS "${CMAKE_SOURCE_DIR}/.git")
     execute_process(COMMAND git describe --abbrev=4 HEAD OUTPUT_VARIABLE version-string OUTPUT_STRIP_TRAILING_WHITESPACE)
 else ()
-    set (version-string "(Unknown Version)")
+    set (version-string "v1.1.1")
 endif ()
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
