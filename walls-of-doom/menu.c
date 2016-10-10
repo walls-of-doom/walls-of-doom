@@ -10,6 +10,7 @@
 #include "platform.h"
 #include "random.h"
 #include "record.h"
+#include "settings.h"
 #include "version.h"
 
 #include <stdlib.h>
@@ -58,7 +59,7 @@ void write_menu(const Menu *const menu, SDL_Renderer *renderer) {
 int game(SDL_Renderer *renderer) {
   char name[MAXIMUM_PLAYER_NAME_SIZE];
   Player player;
-  Platform platforms[PLATFORM_COUNT];
+  Platform platforms[MAXIMUM_PLATFORM_COUNT];
   BoundingBox box;
   Game game;
 
@@ -70,9 +71,9 @@ int game(SDL_Renderer *renderer) {
 
   box = bounding_box_from_screen();
 
-  generate_platforms(platforms, PLATFORM_COUNT);
+  generate_platforms(platforms, get_platform_count());
 
-  game = create_game(&player, platforms, PLATFORM_COUNT, &box);
+  game = create_game(&player, platforms, get_platform_count(), &box);
 
   run_game(&game, renderer);
   return 0;

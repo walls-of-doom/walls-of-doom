@@ -10,6 +10,7 @@
 #include "player.h"
 #include "profiler.h"
 #include "random.h"
+#include "settings.h"
 #include "text.h"
 
 #include <SDL.h>
@@ -121,6 +122,7 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
   int height = 1;
   initialize_logger();
   initialize_profiler();
+  initialize_settings();
   /* Initialize SDL. */
   if (SDL_Init(SDL_INIT_VIDEO)) {
     sprintf(log_buffer, "SDL initialization error: %s", SDL_GetError());

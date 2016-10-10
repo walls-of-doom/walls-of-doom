@@ -42,8 +42,6 @@
 
 #define FALLBACK_PLAYER_NAME "Player"
 
-#define PLATFORM_COUNT 16
-
 /**
  * The number of frames per second the engine renders.
  */
@@ -61,6 +59,8 @@
 #define PLAYER_JUMPING_SPEED PLAYER_FALLING_SPEED
 
 #define PLAYER_JUMPING_HEIGHT PLAYER_JUMPING_SPEED
+
+#define SETTINGS_FILE "@ASSETS_DIR@/settings/settings.txt"
 
 #define ABOUT_PAGE_PATH "@ASSETS_DIR@/about/about.txt"
 #define ABOUT_PAGE_BUFFER_SIZE 1024
