@@ -1,0 +1,17 @@
+language: c
+sudo: required
+
+compiler:
+  - clang
+  - gcc
+
+# Ubuntu 12.04 does not have SDL 2, so we must add a PPA.
+before_install:
+  - sudo add-apt-repository -y ppa:team-xbmc/ppa
+  - sudo apt-get update -qq
+
+install:
+  - bash scripts/setup.sh
+
+script:
+  - bash scripts/test.sh
