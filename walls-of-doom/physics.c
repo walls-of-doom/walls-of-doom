@@ -9,7 +9,14 @@
 #include <stdio.h>
 
 #define MINIMUM_REMAINING_FRAMES_FOR_MESSAGE (5 * FPS)
-#define PLAYER_LIFE_COST 100
+
+/* Extra level of indirection needed to expand macros before the conversion. */
+#define AS_STR(X) #X
+#define STR(X) AS_STR(X)
+
+#define BUY_LIFE_PRICE 100
+#define BUY_LIFE_FORMAT(PRICE) "Bought an extra life for " STR(PRICE) " points."
+#define BUY_LIFE_MESSAGE BUY_LIFE_FORMAT(BUY_LIFE_PRICE)
 
 static void reposition(Game *const game, Platform *const platform);
 
@@ -474,10 +481,11 @@ void process_jump(Game *const game) {
   }
 }
 
-static void convert_score_into_lifes(Game *game) {
-  if (game->player->score >= PLAYER_LIFE_COST) {
-    game->player->score -= PLAYER_LIFE_COST;
+static void buy_life(Game *game) {
+  if (game->player->score >= BUY_LIFE_PRICE) {
+    game->player->score -= BUY_LIFE_PRICE;
     game->player->lives++;
+    game_set_message(game, BUY_LIFE_MESSAGE, 1, 1);
   }
 }
 
@@ -502,7 +510,7 @@ void process_command(Game *game, const Command command) {
   } else if (command == COMMAND_JUMP) {
     process_jump(game);
   } else if (command == COMMAND_CONVERT) {
-    convert_score_into_lifes(game);
+    buy_life(game);
   }
 }
 
@@ -553,13 +561,13 @@ void update_double_jump(Game *game) {
 static void write_got_perk_message(Game *game, const Perk perk) {
   char message[MAXIMUM_STRING_SIZE];
   sprintf(message, "Got %s!", get_perk_name(perk));
-  game_set_message(game, message);
+  game_set_message(game, message, 1, 0);
 }
 
 static void write_perk_faded_message(Game *game, const Perk perk) {
   char message[MAXIMUM_STRING_SIZE];
   sprintf(message, "%s has faded.", get_perk_name(perk));
-  game_set_message(game, message);
+  game_set_message(game, message, 1, 0);
 }
 
 static void write_perk_fading_message(Game *game, const Perk perk,
@@ -574,7 +582,7 @@ static void write_perk_fading_message(Game *game, const Perk perk,
   } else {
     sprintf(message, "%s will fade in %d seconds.", perk_name, seconds);
   }
-  game_set_message(game, message);
+  game_set_message(game, message, 1, 0);
 }
 
 void update_player_perk(Game *game) {

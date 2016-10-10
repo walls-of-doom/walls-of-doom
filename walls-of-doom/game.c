@@ -40,19 +40,37 @@ Game create_game(Player *player, Platform *platforms,
   game.perk_end_frame = PERK_SCREEN_DURATION_IN_FRAMES;
 
   game.message[0] = '\0';
+  game.message_end_frame = 0;
+  game.message_priority = 0;
 
   log_message("Finished creating the game");
 
   return game;
 }
 
+void game_update(Game *const game) {
+  if (game->message_end_frame == game->frame) {
+    game->message[0] = '\0';
+  }
+}
+
 /**
- * Changes the game message to the provided text.
+ * Changes the game message to the provided text, for the provided duration.
+ *
+ * If there is a message and it has higher or equal priority, it is unchanged.
  *
  * This function prevents buffer overflow by truncating the message.
  */
-void game_set_message(Game *const game, const char *message) {
-  copy_string(game->message, message, MAXIMUM_STRING_SIZE);
+void game_set_message(Game *const game, const char *message,
+                      const unsigned long duration,
+                      const unsigned int priority) {
+  int last_message_expired = game->message_end_frame <= game->frame;
+  int last_message_has_lower_priority = game->message_priority < priority;
+  if (last_message_expired || last_message_has_lower_priority) {
+    game->message_end_frame = game->frame + duration * FPS;
+    game->message_priority = priority;
+    copy_string(game->message, message, MAXIMUM_STRING_SIZE);
+  }
 }
 
 void register_score(const Game *const game, SDL_Renderer *renderer) {
@@ -91,30 +109,22 @@ int run_game(Game *const game, SDL_Renderer *renderer) {
   const Milliseconds interval = 1000 / FPS;
   Milliseconds drawing_delta = 0;
   Command command = COMMAND_NONE;
-  /* Checking for any nonpositive player.lives value would be safer but could
-   * hide some bugs */
   while (command != COMMAND_QUIT && game->player->lives != 0) {
     /* Game loop */
-    /* 1. Update the score */
     if (game->played_frames == next_played_frames_score) {
       game->player->score++;
       next_played_frames_score += FPS;
     }
-    /* 2. Update the platforms */
+    game_update(game);
     update_platforms(game);
-    /* 3. Update the perk */
     update_perk(game);
-    /* 4. Draw everything */
     drawing_delta = draw_game(game, renderer);
-    /* 5. Delay, if needed */
+    /* Delay, if needed */
     if (drawing_delta < interval) {
       SDL_Delay(interval - drawing_delta);
     }
-    /* 6. Read whatever command we got (if any) */
     command = read_next_command();
-    /* 7. Update the player using the command */
     update_player(game, command);
-    /* 8. Increment the frame counter */
     game->frame++;
   }
   /* Ignoring how the game ended (quit command, screen resize, or death),

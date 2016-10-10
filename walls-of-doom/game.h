@@ -39,6 +39,8 @@ typedef struct Game {
   BoundingBox *box;
 
   char message[MAXIMUM_STRING_SIZE];
+  unsigned long message_end_frame;
+  unsigned int message_priority;
 
 } Game;
 
@@ -48,14 +50,18 @@ typedef struct Game {
 Game create_game(Player *player, Platform *platforms,
                  const size_t platform_count, BoundingBox *box);
 
-void update_game(Game *const game);
+void game_update(Game *const game);
 
 /**
- * Changes the game message to the provided text.
+ * Changes the game message to the provided text, for the provided duration.
+ *
+ * If there is a message and it has higher or equal priority, it is unchanged.
  *
  * This function prevents buffer overflow by truncating the message.
  */
-void game_set_message(Game *const game, const char *message);
+void game_set_message(Game *const game, const char *message,
+                      const unsigned long duration,
+                      const unsigned int priority);
 
 /**
  * Runs the main loop of the provided game and registers the player score at the
