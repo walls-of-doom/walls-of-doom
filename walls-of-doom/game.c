@@ -49,7 +49,7 @@ Game create_game(Player *player, Platform *platforms,
 }
 
 void game_update(Game *const game) {
-  if (game->message_end_frame == game->frame) {
+  if (game->message_end_frame < game->frame) {
     game->message[0] = '\0';
   }
 }
