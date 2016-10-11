@@ -245,8 +245,9 @@ int select_random_line_awarely(const unsigned char *lines, const int size) {
 
 static void reposition(Game *const game, Platform *const platform) {
   const BoundingBox *const box = game->box;
-  const int occupied_size = LINES - 4;
-  unsigned char occupied[LINES - 4] = {0};
+  /* The occupied size may be smaller than the array actually is. */
+  const int occupied_size = get_lines() - 4;
+  unsigned char occupied[MAXIMUM_LINES - 4] = {0};
   int line;
   size_t i;
   /* Build a table of occupied rows. */

@@ -32,13 +32,13 @@ void write_menu(const Menu *const menu, SDL_Renderer *renderer) {
   const size_t entries = menu->option_count + 1;
   const unsigned int ENTRY_HEIGHT = 3;
   const unsigned int height = entries * ENTRY_HEIGHT;
-  const int starting_y = (LINES - height) / 2;
+  const int starting_y = (get_lines() - height) / 2;
   int y = starting_y + 1;
   int x;
   size_t i;
   char buffer[MAXIMUM_STRING_SIZE];
   SDL_RenderClear(renderer);
-  x = (COLUMNS - strlen(menu->title)) / 2;
+  x = (get_columns() - strlen(menu->title)) / 2;
   print(x, y, menu->title, DEFAULT_COLOR, renderer);
   for (i = 0; i < menu->option_count; i++) {
     char *string = menu->options[i];
@@ -46,7 +46,7 @@ void write_menu(const Menu *const menu, SDL_Renderer *renderer) {
       sprintf(buffer, "> %s <", string);
       string = buffer;
     }
-    x = (COLUMNS - strlen(string)) / 2;
+    x = (get_columns() - strlen(string)) / 2;
     y += ENTRY_HEIGHT;
     print(x, y, string, DEFAULT_COLOR, renderer);
   }
@@ -66,8 +66,8 @@ int game(SDL_Renderer *renderer) {
   read_player_name(name, MAXIMUM_PLAYER_NAME_SIZE, renderer);
 
   player = make_player(name);
-  player.x = COLUMNS / 2;
-  player.y = LINES / 2;
+  player.x = get_columns() / 2;
+  player.y = get_lines() / 2;
 
   box = bounding_box_from_screen();
 

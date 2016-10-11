@@ -16,14 +16,6 @@
 #define TOP_BAR_STRING_COUNT 4
 
 /**
- * The number of columns and lines of the window.
- */
-
-#define COLUMNS 80
-
-#define LINES 30
-
-/**
  * How many spaces should be left from the margins when printing text.
  */
 #define PADDING 2

@@ -11,11 +11,17 @@
 #define SETTINGS_STRING_SIZE 64
 #define SETTINGS_BUFFER_SIZE 4096
 
-#define MINIMUM_PLATFORM_COUNT 0
 #define DEFAULT_PLATFORM_COUNT 16
+#define MINIMUM_PLATFORM_COUNT 0
+#define DEFAULT_COLUMNS 80
+#define MINIMUM_COLUMNS 40
+#define DEFAULT_LINES 30
+#define MINIMUM_LINES 20
 
 static RepositionAlgorithm reposition_algorithm = REPOSITION_SELECT_AWARELY;
 static long platform_count = DEFAULT_PLATFORM_COUNT;
+static long columns = DEFAULT_COLUMNS;
+static long lines = DEFAULT_LINES;
 
 static int parse_line(const char **input, char *key, char *value) {
   int reading_key = 1;
@@ -55,11 +61,31 @@ static int parse_line(const char **input, char *key, char *value) {
   return 1;
 }
 
+static long parse_value(const char *value, const long minimum,
+                        const long maximum, const long fallback) {
+  long integer = strtol(value, NULL, 10);
+  if (errno) {
+    log_message("Failed to read an integer for ");
+    errno = 0;
+    return fallback;
+  }
+  if (integer < minimum) {
+    return minimum;
+  }
+  if (integer > maximum) {
+    return maximum;
+  }
+  return integer;
+}
+
 void initialize_settings(void) {
   char input[SETTINGS_BUFFER_SIZE];
   char key[SETTINGS_STRING_SIZE];
   char value[SETTINGS_STRING_SIZE];
   const char *read = input;
+  long min_value;
+  long max_value;
+  long fallback;
   read_characters(SETTINGS_FILE, input, SETTINGS_BUFFER_SIZE);
   while (parse_line(&read, key, value)) {
     if (strcmp(key, "REPOSITION_ALGORITHM") == 0) {
@@ -72,16 +98,20 @@ void initialize_settings(void) {
       }
       /* Did not match any existing algorithm, do not change the default. */
     } else if (strcmp(key, "PLATFORM_COUNT") == 0) {
-      platform_count = strtol(value, NULL, 10);
-      if (errno) {
-        log_message("Failed to read an integer for PLATFORM_COUNT");
-        errno = 0;
-      }
-      if (platform_count < MINIMUM_PLATFORM_COUNT) {
-        platform_count = MINIMUM_PLATFORM_COUNT;
-      } else if (platform_count > MAXIMUM_PLATFORM_COUNT) {
-        platform_count = MAXIMUM_PLATFORM_COUNT;
-      }
+      min_value = MINIMUM_PLATFORM_COUNT;
+      max_value = MAXIMUM_PLATFORM_COUNT;
+      fallback = DEFAULT_PLATFORM_COUNT;
+      platform_count = parse_value(value, min_value, max_value, fallback);
+    } else if (strcmp(key, "COLUMNS") == 0) {
+      min_value = MINIMUM_COLUMNS;
+      max_value = MAXIMUM_COLUMNS;
+      fallback = DEFAULT_COLUMNS;
+      columns = parse_value(value, min_value, max_value, fallback);
+    } else if (strcmp(key, "LINES") == 0) {
+      min_value = MINIMUM_LINES;
+      max_value = MAXIMUM_LINES;
+      fallback = DEFAULT_LINES;
+      lines = parse_value(value, min_value, max_value, fallback);
     }
   }
 }
@@ -91,3 +121,7 @@ RepositionAlgorithm get_reposition_algorithm(void) {
 }
 
 long get_platform_count(void) { return platform_count; }
+
+long get_columns(void) { return columns; }
+
+long get_lines(void) { return lines; }

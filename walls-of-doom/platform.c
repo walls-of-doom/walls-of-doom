@@ -4,6 +4,7 @@
 #include "data.h"
 #include "logger.h"
 #include "random.h"
+#include "settings.h"
 
 #include <stdlib.h>
 
@@ -20,8 +21,8 @@ void generate_platforms(Platform *platforms, int count) {
   for (i = 0; i < count; i++) {
     Platform *platform = platforms + i;
     platform->width = random_integer(MINIMUM_WIDTH, MAXIMUM_WIDTH);
-    platform->x = random_integer(1, COLUMNS - 1);
-    platform->y = random_integer(4, LINES - 4);
+    platform->x = random_integer(1, get_columns() - 1);
+    platform->y = random_integer(4, get_lines() - 4);
     platform->speed_x = 0;
     platform->speed_y = 0;
     speed = PLATFORM_BASE_SPEED * random_integer(MINIMUM_SPEED, MAXIMUM_SPEED);

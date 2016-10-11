@@ -157,8 +157,8 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
    * number of pixels we need for the screen is not. We find this number by
    * experimenting before creating the window.
    */
-  width = global_monospaced_font_width * COLUMNS;
-  height = global_monospaced_font_height * LINES;
+  width = global_monospaced_font_width * get_columns();
+  height = global_monospaced_font_height * get_lines();
   /* Log the size of the window we are going to create. */
   sprintf(log_buffer, "Creating a %dx%d window", width, height);
   log_message(log_buffer);
@@ -247,7 +247,7 @@ void read_player_name(char *destination, const size_t maximum_size,
   /* While there is not a read error or a valid name. */
   while (!error && !valid_name) {
     x = PADDING;
-    y = LINES / 2;
+    y = get_lines() / 2;
     error = read_string(x, y, message, destination, maximum_size, renderer);
     if (error) {
       log_message("Failed to read player name");
@@ -405,7 +405,7 @@ static Code render_borders(BoundingBox borders, SDL_Renderer *renderer) {
  */
 void print_centered(const int y, const char *string, const ColorPair color_pair,
                     SDL_Renderer *renderer) {
-  const int x = (COLUMNS - strlen(string)) / 2;
+  const int x = (get_columns() - strlen(string)) / 2;
   print(x, y, string, color_pair, renderer);
 }
 
@@ -451,8 +451,8 @@ char *copy_first_line(char *source, char *destination) {
  * Prints the provided string after formatting it to increase readability.
  */
 void print_long_text(char *string, SDL_Renderer *renderer) {
-  const int width = COLUMNS - 2 * PADDING;
-  char line[COLUMNS + 1];
+  const int width = get_columns() - 2 * PADDING;
+  char line[MAXIMUM_COLUMNS + 1];
   char *cursor;
   int line_count;
   int y;
@@ -462,7 +462,7 @@ void print_long_text(char *string, SDL_Renderer *renderer) {
   clear(renderer);
   /* Print each line. */
   cursor = string;
-  y = (LINES - line_count) / 2;
+  y = (get_lines() - line_count) / 2;
   while (*cursor != '\0') {
     cursor = copy_first_line(cursor, line);
     print(PADDING, y, line, DEFAULT_COLOR, renderer);
@@ -482,11 +482,11 @@ void write_top_bar_strings(char *strings[], SDL_Renderer *renderer) {
   int x;
   int i;
 
-  const int columns_per_string = COLUMNS / TOP_BAR_STRING_COUNT;
+  const int columns_per_string = get_columns() / TOP_BAR_STRING_COUNT;
 
-  char buffer[COLUMNS + 1];
-  memset(buffer, ' ', COLUMNS);
-  buffer[COLUMNS] = '\0';
+  char buffer[MAXIMUM_COLUMNS + 1];
+  memset(buffer, ' ', get_columns());
+  buffer[get_columns()] = '\0';
 
   for (i = 0; i < TOP_BAR_STRING_COUNT; i++) {
     begin_x = i * columns_per_string;
@@ -499,7 +499,7 @@ void write_top_bar_strings(char *strings[], SDL_Renderer *renderer) {
        * left uncolored at the end if we do not ensure that all columns
        * are painted.
        */
-      after_x = COLUMNS;
+      after_x = get_columns();
     }
     string_length = strlen(strings[i]);
     if (string_length < columns_per_string) {
@@ -511,7 +511,7 @@ void write_top_bar_strings(char *strings[], SDL_Renderer *renderer) {
       for (x = begin_x; x < begin_text_x; x++) {
         buffer[x] = ' ';
       }
-      copy_string(buffer + x, strings[i], COLUMNS + 1 - x);
+      copy_string(buffer + x, strings[i], get_columns() + 1 - x);
       for (x = after_text_x; x < after_x; x++) {
         buffer[x] = ' ';
       }
@@ -562,11 +562,11 @@ int draw_top_bar(const Player *const player, SDL_Renderer *renderer) {
  * Draws the bottom status bar on the screen for a given Player.
  */
 void draw_bottom_bar(const char *message, SDL_Renderer *renderer) {
-  char buffer[COLUMNS + 1];
-  memset(buffer, ' ', COLUMNS);
-  buffer[COLUMNS] = '\0';
-  print(0, LINES - 1, buffer, BOTTOM_BAR_COLOR, renderer);
-  print(0, LINES - 1, message, BOTTOM_BAR_COLOR, renderer);
+  char buffer[MAXIMUM_COLUMNS + 1];
+  memset(buffer, ' ', get_columns());
+  buffer[get_columns()] = '\0';
+  print(0, get_lines() - 1, buffer, BOTTOM_BAR_COLOR, renderer);
+  print(0, get_lines() - 1, message, BOTTOM_BAR_COLOR, renderer);
 }
 
 /**
@@ -575,9 +575,9 @@ void draw_bottom_bar(const char *message, SDL_Renderer *renderer) {
 void draw_borders(SDL_Renderer *renderer) {
   BoundingBox borders;
   borders.min_x = 0;
-  borders.max_x = COLUMNS - 1;
+  borders.max_x = get_columns() - 1;
   borders.min_y = 1;
-  borders.max_y = LINES - 2;
+  borders.max_y = get_lines() - 2;
   render_borders(borders, renderer);
 }
 
@@ -588,10 +588,10 @@ int draw_platforms(const Platform *platforms, const size_t platform_count,
   int max_x;
   size_t i;
   /* We make the assumption that the biggest box is COLUMNS wide. */
-  char buffer[COLUMNS + 1];
+  char buffer[MAXIMUM_COLUMNS + 1];
   char *iter;
-  memset(buffer, ' ', COLUMNS + 1);
-  buffer[COLUMNS] = '\0';
+  memset(buffer, ' ', get_columns() + 1);
+  buffer[get_columns()] = '\0';
   for (i = 0; i < platform_count; i++) {
     y = platforms[i].y;
     min_x = platforms[i].x;
@@ -600,7 +600,7 @@ int draw_platforms(const Platform *platforms, const size_t platform_count,
       if (min_x <= box->max_x && max_x >= box->min_x) {
         min_x = max(box->min_x, min_x);
         max_x = min(box->max_x, max_x);
-        iter = buffer + COLUMNS - (max_x - min_x + 1);
+        iter = buffer + get_columns() - (max_x - min_x + 1);
         print(min_x, y, iter, PLATFORM_COLOR, renderer);
       }
     }
@@ -682,8 +682,8 @@ void print_game_result(const char *name, const unsigned int score,
     sprintf(second_line, "%s didn't make it to the top scores.", name);
   }
   clear(renderer);
-  print_centered(LINES / 2 - 1, first_line, DEFAULT_COLOR, renderer);
-  print_centered(LINES / 2 + 1, second_line, DEFAULT_COLOR, renderer);
+  print_centered(get_lines() / 2 - 1, first_line, DEFAULT_COLOR, renderer);
+  print_centered(get_lines() / 2 + 1, second_line, DEFAULT_COLOR, renderer);
   present(renderer);
 }
 
@@ -695,8 +695,8 @@ BoundingBox bounding_box_from_screen(void) {
   BoundingBox box;
   box.min_x = 1;
   box.min_y = 2; /* Top bar. */
-  box.max_x = COLUMNS - 2;
-  box.max_y = LINES - 3; /* Bottom bar. */
+  box.max_x = get_columns() - 2;
+  box.max_y = get_lines() - 3; /* Bottom bar. */
   return box;
 }
 
@@ -782,7 +782,7 @@ static void print_limited(const int x, const int y, const char *string,
 int read_string(const int x, const int y, const char *prompt, char *destination,
                 const size_t size, SDL_Renderer *renderer) {
   const int buffer_x = x + strlen(prompt) + 1;
-  const int buffer_view_limit = COLUMNS - PADDING - buffer_x;
+  const int buffer_view_limit = get_columns() - PADDING - buffer_x;
   int is_done = 0;
   int should_rerender = 1;
   /* The x coordinate of the user input buffer. */
