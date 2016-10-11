@@ -206,6 +206,8 @@ int finalize(SDL_Window **window, SDL_Renderer **renderer) {
   if (TTF_WasInit()) {
     TTF_Quit();
   }
+  /* This could be called earlier, but we only do it here to organize things. */
+  IMG_Quit();
   SDL_Quit();
   finalize_profiler();
   finalize_logger();
