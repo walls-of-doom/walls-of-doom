@@ -1,5 +1,5 @@
 ---
-Checks:          'clang-diagnostic-*,clang-analyzer-*,clang-analyzer-alpha.*,-clang-analyzer-alpha.clone.CloneChecker'
+Checks:          'clang-diagnostic-*,clang-analyzer-*,clang-analyzer-alpha.*,-clang-analyzer-alpha.security.ArrayBoundV2,-clang-analyzer-alpha.clone.CloneChecker,-clang-analyzer-alpha.deadcode.UnreachableCode'
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false
