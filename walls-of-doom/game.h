@@ -55,7 +55,7 @@ void game_update(Game *const game);
 /**
  * Changes the game message to the provided text, for the provided duration.
  *
- * If there is a message and it has higher or equal priority, it is unchanged.
+ * If there is a message and it has higher priority, it is not changed.
  *
  * This function prevents buffer overflow by truncating the message.
  */

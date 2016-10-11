@@ -8,7 +8,8 @@
 
 #include <stdio.h>
 
-#define MINIMUM_REMAINING_FRAMES_FOR_MESSAGE (5 * FPS)
+/* Should be the maximum frame count value for 5 seconds remaining. */
+#define MINIMUM_REMAINING_FRAMES_FOR_MESSAGE (6 * FPS - 1)
 
 /* Extra level of indirection needed to expand macros before the conversion. */
 #define AS_STR(X) #X

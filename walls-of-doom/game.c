@@ -57,7 +57,7 @@ void game_update(Game *const game) {
 /**
  * Changes the game message to the provided text, for the provided duration.
  *
- * If there is a message and it has higher or equal priority, it is unchanged.
+ * If there is a message and it has higher priority, it is not changed.
  *
  * This function prevents buffer overflow by truncating the message.
  */
@@ -65,7 +65,7 @@ void game_set_message(Game *const game, const char *message,
                       const unsigned long duration,
                       const unsigned int priority) {
   int last_message_expired = game->message_end_frame <= game->frame;
-  int last_message_has_lower_priority = game->message_priority < priority;
+  int last_message_has_lower_priority = game->message_priority <= priority;
   if (last_message_expired || last_message_has_lower_priority) {
     game->message_end_frame = game->frame + duration * FPS;
     game->message_priority = priority;
