@@ -1,10 +1,12 @@
 #include "game.h"
 
 #include "about.h"
+#include "box.h"
 #include "constants.h"
 #include "data.h"
 #include "io.h"
 #include "logger.h"
+#include "memory.h"
 #include "menu.h"
 #include "physics.h"
 #include "random.h"
@@ -16,6 +18,55 @@
 #include <string.h>
 
 #include <SDL.h>
+
+static size_t get_rigid_matrix_index(const Game *const game, const int x,
+                                     const int y) {
+  const int base_x = x - game->box->min_x;
+  const int base_y = y - game->box->min_y;
+  return base_x + base_y * game->rigid_matrix_m;
+}
+
+unsigned char get_from_rigid_matrix(const Game *const game, const int x,
+                                    const int y) {
+  if (bounding_box_contains(game->box, x, y)) {
+    return game->rigid_matrix[get_rigid_matrix_index(game, x, y)];
+  }
+  return 0;
+}
+
+void modify_rigid_matrix_point(const Game *const game, const int x, const int y,
+                               const unsigned char delta) {
+  if (bounding_box_contains(game->box, x, y)) {
+    game->rigid_matrix[get_rigid_matrix_index(game, x, y)] += delta;
+  }
+}
+
+void modify_rigid_matrix_platform(Game *game, Platform *platform,
+                                  const unsigned char delta) {
+  int i;
+  for (i = 0; i < platform->width; i++) {
+    modify_rigid_matrix_point(game, platform->x + i, platform->y, delta);
+  }
+}
+
+void print_rigid_matrix(Game *game) {
+  size_t i;
+  size_t j;
+  for (i = 0; i < game->rigid_matrix_n; i++) {
+    for (j = 0; j < game->rigid_matrix_m; j++) {
+      printf("%c", game->rigid_matrix[j + i * game->rigid_matrix_m] + '0');
+    }
+    printf("\n");
+  }
+}
+
+static void initialize_rigid_matrix(Game *game) {
+  size_t i;
+  memset(game->rigid_matrix, 0, game->rigid_matrix_size);
+  for (i = 0; i < game->platform_count; i++) {
+    modify_rigid_matrix_platform(game, game->platforms + i, 1);
+  }
+}
 
 /**
  * Creates a new Game object with the provided objects.
@@ -39,6 +90,13 @@ Game create_game(Player *player, Platform *platforms,
   /* Don't start with a Perk on the screen. */
   game.perk_end_frame = PERK_SCREEN_DURATION_IN_FRAMES;
 
+  game.rigid_matrix_n = box->max_y - box->min_y + 1;
+  game.rigid_matrix_m = box->max_x - box->min_x + 1;
+  game.rigid_matrix_size = game.rigid_matrix_n * game.rigid_matrix_m;
+  game.rigid_matrix = NULL;
+  game.rigid_matrix = resize_memory(game.rigid_matrix, game.rigid_matrix_size);
+  initialize_rigid_matrix(&game);
+
   game.message[0] = '\0';
   game.message_end_frame = 0;
   game.message_priority = 0;
@@ -46,6 +104,10 @@ Game create_game(Player *player, Platform *platforms,
   log_message("Finished creating the game");
 
   return game;
+}
+
+void destroy_game(Game *game) {
+  game->rigid_matrix = resize_memory(game->rigid_matrix, 0);
 }
 
 void game_update(Game *const game) {

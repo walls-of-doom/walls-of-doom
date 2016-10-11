@@ -9,6 +9,7 @@
 #include "platform.h"
 #include "player.h"
 #include "random.h"
+#include "settings.h"
 
 #include <stdlib.h>
 
@@ -38,6 +39,11 @@ typedef struct Game {
 
   BoundingBox *box;
 
+  size_t rigid_matrix_n;
+  size_t rigid_matrix_m;
+  size_t rigid_matrix_size;
+  unsigned char *rigid_matrix;
+
   char message[MAXIMUM_STRING_SIZE];
   unsigned long message_end_frame;
   unsigned int message_priority;
@@ -50,7 +56,18 @@ typedef struct Game {
 Game create_game(Player *player, Platform *platforms,
                  const size_t platform_count, BoundingBox *box);
 
+void destroy_game(Game *game);
+
 void game_update(Game *const game);
+
+unsigned char get_from_rigid_matrix(const Game *const game, const int x,
+                                    const int y);
+void modify_rigid_matrix_point(const Game *const game, const int x, const int y,
+                               const unsigned char delta);
+void modify_rigid_matrix_platform(Game *game, Platform *platform,
+                                  const unsigned char delta);
+
+void print_rigid_matrix(Game *game);
 
 /**
  * Changes the game message to the provided text, for the provided duration.

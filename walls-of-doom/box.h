@@ -8,9 +8,13 @@ typedef struct BoundingBox {
   int max_y;
 } BoundingBox;
 
+int bounding_box_contains(const BoundingBox *a, const int x, const int y);
+
 /**
  * Compares two BoundingBox objects for equality.
  */
 int bounding_box_equals(const BoundingBox *a, const BoundingBox *const b);
+
+long bounding_box_area(const BoundingBox *box);
 
 #endif

@@ -76,6 +76,9 @@ int game(SDL_Renderer *renderer) {
   game = create_game(&player, platforms, get_platform_count(), &box);
 
   run_game(&game, renderer);
+
+  destroy_game(&game);
+
   return 0;
 }
 

@@ -100,26 +100,78 @@ int should_move_at_current_frame(const Game *const game, const int speed) {
   }
 }
 
+static void subtract_platform(Game *const game, Platform *const platform) {
+  modify_rigid_matrix_platform(game, platform, -1);
+}
+
+static void add_platform(Game *const game, Platform *const platform) {
+  modify_rigid_matrix_platform(game, platform, 1);
+}
+
+/**
+ * Returns whether or not the platform can be inserted in the game without
+ * overlapping any existing platforms.
+ */
+static int can_insert_platform(Game *const game, Platform *const platform) {
+  int i;
+  for (i = 0; i < platform->width; i++) {
+    if (get_from_rigid_matrix(game, platform->x + i, platform->y)) {
+      return 0;
+    }
+  }
+  return 1;
+}
+
+static int can_move_platform(Game *const game, Platform *const platform,
+                             const int dx, const int dy) {
+  /* If the platform would intersect with another platform, do not move it. */
+  int can_move = 0;
+  subtract_platform(game, platform);
+  platform->x += dx;
+  platform->y += dy;
+  can_move = can_insert_platform(game, platform);
+  platform->x -= dx;
+  platform->y -= dy;
+  add_platform(game, platform);
+  return can_move;
+}
+
+/**
+ * This function is the ONLY right way to move a platform.
+ *
+ * This function keeps the cached rigid body matrix in the Game object valid.
+ */
+static void move_platform(Game *const game, Platform *const platform,
+                          const int dx, const int dy) {
+  if (can_move_platform(game, platform, dx, dy)) {
+    subtract_platform(game, platform);
+    platform->x += dx;
+    platform->y += dy;
+    add_platform(game, platform);
+  }
+}
+
 void move_platform_horizontally(Game *const game, Platform *const platform) {
+  const int normalized_speed = normalize(platform->speed_x);
   Player *const player = game->player;
   if (should_move_at_current_frame(game, platform->speed_x)) {
-    if (player->y ==
-        platform->y) { /* Fail fast if the platform is not on the same line */
-      if (normalize(platform->speed_x) == 1) {
-        if (player->x == platform->x + platform->width) {
-          shove_player(game, 1, 0);
+    if (can_move_platform(game, platform, normalized_speed, 0)) {
+      /* Fail fast if the platform is not on the same line. */
+      if (player->y == platform->y) {
+        if (normalized_speed == 1) {
+          if (player->x == platform->x + platform->width) {
+            shove_player(game, 1, 0);
+          }
+        } else if (normalized_speed == -1) {
+          if (player->x == platform->x - 1) {
+            shove_player(game, -1, 0);
+          }
         }
-      } else if (normalize(platform->speed_x) == -1) {
-        if (player->x == platform->x - 1) {
-          shove_player(game, -1, 0);
-        }
+      } else if (is_over_platform(player->x, player->y, platform)) {
+        shove_player(game, normalized_speed, 0);
       }
-    } else if (is_over_platform(
-                   player->x, player->y,
-                   platform)) { /* If the player is over the platform */
-      shove_player(game, normalize(platform->speed_x), 0);
+      move_platform(game, platform, normalized_speed, 0);
     }
-    platform->x += normalize(platform->speed_x);
   }
 }
 
@@ -261,14 +313,18 @@ static void reposition(Game *const game, Platform *const platform) {
   }
   /* To the right of the box. */
   if (platform->x > box->max_x) {
+    subtract_platform(game, platform);
     /* The platform should be one tick inside the box. */
     platform->x = box->min_x - platform->width + 1;
     platform->y = line + box->min_y;
+    add_platform(game, platform);
     /* To the left of the box. */
   } else if (platform->x + platform->width < box->min_x) {
+    subtract_platform(game, platform);
     /* The platform should be one tick inside the box. */
     platform->x = box->max_x;
     platform->y = line + box->min_y;
+    add_platform(game, platform);
     /* Above the box. */
   } else if (platform->y < box->min_y) {
     platform->x = random_integer(box->min_x, box->max_x - platform->width);
