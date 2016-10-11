@@ -190,6 +190,47 @@ void test_wrap_at_right_margin_with_maximum_width(void) {
   TEST_ASSERT_EQUAL_STRING(expected, actual);
 }
 
+/* Tests for find_start_of_text. */
+void test_find_start_of_text_with_empty_string(void) {
+  char *string = "";
+  TEST_ASSERT_EQUAL(string, find_start_of_text(string));
+}
+
+void test_find_start_of_text_with_only_spaces(void) {
+  char *string = " \t\r\n";
+  TEST_ASSERT_EQUAL(string + 4, find_start_of_text(string));
+}
+
+void test_find_start_of_text_with_single_word(void) {
+  char *string = "string";
+  TEST_ASSERT_EQUAL(string, find_start_of_text(string));
+}
+
+void test_find_start_of_text_with_leading_spaces(void) {
+  char *string = " \t\r\n string";
+  TEST_ASSERT_EQUAL(string + 5, find_start_of_text(string));
+}
+
+/* Tests for find_end_of_text. */
+void test_find_end_of_text_with_empty_string(void) {
+  char *string = "";
+  TEST_ASSERT_EQUAL(string, find_end_of_text(string));
+}
+
+void test_find_end_of_text_with_only_spaces(void) {
+  char *string = " \t\r\n";
+  TEST_ASSERT_EQUAL(string, find_end_of_text(string));
+}
+
+void test_find_end_of_text_with_single_word(void) {
+  char *string = "string";
+  TEST_ASSERT_EQUAL(string + 6, find_end_of_text(string));
+}
+void test_find_end_of_text_with_trailing_spaces(void) {
+  char *string = "string \t\r\n ";
+  TEST_ASSERT_EQUAL(string + 6, find_end_of_text(string));
+}
+
 void test_read_integers(void) {
   char filename[] = "test_read_integers_file.txt";
   const int expected_count = 1;
@@ -510,6 +551,14 @@ int main(void) {
   RUN_TEST(test_wrap_at_right_margin_with_width_40);
   RUN_TEST(test_wrap_at_right_margin_with_width_80);
   RUN_TEST(test_wrap_at_right_margin_with_maximum_width);
+  RUN_TEST(test_find_start_of_text_with_empty_string);
+  RUN_TEST(test_find_start_of_text_with_only_spaces);
+  RUN_TEST(test_find_start_of_text_with_single_word);
+  RUN_TEST(test_find_start_of_text_with_leading_spaces);
+  RUN_TEST(test_find_end_of_text_with_empty_string);
+  RUN_TEST(test_find_end_of_text_with_only_spaces);
+  RUN_TEST(test_find_end_of_text_with_single_word);
+  RUN_TEST(test_find_end_of_text_with_trailing_spaces);
   RUN_TEST(test_read_integers);
   RUN_TEST(test_compare_unsigned_char);
   RUN_TEST(test_sort_with_empty_range);

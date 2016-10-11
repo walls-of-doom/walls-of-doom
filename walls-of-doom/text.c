@@ -58,17 +58,21 @@ char *find_start_of_text(char *string) {
  * This is either the first trailing space or '\0'.
  */
 char *find_end_of_text(char *string) {
-  char *last_not_space = string;
+  char *end = string;
   while (*string != '\0') {
     if (!isspace(*string)) {
-      last_not_space = string;
+      end = string;
     }
     string++;
   }
-  if (*last_not_space != '\0') {
-    last_not_space++;
+  if (*end == '\0') {
+    return end;
   }
-  return last_not_space;
+  /* If the string is only spaces, end points to the first space. */
+  if (isspace(*end)) {
+    return end;
+  }
+  return end + 1;
 }
 
 /**
