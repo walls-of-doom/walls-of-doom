@@ -61,7 +61,6 @@
  * Information required for font loading.
  */
 #define MONOSPACED_FONT_PATH "@ASSETS_DIR@/fonts/roboto-mono.ttf"
-#define MONOSPACED_FONT_SIZE 20
 
 #define ICON_PATH "@ASSETS_DIR@/icons/icon.png"
 

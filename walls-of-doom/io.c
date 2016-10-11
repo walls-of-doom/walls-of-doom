@@ -54,7 +54,7 @@ static int initialize_fonts(void) {
     return 0;
   }
   /* We try to open the font if we need to initialize. */
-  font = TTF_OpenFont(MONOSPACED_FONT_PATH, MONOSPACED_FONT_SIZE);
+  font = TTF_OpenFont(MONOSPACED_FONT_PATH, get_font_size());
   /* If it failed, we log an error. */
   if (font == NULL) {
     sprintf(log_buffer, "TTF font opening error: %s", SDL_GetError());

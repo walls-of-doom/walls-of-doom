@@ -13,6 +13,9 @@
 
 #define DEFAULT_PLATFORM_COUNT 16
 #define MINIMUM_PLATFORM_COUNT 0
+#define MAXIMUM_FONT_SIZE 48
+#define DEFAULT_FONT_SIZE 20
+#define MINIMUM_FONT_SIZE 12
 #define DEFAULT_COLUMNS 80
 #define MINIMUM_COLUMNS 40
 #define DEFAULT_LINES 30
@@ -20,6 +23,7 @@
 
 static RepositionAlgorithm reposition_algorithm = REPOSITION_SELECT_AWARELY;
 static long platform_count = DEFAULT_PLATFORM_COUNT;
+static int font_size = DEFAULT_FONT_SIZE;
 static long columns = DEFAULT_COLUMNS;
 static long lines = DEFAULT_LINES;
 
@@ -102,6 +106,11 @@ void initialize_settings(void) {
       max_value = MAXIMUM_PLATFORM_COUNT;
       fallback = DEFAULT_PLATFORM_COUNT;
       platform_count = parse_value(value, min_value, max_value, fallback);
+    } else if (strcmp(key, "FONT_SIZE") == 0) {
+      min_value = MINIMUM_FONT_SIZE;
+      max_value = MAXIMUM_FONT_SIZE;
+      fallback = DEFAULT_FONT_SIZE;
+      font_size = parse_value(value, min_value, max_value, fallback);
     } else if (strcmp(key, "COLUMNS") == 0) {
       min_value = MINIMUM_COLUMNS;
       max_value = MAXIMUM_COLUMNS;
@@ -121,6 +130,8 @@ RepositionAlgorithm get_reposition_algorithm(void) {
 }
 
 long get_platform_count(void) { return platform_count; }
+
+int get_font_size(void) { return font_size; }
 
 long get_columns(void) { return columns; }
 

@@ -18,6 +18,8 @@ RepositionAlgorithm get_reposition_algorithm(void);
 
 long get_platform_count(void);
 
+int get_font_size(void);
+
 long get_columns(void);
 
 long get_lines(void);
