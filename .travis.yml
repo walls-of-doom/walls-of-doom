@@ -11,3 +11,10 @@ install:
 
 script:
   - bash scripts/test.sh
+
+notifications:
+  email:
+    on_success: always
+    on_failure: always
+    recipients:
+      - mafagafogigante@gmail.com
