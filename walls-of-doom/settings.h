@@ -4,8 +4,8 @@
 /* These maximums are made public so that static allocation is possible. */
 
 #define MAXIMUM_PLATFORM_COUNT 64
-#define MAXIMUM_COLUMNS 120
-#define MAXIMUM_LINES 40
+#define MAXIMUM_COLUMNS 200
+#define MAXIMUM_LINES 50
 
 typedef enum RepositionAlgorithm {
   REPOSITION_SELECT_BLINDLY,
