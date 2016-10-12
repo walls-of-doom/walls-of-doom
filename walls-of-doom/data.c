@@ -115,18 +115,22 @@ void log_access(Operation operation, const size_t bytes, const char *filename) {
  */
 int write_bytes(const char *filename, const void *source, const size_t size,
                 const size_t count) {
-  FILE *file;
-  size_t written_items;
   char log_buffer[MAXIMUM_STRING_SIZE];
+  unsigned long long_count;
+  unsigned long long_written;
+  size_t written;
+  FILE *file;
   log_access(WRITE, size * count, filename);
   file = fopen(filename, "wb");
   if (file == NULL) {
     return 1;
   }
-  written_items = fwrite(source, size, count, file);
+  written = fwrite(source, size, count, file);
   fclose(file);
-  if (written_items != count) {
-    sprintf(log_buffer, WRITE_BYTES_COUNT_FORMAT, count, written_items);
+  if (written != count) {
+    long_count = (unsigned long) count;
+    long_written = (unsigned long) written;
+    sprintf(log_buffer, WRITE_BYTES_COUNT_FORMAT, long_count, long_written);
     log_message(log_buffer);
     return 2;
   }
@@ -140,9 +144,11 @@ int write_bytes(const char *filename, const void *source, const size_t size,
  */
 int read_bytes(const char *filename, void *destination, const size_t size,
                const size_t count) {
-  FILE *file;
-  size_t read_items;
   char log_buffer[MAXIMUM_STRING_SIZE];
+  unsigned long long_count;
+  unsigned long long_read;
+  size_t read;
+  FILE *file;
   log_access(READ, size * count, filename);
   if (!file_exists(filename)) {
     return 1;
@@ -151,10 +157,12 @@ int read_bytes(const char *filename, void *destination, const size_t size,
   if (file == NULL) {
     return 2;
   }
-  read_items = fread(destination, size, count, file);
+  read = fread(destination, size, count, file);
   fclose(file);
-  if (read_items != count) {
-    sprintf(log_buffer, READ_BYTES_COUNT_FORMAT, count, read_items);
+  if (read != count) {
+    long_count = (unsigned long) count;
+    long_read = (unsigned long) read;
+    sprintf(log_buffer, READ_BYTES_COUNT_FORMAT, long_count, long_read);
     log_message(log_buffer);
     return 3;
   }
