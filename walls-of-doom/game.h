@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include "box.h"
+#include "clock.h"
 #include "constants.h"
 #include "logger.h"
 #include "numeric.h"
@@ -58,7 +59,7 @@ Game create_game(Player *player, Platform *platforms,
 
 void destroy_game(Game *game);
 
-void game_update(Game *const game);
+Milliseconds update_game(Game *const game);
 
 unsigned char get_from_rigid_matrix(const Game *const game, const int x,
                                     const int y);

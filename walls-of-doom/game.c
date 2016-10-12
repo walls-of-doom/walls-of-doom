@@ -9,6 +9,7 @@
 #include "memory.h"
 #include "menu.h"
 #include "physics.h"
+#include "profiler.h"
 #include "random.h"
 #include "record.h"
 #include "text.h"
@@ -112,10 +113,16 @@ void destroy_game(Game *game) {
   game->rigid_matrix = resize_memory(game->rigid_matrix, 0);
 }
 
-void game_update(Game *const game) {
+Milliseconds update_game(Game *const game) {
+  Milliseconds game_update_start = get_milliseconds();
   if (game->message_end_frame < game->frame) {
     game->message[0] = '\0';
   }
+  update_platforms(game);
+  update_perk(game);
+
+  update_profiler("update_game", get_milliseconds() - game_update_start);
+  return get_milliseconds() - game_update_start;
 }
 
 /**
@@ -172,6 +179,7 @@ int run_game(Game *const game, SDL_Renderer *renderer) {
   unsigned long next_played_frames_score = FPS;
   const Milliseconds interval = 1000 / FPS;
   Milliseconds drawing_delta = 0;
+  Milliseconds updating_delta = 0;
   Command command = COMMAND_NONE;
   while (command != COMMAND_QUIT && game->player->lives != 0) {
     /* Game loop */
@@ -179,12 +187,10 @@ int run_game(Game *const game, SDL_Renderer *renderer) {
       game->player->score++;
       next_played_frames_score += FPS;
     }
-    game_update(game);
-    update_platforms(game);
-    update_perk(game);
+    updating_delta = update_game(game);
     drawing_delta = draw_game(game, renderer);
     /* Delay, if needed */
-    if (drawing_delta < interval) {
+    if (updating_delta + drawing_delta < interval) {
       SDL_Delay(interval - drawing_delta);
     }
     command = read_next_command();
