@@ -71,7 +71,7 @@ int game(SDL_Renderer *renderer) {
 
   box = bounding_box_from_screen();
 
-  generate_platforms(platforms, get_platform_count());
+  generate_platforms(platforms, &box, get_platform_count());
 
   game = create_game(&player, platforms, get_platform_count(), &box);
 
