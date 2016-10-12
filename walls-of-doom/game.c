@@ -73,6 +73,7 @@ static void initialize_rigid_matrix(Game *game) {
  */
 Game create_game(Player *player, Platform *platforms,
                  const size_t platform_count, BoundingBox *box) {
+  size_t rigit_matrix_bytes;
   Game game;
 
   game.player = player;
@@ -94,7 +95,8 @@ Game create_game(Player *player, Platform *platforms,
   game.rigid_matrix_m = box->max_x - box->min_x + 1;
   game.rigid_matrix_size = game.rigid_matrix_n * game.rigid_matrix_m;
   game.rigid_matrix = NULL;
-  game.rigid_matrix = resize_memory(game.rigid_matrix, game.rigid_matrix_size);
+  rigit_matrix_bytes = sizeof(unsigned char) * game.rigid_matrix_size;
+  game.rigid_matrix = resize_memory(game.rigid_matrix, rigit_matrix_bytes);
   initialize_rigid_matrix(&game);
 
   game.message[0] = '\0';
