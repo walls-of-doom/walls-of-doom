@@ -63,6 +63,11 @@ $ make
 $ sudo make install
 ```
 
+> You can use `cmake -cmake -Dm32=1 ..` to get a 32-bit build.
+
+> Note that in order to build the 32-bit version, you will need the 32-bit
+> versions of all dependencies.
+
 ## Running the game
 
 ```bash

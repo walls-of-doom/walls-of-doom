@@ -24,7 +24,7 @@ set (CMAKE_EXPORT_COMPILE_COMMANDS 1)
 # C standard is enforced with compiler-specific flags.
 if ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
     set (CMAKE_C_FLAGS_BASE "-Wall -Wextra -Werror -Wpedantic")
-    if (32_BITS)
+    if (m32)
         set (CMAKE_C_FLAGS_BASE "${CMAKE_C_FLAGS_BASE} -m32")
     endif ()
 endif ()
