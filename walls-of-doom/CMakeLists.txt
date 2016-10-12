@@ -3,6 +3,7 @@ cmake_minimum_required (VERSION 2.8.7)
 set (CMAKE_MODULE_PATH ../cmake)
 set (ASSETS_DIR ${CMAKE_INSTALL_PREFIX}/share/${CMAKE_PROJECT_NAME})
 set (WRITABLE_ASSETS_DIR ${CMAKE_INSTALL_PREFIX}/share/${CMAKE_PROJECT_NAME}/saved)
+set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS_BASE} -std=c89")
 
 configure_file (version.h.in version.h)
 configure_file (constants.h.in constants.h)
