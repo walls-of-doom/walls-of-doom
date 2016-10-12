@@ -3,6 +3,7 @@
 #include "data.h"
 #include "io.h"
 #include "logger.h"
+#include "memory.h"
 #include "numeric.h"
 #include "random.h"
 #include "sort.h"
@@ -349,6 +350,40 @@ void test_bounding_box_equals(void) {
   }
 }
 
+void test_generate_platforms_avoids_multiple_platforms_on_the_same_line(void) {
+  const size_t platform_count = 128;
+  Platform *platforms = NULL;
+  int *y_counter = NULL;
+  BoundingBox box;
+  size_t i;
+  int y;
+  platforms = resize_memory(platforms, sizeof(Platform) * platform_count);
+  y_counter = resize_memory(y_counter, sizeof(int) * platform_count);
+  for (i = 0; i < platform_count; i++) {
+    y_counter[i] = 0;
+  }
+  box.min_x = 0;
+  box.min_y = 0;
+  box.max_x = platform_count - 1;
+  box.max_y = platform_count - 1;
+  generate_platforms(platforms, &box, platform_count);
+  /* Each platform in platforms should have a different y coordinate. */
+  for (i = 0; i < platform_count; i++) {
+    y = platforms[i].y;
+    /* Casting is safe because y is nonnegative at that point. */
+    if (y >= 0 && (size_t)y < platform_count) {
+      if (y_counter[y]) {
+        TEST_FAIL_MESSAGE("Two of more platforms on the same line");
+      } else {
+        y_counter[y]++;
+      }
+    } else {
+      TEST_FAIL_MESSAGE("Platform has invalid y coordinate");
+    }
+  }
+  resize_memory(platforms, 0);
+}
+
 void test_find_next_power_of_two_works_for_zero(void) {
   TEST_ASSERT_EQUAL_INT64(find_next_power_of_two(0), 1);
 }
@@ -569,6 +604,7 @@ int main(void) {
   RUN_TEST(test_reverse_with_an_even_number_of_single_bytes);
   RUN_TEST(test_reverse_with_words);
   RUN_TEST(test_bounding_box_equals);
+  RUN_TEST(test_generate_platforms_avoids_multiple_platforms_on_the_same_line);
   RUN_TEST(test_find_next_power_of_two_works_for_zero);
   RUN_TEST(test_find_next_power_of_two_works_for_positive_integers);
   RUN_TEST(test_random_integer_respects_the_provided_range);
