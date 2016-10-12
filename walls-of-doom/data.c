@@ -128,8 +128,8 @@ int write_bytes(const char *filename, const void *source, const size_t size,
   written = fwrite(source, size, count, file);
   fclose(file);
   if (written != count) {
-    long_count = (unsigned long) count;
-    long_written = (unsigned long) written;
+    long_count = (unsigned long)count;
+    long_written = (unsigned long)written;
     sprintf(log_buffer, WRITE_BYTES_COUNT_FORMAT, long_count, long_written);
     log_message(log_buffer);
     return 2;
@@ -160,8 +160,8 @@ int read_bytes(const char *filename, void *destination, const size_t size,
   read = fread(destination, size, count, file);
   fclose(file);
   if (read != count) {
-    long_count = (unsigned long) count;
-    long_read = (unsigned long) read;
+    long_count = (unsigned long)count;
+    long_read = (unsigned long)read;
     sprintf(log_buffer, READ_BYTES_COUNT_FORMAT, long_count, long_read);
     log_message(log_buffer);
     return 3;
