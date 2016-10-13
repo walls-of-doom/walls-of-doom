@@ -15,6 +15,8 @@ const ColorPair TOP_BAR_COLOR = {{0x22, 0x22, 0x22, 0xFF},
 /* Dark gray with blue-gray. */
 const ColorPair BOTTOM_BAR_COLOR = {{0x22, 0x22, 0x22, 0xFF},
                                     {0x66, 0x99, 0xCC, 0xFF}};
+const ColorPair PLAYER_COLOR = {{0xFF, 0xF5, 0xC3, 0xFF},
+                                {0x66, 0x99, 0xCC, 0xFF}};
 
 int color_equals(Color a, Color b) {
   return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;

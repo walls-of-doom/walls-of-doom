@@ -624,9 +624,16 @@ int draw_perk(const Game *const game, SDL_Renderer *renderer) {
   return 0;
 }
 
-int draw_player(const Player *const player, SDL_Renderer *renderer) {
-  print(player->x, player->y, PLAYER_SYMBOL, DEFAULT_COLOR, renderer);
-  return 0;
+Code draw_player(const Player *const player, SDL_Renderer *renderer) {
+  const int w = global_monospaced_font_width;
+  const int h = global_monospaced_font_height;
+  SDL_Rect rectangle;
+  rectangle.x = player->x * w;
+  rectangle.y = player->y * h;
+  rectangle.h = h;
+  rectangle.w = w;
+  draw_rectangle(rectangle, PLAYER_COLOR, renderer);
+  return CODE_OK;
 }
 
 /**
