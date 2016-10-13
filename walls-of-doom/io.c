@@ -591,22 +591,24 @@ static void draw_rectangle(SDL_Rect rectangle, ColorPair color_pair,
   SDL_SetRenderDrawColor(renderer, helper.r, helper.g, helper.b, helper.a);
 }
 
-Code draw_platforms(const Game *game, SDL_Renderer *renderer) {
-  int x;
-  int y;
+int draw_platforms(const Platform *platforms, const size_t platform_count,
+                   const BoundingBox *box, SDL_Renderer *renderer) {
+  const int w = global_monospaced_font_width;
+  const int h = global_monospaced_font_height;
+  Platform p;
   SDL_Rect rectangle;
-  rectangle.w = global_monospaced_font_width;
-  rectangle.h = global_monospaced_font_height;
-  for (x = game->box->min_x; x <= game->box->max_x; x++) {
-    for (y = game->box->min_y; y <= game->box->max_y; y++) {
-      if (get_from_rigid_matrix(game, x, y)) {
-        rectangle.x = x * rectangle.w;
-        rectangle.y = y * rectangle.h;
-        draw_rectangle(rectangle, PLATFORM_COLOR, renderer);
-      }
-    }
+  size_t i;
+  rectangle.h = h;
+  for (i = 0; i < platform_count; i++) {
+    p = platforms[i];
+    rectangle.x = max(box->min_x, p.x);
+    rectangle.w = min(box->max_x, p.x + p.width - 1) - rectangle.x + 1;
+    rectangle.x *= w;
+    rectangle.w *= w;
+    rectangle.y = p.y * h;
+    draw_rectangle(rectangle, PLATFORM_COLOR, renderer);
   }
-  return CODE_OK;
+  return 0;
 }
 
 int has_active_perk(const Game *const game) { return game->perk != PERK_NONE; }
@@ -653,7 +655,7 @@ Milliseconds draw_game(const Game *const game, SDL_Renderer *renderer) {
   update_profiler("draw_game:draw_borders", get_milliseconds() - start);
 
   start = get_milliseconds();
-  draw_platforms(game, renderer);
+  draw_platforms(game->platforms, game->platform_count, game->box, renderer);
   update_profiler("draw_game:draw_platforms", get_milliseconds() - start);
 
   start = get_milliseconds();
