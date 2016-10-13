@@ -15,7 +15,8 @@ typedef enum Command {
   COMMAND_JUMP,
   COMMAND_ENTER,
   COMMAND_CONVERT,
-  COMMAND_QUIT
+  COMMAND_QUIT,
+  COMMAND_CLOSE
 } Command;
 
 #endif

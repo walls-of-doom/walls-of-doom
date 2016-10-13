@@ -235,25 +235,28 @@ int is_valid_player_name(const char *player_name) {
   return strlen(buffer) >= 2;
 }
 
-void read_player_name(char *destination, const size_t maximum_size,
+/**
+ * Attempts to read a player name.
+ *
+ * Returns a Code, which may indicate that the player tried to quit.
+ */
+Code read_player_name(char *destination, const size_t maximum_size,
                       SDL_Renderer *renderer) {
   int x;
   int y;
-  int error = 0;
+  Code code = CODE_ERROR;
   int valid_name = 0;
   const char message[] = "Name your character: ";
   char log_buffer[MAXIMUM_STRING_SIZE];
   random_name(destination);
   /* While there is not a read error or a valid name. */
-  while (!error && !valid_name) {
+  while (code != CODE_OK && !valid_name) {
     x = PADDING;
     y = get_lines() / 2;
-    error = read_string(x, y, message, destination, maximum_size, renderer);
-    if (error) {
-      log_message("Failed to read player name");
-      /* Cope with it by providing a name for the player. */
-      copy_string(destination, FALLBACK_PLAYER_NAME, maximum_size);
-    } else {
+    code = read_string(x, y, message, destination, maximum_size, renderer);
+    if (code == CODE_QUIT) {
+      return CODE_QUIT;
+    } else if (code == CODE_OK) {
       sprintf(log_buffer, "Read '%s' from the user", destination);
       log_message(log_buffer);
       /* Trim the name the user entered. */
@@ -263,6 +266,7 @@ void read_player_name(char *destination, const size_t maximum_size,
       valid_name = is_valid_player_name(destination);
     }
   }
+  return code;
 }
 
 /**
@@ -717,7 +721,7 @@ BoundingBox bounding_box_from_screen(void) {
 Command command_from_event(const SDL_Event event) {
   SDL_Keycode keycode;
   if (event.type == SDL_QUIT) {
-    return COMMAND_QUIT;
+    return COMMAND_CLOSE;
   }
   if (event.type == SDL_KEYDOWN) {
     keycode = event.key.keysym.sym;
@@ -786,12 +790,9 @@ static void print_limited(const int x, const int y, const char *string,
  * Reads a string from the user of up to size characters (including NUL).
  *
  * The string will be echoed after the prompt, which starts at (x, y).
- *
- * Returns 0 if successful.
- * Returns 1 if the user tried to quit.
  */
-int read_string(const int x, const int y, const char *prompt, char *destination,
-                const size_t size, SDL_Renderer *renderer) {
+Code read_string(const int x, const int y, const char *prompt,
+                 char *destination, const size_t size, SDL_Renderer *renderer) {
   const int buffer_x = x + strlen(prompt) + 1;
   const int buffer_view_limit = get_columns() - PADDING - buffer_x;
   int is_done = 0;
@@ -829,7 +830,7 @@ int read_string(const int x, const int y, const char *prompt, char *destination,
       /* This is OK because the destination string is always a valid C string.
        */
       if (event.type == SDL_QUIT) {
-        return 1;
+        return CODE_QUIT;
       } else if (event.type == SDL_KEYDOWN) {
         /* Handle backspace. */
         if (event.key.keysym.sym == SDLK_BACKSPACE && written > 0) {
@@ -857,7 +858,7 @@ int read_string(const int x, const int y, const char *prompt, char *destination,
   }
   /* Stop listening for text input. */
   SDL_StopTextInput();
-  return 0;
+  return CODE_OK;
 }
 
 /**

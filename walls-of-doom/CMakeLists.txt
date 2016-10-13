@@ -12,7 +12,7 @@ add_library (walls-of-doom-base
     about.h about.c
     box.h box.c
     clock.h clock.c
-    code.h
+    code.h code.c
     color.h color.c
     command.h
     constants.h

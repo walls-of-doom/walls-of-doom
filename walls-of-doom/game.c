@@ -169,19 +169,27 @@ void register_score(const Game *const game, SDL_Renderer *renderer) {
   wait_for_input();
 }
 
+static Code code_from_command(const Command command) {
+  if (command == COMMAND_CLOSE) {
+    return CODE_CLOSE;
+  } else if (command == COMMAND_QUIT) {
+    return CODE_QUIT;
+  } else {
+    return CODE_OK;
+  }
+}
+
 /**
- * Runs the main loop of the provided game and registers the player score at the
- * end.
- *
- * Returns 0 if successful.
+ * Runs the main game loop for the Game object and registers the player score.
  */
-int run_game(Game *const game, SDL_Renderer *renderer) {
+Code run_game(Game *const game, SDL_Renderer *renderer) {
   unsigned long next_played_frames_score = FPS;
   const Milliseconds interval = 1000 / FPS;
   Milliseconds drawing_delta = 0;
   Milliseconds updating_delta = 0;
   Command command = COMMAND_NONE;
-  while (command != COMMAND_QUIT && game->player->lives != 0) {
+  Code code = CODE_OK;
+  while (!is_termination_code(code) && game->player->lives != 0) {
     /* Game loop */
     if (game->played_frames == next_played_frames_score) {
       game->player->score++;
@@ -194,11 +202,16 @@ int run_game(Game *const game, SDL_Renderer *renderer) {
       SDL_Delay(interval - drawing_delta);
     }
     command = read_next_command();
+    code = code_from_command(command);
     update_player(game, command);
     game->frame++;
   }
-  /* Ignoring how the game ended (quit command, screen resize, or death),
-   * register the score */
-  register_score(game, renderer);
-  return 0;
+  if (code != CODE_CLOSE) {
+    register_score(game, renderer);
+  }
+  if (code == CODE_QUIT) {
+    /* When the player quits from the game, it should go back to the menu. */
+    code = CODE_OK;
+  }
+  return code;
 }

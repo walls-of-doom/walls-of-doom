@@ -41,14 +41,16 @@ int finalize(SDL_Window **window, SDL_Renderer **renderer);
  * Reads a string from the user of up to size characters (including NUL).
  *
  * The string will be echoed after the prompt, which starts at (x, y).
- *
- * Returns 0 if successful.
- * Returns 1 if the user tried to quit.
  */
-int read_string(const int x, const int y, const char *prompt, char *destination,
-                size_t size, SDL_Renderer *renderer);
+Code read_string(const int x, const int y, const char *prompt,
+                 char *destination, size_t size, SDL_Renderer *renderer);
 
-void read_player_name(char *destination, const size_t maximum_size,
+/**
+ * Attempts to read a player name.
+ *
+ * Returns a Code, which may indicate that the player tried to quit.
+ */
+Code read_player_name(char *destination, const size_t maximum_size,
                       SDL_Renderer *renderer);
 
 /**

@@ -3,6 +3,7 @@
 
 #include "box.h"
 #include "clock.h"
+#include "code.h"
 #include "constants.h"
 #include "logger.h"
 #include "numeric.h"
@@ -82,11 +83,8 @@ void game_set_message(Game *const game, const char *message,
                       const unsigned int priority);
 
 /**
- * Runs the main loop of the provided game and registers the player score at the
- * end.
- *
- * Returns 0 if successful.
+ * Runs the main game loop for the Game object and registers the player score.
  */
-int run_game(Game *const game, SDL_Renderer *renderer);
+Code run_game(Game *const game, SDL_Renderer *renderer);
 
 #endif

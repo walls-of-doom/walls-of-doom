@@ -56,14 +56,19 @@ void write_menu(const Menu *const menu, SDL_Renderer *renderer) {
 /**
  * Enters the game.
  */
-int game(SDL_Renderer *renderer) {
+Code game(SDL_Renderer *renderer) {
   char name[MAXIMUM_PLAYER_NAME_SIZE];
   Player player;
   Platform platforms[MAXIMUM_PLATFORM_COUNT];
   BoundingBox box;
   Game game;
+  Code code;
 
-  read_player_name(name, MAXIMUM_PLAYER_NAME_SIZE, renderer);
+  code = read_player_name(name, MAXIMUM_PLAYER_NAME_SIZE, renderer);
+  /* If got QUIT or CLOSE, return now. */
+  if (code == CODE_QUIT || code == CODE_CLOSE) {
+    return code;
+  }
 
   player = make_player(name);
   player.x = get_columns() / 2;
@@ -75,11 +80,11 @@ int game(SDL_Renderer *renderer) {
 
   game = create_game(&player, platforms, get_platform_count(), &box);
 
-  run_game(&game, renderer);
+  code = run_game(&game, renderer);
 
   destroy_game(&game);
 
-  return 0;
+  return code;
 }
 
 int main_menu(SDL_Renderer *renderer) {
@@ -112,15 +117,17 @@ int main_menu(SDL_Renderer *renderer) {
       }
     } else if (command == COMMAND_ENTER || command == COMMAND_CENTER) {
       if (menu.selected_option == 0) {
-        game(renderer);
+        code = game(renderer);
       } else if (menu.selected_option == 1) {
         code = top_scores(renderer);
-        should_quit = code == CODE_QUIT;
       } else if (menu.selected_option == 2) {
         code = info(renderer);
-        should_quit = code == CODE_QUIT;
       } else if (menu.selected_option == 3) {
         should_quit = 1;
+      }
+      /* If it is not defined whether or not we should quit, check the code. */
+      if (should_quit == 0) {
+        should_quit = is_termination_code(code);
       }
     }
     /* Quit if the user selected the Quit option or closed the window. */
