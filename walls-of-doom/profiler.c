@@ -15,12 +15,12 @@
 #define MAXIMUM_DATA_IDENTIFIER_SIZE 32
 
 #define OUTPUT_HEADER "Mean,Frequency,Identifier\n"
-#define OUTPUT_FORMAT "%.2f,%ld,%s\n"
+#define OUTPUT_FORMAT "%s,%ld,%s\n"
 #define OUTPUT_FORMAT_SIZE 128
 
 typedef struct ProfilerData {
   char identifier[MAXIMUM_DATA_IDENTIFIER_SIZE];
-  Milliseconds sum;
+  Nanoseconds sum;
   unsigned long frequency;
 } ProfilerData;
 
@@ -74,11 +74,33 @@ ProfilerData *get_data(const char *identifier) {
 void update_profiler(const char *identifier, const Milliseconds delta) {
   ProfilerData *data = get_data(identifier);
   data->frequency++;
+  data->sum += delta * 1000000;
+}
+
+/**
+ * Updates the statistics about an identifier with a new nanosecond count.
+ */
+void update_profiler_precise(const char *identifier, const Nanoseconds delta) {
+  ProfilerData *data = get_data(identifier);
+  data->frequency++;
   data->sum += delta;
 }
 
 static double profiler_data_mean(const ProfilerData *const data) {
   return data->sum / (double)data->frequency;
+}
+
+static void write_mean(const double nano_mean, char *dest) {
+  if (nano_mean < 1e3) {
+    sprintf(dest, "%7.3f ns", nano_mean);
+  } else if (nano_mean < 1e6) {
+    /* Should not be a 'u', but for now it will do. */
+    sprintf(dest, "%7.3f us", nano_mean / 1e3);
+  } else if (nano_mean < 1e9) {
+    sprintf(dest, "%7.3f ms", nano_mean / 1e6);
+  } else {
+    sprintf(dest, "%7.3f  s", nano_mean / 1e9);
+  }
 }
 
 static void profiler_data_copy_base_id(const ProfilerData *data, char *dest) {
@@ -118,6 +140,7 @@ void sort_table(void) {
 }
 
 void write_statistics(void) {
+  char mean_buffer[MAXIMUM_STRING_SIZE];
   char path[MAXIMUM_PATH_SIZE];
   unsigned long frequency;
   double mean;
@@ -137,7 +160,8 @@ void write_statistics(void) {
       mean = profiler_data_mean(table + i);
       frequency = table[i].frequency;
       identifier = table[i].identifier;
-      fprintf(file, OUTPUT_FORMAT, mean, frequency, identifier);
+      write_mean(mean, mean_buffer);
+      fprintf(file, OUTPUT_FORMAT, mean_buffer, frequency, identifier);
     }
     fprintf(file, "\n");
     fclose(file);

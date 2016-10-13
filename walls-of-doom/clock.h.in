@@ -1,0 +1,31 @@
+#ifndef CLOCK_H
+#define CLOCK_H
+
+/* The minimum required for what we need. */
+#define _POSIX_C_SOURCE 199309L
+
+typedef long Milliseconds;
+typedef long Nanoseconds;
+
+#if (@UNIX_AND_NOT_APPLE@)
+  #include <unistd.h>
+  #if (_POSIX_TIMERS > 0)
+    #define HAS_CLOCK_GETTIME
+  #endif
+#endif
+
+/**
+ * Returns a number of milliseconds.
+ *
+ * This function should be used to measure computation times.
+ */
+Milliseconds get_milliseconds(void);
+
+/**
+ * Returns a number of nanoseconds.
+ *
+ * This function should be used to measure computation times.
+ */
+Nanoseconds get_nanoseconds(void);
+
+#endif
