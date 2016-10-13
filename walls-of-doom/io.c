@@ -581,31 +581,32 @@ void draw_borders(SDL_Renderer *renderer) {
   render_borders(borders, renderer);
 }
 
-int draw_platforms(const Platform *platforms, const size_t platform_count,
-                   const BoundingBox *const box, SDL_Renderer *renderer) {
+static void draw_rectangle(SDL_Rect rectangle, ColorPair color_pair,
+                           SDL_Renderer *renderer) {
+  const SDL_Color color = to_sdl_color(color_pair.foreground);
+  SDL_Color helper;
+  SDL_GetRenderDrawColor(renderer, &helper.r, &helper.g, &helper.b, &helper.a);
+  SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+  SDL_RenderFillRect(renderer, &rectangle);
+  SDL_SetRenderDrawColor(renderer, helper.r, helper.g, helper.b, helper.a);
+}
+
+Code draw_platforms(const Game *game, SDL_Renderer *renderer) {
+  int x;
   int y;
-  int min_x;
-  int max_x;
-  size_t i;
-  /* We make the assumption that the biggest box is COLUMNS wide. */
-  char buffer[MAXIMUM_COLUMNS + 1];
-  char *iter;
-  memset(buffer, ' ', get_columns() + 1);
-  buffer[get_columns()] = '\0';
-  for (i = 0; i < platform_count; i++) {
-    y = platforms[i].y;
-    min_x = platforms[i].x;
-    max_x = platforms[i].x + platforms[i].width - 1;
-    if (y >= box->min_y && y <= box->max_y) {
-      if (min_x <= box->max_x && max_x >= box->min_x) {
-        min_x = max(box->min_x, min_x);
-        max_x = min(box->max_x, max_x);
-        iter = buffer + get_columns() - (max_x - min_x + 1);
-        print(min_x, y, iter, PLATFORM_COLOR, renderer);
+  SDL_Rect rectangle;
+  rectangle.w = global_monospaced_font_width;
+  rectangle.h = global_monospaced_font_height;
+  for (x = game->box->min_x; x <= game->box->max_x; x++) {
+    for (y = game->box->min_y; y <= game->box->max_y; y++) {
+      if (get_from_rigid_matrix(game, x, y)) {
+        rectangle.x = x * rectangle.w;
+        rectangle.y = y * rectangle.h;
+        draw_rectangle(rectangle, PLATFORM_COLOR, renderer);
       }
     }
   }
-  return 0;
+  return CODE_OK;
 }
 
 int has_active_perk(const Game *const game) { return game->perk != PERK_NONE; }
@@ -652,7 +653,7 @@ Milliseconds draw_game(const Game *const game, SDL_Renderer *renderer) {
   update_profiler("draw_game:draw_borders", get_milliseconds() - start);
 
   start = get_milliseconds();
-  draw_platforms(game->platforms, game->platform_count, game->box, renderer);
+  draw_platforms(game, renderer);
   update_profiler("draw_game:draw_platforms", get_milliseconds() - start);
 
   start = get_milliseconds();
