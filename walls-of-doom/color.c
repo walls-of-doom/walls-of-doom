@@ -2,21 +2,42 @@
 
 #include <SDL.h>
 
-const Color BACKGROUND_COLOR = {0x22, 0x22, 0x22, 0xFF};
-const ColorPair DEFAULT_COLOR = {{0xBB, 0xBB, 0xBB, 0xFF},
-                                 {0x22, 0x22, 0x22, 0xFF}};
-const ColorPair PLATFORM_COLOR = {{0xBB, 0xBB, 0xBB, 0xFF},
-                                  {0xAA, 0xAA, 0xAA, 0xFF}};
-const ColorPair PERK_COLOR = {{0xBB, 0xBB, 0xBB, 0xFF},
-                              {0x77, 0xDD, 0x77, 0xFF}};
-/* Dark gray with pastel red. */
-const ColorPair TOP_BAR_COLOR = {{0x22, 0x22, 0x22, 0xFF},
-                                 {0xFF, 0x69, 0x61, 0xFF}};
-/* Dark gray with blue-gray. */
-const ColorPair BOTTOM_BAR_COLOR = {{0x22, 0x22, 0x22, 0xFF},
-                                    {0x66, 0x99, 0xCC, 0xFF}};
-const ColorPair PLAYER_COLOR = {{0xFF, 0xF5, 0xC3, 0xFF},
-                                {0x66, 0x99, 0xCC, 0xFF}};
+/* These colors work as fallback if settings fails. */
+Color COLOR_DEFAULT_FOREGROUND = {192, 192, 192, 255};
+Color COLOR_DEFAULT_BACKGROUND = {32, 32, 32, 255};
+ColorPair COLOR_PAIR_DEFAULT = {{192, 192, 192, 255}, {32, 32, 32, 255}};
+ColorPair COLOR_PAIR_PERK = {{192, 192, 192, 255}, {32, 32, 32, 255}};
+ColorPair COLOR_PAIR_PLAYER = {{192, 192, 192, 255}, {32, 32, 32, 255}};
+ColorPair COLOR_PAIR_TOP_BAR = {{192, 192, 192, 255}, {32, 32, 32, 255}};
+ColorPair COLOR_PAIR_PLATFORM = {{192, 192, 192, 255}, {32, 32, 32, 255}};
+ColorPair COLOR_PAIR_BOTTOM_BAR = {{192, 192, 192, 255}, {32, 32, 32, 255}};
+
+static unsigned char parse_two_hexadecimal_characters(const char *string) {
+  char substring[3];
+  substring[0] = string[0];
+  substring[1] = string[1];
+  substring[2] = '\0';
+  return (unsigned char)strtoul(substring, NULL, 16);
+}
+
+Color color_from_string(const char *string) {
+  Color color;
+  color.r = parse_two_hexadecimal_characters(string);
+  color.g = parse_two_hexadecimal_characters(string + 2);
+  color.b = parse_two_hexadecimal_characters(string + 4);
+  color.a = parse_two_hexadecimal_characters(string + 6);
+  return color;
+}
+
+ColorPair color_pair_from_string(const char *string) {
+  ColorPair pair;
+  char *const end = strchr(string, ',');
+  *end = '\0';
+  pair.foreground = color_from_string(string);
+  *end = ',';
+  pair.background = color_from_string(end + 1);
+  return pair;
+}
 
 int color_equals(Color a, Color b) {
   return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;

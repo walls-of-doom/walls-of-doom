@@ -170,7 +170,7 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
   }
   set_window_title_and_icon(*window);
   *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED);
-  set_render_color(*renderer, BACKGROUND_COLOR);
+  set_render_color(*renderer, COLOR_DEFAULT_BACKGROUND);
   clear(*renderer);
   return 0;
 }
@@ -311,8 +311,8 @@ static SDL_Texture *renderable_texture(int w, int h, SDL_Renderer *renderer) {
 }
 
 static Code cache_borders_texture(BoundingBox borders, SDL_Renderer *renderer) {
-  const SDL_Color foreground = to_sdl_color(DEFAULT_COLOR.foreground);
-  const SDL_Color background = to_sdl_color(DEFAULT_COLOR.background);
+  const SDL_Color foreground = to_sdl_color(COLOR_PAIR_DEFAULT.foreground);
+  const SDL_Color background = to_sdl_color(COLOR_PAIR_DEFAULT.background);
   const int x_step = global_monospaced_font_width;
   const int y_step = global_monospaced_font_height;
   const int min_x = borders.min_x;
@@ -465,7 +465,7 @@ void print_long_text(char *string, SDL_Renderer *renderer) {
   y = (get_lines() - line_count) / 2;
   while (*cursor != '\0') {
     cursor = copy_first_line(cursor, line);
-    print(PADDING, y, line, DEFAULT_COLOR, renderer);
+    print(PADDING, y, line, COLOR_PAIR_DEFAULT, renderer);
     y++;
   }
   present(renderer);
@@ -524,7 +524,7 @@ void write_top_bar_strings(char *strings[], SDL_Renderer *renderer) {
       }
     }
   }
-  print(0, 0, buffer, TOP_BAR_COLOR, renderer);
+  print(0, 0, buffer, COLOR_PAIR_TOP_BAR, renderer);
 }
 
 /**
@@ -565,8 +565,8 @@ void draw_bottom_bar(const char *message, SDL_Renderer *renderer) {
   char buffer[MAXIMUM_COLUMNS + 1];
   memset(buffer, ' ', get_columns());
   buffer[get_columns()] = '\0';
-  print(0, get_lines() - 1, buffer, BOTTOM_BAR_COLOR, renderer);
-  print(0, get_lines() - 1, message, BOTTOM_BAR_COLOR, renderer);
+  print(0, get_lines() - 1, buffer, COLOR_PAIR_BOTTOM_BAR, renderer);
+  print(0, get_lines() - 1, message, COLOR_PAIR_BOTTOM_BAR, renderer);
 }
 
 /**
@@ -606,14 +606,14 @@ int draw_platforms(const Platform *platforms, const size_t platform_count,
     rectangle.x *= w;
     rectangle.w *= w;
     rectangle.y = p.y * h;
-    draw_rectangle(rectangle, PLATFORM_COLOR, renderer);
+    draw_rectangle(rectangle, COLOR_PAIR_PLATFORM, renderer);
   }
   return 0;
 }
 
 int has_active_perk(const Game *const game) { return game->perk != PERK_NONE; }
 
-static ColorPair get_perk_color() { return PERK_COLOR; }
+static ColorPair get_perk_color() { return COLOR_PAIR_PERK; }
 
 int draw_perk(const Game *const game, SDL_Renderer *renderer) {
   ColorPair perk_color;
@@ -632,7 +632,7 @@ Code draw_player(const Player *const player, SDL_Renderer *renderer) {
   rectangle.y = player->y * h;
   rectangle.h = h;
   rectangle.w = w;
-  draw_rectangle(rectangle, PLAYER_COLOR, renderer);
+  draw_rectangle(rectangle, COLOR_PAIR_PLAYER, renderer);
   return CODE_OK;
 }
 
@@ -683,6 +683,7 @@ Milliseconds draw_game(const Game *const game, SDL_Renderer *renderer) {
 
 void print_game_result(const char *name, const unsigned int score,
                        const int position, SDL_Renderer *renderer) {
+  const ColorPair color = COLOR_PAIR_DEFAULT;
   char first_line[MAXIMUM_STRING_SIZE];
   char second_line[MAXIMUM_STRING_SIZE];
   sprintf(first_line, "%s died after making %d points.", name, score);
@@ -692,8 +693,8 @@ void print_game_result(const char *name, const unsigned int score,
     sprintf(second_line, "%s didn't make it to the top scores.", name);
   }
   clear(renderer);
-  print_centered(get_lines() / 2 - 1, first_line, DEFAULT_COLOR, renderer);
-  print_centered(get_lines() / 2 + 1, second_line, DEFAULT_COLOR, renderer);
+  print_centered(get_lines() / 2 - 1, first_line, color, renderer);
+  print_centered(get_lines() / 2 + 1, second_line, color, renderer);
   present(renderer);
 }
 
@@ -768,17 +769,17 @@ static void print_limited(const int x, const int y, const char *string,
    */
   /* String length is less than the limit. */
   if (string_length < limit) {
-    print(x, y, string, DEFAULT_COLOR, renderer);
+    print(x, y, string, COLOR_PAIR_DEFAULT, renderer);
     return;
   }
   /* String is longer than the limit. */
   /* Write the ellipsis if we need to. */
   if (limit >= MINIMUM_STRING_SIZE_FOR_ELLIPSIS) {
-    print(x, y, ELLIPSIS_STRING, DEFAULT_COLOR, renderer);
+    print(x, y, ELLIPSIS_STRING, COLOR_PAIR_DEFAULT, renderer);
   }
   /* Write the tail of the input string. */
   string += string_length - limit + ELLIPSIS_LENGTH;
-  print(x + ELLIPSIS_LENGTH, y, string, DEFAULT_COLOR, renderer);
+  print(x + ELLIPSIS_LENGTH, y, string, COLOR_PAIR_DEFAULT, renderer);
 }
 
 /**
@@ -805,10 +806,10 @@ int read_string(const int x, const int y, const char *prompt, char *destination,
   while (!is_done) {
     if (should_rerender) {
       clear(renderer);
-      print(x, y, prompt, DEFAULT_COLOR, renderer);
+      print(x, y, prompt, COLOR_PAIR_DEFAULT, renderer);
       if (written == 0) {
         /* We must write a single space, or SDL will not render anything. */
-        print(buffer_x, y, " ", DEFAULT_COLOR, renderer);
+        print(buffer_x, y, " ", COLOR_PAIR_DEFAULT, renderer);
       } else {
         /*
          * Must care about how much we write, PADDING should be respected.

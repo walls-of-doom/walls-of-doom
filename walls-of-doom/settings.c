@@ -1,5 +1,6 @@
 #include "settings.h"
 
+#include "color.h"
 #include "constants.h"
 #include "data.h"
 #include "logger.h"
@@ -82,6 +83,10 @@ static long parse_value(const char *value, const long minimum,
   return integer;
 }
 
+static ColorPair parse_color(const char *string) {
+  return color_pair_from_string(string);
+}
+
 void initialize_settings(void) {
   char input[SETTINGS_BUFFER_SIZE];
   char key[SETTINGS_STRING_SIZE];
@@ -121,6 +126,18 @@ void initialize_settings(void) {
       max_value = MAXIMUM_LINES;
       fallback = DEFAULT_LINES;
       lines = parse_value(value, min_value, max_value, fallback);
+    } else if (strcmp(key, "COLOR_PAIR_DEFAULT") == 0) {
+      COLOR_PAIR_DEFAULT = parse_color(value);
+    } else if (strcmp(key, "COLOR_PAIR_PERK") == 0) {
+      COLOR_PAIR_PERK = parse_color(value);
+    } else if (strcmp(key, "COLOR_PAIR_PLAYER") == 0) {
+      COLOR_PAIR_PLAYER = parse_color(value);
+    } else if (strcmp(key, "COLOR_PAIR_TOP_BAR") == 0) {
+      COLOR_PAIR_TOP_BAR = parse_color(value);
+    } else if (strcmp(key, "COLOR_PAIR_PLATFORM") == 0) {
+      COLOR_PAIR_PLATFORM = parse_color(value);
+    } else if (strcmp(key, "COLOR_PAIR_BOTTOM_BAR") == 0) {
+      COLOR_PAIR_BOTTOM_BAR = parse_color(value);
     }
   }
 }

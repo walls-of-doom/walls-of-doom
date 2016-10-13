@@ -15,13 +15,17 @@ typedef struct ColorPair {
   Color background;
 } ColorPair;
 
-extern const Color BACKGROUND_COLOR;
-extern const ColorPair DEFAULT_COLOR;
-extern const ColorPair PERK_COLOR;
-extern const ColorPair TOP_BAR_COLOR;
-extern const ColorPair BOTTOM_BAR_COLOR;
-extern const ColorPair PLATFORM_COLOR;
-extern const ColorPair PLAYER_COLOR;
+/* These colors work as fallback if settings fails. */
+extern Color COLOR_DEFAULT_FOREGROUND;
+extern Color COLOR_DEFAULT_BACKGROUND;
+extern ColorPair COLOR_PAIR_DEFAULT;
+extern ColorPair COLOR_PAIR_PERK;
+extern ColorPair COLOR_PAIR_PLAYER;
+extern ColorPair COLOR_PAIR_TOP_BAR;
+extern ColorPair COLOR_PAIR_PLATFORM;
+extern ColorPair COLOR_PAIR_BOTTOM_BAR;
+
+ColorPair color_pair_from_string(const char *string);
 
 int color_equals(Color a, Color b);
 
