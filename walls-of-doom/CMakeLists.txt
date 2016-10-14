@@ -47,4 +47,4 @@ add_executable (walls-of-doom main.c)
 target_link_libraries (walls-of-doom walls-of-doom-base)
 
 install (TARGETS walls-of-doom RUNTIME DESTINATION bin)
-install (DIRECTORY ${CMAKE_SOURCE_DIR}/assets/ DESTINATION ${ASSETS_DIR})
+install (DIRECTORY ${CMAKE_SOURCE_DIR}/assets/ DESTINATION ${ASSETS_DIR} PATTERN "tests" EXCLUDE)
