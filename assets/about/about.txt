@@ -1,4 +1,19 @@
-Walls of Doom is a minimalistic platformer written ANSI C by Bernardo Sulzbach
-and others. The player gets points for surviving in a space enclosed by deadly
-walls with constantly moving platforms. The game is released under the BSD
-3-Clause license for anyone to be able to play and modify it.
+About
+
+
+Walls of Doom is a minimalistic platformer written in ANSI C by Bernardo
+Sulzbach and others. The game is released under the BSD 3-Clause license for
+anyone to be able to play and modify it. The player gets points for surviving
+in a space enclosed by deadly walls with constantly moving platforms.
+
+
+Commands
+
+
+  Arrows or Keypad        - Change running direction
+
+  Space                   - Jump
+
+  C                       - Convert points into a life
+
+  Q                       - Quit

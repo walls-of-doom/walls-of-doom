@@ -414,15 +414,23 @@ void print_centered(const int y, const char *string, const ColorPair color_pair,
 }
 
 /**
- * Replaces all newlines, carriage returns, and tabs by the ASCII space.
+ * Replaces the first line break of any sequence of line breaks by a space.
  */
-void normalize_whitespaces(char *string) {
+static void remove_first_breaks(char *string) {
   char c;
   size_t i;
+  int preserve = 0;
   for (i = 0; string[i] != '\0'; i++) {
     c = string[i];
-    if (c == '\n' || c == '\t') {
-      string[i] = ' ';
+    if (c == '\n') {
+      if (!preserve) {
+        string[i] = ' ';
+        /* Stop erasing newlines. */
+        preserve = 1;
+      }
+    } else {
+      /* Not a newline, we can erase again. */
+      preserve = 0;
     }
   }
 }
@@ -455,23 +463,36 @@ char *copy_first_line(char *source, char *destination) {
  * Prints the provided string after formatting it to increase readability.
  */
 void print_long_text(char *string, SDL_Renderer *renderer) {
-  const int width = get_columns() - 2 * PADDING;
-  char line[MAXIMUM_COLUMNS + 1];
-  char *cursor;
-  int line_count;
-  int y;
-  normalize_whitespaces(string);
-  wrap_at_right_margin(string, width);
-  line_count = count_lines(string);
+  const int font_width = global_monospaced_font_width;
+  const int width = (get_columns() - 2 * PADDING) * font_width;
+  TTF_Font *font = global_monospaced_font;
+  SDL_Surface *surface;
+  SDL_Texture *texture;
+  SDL_Color color = to_sdl_color(COLOR_DEFAULT_FOREGROUND);
+  SDL_Rect position;
+  position.x = PADDING * font_width;
+  position.y = PADDING * font_width;
+  remove_first_breaks(string);
   clear(renderer);
-  /* Print each line. */
-  cursor = string;
-  y = (get_lines() - line_count) / 2;
-  while (*cursor != '\0') {
-    cursor = copy_first_line(cursor, line);
-    print(PADDING, y, line, COLOR_PAIR_DEFAULT, renderer);
-    y++;
+  /* Validate that the string is not empty and that x and y are nonnegative. */
+  if (string == NULL || string[0] == '\0') {
+    return;
   }
+  surface = TTF_RenderText_Blended_Wrapped(font, string, color, width);
+  if (surface == NULL) {
+    log_message("Failed to allocate text surface in print()");
+    return;
+  }
+  texture = SDL_CreateTextureFromSurface(renderer, surface);
+  if (texture == NULL) {
+    log_message("Failed to create texture from surface in print()");
+    return;
+  }
+  /* Copy destination width and height from the texture. */
+  SDL_QueryTexture(texture, NULL, NULL, &position.w, &position.h);
+  SDL_RenderCopy(renderer, texture, NULL, &position);
+  SDL_DestroyTexture(texture);
+  SDL_FreeSurface(surface);
   present(renderer);
 }
 
