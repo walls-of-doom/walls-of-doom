@@ -13,7 +13,10 @@
 #include "settings.h"
 #include "text.h"
 
+#include <GL/glew.h>
+
 #include <SDL.h>
+#include <SDL_opengl.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 
@@ -26,6 +29,8 @@
 #define MINIMUM_STRING_SIZE_FOR_ELLIPSIS (2 * ELLIPSIS_LENGTH)
 
 #define IMG_FLAGS IMG_INIT_PNG
+
+static SDL_GLContext context;
 
 static TTF_Font *global_monospaced_font = NULL;
 static int global_monospaced_font_width = 0;
@@ -89,7 +94,7 @@ static SDL_Window *create_window(int width, int height) {
   char *title = GAME_NAME;
   int x = SDL_WINDOWPOS_CENTERED;
   int y = SDL_WINDOWPOS_CENTERED;
-  Uint32 flags = 0;
+  Uint32 flags = SDL_WINDOW_OPENGL;
   return SDL_CreateWindow(title, x, y, width, height, flags);
 }
 
@@ -129,6 +134,10 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
     log_message(log_buffer);
     return 1;
   }
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+  SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
   /* Initialize TTF. */
   if (!TTF_WasInit()) {
     if (TTF_Init()) {
@@ -172,6 +181,9 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
   *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED);
   set_render_color(*renderer, COLOR_DEFAULT_BACKGROUND);
   clear(*renderer);
+  context = SDL_GL_CreateContext(*window);
+  glewExperimental = GL_TRUE;
+  glewInit();
   return 0;
 }
 
@@ -208,6 +220,7 @@ int finalize(SDL_Window **window, SDL_Renderer **renderer) {
   }
   /* This could be called earlier, but we only do it here to organize things. */
   IMG_Quit();
+  SDL_GL_DeleteContext(context);
   SDL_Quit();
   finalize_profiler();
   finalize_logger();
