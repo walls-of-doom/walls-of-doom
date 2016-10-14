@@ -1,20 +1,48 @@
 # Walls of Doom
 
-Walls of Doom is a minimalistic
-[platformer](https://en.wikipedia.org/wiki/Platform_game) written in [ANSI
-C](https://en.wikipedia.org/wiki/ANSI_C) using SDL 2.
+Walls of Doom is a minimalistic [platformer](https://en.wikipedia.org/wiki/Platform_game) written in [ANSI C](https://en.wikipedia.org/wiki/ANSI_C) using SDL 2.
 
 The game is still under development but is already playable on Linux.
 
-See [the GitHub issue
-tracker](https://github.com/walls-of-doom/walls-of-doom/issues) and have a look
-at [the releases page](https://github.com/walls-of-doom/walls-of-doom/releases).
+See [the GitHub issue tracker](https://github.com/walls-of-doom/walls-of-doom/issues)
+and have a look at [the releases page](https://github.com/walls-of-doom/walls-of-doom/releases).
 
 # Continuous Integration Status
 
+## Travis CI
+
+[![Build Status](https://travis-ci.org/walls-of-doom/walls-of-doom.svg?branch=master)](https://travis-ci.org/walls-of-doom/walls-of-doom)
+
+This build servers uses Ubuntu 14.04.3 64-bit, and builds with the following
+configurations:
+
+```
+Clang 3.5.0
+SDL2 2.0.2
+SDL2_ttf 2.0.12
+SDL2_image 2.0.0
+```
+
+```
+GCC 4.8.4
+SDL2 2.0.2
+SDL2_ttf 2.0.12
+SDL2_image 2.0.0
+```
+
 ## Semaphore CI
 
-This build server uses Ubuntu 14.04 64-bit, CMake 2.8, and GCC 4.8.4.
+[![Build Status](https://semaphoreci.com/api/v1/walls-of-doom/walls-of-doom/branches/pull-request-91/badge.svg)](https://semaphoreci.com/walls-of-doom/walls-of-doom)
+
+This build server uses Ubuntu 14.04 64-bit and builds with the following
+configuration:
+
+```
+GCC 4.8.4
+SDL2 2.0.2
+SDL2_ttf 2.0.12
+SDL2_image 2.0.0
+```
 
 The [build status](https://semaphoreci.com/walls-of-doom/walls-of-doom) is
 visible to everyone.
