@@ -14,7 +14,7 @@
  */
 typedef struct Record {
   char name[MAXIMUM_PLAYER_NAME_SIZE];
-  int score;
+  long score;
 } Record;
 
 /**

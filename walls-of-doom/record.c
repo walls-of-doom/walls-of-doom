@@ -16,7 +16,7 @@
 
 #define READ_TABLE_FAILURE_FORMAT "Failed to read a RecordTable from %s"
 #define READ_TABLE_BUFFER_SIZE 256
-#define RECORD_CSV_OUT "\"%s\",%d\n"
+#define RECORD_CSV_OUT "\"%s\",%ld\n"
 
 typedef struct RecordTable {
   size_t record_count;
