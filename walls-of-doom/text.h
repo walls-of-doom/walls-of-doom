@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 
-/*
+/**
  * Copy from the source string to the destination string, using at most size
  * characters.
  *
@@ -12,7 +12,16 @@
  * This function behaves similarly to strlcpy. However, because the latter may
  * not be available on all platforms, copy_string is used.
  */
-size_t copy_string(char *destination, const char *source, size_t size);
+size_t copy_string(char *destination, const char *source, const size_t size);
+
+/**
+ * Copy from the source string to the destination string, up to the specified
+ * character, using at most size characters.
+ *
+ * NUL terminates the destination string, unless size == 0.
+ */
+size_t copy_string_up_to(char *destination, const char *source, const char *end,
+                         const size_t size);
 
 /**
  * Returns a pointer to the start of the text of the string.

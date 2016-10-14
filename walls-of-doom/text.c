@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-/*
+/**
  * Copy from the source string to the destination string, using at most size
  * characters.
  *
@@ -38,6 +38,36 @@ size_t copy_string(char *destination, const char *source, size_t size) {
   }
   /* Here s points to the first occurrence of '\0' in source. */
   return s - source;
+}
+
+/**
+ * Copy from the source string to the destination string, up to the specified
+ * character, using at most size characters.
+ *
+ * NUL terminates the destination string, unless size == 0.
+ */
+size_t copy_string_up_to(char *destination, const char *begin, const char *end,
+                         const size_t size) {
+  char *d = destination;
+  const char *s = begin;
+  /* Copy only size - 1 characters in order to NUL terminate. */
+  size_t n = size - 1;
+
+  if (size == 0) {
+    return 0;
+  }
+
+  while (s != end && n != 0) {
+    *d++ = *s++;
+    n--;
+  }
+  *d = '\0';
+
+  if (s == end) {
+    return end - begin + 1;
+  } else {
+    return size;
+  }
 }
 
 /**

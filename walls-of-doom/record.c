@@ -15,6 +15,8 @@
 #include <string.h>
 
 #define READ_TABLE_FAILURE_FORMAT "Failed to read a RecordTable from %s"
+#define READ_TABLE_BUFFER_SIZE 256
+#define RECORD_CSV_OUT "\"%s\",%d\n"
 
 typedef struct RecordTable {
   size_t record_count;
@@ -78,21 +80,56 @@ void populate_table_with_default_records(RecordTable *table) {
   }
 }
 
+static void parse_record(const char *buffer, Record *const record) {
+  const char *begin = NULL;
+  const char *end = NULL;
+  /* Properly initialize the Record even if parsing fails. */
+  record->score = 0;
+  record->name[0] = '\0';
+  if (*buffer == '"') {
+    begin = buffer + 1;
+    end = strchr(buffer + 1, '"');
+    if (end == NULL) {
+      return;
+    }
+    copy_string_up_to(record->name, begin, end, MAXIMUM_PLAYER_NAME_SIZE);
+    begin = strchr(end, ',');
+    if (begin == NULL) {
+      return;
+    }
+    record->score = strtol(begin + 1, NULL, 10);
+  }
+}
+
 /**
  * Reads a RecordTable into the provided destination.
  *
  * If the existing table cannot be used a new one is created.
  */
 void read_table(RecordTable *table) {
-  int read_error = 0;
-  char log_buffer[MAXIMUM_STRING_SIZE];
   char path[MAXIMUM_PATH_SIZE];
+  int read_error = 0;
+  Record *record;
+  FILE *file;
+  size_t i;
+  char *buffer = NULL;
+  buffer = resize_memory(buffer, READ_TABLE_BUFFER_SIZE);
   get_full_path(path, RECORD_TABLE_FILE_NAME);
   if (file_exists(path)) {
-    if (read_bytes(path, table, sizeof(RecordTable), 1)) {
-      sprintf(log_buffer, READ_TABLE_FAILURE_FORMAT, path);
-      log_message(log_buffer);
-      /* Set the error flag to trigger the creation of a new table. */
+    file = fopen(path, "r");
+    if (file != NULL) {
+      table->record_count = 0;
+      for (i = 0; i < RECORD_ARRAY_SIZE; i++) {
+        record = table->records + i;
+        if (fgets(buffer, READ_TABLE_BUFFER_SIZE, file) != NULL) {
+          table->record_count++;
+          parse_record(buffer, record);
+        } else {
+          break;
+        }
+      }
+      fclose(file);
+    } else {
       read_error = 1;
     }
   } else {
@@ -107,8 +144,18 @@ void read_table(RecordTable *table) {
 
 void write_table(const RecordTable *const table) {
   char path[MAXIMUM_PATH_SIZE];
+  const Record *record;
+  FILE *file;
+  size_t i;
   get_full_path(path, RECORD_TABLE_FILE_NAME);
-  write_bytes(path, table, sizeof(RecordTable), 1);
+  file = fopen(path, "w");
+  if (file != NULL) {
+    for (i = 0; i < table->record_count; i++) {
+      record = table->records + i;
+      fprintf(file, RECORD_CSV_OUT, record->name, record->score);
+    }
+    fclose(file);
+  }
 }
 
 /**
@@ -167,16 +214,19 @@ size_t read_records(Record *destination, size_t destination_size) {
   return i;
 }
 
-static void record_to_string(Record *record, char *buffer, int expected_width) {
-  char pad_string[MAXIMUM_STRING_SIZE];
-  const char format[] = "%s%*.*s%ld";
+/**
+ * Converts a Record to a human-readable string.
+ */
+void record_to_string(const Record *const record, char *dest, const int width) {
+  const char format[] = "%s%*.*s%d";
   const char *name = record->name;
-  const long score = record->score;
+  const int score = record->score;
+  char pad_string[MAXIMUM_STRING_SIZE];
   int pad_length;
   memset(pad_string, '.', MAXIMUM_STRING_SIZE - 1);
   pad_string[MAXIMUM_STRING_SIZE - 1] = '\0';
-  pad_length = expected_width - strlen(name) - count_digits(score);
-  sprintf(buffer, format, name, pad_length, pad_length, pad_string, score);
+  pad_length = width - strlen(name) - count_digits(score);
+  sprintf(dest, format, name, pad_length, pad_length, pad_string, score);
 }
 
 /**
