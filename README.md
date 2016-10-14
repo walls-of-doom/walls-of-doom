@@ -17,17 +17,17 @@ This build servers uses Ubuntu 14.04.3 64-bit, and builds with the following
 configurations:
 
 ```
-Clang 3.5.0
-SDL2 2.0.2
-SDL2_ttf 2.0.12
-SDL2_image 2.0.0
+Clang         3.5.0
+SDL2          2.0.2
+SDL2_ttf     2.0.12
+SDL2_image    2.0.0
 ```
 
 ```
-GCC 4.8.4
-SDL2 2.0.2
-SDL2_ttf 2.0.12
-SDL2_image 2.0.0
+GCC           4.8.4
+SDL2          2.0.2
+SDL2_ttf     2.0.12
+SDL2_image    2.0.0
 ```
 
 ## Semaphore CI
@@ -37,11 +37,12 @@ SDL2_image 2.0.0
 This build server uses Ubuntu 14.04 64-bit and builds with the following
 configuration:
 
+
 ```
-GCC 4.8.4
-SDL2 2.0.2
-SDL2_ttf 2.0.12
-SDL2_image 2.0.0
+GCC           4.8.4
+SDL2          2.0.2
+SDL2_ttf     2.0.12
+SDL2_image    2.0.0
 ```
 
 The [build status](https://semaphoreci.com/walls-of-doom/walls-of-doom) is
