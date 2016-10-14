@@ -32,7 +32,7 @@ SDL2_image 2.0.0
 
 ## Semaphore CI
 
-[![Build Status](https://semaphoreci.com/api/v1/walls-of-doom/walls-of-doom/branches/pull-request-91/badge.svg)](https://semaphoreci.com/walls-of-doom/walls-of-doom)
+[![Build Status](https://semaphoreci.com/api/v1/walls-of-doom/walls-of-doom/branches/master/shields_badge.svg)](https://semaphoreci.com/walls-of-doom/walls-of-doom)
 
 This build server uses Ubuntu 14.04 64-bit and builds with the following
 configuration:
