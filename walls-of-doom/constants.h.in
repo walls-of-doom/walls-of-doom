@@ -3,12 +3,8 @@
 
 /**
  * This header file defines most of the constants used in the application.
- *
- * Most configuration tweaks require only small changes to this file.
  */
 #define GAME_NAME "Walls of Doom"
-
-#define PLAYER_SYMBOL "@"
 
 /**
  * How many strings the top bar has.
@@ -31,8 +27,6 @@
 #define MAXIMUM_STRING_SIZE 256
 
 #define MAXIMUM_PLAYER_NAME_SIZE 64
-
-#define FALLBACK_PLAYER_NAME "Player"
 
 /**
  * The number of frames per second the engine renders.
