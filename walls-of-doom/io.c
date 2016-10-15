@@ -250,7 +250,7 @@ Code read_player_name(char *destination, const size_t maximum_size,
   char log_buffer[MAXIMUM_STRING_SIZE];
   random_name(destination);
   /* While there is not a read error or a valid name. */
-  while (code != CODE_OK && !valid_name) {
+  while (code != CODE_OK || !valid_name) {
     x = PADDING;
     y = get_lines() / 2;
     code = read_string(x, y, message, destination, maximum_size, renderer);
