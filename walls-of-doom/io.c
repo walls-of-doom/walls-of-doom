@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define GAME_NAME "Walls of Doom"
+
 #define ELLIPSIS_STRING "..."
 #define ELLIPSIS_LENGTH (strlen(ELLIPSIS_STRING))
 #define MINIMUM_STRING_SIZE_FOR_ELLIPSIS (2 * ELLIPSIS_LENGTH)

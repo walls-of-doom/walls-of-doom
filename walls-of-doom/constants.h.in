@@ -4,7 +4,6 @@
 /**
  * This header file defines most of the constants used in the application.
  */
-#define GAME_NAME "Walls of Doom"
 
 /**
  * How many strings the top bar has.
