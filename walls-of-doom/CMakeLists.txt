@@ -18,6 +18,7 @@ add_library (walls-of-doom-base
     constants.h
     data.h data.c
     game.h game.c
+    graphics.h graphics.c
     io.h io.c
     logger.h logger.c
     memory.h memory.c
@@ -35,11 +36,25 @@ add_library (walls-of-doom-base
     text.h text.c
     version.h)
 
+find_package (OpenGL REQUIRED)
+find_package (GLEW REQUIRED)
 find_package (SDL2 REQUIRED)
 find_package (SDL2_ttf REQUIRED)
 find_package (SDL2_image REQUIRED)
-include_directories (${SDL2_INCLUDE_DIR} ${SDL2_TTF_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
-target_link_libraries (walls-of-doom-base ${SDL2_LIBRARY} ${SDL2_TTF_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
+
+include_directories (
+    ${OPENGL_INCLUDE_DIRS}
+    ${GLEW_INCLUDE_DIRS}
+    ${SDL2_INCLUDE_DIR}
+    ${SDL2_TTF_INCLUDE_DIRS}
+    ${SDL2_IMAGE_INCLUDE_DIRS})
+
+target_link_libraries (walls-of-doom-base
+    ${OPENGL_LIBRARIES}
+    ${GLEW_LIBRARIES}
+    ${SDL2_LIBRARY}
+    ${SDL2_TTF_LIBRARIES}
+    ${SDL2_IMAGE_LIBRARIES})
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR})
 

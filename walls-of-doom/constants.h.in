@@ -60,6 +60,9 @@
 #define ADJECTIVES_FILE_PATH "@ASSETS_DIR@/words/adjectives.txt"
 #define NOUNS_FILE_PATH "@ASSETS_DIR@/words/nouns.txt"
 
+#define VERTEX_SHADER_PATH "@ASSETS_DIR@/shaders/vertex.vert"
+#define FRAGMENT_SHADER_PATH "@ASSETS_DIR@/shaders/fragment.frag"
+
 /**
  * The maximum number of records that will be displayed to the player.
  *
