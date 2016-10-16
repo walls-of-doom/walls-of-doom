@@ -18,6 +18,7 @@ add_library (walls-of-doom-base
     constants.h
     data.h data.c
     game.h game.c
+    graphics.h graphics.c
     io.h io.c
     logger.h logger.c
     memory.h memory.c

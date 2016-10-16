@@ -3,6 +3,7 @@
 #include "clock.h"
 #include "constants.h"
 #include "game.h"
+#include "graphics.h"
 #include "logger.h"
 #include "memory.h"
 #include "numeric.h"
@@ -16,8 +17,8 @@
 #include <GL/glew.h>
 
 #include <SDL.h>
-#include <SDL_opengl.h>
 #include <SDL_image.h>
+#include <SDL_opengl.h>
 #include <SDL_ttf.h>
 
 #include <ctype.h>
@@ -36,6 +37,7 @@ static TTF_Font *global_monospaced_font = NULL;
 static int global_monospaced_font_width = 0;
 static int global_monospaced_font_height = 0;
 static SDL_Texture *borders_texture = NULL;
+static GLuint platform_vertex_buffer_object = 0;
 
 /**
  * Clears the screen.
@@ -114,6 +116,14 @@ static void set_render_color(SDL_Renderer *renderer, Color color) {
   SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 }
 
+static void initialize_graphics(void) {
+  glewExperimental = GL_TRUE;
+  glewInit();
+  glGenBuffers(1, &platform_vertex_buffer_object);
+  glBindBuffer(GL_ARRAY_BUFFER, platform_vertex_buffer_object);
+  initialize_shaders();
+}
+
 /**
  * Initializes the required resources.
  *
@@ -182,8 +192,7 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
   set_render_color(*renderer, COLOR_DEFAULT_BACKGROUND);
   clear(*renderer);
   context = SDL_GL_CreateContext(*window);
-  glewExperimental = GL_TRUE;
-  glewInit();
+  initialize_graphics();
   return 0;
 }
 
@@ -224,14 +233,6 @@ int finalize(SDL_Window **window, SDL_Renderer **renderer) {
   SDL_Quit();
   finalize_profiler();
   finalize_logger();
-  return 0;
-}
-
-/**
- * Initializes the color schemes used to render the game.
- */
-int initialize_color_schemes(void) {
-  /* Nothing to do for now. */
   return 0;
 }
 
@@ -608,23 +609,25 @@ static void draw_rectangle(SDL_Rect rectangle, ColorPair color_pair,
   SDL_SetRenderDrawColor(renderer, helper.r, helper.g, helper.b, helper.a);
 }
 
-int draw_platforms(const Platform *platforms, const size_t platform_count,
-                   const BoundingBox *box, SDL_Renderer *renderer) {
-  const int w = global_monospaced_font_width;
-  const int h = global_monospaced_font_height;
-  Platform p;
-  SDL_Rect rectangle;
-  size_t i;
-  rectangle.h = h;
-  for (i = 0; i < platform_count; i++) {
-    p = platforms[i];
-    rectangle.x = max(box->min_x, p.x);
-    rectangle.w = min(box->max_x, p.x + p.width - 1) - rectangle.x + 1;
-    rectangle.x *= w;
-    rectangle.w *= w;
-    rectangle.y = p.y * h;
-    draw_rectangle(rectangle, COLOR_PAIR_PLATFORM, renderer);
-  }
+static int draw_platforms(const Platform *platforms) {
+  const float l = get_lines();
+  const float c = get_columns();
+  /* Just draw the first platform. */
+  Platform p = platforms[0];
+  float vertices[8];
+  vertices[0] = p.x / c;
+  vertices[1] = p.y / l;
+
+  vertices[2] = (p.x + p.width) / c;
+  vertices[3] = p.y / l;
+
+  vertices[4] = (p.x + p.width) / c;
+  vertices[5] = (p.y + 1) / l;
+
+  vertices[6] = p.x / c;
+  vertices[7] = (p.y + 1) / l;
+
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
   return 0;
 }
 
@@ -679,7 +682,7 @@ Milliseconds draw_game(const Game *const game, SDL_Renderer *renderer) {
   update_profiler("draw_game:draw_borders", get_milliseconds() - start);
 
   start = get_milliseconds();
-  draw_platforms(game->platforms, game->platform_count, game->box, renderer);
+  draw_platforms(game->platforms);
   update_profiler("draw_game:draw_platforms", get_milliseconds() - start);
 
   start = get_milliseconds();
