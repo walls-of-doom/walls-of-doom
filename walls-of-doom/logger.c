@@ -3,9 +3,12 @@
 #include "clock.h"
 #include "constants.h"
 #include "data.h"
+#include "version.h"
 
 #include <stdio.h>
 #include <time.h>
+
+#define LOGGER_VERSION_MESSAGE "Version: " WALLS_OF_DOOM_VERSION
 
 #define TIMESTAMP_FORMAT "%Y-%m-%d %H:%M:%S"
 #define TIMESTAMP_BUFFER_SIZE 64
@@ -16,6 +19,7 @@
 void initialize_logger(void) {
   /* Currently, the logger does not need initialization. */
   log_message("Initialized the logger");
+  log_message(LOGGER_VERSION_MESSAGE);
 }
 
 /**
