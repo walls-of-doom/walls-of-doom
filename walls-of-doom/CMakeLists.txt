@@ -1,8 +1,6 @@
 cmake_minimum_required (VERSION 2.8.7)
 
 set (CMAKE_MODULE_PATH ../cmake)
-set (ASSETS_DIR ${CMAKE_INSTALL_PREFIX}/share/${CMAKE_PROJECT_NAME})
-set (WRITABLE_ASSETS_DIR ${CMAKE_INSTALL_PREFIX}/share/${CMAKE_PROJECT_NAME}/saved)
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS_BASE} -std=c89")
 
 configure_file (version.h.in version.h)
@@ -46,5 +44,10 @@ include_directories (${CMAKE_CURRENT_SOURCE_DIR})
 add_executable (walls-of-doom main.c)
 target_link_libraries (walls-of-doom walls-of-doom-base)
 
-install (TARGETS walls-of-doom RUNTIME DESTINATION bin)
-install (DIRECTORY ${CMAKE_SOURCE_DIR}/assets/ DESTINATION ${ASSETS_DIR} PATTERN "tests" EXCLUDE)
+# Copy the launcher to the binary directory.
+configure_file (${CMAKE_SOURCE_DIR}/launcher/start-walls-of-doom.sh ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+
+# Copy the assets to the binary directory.
+add_custom_command (TARGET walls-of-doom POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/assets/ ${CMAKE_CURRENT_BINARY_DIR}/assets/)

@@ -19,7 +19,7 @@
 #define WRITE_BYTES_COUNT_FORMAT "Expected to write %lu but actually wrote %lu"
 #define READ_BYTES_COUNT_FORMAT "Expected to read %lu but actually read %lu"
 
-#define DATA_DIRECTORY ".walls-of-doom"
+#define DATA_DIRECTORY "data"
 
 /* Data directory is writable for the user, and read-only for others. */
 #define DATA_DIRECTORY_UMASK 0755
@@ -46,19 +46,11 @@ typedef enum Operation { READ, WRITE } Operation;
  *
  * This function does not rely on dynamic memory allocation.
  */
-Code get_full_path(char *buffer, char *filename) {
-  const char *home;
+Code get_full_path(char *buffer, const char *filename) {
   struct stat status;
   size_t path_size = 0;
-  /* Get the home directory. */
-  if ((home = getenv("HOME")) == NULL) {
-    /* Only use the user database if HOME is not available. */
-    home = getpwuid(getuid())->pw_dir;
-  }
   /* Check if the full path fits in the buffer. */
-  path_size = strlen(home);
-  path_size += SEPARATOR_SIZE;
-  path_size += strlen(DATA_DIRECTORY);
+  path_size = strlen(DATA_DIRECTORY);
   path_size += SEPARATOR_SIZE;
   path_size += strlen(filename);
   path_size += 1;
@@ -66,12 +58,12 @@ Code get_full_path(char *buffer, char *filename) {
     return CODE_ERROR;
   }
   /* Create the data directory if it does not exist. */
-  sprintf(buffer, "%s/%s", home, DATA_DIRECTORY);
+  sprintf(buffer, "%s", DATA_DIRECTORY);
   if (stat(buffer, &status) == -1) {
     mkdir(buffer, DATA_DIRECTORY_UMASK);
   }
   /* Should not write from one buffer to the same buffer. */
-  sprintf(buffer, "%s/%s/%s", home, DATA_DIRECTORY, filename);
+  sprintf(buffer, "%s/%s", DATA_DIRECTORY, filename);
   return CODE_OK;
 }
 

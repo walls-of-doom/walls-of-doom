@@ -39,7 +39,7 @@ int file_line_count(const char *filename);
  *
  * This is the correct way to access mutable files in any platform.
  */
-Code get_full_path(char *buffer, char *filename);
+Code get_full_path(char *buffer, const char *filename);
 
 /**
  * Writes bytes to the indicated file from the provided source.

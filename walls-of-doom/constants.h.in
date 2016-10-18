@@ -45,20 +45,20 @@
 
 #define PLAYER_JUMPING_HEIGHT PLAYER_JUMPING_SPEED
 
-#define SETTINGS_FILE "@ASSETS_DIR@/settings/settings.txt"
+#define SETTINGS_FILE "assets/settings/settings.txt"
 
-#define ABOUT_PAGE_PATH "@ASSETS_DIR@/about/about.txt"
+#define ABOUT_PAGE_PATH "assets/about/about.txt"
 #define ABOUT_PAGE_BUFFER_SIZE 1024
 
 /**
  * Information required for font loading.
  */
-#define MONOSPACED_FONT_PATH "@ASSETS_DIR@/fonts/roboto-mono.ttf"
+#define MONOSPACED_FONT_PATH "assets/fonts/roboto-mono.ttf"
 
-#define ICON_PATH "@ASSETS_DIR@/icons/icon.png"
+#define ICON_PATH "assets/icons/icon.png"
 
-#define ADJECTIVES_FILE_PATH "@ASSETS_DIR@/words/adjectives.txt"
-#define NOUNS_FILE_PATH "@ASSETS_DIR@/words/nouns.txt"
+#define ADJECTIVES_FILE_PATH "assets/words/adjectives.txt"
+#define NOUNS_FILE_PATH "assets/words/nouns.txt"
 
 /**
  * The maximum number of records that will be displayed to the player.
