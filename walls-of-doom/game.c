@@ -113,16 +113,17 @@ void destroy_game(Game *game) {
   game->rigid_matrix = resize_memory(game->rigid_matrix, 0);
 }
 
-Milliseconds update_game(Game *const game) {
-  Milliseconds game_update_start = get_milliseconds();
+Nanoseconds update_game(Game *const game) {
+  Nanoseconds game_update_start = get_nanoseconds();
+  Nanoseconds delta = get_nanoseconds();
   if (game->message_end_frame < game->frame) {
     game->message[0] = '\0';
   }
   update_platforms(game);
   update_perk(game);
-
-  update_profiler("update_game", get_milliseconds() - game_update_start);
-  return get_milliseconds() - game_update_start;
+  delta = get_nanoseconds() - game_update_start;
+  update_profiler_precise("update_game", delta);
+  return delta;
 }
 
 /**
@@ -195,7 +196,7 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
       game->player->score++;
       next_played_frames_score += FPS;
     }
-    updating_delta = update_game(game);
+    updating_delta = update_game(game) / 1000000;
     drawing_delta = draw_game(game, renderer);
     /* Delay, if needed */
     if (updating_delta + drawing_delta < interval) {

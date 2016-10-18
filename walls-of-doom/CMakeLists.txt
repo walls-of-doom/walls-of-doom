@@ -5,8 +5,15 @@ set (ASSETS_DIR ${CMAKE_INSTALL_PREFIX}/share/${CMAKE_PROJECT_NAME})
 set (WRITABLE_ASSETS_DIR ${CMAKE_INSTALL_PREFIX}/share/${CMAKE_PROJECT_NAME}/saved)
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS_BASE} -std=c89")
 
+if (UNIX AND NOT APPLE)
+    set (UNIX_AND_NOT_APPLE 1)
+else ()
+    set (UNIX_AND_NOT_APPLE 0)
+endif ()
+
 configure_file (version.h.in version.h)
 configure_file (constants.h.in constants.h)
+configure_file (clock.h.in clock.h)
 
 add_library (walls-of-doom-base
     about.h about.c
