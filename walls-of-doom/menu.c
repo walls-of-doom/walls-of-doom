@@ -34,21 +34,18 @@ void write_menu(const Menu *const menu, SDL_Renderer *renderer) {
   const unsigned int height = entries * ENTRY_HEIGHT;
   const int starting_y = (get_lines() - height) / 2;
   int y = starting_y + 1;
-  int x;
   size_t i;
   char buffer[MAXIMUM_STRING_SIZE];
   SDL_RenderClear(renderer);
-  x = (get_columns() - strlen(menu->title)) / 2;
-  print(x, y, menu->title, COLOR_PAIR_DEFAULT, renderer);
+  print_centered(y, menu->title, COLOR_PAIR_DEFAULT, renderer);
   for (i = 0; i < menu->option_count; i++) {
     char *string = menu->options[i];
     if (i == menu->selected_option) {
       sprintf(buffer, "> %s <", string);
       string = buffer;
     }
-    x = (get_columns() - strlen(string)) / 2;
     y += ENTRY_HEIGHT;
-    print(x, y, string, COLOR_PAIR_DEFAULT, renderer);
+    print_centered(y, string, COLOR_PAIR_DEFAULT, renderer);
   }
   SDL_RenderPresent(renderer);
 }

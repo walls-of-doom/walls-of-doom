@@ -27,12 +27,19 @@
 #define ELLIPSIS_LENGTH (strlen(ELLIPSIS_STRING))
 #define MINIMUM_STRING_SIZE_FOR_ELLIPSIS (2 * ELLIPSIS_LENGTH)
 
+#define MINIMUM_BAR_HEIGHT 20
+
 #define IMG_FLAGS IMG_INIT_PNG
 
 static TTF_Font *global_monospaced_font = NULL;
-static int global_monospaced_font_width = 0;
-static int global_monospaced_font_height = 0;
 static SDL_Texture *borders_texture = NULL;
+
+/* Default integers to one to prevent divisions by zero. */
+static int bar_height = 1;
+static int window_width = 1;
+static int window_height = 1;
+static int global_monospaced_font_width = 1;
+static int global_monospaced_font_height = 1;
 
 /**
  * Clears the screen.
@@ -43,6 +50,26 @@ void clear(SDL_Renderer *renderer) { SDL_RenderClear(renderer); }
  * Updates the screen with what has been rendered.
  */
 void present(SDL_Renderer *renderer) { SDL_RenderPresent(renderer); }
+
+/**
+ * In the future we may support window resizing.
+ *
+ * These functions encapsulate how window metrics are actually obtained.
+ */
+static int get_window_width(void) { return window_width; }
+
+static int get_window_height(void) { return window_height; }
+
+/**
+ * Returns the height of the top and bottom bars.
+ */
+static int get_bar_height(void) { return bar_height; }
+
+static int get_tile_width(void) { return get_window_width() / get_columns(); }
+
+static int get_tile_height(void) {
+  return (get_window_height() - get_bar_height()) / get_lines();
+}
 
 /**
  * Initializes the global fonts.
@@ -87,12 +114,23 @@ static int initialize_font_metrics(void) {
   return 0;
 }
 
-static SDL_Window *create_window(int width, int height) {
-  char *title = GAME_NAME;
-  int x = SDL_WINDOWPOS_CENTERED;
-  int y = SDL_WINDOWPOS_CENTERED;
-  Uint32 flags = 0;
-  return SDL_CreateWindow(title, x, y, width, height, flags);
+/**
+ * Creates a new fullscreen window.
+ *
+ * Updates the pointers with the window width, window height, and bar height.
+ */
+static SDL_Window *create_window(int *width, int *height, int *bar_height) {
+  const char *title = GAME_NAME;
+  const int x = SDL_WINDOWPOS_CENTERED;
+  const int y = SDL_WINDOWPOS_CENTERED;
+  Uint32 flags = SDL_WINDOW_FULLSCREEN_DESKTOP;
+  int line_height;
+  /* Width and height do not matter because it is fullscreen. */
+  SDL_Window *window = SDL_CreateWindow(title, x, y, 1, 1, flags);
+  SDL_GetWindowSize(window, width, height);
+  line_height = (*height - 2 * MINIMUM_BAR_HEIGHT) / get_lines();
+  *bar_height = (*height - get_lines() * line_height) / 2;
+  return window;
 }
 
 int set_window_title_and_icon(SDL_Window *window) {
@@ -159,12 +197,10 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
    * number of pixels we need for the screen is not. We find this number by
    * experimenting before creating the window.
    */
-  width = global_monospaced_font_width * get_columns();
-  height = global_monospaced_font_height * get_lines();
   /* Log the size of the window we are going to create. */
   sprintf(log_buffer, "Creating a %dx%d window", width, height);
   log_message(log_buffer);
-  *window = create_window(width, height);
+  *window = create_window(&window_width, &window_height, &bar_height);
   if (*window == NULL) {
     sprintf(log_buffer, "SDL initialization error: %s", SDL_GetError());
     log_message(log_buffer);
@@ -271,6 +307,41 @@ Code read_player_name(char *destination, const size_t maximum_size,
   return code;
 }
 
+Code print_absolute(const int x, const int y, const char *string,
+                    const ColorPair color_pair, SDL_Renderer *renderer) {
+  const SDL_Color foreground = to_sdl_color(color_pair.foreground);
+  const SDL_Color background = to_sdl_color(color_pair.background);
+  TTF_Font *font = global_monospaced_font;
+  SDL_Surface *surface;
+  SDL_Texture *texture;
+  SDL_Rect position;
+  position.x = x;
+  position.y = y;
+  if (string == NULL || string[0] == '\0') {
+    return CODE_OK;
+  }
+  /* Validate that x and y are nonnegative. */
+  if (x < 0 || y < 0) {
+    return CODE_ERROR;
+  }
+  surface = TTF_RenderText_Shaded(font, string, foreground, background);
+  if (surface == NULL) {
+    log_message("Failed to allocate text surface in print()");
+    return CODE_ERROR;
+  }
+  texture = SDL_CreateTextureFromSurface(renderer, surface);
+  if (texture == NULL) {
+    log_message("Failed to create texture from surface in print()");
+    return CODE_ERROR;
+  }
+  /* Copy destination width and height from the texture. */
+  SDL_QueryTexture(texture, NULL, NULL, &position.w, &position.h);
+  SDL_RenderCopy(renderer, texture, NULL, &position);
+  SDL_DestroyTexture(texture);
+  SDL_FreeSurface(surface);
+  return CODE_OK;
+}
+
 /**
  * Prints the provided string on the screen starting at (x, y).
  *
@@ -278,37 +349,9 @@ Code read_player_name(char *destination, const size_t maximum_size,
  */
 int print(const int x, const int y, const char *string,
           const ColorPair color_pair, SDL_Renderer *renderer) {
-  const SDL_Color foreground = to_sdl_color(color_pair.foreground);
-  const SDL_Color background = to_sdl_color(color_pair.background);
-  TTF_Font *font = global_monospaced_font;
-  SDL_Surface *surface;
-  SDL_Texture *texture;
-  SDL_Rect position;
-  position.x = global_monospaced_font_width * x;
-  position.y = global_monospaced_font_height * y;
-  if (string == NULL || string[0] == '\0') {
-    return 0;
-  }
-  /* Validate that x and y are nonnegative. */
-  if (x < 0 || y < 0) {
-    return 1;
-  }
-  surface = TTF_RenderText_Shaded(font, string, foreground, background);
-  if (surface == NULL) {
-    log_message("Failed to allocate text surface in print()");
-    return 1;
-  }
-  texture = SDL_CreateTextureFromSurface(renderer, surface);
-  if (texture == NULL) {
-    log_message("Failed to create texture from surface in print()");
-    return 1;
-  }
-  /* Copy destination width and height from the texture. */
-  SDL_QueryTexture(texture, NULL, NULL, &position.w, &position.h);
-  SDL_RenderCopy(renderer, texture, NULL, &position);
-  SDL_DestroyTexture(texture);
-  SDL_FreeSurface(surface);
-  return 0;
+  const int absolute_x = get_tile_width() * x;
+  const int absolute_y = get_bar_height() + get_tile_height() * (y - 1);
+  return print_absolute(absolute_x, absolute_y, string, color_pair, renderer);
 }
 
 static SDL_Texture *renderable_texture(int w, int h, SDL_Renderer *renderer) {
@@ -319,8 +362,8 @@ static SDL_Texture *renderable_texture(int w, int h, SDL_Renderer *renderer) {
 static Code cache_borders_texture(BoundingBox borders, SDL_Renderer *renderer) {
   const SDL_Color foreground = to_sdl_color(COLOR_PAIR_DEFAULT.foreground);
   const SDL_Color background = to_sdl_color(COLOR_PAIR_DEFAULT.background);
-  const int x_step = global_monospaced_font_width;
-  const int y_step = global_monospaced_font_height;
+  const int x_step = get_tile_width();
+  const int y_step = get_tile_height();
   const int min_x = borders.min_x;
   const int max_x = borders.max_x;
   const int min_y = borders.min_y;
@@ -383,17 +426,17 @@ static Code cache_borders_texture(BoundingBox borders, SDL_Renderer *renderer) {
   /* Change the renderer target back to the window. */
   SDL_DestroyTexture(glyph_texture);
   SDL_SetRenderTarget(renderer, NULL);
-  /* Note that the texture is not destroyed here (obviosly). */
+  /* Note that the texture is not destroyed here (obviously). */
   borders_texture = full_texture;
   return CODE_OK;
 }
 
 static Code render_borders(BoundingBox borders, SDL_Renderer *renderer) {
-  const int x_step = global_monospaced_font_width;
-  const int y_step = global_monospaced_font_height;
+  const int x_step = get_tile_width();
+  const int y_step = get_tile_height();
   SDL_Rect pos;
   pos.x = borders.min_x * x_step;
-  pos.y = borders.min_y * y_step;
+  pos.y = bar_height + borders.min_y * y_step;
   if (borders_texture == NULL) {
     cache_borders_texture(borders, renderer);
     if (borders_texture == NULL) {
@@ -409,10 +452,79 @@ static Code render_borders(BoundingBox borders, SDL_Renderer *renderer) {
 /**
  * Prints the provided string centered on the screen at the provided line.
  */
-void print_centered(const int y, const char *string, const ColorPair color_pair,
+Code print_centered(const int y, const char *string, const ColorPair color_pair,
                     SDL_Renderer *renderer) {
-  const int x = (get_columns() - strlen(string)) / 2;
-  print(x, y, string, color_pair, renderer);
+  const SDL_Color foreground = to_sdl_color(color_pair.foreground);
+  const SDL_Color background = to_sdl_color(color_pair.background);
+  TTF_Font *font = global_monospaced_font;
+  SDL_Surface *surface;
+  SDL_Texture *texture;
+  SDL_Rect position;
+  position.x = 0;
+  position.y = get_tile_height() * y;
+  /* Validate that x and y are nonnegative. */
+  if (y < 0) {
+    return CODE_ERROR;
+  }
+  surface = TTF_RenderText_Shaded(font, string, foreground, background);
+  if (surface == NULL) {
+    log_message("Failed to allocate text surface in print()");
+    return CODE_ERROR;
+  }
+  texture = SDL_CreateTextureFromSurface(renderer, surface);
+  if (texture == NULL) {
+    log_message("Failed to create texture from surface in print()");
+    return CODE_ERROR;
+  }
+  /* Copy destination width and height from the texture. */
+  SDL_QueryTexture(texture, NULL, NULL, &position.w, &position.h);
+  position.x = (get_window_width() - position.w) / 2;
+  SDL_RenderCopy(renderer, texture, NULL, &position);
+  SDL_DestroyTexture(texture);
+  SDL_FreeSurface(surface);
+  return CODE_OK;
+}
+
+/**
+ * Prints the provided strings centered on the screen at the provided line.
+ */
+Code print_centered_strings(const int y, const int string_count,
+                            const char *const *strings,
+                            const ColorPair color_pair,
+                            SDL_Renderer *renderer) {
+  const SDL_Color foreground = to_sdl_color(color_pair.foreground);
+  const SDL_Color background = to_sdl_color(color_pair.background);
+  const int slice_size = get_window_width() / string_count;
+  TTF_Font *font = global_monospaced_font;
+  SDL_Surface *surface;
+  SDL_Texture *texture;
+  SDL_Rect position;
+  int i;
+  position.x = 0;
+  position.y = y;
+  /* Validate that x and y are nonnegative. */
+  if (y < 0) {
+    return CODE_ERROR;
+  }
+  for (i = 0; i < string_count; i++) {
+    surface = TTF_RenderText_Shaded(font, strings[i], foreground, background);
+    if (surface == NULL) {
+      log_message("Failed to allocate text surface in print()");
+      return CODE_ERROR;
+    }
+    texture = SDL_CreateTextureFromSurface(renderer, surface);
+    if (texture == NULL) {
+      log_message("Failed to create texture from surface in print()");
+      return CODE_ERROR;
+    }
+    /* Copy destination width and height from the texture. */
+    SDL_QueryTexture(texture, NULL, NULL, &position.w, &position.h);
+    position.x = i * slice_size + (slice_size - position.w) / 2;
+    SDL_RenderCopy(renderer, texture, NULL, &position);
+    SDL_DestroyTexture(texture);
+    SDL_FreeSurface(surface);
+  }
+  return CODE_OK;
 }
 
 /**
@@ -466,7 +578,7 @@ char *copy_first_line(char *source, char *destination) {
  */
 void print_long_text(char *string, SDL_Renderer *renderer) {
   const int font_width = global_monospaced_font_width;
-  const int width = (get_columns() - 2 * PADDING) * font_width;
+  const int width = get_window_width() - 2 * PADDING * font_width;
   TTF_Font *font = global_monospaced_font;
   SDL_Surface *surface;
   SDL_Texture *texture;
@@ -498,60 +610,45 @@ void print_long_text(char *string, SDL_Renderer *renderer) {
   present(renderer);
 }
 
-void write_top_bar_strings(char *strings[], SDL_Renderer *renderer) {
-  int begin_x;
-  int after_x;
-  int begin_text_x;
-  int after_text_x;
+/**
+ * Draws an absolute rectangle based on the provided coordinates.
+ */
+static void draw_absolute_rectangle(const int x, const int y, const int w,
+                                    const int h, Color color,
+                                    SDL_Renderer *renderer) {
+  SDL_Color helper;
+  SDL_Rect rectangle;
+  rectangle.x = x;
+  rectangle.y = y;
+  rectangle.w = w;
+  rectangle.h = h;
+  SDL_GetRenderDrawColor(renderer, &helper.r, &helper.g, &helper.b, &helper.a);
+  SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+  SDL_RenderFillRect(renderer, &rectangle);
+  SDL_SetRenderDrawColor(renderer, helper.r, helper.g, helper.b, helper.a);
+}
 
-  int string_length;
+/**
+ * Draws a relative rectangle based on the provided coordinates.
+ */
+static void draw_rectangle(int x, int y, int w, int h, Color color,
+                           SDL_Renderer *renderer) {
+  x = x * get_tile_width();
+  y = get_bar_height() + y * get_tile_height();
+  w = w * get_tile_width();
+  h = h * get_tile_height();
+  draw_absolute_rectangle(x, y, w, h, color, renderer);
+}
 
-  int x;
-  int i;
-
-  const int columns_per_string = get_columns() / TOP_BAR_STRING_COUNT;
-
-  char buffer[MAXIMUM_COLUMNS + 1];
-  memset(buffer, ' ', get_columns());
-  buffer[get_columns()] = '\0';
-
-  for (i = 0; i < TOP_BAR_STRING_COUNT; i++) {
-    begin_x = i * columns_per_string;
-    after_x = (i + 1) * columns_per_string;
-    if (i + 1 == TOP_BAR_STRING_COUNT) {
-      /*
-       * If this is the last string on the top, make sure that we will
-       * write enough colored spaces. Integer division truncates, which
-       * can make 4 * (COLUMNS / 4) != COLUMNS. Therefore, some spaces may be
-       * left uncolored at the end if we do not ensure that all columns
-       * are painted.
-       */
-      after_x = get_columns();
-    }
-    string_length = strlen(strings[i]);
-    if (string_length < columns_per_string) {
-      /*
-       * Write the string because it fits.
-       */
-      begin_text_x = begin_x + (columns_per_string - string_length) / 2;
-      after_text_x = begin_text_x + string_length;
-      for (x = begin_x; x < begin_text_x; x++) {
-        buffer[x] = ' ';
-      }
-      copy_string(buffer + x, strings[i], get_columns() + 1 - x);
-      for (x = after_text_x; x < after_x; x++) {
-        buffer[x] = ' ';
-      }
-    } else {
-      /*
-       * String does not fit, do not write it.
-       */
-      for (x = begin_x; x < after_x; x++) {
-        buffer[x] = ' ';
-      }
-    }
-  }
-  print(0, 0, buffer, COLOR_PAIR_TOP_BAR, renderer);
+static void write_top_bar_strings(const char *strings[],
+                                  SDL_Renderer *renderer) {
+  const ColorPair color_pair = COLOR_PAIR_TOP_BAR;
+  const int string_count = TOP_BAR_STRING_COUNT;
+  const int y = (get_bar_height() - global_monospaced_font_height) / 2;
+  int h = get_bar_height();
+  int w = get_window_width();
+  draw_absolute_rectangle(0, 0, w, h, color_pair.background, renderer);
+  print_centered_strings(y, string_count, strings, color_pair, renderer);
 }
 
 /**
@@ -560,40 +657,43 @@ void write_top_bar_strings(char *strings[], SDL_Renderer *renderer) {
  * Returns 0 if successful.
  */
 int draw_top_bar(const Player *const player, SDL_Renderer *renderer) {
-  char power_buffer[MAXIMUM_STRING_SIZE];
   char lives_buffer[MAXIMUM_STRING_SIZE];
   char score_buffer[MAXIMUM_STRING_SIZE];
-
-  char *strings[TOP_BAR_STRING_COUNT];
-
+  const char *strings[TOP_BAR_STRING_COUNT];
+  const char *perk_name = "No Power";
   if (player->perk != PERK_NONE) {
-    sprintf(power_buffer, "%s", get_perk_name(player->perk));
-  } else {
-    sprintf(power_buffer, "No Power");
+    perk_name = get_perk_name(player->perk);
   }
-
   sprintf(lives_buffer, "Lives: %d", player->lives);
-
   sprintf(score_buffer, "Score: %d", player->score);
-
   strings[0] = GAME_NAME;
-  strings[1] = power_buffer;
+  strings[1] = perk_name;
   strings[2] = lives_buffer;
   strings[3] = score_buffer;
-
-  write_top_bar_strings(strings, renderer);
+  write_top_bar_strings((const char **)strings, renderer);
   return 0;
+}
+
+static void write_bottom_bar_string(const char *string,
+                                    SDL_Renderer *renderer) {
+  /* Use half a character for horizontal padding. */
+  const int x = global_monospaced_font_width / 2;
+  const int bar_start = get_window_height() - get_bar_height();
+  const int padding = (get_bar_height() - global_monospaced_font_height) / 2;
+  const int y = bar_start + padding;
+  print_absolute(x, y, string, COLOR_PAIR_BOTTOM_BAR, renderer);
 }
 
 /*
  * Draws the bottom status bar on the screen for a given Player.
  */
 void draw_bottom_bar(const char *message, SDL_Renderer *renderer) {
-  char buffer[MAXIMUM_COLUMNS + 1];
-  memset(buffer, ' ', get_columns());
-  buffer[get_columns()] = '\0';
-  print(0, get_lines() - 1, buffer, COLOR_PAIR_BOTTOM_BAR, renderer);
-  print(0, get_lines() - 1, message, COLOR_PAIR_BOTTOM_BAR, renderer);
+  const Color color = COLOR_PAIR_BOTTOM_BAR.background;
+  const int y = get_window_height() - bar_height;
+  const int w = get_window_width();
+  const int h = get_bar_height();
+  draw_absolute_rectangle(0, y, w, h, color, renderer);
+  write_bottom_bar_string(message, renderer);
 }
 
 /**
@@ -603,63 +703,42 @@ void draw_borders(SDL_Renderer *renderer) {
   BoundingBox borders;
   borders.min_x = 0;
   borders.max_x = get_columns() - 1;
-  borders.min_y = 1;
-  borders.max_y = get_lines() - 2;
+  borders.min_y = 0;
+  borders.max_y = get_lines() - 1;
   render_borders(borders, renderer);
-}
-
-static void draw_rectangle(SDL_Rect rectangle, ColorPair color_pair,
-                           SDL_Renderer *renderer) {
-  const SDL_Color color = to_sdl_color(color_pair.foreground);
-  SDL_Color helper;
-  SDL_GetRenderDrawColor(renderer, &helper.r, &helper.g, &helper.b, &helper.a);
-  SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
-  SDL_RenderFillRect(renderer, &rectangle);
-  SDL_SetRenderDrawColor(renderer, helper.r, helper.g, helper.b, helper.a);
 }
 
 int draw_platforms(const Platform *platforms, const size_t platform_count,
                    const BoundingBox *box, SDL_Renderer *renderer) {
-  const int w = global_monospaced_font_width;
-  const int h = global_monospaced_font_height;
   Platform p;
-  SDL_Rect rectangle;
+  int x;
+  int y;
+  int w;
   size_t i;
-  rectangle.h = h;
   for (i = 0; i < platform_count; i++) {
     p = platforms[i];
-    rectangle.x = max(box->min_x, p.x);
-    rectangle.w = min(box->max_x, p.x + p.width - 1) - rectangle.x + 1;
-    rectangle.x *= w;
-    rectangle.w *= w;
-    rectangle.y = p.y * h;
-    draw_rectangle(rectangle, COLOR_PAIR_PLATFORM, renderer);
+    x = max(box->min_x, p.x);
+    y = p.y;
+    w = min(box->max_x, p.x + p.width - 1) - x + 1;
+    draw_rectangle(x, y, w, 1, COLOR_PAIR_PLATFORM.foreground, renderer);
   }
   return 0;
 }
 
 int has_active_perk(const Game *const game) { return game->perk != PERK_NONE; }
 
-static ColorPair get_perk_color() { return COLOR_PAIR_PERK; }
-
 int draw_perk(const Game *const game, SDL_Renderer *renderer) {
-  ColorPair perk_color;
+  const Color color = COLOR_PAIR_PERK.background;
   if (has_active_perk(game)) {
-    perk_color = get_perk_color();
-    print(game->perk_x, game->perk_y, get_perk_symbol(), perk_color, renderer);
+    draw_rectangle(game->perk_x, game->perk_y, 1, 1, color, renderer);
   }
   return 0;
 }
 
 Code draw_player(const Player *const player, SDL_Renderer *renderer) {
-  const int w = global_monospaced_font_width;
-  const int h = global_monospaced_font_height;
-  SDL_Rect rectangle;
-  rectangle.x = player->x * w;
-  rectangle.y = player->y * h;
-  rectangle.h = h;
-  rectangle.w = w;
-  draw_rectangle(rectangle, COLOR_PAIR_PLAYER, renderer);
+  const int x = player->x;
+  const int y = player->y;
+  draw_rectangle(x, y, 1, 1, COLOR_PAIR_PLAYER.foreground, renderer);
   return CODE_OK;
 }
 
@@ -726,15 +805,14 @@ void print_game_result(const char *name, const unsigned int score,
 }
 
 /**
- * Returns a BoundingBox that represents the playable area after removing bars
- * and margins.
+ * Returns a BoundingBox that represents the playable box.
  */
 BoundingBox bounding_box_from_screen(void) {
   BoundingBox box;
   box.min_x = 1;
-  box.min_y = 2; /* Top bar. */
+  box.min_y = 1;
   box.max_x = get_columns() - 2;
-  box.max_y = get_lines() - 3; /* Bottom bar. */
+  box.max_y = get_lines() - 2;
   return box;
 }
 

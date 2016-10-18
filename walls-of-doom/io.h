@@ -71,8 +71,15 @@ int print(const int x, const int y, const char *string, ColorPair color_pair,
 /**
  * Prints the provided string centered on the screen at the provided line.
  */
-void print_centered(const int y, const char *string, ColorPair color_pair,
+Code print_centered(const int y, const char *string, const ColorPair color_pair,
                     SDL_Renderer *renderer);
+
+/**
+ * Prints the provided strings centered on the screen at the provided line.
+ */
+Code print_centered_strings(const int y, const int string_count,
+                            const char *const *strings,
+                            const ColorPair color_pair, SDL_Renderer *renderer);
 
 /**
  * Prints the provided string after formatting it to increase readability.
