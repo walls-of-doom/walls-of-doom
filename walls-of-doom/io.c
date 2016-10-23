@@ -206,6 +206,8 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
     log_message(log_buffer);
     return 1;
   }
+  /* Must disable text input to prevent a name capture bug. */
+  SDL_StopTextInput();
   set_window_title_and_icon(*window);
   *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED);
   set_render_color(*renderer, COLOR_DEFAULT_BACKGROUND);
