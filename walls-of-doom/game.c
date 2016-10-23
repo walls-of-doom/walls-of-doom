@@ -190,16 +190,15 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
   Command command = COMMAND_NONE;
   Code code = CODE_OK;
   while (!is_termination_code(code) && game->player->lives != 0) {
-    /* Game loop */
     if (game->played_frames == next_played_frames_score) {
       game->player->score++;
       next_played_frames_score += FPS;
     }
     updating_delta = update_game(game);
     drawing_delta = draw_game(game, renderer);
-    /* Delay, if needed */
+    /* Delay, if needed. */
     if (updating_delta + drawing_delta < interval) {
-      SDL_Delay(interval - drawing_delta);
+      sleep(interval - updating_delta - drawing_delta);
     }
     command = read_next_command();
     code = code_from_command(command);
