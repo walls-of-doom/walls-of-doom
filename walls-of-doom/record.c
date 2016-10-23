@@ -7,6 +7,7 @@
 #include "logger.h"
 #include "memory.h"
 #include "numeric.h"
+#include "profiler.h"
 #include "settings.h"
 #include "sort.h"
 #include "text.h"
@@ -233,6 +234,7 @@ void record_to_string(const Record *const record, char *dest, const int width) {
  * Loads and presents the top scores on the screen.
  */
 Code top_scores(SDL_Renderer *renderer) {
+  Milliseconds start = get_milliseconds();
   Record records[MAXIMUM_DISPLAYED_RECORDS];
   char *strings[MAXIMUM_DISPLAYED_RECORDS] = {NULL};
   const size_t count = read_records(records, MAXIMUM_DISPLAYED_RECORDS);
@@ -248,5 +250,6 @@ Code top_scores(SDL_Renderer *renderer) {
   for (i = 0; i < count; i++) {
     resize_memory(strings[i], 0);
   }
+  update_profiler("top_scores", get_milliseconds() - start);
   return wait_for_input();
 }
