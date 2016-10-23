@@ -536,7 +536,9 @@ Code print_centered_vertically(int string_count, const char *const *strings,
                                const ColorPair color_pair,
                                SDL_Renderer *renderer) {
   const int text_line_height = global_monospaced_font_height;
-  const int text_lines_limit = get_window_height() / text_line_height;
+  const int padding = 2 * get_padding() * global_monospaced_font_height;
+  const int available_window_height = get_window_height() - padding;
+  const int text_lines_limit = available_window_height / text_line_height;
   int y;
   int i;
   if (string_count > text_lines_limit) {
