@@ -131,11 +131,9 @@ int write_bytes(const char *filename, const void *source, const size_t size,
 
 /**
  * Reads bytes from the indicated file to the provided destination.
- *
- * Returns 0 in case of success.
  */
-int read_bytes(const char *filename, void *destination, const size_t size,
-               const size_t count) {
+Code read_bytes(const char *filename, void *destination, const size_t size,
+                const size_t count) {
   char log_buffer[MAXIMUM_STRING_SIZE];
   unsigned long long_count;
   unsigned long long_read;
@@ -143,11 +141,11 @@ int read_bytes(const char *filename, void *destination, const size_t size,
   FILE *file;
   log_access(READ, size * count, filename);
   if (!file_exists(filename)) {
-    return 1;
+    return CODE_ERROR;
   }
   file = fopen(filename, "rb");
   if (file == NULL) {
-    return 2;
+    return CODE_ERROR;
   }
   read = fread(destination, size, count, file);
   fclose(file);
@@ -156,18 +154,16 @@ int read_bytes(const char *filename, void *destination, const size_t size,
     long_read = (unsigned long)read;
     sprintf(log_buffer, READ_BYTES_COUNT_FORMAT, long_count, long_read);
     log_message(log_buffer);
-    return 3;
+    return CODE_ERROR;
   }
-  return 0;
+  return CODE_OK;
 }
 
 /**
  * Reads characters from the indicated file into the provided character string.
- *
- * Returns 0 in case of success.
  */
-int read_characters(const char *const filename, char *destination,
-                    const size_t destination_size) {
+Code read_characters(const char *const filename, char *destination,
+                     const size_t destination_size) {
   FILE *file;
   size_t copied = 0;
   int c; /* Must be an integer because it may be EOF */
@@ -186,10 +182,10 @@ int read_characters(const char *const filename, char *destination,
         destination[copied] = '\0';
       }
       fclose(file);
-      return 0;
+      return CODE_OK;
     }
   }
-  return 1;
+  return CODE_ERROR;
 }
 
 /**

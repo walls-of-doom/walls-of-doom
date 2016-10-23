@@ -51,19 +51,15 @@ int write_bytes(const char *filename, const void *source, const size_t size,
 
 /**
  * Reads bytes from the indicated file to the provided destination.
- *
- * Returns 0 in case of success.
  */
-int read_bytes(const char *filename, void *destination, const size_t size,
-               const size_t count);
+Code read_bytes(const char *filename, void *destination, const size_t size,
+                const size_t count);
 
 /**
  * Reads characters from the indicated file into the provided character string.
- *
- * Returns 0 in case of success.
  */
-int read_characters(const char *const filename, char *destination,
-                    const size_t destination_size);
+Code read_characters(const char *const filename, char *destination,
+                     const size_t destination_size);
 
 /**
  * Reads integers from the indicated file into the provided array.
