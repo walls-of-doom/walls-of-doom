@@ -5,6 +5,7 @@
 #include "data.h"
 #include "io.h"
 #include "logger.h"
+#include "memory.h"
 #include "numeric.h"
 #include "settings.h"
 #include "sort.h"
@@ -166,17 +167,16 @@ size_t read_records(Record *destination, size_t destination_size) {
   return i;
 }
 
-void record_to_string(const Record *const record, char *buffer,
-                      const int expected_width) {
-  const char format[] = "%s%*.*s%d";
-  char padding_string[MAXIMUM_STRING_SIZE];
-  int padding_length;
-  memset(padding_string, '.', MAXIMUM_STRING_SIZE - 1);
-  padding_string[MAXIMUM_STRING_SIZE - 1] = '\0';
-  padding_length =
-      expected_width - strlen(record->name) - count_digits(record->score);
-  sprintf(buffer, format, record->name, padding_length, padding_length,
-          padding_string, record->score);
+static void record_to_string(Record *record, char *buffer, int expected_width) {
+  char pad_string[MAXIMUM_STRING_SIZE];
+  const char format[] = "%s%*.*s%ld";
+  const char *name = record->name;
+  const long score = record->score;
+  int pad_length;
+  memset(pad_string, '.', MAXIMUM_STRING_SIZE - 1);
+  pad_string[MAXIMUM_STRING_SIZE - 1] = '\0';
+  pad_length = expected_width - strlen(name) - count_digits(score);
+  sprintf(buffer, format, name, pad_length, pad_length, pad_string, score);
 }
 
 /**
@@ -184,20 +184,19 @@ void record_to_string(const Record *const record, char *buffer,
  */
 Code top_scores(SDL_Renderer *renderer) {
   Record records[MAXIMUM_DISPLAYED_RECORDS];
-  char line[MAXIMUM_STRING_SIZE];
-  const int line_width = get_columns() - 2 * PADDING;
-  const size_t line_count = get_lines() - 2 * PADDING;
-  const int record_width = min(line_width, MAXIMUM_STRING_SIZE - 1);
-  const size_t record_count = read_records(records, MAXIMUM_DISPLAYED_RECORDS);
+  char *strings[MAXIMUM_DISPLAYED_RECORDS] = {NULL};
+  const size_t count = read_records(records, MAXIMUM_DISPLAYED_RECORDS);
+  ColorPair pair = COLOR_PAIR_DEFAULT;
   size_t i;
-  if (get_columns() < 16) {
-    return CODE_ERROR;
+  for (i = 0; i < count; i++) {
+    strings[i] = resize_memory(strings[i], MAXIMUM_STRING_SIZE);
+    record_to_string(records + i, strings[i], get_columns());
   }
   clear(renderer);
-  for (i = 0; i < record_count && i < line_count; i++) {
-    record_to_string(records + i, line, record_width);
-    print_centered(PADDING + i, line, COLOR_PAIR_DEFAULT, renderer);
-  }
+  print_centered_vertically(count, (const char **)strings, pair, renderer);
   present(renderer);
+  for (i = 0; i < count; i++) {
+    resize_memory(strings[i], 0);
+  }
   return wait_for_input();
 }

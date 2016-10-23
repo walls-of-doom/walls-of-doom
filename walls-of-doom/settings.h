@@ -24,4 +24,6 @@ long get_columns(void);
 
 long get_lines(void);
 
+long get_padding(void);
+
 #endif

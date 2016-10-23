@@ -486,12 +486,12 @@ Code print_centered(const int y, const char *string, const ColorPair color_pair,
 }
 
 /**
- * Prints the provided strings centered on the screen at the provided line.
+ * Prints the provided strings centered at the specified absolute line.
  */
-Code print_centered_strings(const int y, const int string_count,
-                            const char *const *strings,
-                            const ColorPair color_pair,
-                            SDL_Renderer *renderer) {
+Code print_centered_horizontally(const int y, const int string_count,
+                                 const char *const *strings,
+                                 const ColorPair color_pair,
+                                 SDL_Renderer *renderer) {
   const SDL_Color foreground = to_sdl_color(color_pair.foreground);
   const SDL_Color background = to_sdl_color(color_pair.background);
   const int slice_size = get_window_width() / string_count;
@@ -523,6 +523,27 @@ Code print_centered_strings(const int y, const int string_count,
     SDL_RenderCopy(renderer, texture, NULL, &position);
     SDL_DestroyTexture(texture);
     SDL_FreeSurface(surface);
+  }
+  return CODE_OK;
+}
+
+/**
+ * Prints the provided strings centered in the middle of the screen.
+ */
+Code print_centered_vertically(int string_count, const char *const *strings,
+                               const ColorPair color_pair,
+                               SDL_Renderer *renderer) {
+  const int text_line_height = global_monospaced_font_height;
+  const int text_lines_limit = get_window_height() / text_line_height;
+  int y;
+  int i;
+  if (string_count > text_lines_limit) {
+    string_count = text_lines_limit;
+  }
+  y = (get_window_height() - string_count * text_line_height) / 2;
+  for (i = 0; i < string_count; i++) {
+    print_centered_horizontally(y, 1, strings + i, color_pair, renderer);
+    y += text_line_height;
   }
   return CODE_OK;
 }
@@ -648,7 +669,7 @@ static void write_top_bar_strings(const char *strings[],
   int h = get_bar_height();
   int w = get_window_width();
   draw_absolute_rectangle(0, 0, w, h, color_pair.background, renderer);
-  print_centered_strings(y, string_count, strings, color_pair, renderer);
+  print_centered_horizontally(y, string_count, strings, color_pair, renderer);
 }
 
 /**
