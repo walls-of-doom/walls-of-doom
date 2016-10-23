@@ -22,11 +22,17 @@
 #define DEFAULT_LINES 30
 #define MINIMUM_LINES 20
 
+/**
+ * How many spaces should be left from the margins when printing text.
+ */
+#define DEFAULT_PADDING 2
+
 static RepositionAlgorithm reposition_algorithm = REPOSITION_SELECT_AWARELY;
 static long platform_count = DEFAULT_PLATFORM_COUNT;
 static int font_size = DEFAULT_FONT_SIZE;
 static long columns = DEFAULT_COLUMNS;
 static long lines = DEFAULT_LINES;
+static long padding = DEFAULT_PADDING;
 
 static int parse_line(const char **input, char *key, char *value) {
   int reading_key = 1;
@@ -153,3 +159,5 @@ int get_font_size(void) { return font_size; }
 long get_columns(void) { return columns; }
 
 long get_lines(void) { return lines; }
+
+long get_padding(void) { return padding; }

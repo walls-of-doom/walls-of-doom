@@ -11,11 +11,6 @@
 #define TOP_BAR_STRING_COUNT 4
 
 /**
- * How many spaces should be left from the margins when printing text.
- */
-#define PADDING 2
-
-/**
  * All stack character buffers default to this size.
  *
  * This is the maximum size which the application strings should have.

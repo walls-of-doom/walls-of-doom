@@ -291,7 +291,7 @@ Code read_player_name(char *destination, const size_t maximum_size,
   random_name(destination);
   /* While there is not a read error or a valid name. */
   while (code != CODE_OK || !valid_name) {
-    x = PADDING;
+    x = get_padding();
     y = get_lines() / 2;
     code = read_string(x, y, message, destination, maximum_size, renderer);
     if (code == CODE_QUIT) {
@@ -601,14 +601,14 @@ char *copy_first_line(char *source, char *destination) {
  */
 void print_long_text(char *string, SDL_Renderer *renderer) {
   const int font_width = global_monospaced_font_width;
-  const int width = get_window_width() - 2 * PADDING * font_width;
+  const int width = get_window_width() - 2 * get_padding() * font_width;
   TTF_Font *font = global_monospaced_font;
   SDL_Surface *surface;
   SDL_Texture *texture;
   SDL_Color color = to_sdl_color(COLOR_DEFAULT_FOREGROUND);
   SDL_Rect position;
-  position.x = PADDING * font_width;
-  position.y = PADDING * font_width;
+  position.x = get_padding() * font_width;
+  position.y = get_padding() * font_width;
   remove_first_breaks(string);
   clear(renderer);
   /* Validate that the string is not empty and that x and y are nonnegative. */
@@ -918,7 +918,7 @@ static void print_limited(const int x, const int y, const char *string,
 Code read_string(const int x, const int y, const char *prompt,
                  char *destination, const size_t size, SDL_Renderer *renderer) {
   const int buffer_x = x + strlen(prompt) + 1;
-  const int buffer_view_limit = get_columns() - PADDING - buffer_x;
+  const int buffer_view_limit = get_columns() - get_padding() - buffer_x;
   int is_done = 0;
   int should_rerender = 1;
   /* The x coordinate of the user input buffer. */
@@ -937,7 +937,7 @@ Code read_string(const int x, const int y, const char *prompt,
         print(buffer_x, y, " ", COLOR_PAIR_DEFAULT, renderer);
       } else {
         /*
-         * Must care about how much we write, PADDING should be respected.
+         * Must care about how much we write, padding should be respected.
          *
          * Simply enough, we print the tail of the string and omit the
          * beginning with an ellipsis.
