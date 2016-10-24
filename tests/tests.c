@@ -389,10 +389,9 @@ void test_find_next_power_of_two_works_for_zero(void) {
 }
 
 void test_find_next_power_of_two_works_for_positive_integers(void) {
-  /* Ensure we are shifting a 64-bit value. */
-  const long one = 1;
-  long input;
-  long expected;
+  const unsigned long one = 1;
+  unsigned long input;
+  unsigned long expected;
   int i;
   /* Do not get to 31, because then the loop evaluates 1 << 32. */
   for (i = 0; i < 31; i++) {
