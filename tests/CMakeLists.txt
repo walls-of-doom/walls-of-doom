@@ -12,3 +12,6 @@ add_executable (tests tests.c)
 target_link_libraries (tests unity)
 target_link_libraries (tests walls-of-doom-base)
 target_link_libraries (tests ${SDL2_LIBRARY} ${SDL2_TTF_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
+
+# Copy the assets to the binary directory.
+add_custom_command (TARGET tests POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets/ ${CMAKE_CURRENT_BINARY_DIR}/assets/)

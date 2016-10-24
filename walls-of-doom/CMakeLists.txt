@@ -48,6 +48,4 @@ target_link_libraries (walls-of-doom walls-of-doom-base)
 configure_file (${CMAKE_SOURCE_DIR}/launcher/start-walls-of-doom.sh ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 
 # Copy the assets to the binary directory.
-add_custom_command (TARGET walls-of-doom POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_SOURCE_DIR}/assets/ ${CMAKE_CURRENT_BINARY_DIR}/assets/)
+add_custom_command (TARGET walls-of-doom POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets/ ${CMAKE_CURRENT_BINARY_DIR}/assets/)
