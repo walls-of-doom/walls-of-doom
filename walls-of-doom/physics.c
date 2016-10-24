@@ -299,9 +299,10 @@ static void reposition(Game *const game, Platform *const platform) {
   const BoundingBox *const box = game->box;
   /* The occupied size may be smaller than the array actually is. */
   const int occupied_size = get_lines() - 2;
-  unsigned char occupied[MAXIMUM_LINES - 2] = {0};
+  unsigned char *occupied = NULL;
   int line;
   size_t i;
+  occupied = resize_memory(occupied, occupied_size);
   /* Build a table of occupied rows. */
   for (i = 0; i < game->platform_count; i++) {
     occupied[game->platforms[i].y - box->min_y] = 1;
@@ -311,6 +312,7 @@ static void reposition(Game *const game, Platform *const platform) {
   } else {
     line = select_random_line_awarely(occupied, occupied_size);
   }
+  resize_memory(occupied, 0);
   /* To the right of the box. */
   if (platform->x > box->max_x) {
     subtract_platform(game, platform);
