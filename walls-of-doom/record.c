@@ -141,6 +141,7 @@ void read_table(RecordTable *table) {
     populate_table_with_default_records(table);
     log_message("Populated the table with the default records");
   }
+  resize_memory(buffer, 0);
 }
 
 void write_table(const RecordTable *const table) {
