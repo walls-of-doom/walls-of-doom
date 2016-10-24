@@ -13,13 +13,14 @@
 #define MAXIMUM_WORD_SIZE 32
 
 /* These state variables must be initialized so that they are not all zero. */
-static long x;
-static long y;
-static long z;
-static long w;
+static unsigned long x;
+static unsigned long y;
+static unsigned long z;
+static unsigned long w;
 
-static long xorshift128(void) {
-  long t = x;
+static unsigned long xorshift128(void) {
+  unsigned long t = x;
+  /* Left shif overflow is undefined behavior in C. */
   t ^= t << 11;
   t ^= t >> 8;
   x = y;
@@ -54,12 +55,14 @@ unsigned long find_next_power_of_two(unsigned long number) {
  */
 int random_integer(const int minimum, const int maximum) {
   /* Range should be a bigger type because the difference may overflow int. */
-  const long range = maximum - minimum + 1;
-  long next_power_of_two;
-  long value;
+  unsigned long range;
+  unsigned long next_power_of_two;
+  unsigned long value;
   if (maximum < minimum) {
     return 0;
   }
+  /* This never overflows, even when int and long have the same size. */
+  range = maximum - minimum + 1;
   next_power_of_two = find_next_power_of_two(range);
   do {
     value = xorshift128() % next_power_of_two;
