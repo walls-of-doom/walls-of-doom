@@ -5,7 +5,6 @@
 #include "memory.h"
 #include "random.h"
 #include "settings.h"
-
 #include <stdio.h>
 
 /* Should be the maximum frame count value for 5 seconds remaining. */

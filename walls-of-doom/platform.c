@@ -1,5 +1,4 @@
 #include "platform.h"
-
 #include "constants.h"
 #include "data.h"
 #include "logger.h"
@@ -7,7 +6,6 @@
 #include "physics.h"
 #include "random.h"
 #include "settings.h"
-
 #include <limits.h>
 #include <stdlib.h>
 

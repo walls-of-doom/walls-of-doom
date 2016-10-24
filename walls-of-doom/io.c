@@ -1,5 +1,4 @@
 #include "io.h"
-
 #include "clock.h"
 #include "constants.h"
 #include "game.h"
@@ -12,11 +11,9 @@
 #include "random.h"
 #include "settings.h"
 #include "text.h"
-
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
-
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>

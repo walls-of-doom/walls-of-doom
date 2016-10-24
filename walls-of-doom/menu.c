@@ -1,5 +1,4 @@
 #include "menu.h"
-
 #include "about.h"
 #include "constants.h"
 #include "data.h"
@@ -12,11 +11,9 @@
 #include "record.h"
 #include "settings.h"
 #include "version.h"
-
+#include <SDL.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <SDL.h>
 
 typedef struct Menu {
   char *title;

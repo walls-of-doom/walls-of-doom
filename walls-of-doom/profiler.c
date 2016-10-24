@@ -1,5 +1,4 @@
 #include "profiler.h"
-
 #include "clock.h"
 #include "constants.h"
 #include "data.h"
@@ -7,7 +6,6 @@
 #include "memory.h"
 #include "sort.h"
 #include "text.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

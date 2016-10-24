@@ -6,8 +6,7 @@
 #include "game.h"
 #include "platform.h"
 #include "player.h"
-
-#include "stdlib.h"
+#include <stdlib.h>
 
 /**
  * From an array of lines occupancy states, selects at random an empty line.

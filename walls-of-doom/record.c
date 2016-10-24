@@ -1,5 +1,4 @@
 #include "record.h"
-
 #include "code.h"
 #include "constants.h"
 #include "data.h"
@@ -11,7 +10,6 @@
 #include "settings.h"
 #include "sort.h"
 #include "text.h"
-
 #include <stdio.h>
 #include <string.h>
 

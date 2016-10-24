@@ -2,7 +2,6 @@
 #define ABOUT_H
 
 #include "code.h"
-
 #include <SDL.h>
 
 /**

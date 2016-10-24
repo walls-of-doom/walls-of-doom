@@ -1,10 +1,8 @@
 #include "settings.h"
-
 #include "color.h"
 #include "constants.h"
 #include "data.h"
 #include "logger.h"
-
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>

@@ -1,5 +1,4 @@
 #include "numeric.h"
-
 #include <stdlib.h>
 
 /**

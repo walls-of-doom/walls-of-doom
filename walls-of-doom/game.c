@@ -1,5 +1,4 @@
 #include "game.h"
-
 #include "about.h"
 #include "box.h"
 #include "constants.h"
@@ -14,11 +13,9 @@
 #include "record.h"
 #include "text.h"
 #include "version.h"
-
+#include <SDL.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <SDL.h>
 
 static size_t get_rigid_matrix_index(const Game *const game, const int x,
                                      const int y) {

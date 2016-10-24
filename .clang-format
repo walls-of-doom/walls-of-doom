@@ -49,12 +49,15 @@ DisableFormat:   false
 ExperimentalAutoDetectBinPacking: false
 ForEachMacros:   [ foreach, Q_FOREACH, BOOST_FOREACH ]
 IncludeCategories: 
-  - Regex:           '^"(llvm|llvm-c|clang|clang-c)/'
-    Priority:        2
-  - Regex:           '^(<|"(gtest|isl|json)/)'
-    Priority:        3
-  - Regex:           '.*'
+# Walls of Doom headers
+  - Regex:           '".\*"'
     Priority:        1
+# SDL headers
+  - Regex:           '^<SDL.\*'
+    Priority:        2
+# System headers
+  - Regex:           '^<.\*'
+    Priority:        3
 IncludeIsMainRegex: '$'
 IndentCaseLabels: false
 IndentWidth:     2

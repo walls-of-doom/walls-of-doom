@@ -1,10 +1,8 @@
 #include "logger.h"
-
 #include "clock.h"
 #include "constants.h"
 #include "data.h"
 #include "version.h"
-
 #include <stdio.h>
 #include <time.h>
 

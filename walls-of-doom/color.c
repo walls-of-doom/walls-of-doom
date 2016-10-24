@@ -1,5 +1,4 @@
 #include "color.h"
-
 #include <SDL.h>
 
 /* These colors work as fallback if settings fails. */

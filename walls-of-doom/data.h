@@ -2,7 +2,6 @@
 #define DATA_H
 
 #include "code.h"
-
 #include <stdio.h>
 
 /**

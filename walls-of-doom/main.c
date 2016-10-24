@@ -1,7 +1,6 @@
 #include "io.h"
 #include "menu.h"
 #include "random.h"
-
 #include <SDL.h>
 
 int main(void) {

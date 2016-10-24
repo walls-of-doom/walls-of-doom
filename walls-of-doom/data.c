@@ -1,17 +1,14 @@
 #include "data.h"
-
 #include "code.h"
 #include "constants.h"
 #include "logger.h"
-
 #include <pwd.h>
-#include <unistd.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 #define LOG_ACCESS_WRITE_FORMAT "Writing %lu bytes (%.2lf KiB) to %s"
 #define LOG_ACCESS_READ_FORMAT "Reading %lu bytes (%.2lf KiB) from %s"

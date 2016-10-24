@@ -12,10 +12,8 @@
 #include "player.h"
 #include "random.h"
 #include "settings.h"
-
-#include <stdlib.h>
-
 #include <SDL.h>
+#include <stdlib.h>
 
 typedef struct Game {
 

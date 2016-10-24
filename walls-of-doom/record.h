@@ -4,10 +4,8 @@
 #include "code.h"
 #include "constants.h"
 #include "player.h"
-
-#include <stdlib.h>
-
 #include <SDL.h>
+#include <stdlib.h>
 
 /**
  * A Record is a structure that stores the outcome of a game.
