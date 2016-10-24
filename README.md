@@ -129,6 +129,23 @@ And they should be written in to the output subdirectory.
 
 All these images are posted on the [Imgur album of the project](http://imgur.com/a/kiOY2).
 
+# Coding Style
+
+The coding style is enforced by clang-format and the formatter can be ran with
+
+```bash
+$ scripts/llvm/reformat.sh
+```
+
+## Include Order
+
+The following include order should be respected in all implementation files
+
+1. Main header
+2. Walls of Doom headers
+3. SDL headers
+4. System headers
+
 # Implementation Notes
 
 These are notes on some of the modules of the project to help new developers get
