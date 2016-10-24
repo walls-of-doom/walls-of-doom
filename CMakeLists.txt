@@ -21,16 +21,22 @@ set (C_STANDARD 90)
 
 set (CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
-option (m32 "Generate code for a 32-bit environment.")
-option (m64 "Generate code for a 64-bit environment.")
+option (ENV32 "Generate code for a 32-bit environment.")
+option (ENV64 "Generate code for a 64-bit environment.")
+option (SANITIZE "Modify the program at compile-time to catch undefined behavior during program execution.")
 
-# C standard is enforced with compiler-specific flags.
 if ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
     set (CMAKE_C_FLAGS_BASE "-Wall -Wextra -Werror -Wpedantic")
-    if (m32)
+    if (ENV32)
         set (CMAKE_C_FLAGS_BASE "${CMAKE_C_FLAGS_BASE} -m32")
-    elseif (m64)
+    elseif (ENV64)
         set (CMAKE_C_FLAGS_BASE "${CMAKE_C_FLAGS_BASE} -m64")
+    endif ()
+endif ()
+
+if ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
+    if (SANITIZE)
+        set (CMAKE_C_FLAGS_BASE "${CMAKE_C_FLAGS_BASE} -fsanitize=undefined")
     endif ()
 endif ()
 
