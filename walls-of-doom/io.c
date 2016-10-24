@@ -358,24 +358,28 @@ static SDL_Texture *renderable_texture(int w, int h, SDL_Renderer *renderer) {
   return SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, access, w, h);
 }
 
+static void swap_color(SDL_Renderer *renderer, SDL_Color *color) {
+  unsigned char r;
+  unsigned char g;
+  unsigned char b;
+  unsigned char a;
+  SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a);
+  SDL_SetRenderDrawColor(renderer, color->r, color->g, color->b, color->a);
+  color->r = r;
+  color->g = g;
+  color->b = b;
+  color->a = a;
+}
+
 static Code cache_borders_texture(BoundingBox borders, SDL_Renderer *renderer) {
-  const SDL_Color foreground = to_sdl_color(COLOR_PAIR_DEFAULT.foreground);
-  const SDL_Color background = to_sdl_color(COLOR_PAIR_DEFAULT.background);
-  const int x_step = get_tile_width();
-  const int y_step = get_tile_height();
-  const int min_x = borders.min_x;
-  const int max_x = borders.max_x;
-  const int min_y = borders.min_y;
-  const int max_y = borders.max_y;
-  const int full_width = (max_x - min_x + 1) * x_step;
-  const int full_height = (max_y - min_y + 1) * y_step;
-  SDL_Surface *surface;
-  SDL_Texture *glyph_texture;
+  const int min_x = borders.min_x * get_tile_width() + get_tile_width() / 2;
+  const int max_x = borders.max_x * get_tile_width() + get_tile_width() / 2;
+  const int min_y = borders.min_y * get_tile_height() + get_tile_height() / 2;
+  const int max_y = borders.max_y * get_tile_height() + get_tile_height() / 2;
+  const int texture_w = (borders.max_x - borders.min_x + 1) * get_tile_width();
+  const int texture_h = (borders.max_y - borders.min_y + 1) * get_tile_height();
   SDL_Texture *full_texture;
-  SDL_Rect position;
-  TTF_Font *font = global_monospaced_font;
-  int x;
-  int y;
+  SDL_Color color = to_sdl_color(COLOR_DEFAULT_FOREGROUND);
   if (borders_texture != NULL) {
     return CODE_ERROR;
   }
@@ -383,14 +387,8 @@ static Code cache_borders_texture(BoundingBox borders, SDL_Renderer *renderer) {
     log_message("Got invalid border limits");
     return CODE_ERROR;
   }
-  /* All preconditions are valid. */
-  /* Now we create a texture for a single glyph. */
-  surface = TTF_RenderGlyph_Shaded(font, '+', foreground, background);
-  glyph_texture = SDL_CreateTextureFromSurface(renderer, surface);
-  /* Free surface now because we may return before the end. */
-  SDL_FreeSurface(surface);
   /* Create the target texture. */
-  full_texture = renderable_texture(full_width, full_height, renderer);
+  full_texture = renderable_texture(texture_w, texture_h, renderer);
   if (!full_texture) {
     log_message("Failed to create cached borders texture");
     return CODE_ERROR;
@@ -398,32 +396,12 @@ static Code cache_borders_texture(BoundingBox borders, SDL_Renderer *renderer) {
   /* Change the renderer target to the texture which will be cached. */
   SDL_SetRenderTarget(renderer, full_texture);
   SDL_RenderClear(renderer);
-  /* Copy destination width and height from the texture. */
-  SDL_QueryTexture(glyph_texture, NULL, NULL, &position.w, &position.h);
-  /*
-   * This is the optimized step.
-   *
-   * We have a texture of a single symbol, so we just copy it to all the places
-   * where the symbol should appear.
-   */
-  /* Write the top and bottom borders. */
-  for (x = 0; x < full_width; x += x_step) {
-    position.x = x;
-    position.y = 0;
-    SDL_RenderCopy(renderer, glyph_texture, NULL, &position);
-    position.y = full_height - y_step;
-    SDL_RenderCopy(renderer, glyph_texture, NULL, &position);
-  }
-  /* Write the left and right borders. */
-  for (y = 0; y < full_height; y += y_step) {
-    position.y = y;
-    position.x = 0;
-    SDL_RenderCopy(renderer, glyph_texture, NULL, &position);
-    position.x = full_width - x_step;
-    SDL_RenderCopy(renderer, glyph_texture, NULL, &position);
-  }
-  /* Change the renderer target back to the window. */
-  SDL_DestroyTexture(glyph_texture);
+  swap_color(renderer, &color);
+  SDL_RenderDrawLine(renderer, min_x, min_y, max_x, min_y);
+  SDL_RenderDrawLine(renderer, max_x, min_y, max_x, max_y);
+  SDL_RenderDrawLine(renderer, max_x, max_y, min_x, max_y);
+  SDL_RenderDrawLine(renderer, min_x, max_y, min_x, min_y);
+  swap_color(renderer, &color);
   SDL_SetRenderTarget(renderer, NULL);
   /* Note that the texture is not destroyed here (obviously). */
   borders_texture = full_texture;
@@ -638,16 +616,15 @@ void print_long_text(char *string, SDL_Renderer *renderer) {
 static void draw_absolute_rectangle(const int x, const int y, const int w,
                                     const int h, Color color,
                                     SDL_Renderer *renderer) {
-  SDL_Color helper;
+  SDL_Color swap = to_sdl_color(color);
   SDL_Rect rectangle;
   rectangle.x = x;
   rectangle.y = y;
   rectangle.w = w;
   rectangle.h = h;
-  SDL_GetRenderDrawColor(renderer, &helper.r, &helper.g, &helper.b, &helper.a);
-  SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+  swap_color(renderer, &swap);
   SDL_RenderFillRect(renderer, &rectangle);
-  SDL_SetRenderDrawColor(renderer, helper.r, helper.g, helper.b, helper.a);
+  swap_color(renderer, &swap);
 }
 
 /**
