@@ -20,10 +20,6 @@
 
 #define GAME_NAME "Walls of Doom"
 
-#define ELLIPSIS_STRING "..."
-#define ELLIPSIS_LENGTH (strlen(ELLIPSIS_STRING))
-#define MINIMUM_STRING_SIZE_FOR_ELLIPSIS (2 * ELLIPSIS_LENGTH)
-
 #define MINIMUM_BAR_HEIGHT 20
 
 #define IMG_FLAGS IMG_INIT_PNG
@@ -61,6 +57,10 @@ static int get_window_height(void) { return window_height; }
  * Returns the height of the top and bottom bars.
  */
 static int get_bar_height(void) { return bar_height; }
+
+static int get_font_width(void) { return global_monospaced_font_width; }
+
+static int get_font_height(void) { return global_monospaced_font_height; }
 
 static int get_tile_width(void) { return get_window_width() / get_columns(); }
 
@@ -288,8 +288,8 @@ Code read_player_name(char *destination, const size_t maximum_size,
   random_name(destination);
   /* While there is not a read error or a valid name. */
   while (code != CODE_OK || !valid_name) {
-    x = get_padding();
-    y = get_lines() / 2;
+    x = get_padding() * get_font_width();
+    y = (get_window_height() - get_font_height()) / 2;
     code = read_string(x, y, message, destination, maximum_size, renderer);
     if (code == CODE_QUIT) {
       return CODE_QUIT;
@@ -861,7 +861,10 @@ int is_valid_input_character(char c) { return isalnum(c); }
  */
 static void print_limited(const int x, const int y, const char *string,
                           const size_t limit, SDL_Renderer *renderer) {
+  const char ellipsis[] = "...";
   const size_t string_length = strlen(string);
+  const size_t ellipsis_length = strlen(ellipsis);
+  const size_t minimum_string_size_for_ellipsis = 2 * ellipsis_length;
   /* No-op. */
   if (limit < 1) {
     return;
@@ -873,28 +876,28 @@ static void print_limited(const int x, const int y, const char *string,
    */
   /* String length is less than the limit. */
   if (string_length < limit) {
-    print(x, y, string, COLOR_PAIR_DEFAULT, renderer);
+    print_absolute(x, y, string, COLOR_PAIR_DEFAULT, renderer);
     return;
   }
   /* String is longer than the limit. */
   /* Write the ellipsis if we need to. */
-  if (limit >= MINIMUM_STRING_SIZE_FOR_ELLIPSIS) {
-    print(x, y, ELLIPSIS_STRING, COLOR_PAIR_DEFAULT, renderer);
+  if (limit >= minimum_string_size_for_ellipsis) {
+    print_absolute(x, y, ellipsis, COLOR_PAIR_DEFAULT, renderer);
   }
   /* Write the tail of the input string. */
-  string += string_length - limit + ELLIPSIS_LENGTH;
-  print(x + ELLIPSIS_LENGTH, y, string, COLOR_PAIR_DEFAULT, renderer);
+  string += string_length - limit + ellipsis_length;
+  print_absolute(x + ellipsis_length, y, string, COLOR_PAIR_DEFAULT, renderer);
 }
 
 /**
  * Reads a string from the user of up to size characters (including NUL).
- *
- * The string will be echoed after the prompt, which starts at (x, y).
  */
 Code read_string(const int x, const int y, const char *prompt,
                  char *destination, const size_t size, SDL_Renderer *renderer) {
-  const int buffer_x = x + strlen(prompt) + 1;
-  const int buffer_view_limit = get_columns() - get_padding() - buffer_x;
+  const int buffer_x = x + (strlen(prompt) + 1) * get_font_width();
+  const int padding_size = get_padding() * get_font_width();
+  const int buffer_view_size = get_window_width() - buffer_x - padding_size;
+  const int buffer_view_limit = buffer_view_size / get_font_width();
   int is_done = 0;
   int should_rerender = 1;
   /* The x coordinate of the user input buffer. */
@@ -907,10 +910,10 @@ Code read_string(const int x, const int y, const char *prompt,
   while (!is_done) {
     if (should_rerender) {
       clear(renderer);
-      print(x, y, prompt, COLOR_PAIR_DEFAULT, renderer);
+      print_absolute(x, y, prompt, COLOR_PAIR_DEFAULT, renderer);
       if (written == 0) {
         /* We must write a single space, or SDL will not render anything. */
-        print(buffer_x, y, " ", COLOR_PAIR_DEFAULT, renderer);
+        print_absolute(buffer_x, y, " ", COLOR_PAIR_DEFAULT, renderer);
       } else {
         /*
          * Must care about how much we write, padding should be respected.
