@@ -427,42 +427,6 @@ static Code render_borders(BoundingBox borders, SDL_Renderer *renderer) {
 }
 
 /**
- * Prints the provided string centered on the screen at the provided line.
- */
-Code print_centered(const int y, const char *string, const ColorPair color_pair,
-                    SDL_Renderer *renderer) {
-  const SDL_Color foreground = to_sdl_color(color_pair.foreground);
-  const SDL_Color background = to_sdl_color(color_pair.background);
-  TTF_Font *font = global_monospaced_font;
-  SDL_Surface *surface;
-  SDL_Texture *texture;
-  SDL_Rect position;
-  position.x = 0;
-  position.y = get_tile_height() * y;
-  /* Validate that x and y are nonnegative. */
-  if (y < 0) {
-    return CODE_ERROR;
-  }
-  surface = TTF_RenderText_Shaded(font, string, foreground, background);
-  if (surface == NULL) {
-    log_message("Failed to allocate text surface in print()");
-    return CODE_ERROR;
-  }
-  texture = SDL_CreateTextureFromSurface(renderer, surface);
-  if (texture == NULL) {
-    log_message("Failed to create texture from surface in print()");
-    return CODE_ERROR;
-  }
-  /* Copy destination width and height from the texture. */
-  SDL_QueryTexture(texture, NULL, NULL, &position.w, &position.h);
-  position.x = (get_window_width() - position.w) / 2;
-  SDL_RenderCopy(renderer, texture, NULL, &position);
-  SDL_DestroyTexture(texture);
-  SDL_FreeSurface(surface);
-  return CODE_OK;
-}
-
-/**
  * Prints the provided strings centered at the specified absolute line.
  */
 Code print_centered_horizontally(const int y, const int string_count,
