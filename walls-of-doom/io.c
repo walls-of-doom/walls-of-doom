@@ -21,6 +21,9 @@
 
 #define GAME_NAME "Walls of Doom"
 
+#define CREATE_SURFACE_FAIL "Failed to create surface in %s!"
+#define CREATE_TEXTURE_FAIL "Failed to create texture in %s!"
+
 #define MINIMUM_BAR_HEIGHT 20
 
 #define IMG_FLAGS IMG_INIT_PNG
@@ -309,6 +312,7 @@ Code read_player_name(char *destination, const size_t maximum_size,
 
 Code print_absolute(const int x, const int y, const char *string,
                     const ColorPair color_pair, SDL_Renderer *renderer) {
+  char log_buffer[MAXIMUM_STRING_SIZE];
   const SDL_Color foreground = to_sdl_color(color_pair.foreground);
   const SDL_Color background = to_sdl_color(color_pair.background);
   TTF_Font *font = global_monospaced_font;
@@ -326,12 +330,14 @@ Code print_absolute(const int x, const int y, const char *string,
   }
   surface = TTF_RenderText_Shaded(font, string, foreground, background);
   if (surface == NULL) {
-    log_message("Failed to allocate text surface in print()");
+    sprintf(log_buffer, CREATE_SURFACE_FAIL, "print_absolute()");
+    log_message(log_buffer);
     return CODE_ERROR;
   }
   texture = SDL_CreateTextureFromSurface(renderer, surface);
   if (texture == NULL) {
-    log_message("Failed to create texture from surface in print()");
+    sprintf(log_buffer, CREATE_TEXTURE_FAIL, "print_absolute()");
+    log_message(log_buffer);
     return CODE_ERROR;
   }
   /* Copy destination width and height from the texture. */
@@ -434,6 +440,7 @@ Code print_centered_horizontally(const int y, const int string_count,
                                  const char *const *strings,
                                  const ColorPair color_pair,
                                  SDL_Renderer *renderer) {
+  char log_buffer[MAXIMUM_STRING_SIZE];
   const SDL_Color foreground = to_sdl_color(color_pair.foreground);
   const SDL_Color background = to_sdl_color(color_pair.background);
   const int slice_size = get_window_width() / string_count;
@@ -451,12 +458,14 @@ Code print_centered_horizontally(const int y, const int string_count,
   for (i = 0; i < string_count; i++) {
     surface = TTF_RenderText_Shaded(font, strings[i], foreground, background);
     if (surface == NULL) {
-      log_message("Failed to allocate text surface in print()");
+      sprintf(log_buffer, CREATE_SURFACE_FAIL, "print_centered_horizontally()");
+      log_message(log_buffer);
       return CODE_ERROR;
     }
     texture = SDL_CreateTextureFromSurface(renderer, surface);
     if (texture == NULL) {
-      log_message("Failed to create texture from surface in print()");
+      sprintf(log_buffer, CREATE_TEXTURE_FAIL, "print_centered_horizontally()");
+      log_message(log_buffer);
       return CODE_ERROR;
     }
     /* Copy destination width and height from the texture. */
@@ -542,6 +551,7 @@ char *copy_first_line(char *source, char *destination) {
  * Prints the provided string after formatting it to increase readability.
  */
 void print_long_text(char *string, SDL_Renderer *renderer) {
+  char log_buffer[MAXIMUM_STRING_SIZE];
   const int font_width = global_monospaced_font_width;
   const int width = get_window_width() - 2 * get_padding() * font_width;
   TTF_Font *font = global_monospaced_font;
@@ -559,12 +569,14 @@ void print_long_text(char *string, SDL_Renderer *renderer) {
   }
   surface = TTF_RenderText_Blended_Wrapped(font, string, color, width);
   if (surface == NULL) {
-    log_message("Failed to allocate text surface in print()");
+    sprintf(log_buffer, CREATE_SURFACE_FAIL, "print_long_text()");
+    log_message(log_buffer);
     return;
   }
   texture = SDL_CreateTextureFromSurface(renderer, surface);
   if (texture == NULL) {
-    log_message("Failed to create texture from surface in print()");
+    sprintf(log_buffer, CREATE_TEXTURE_FAIL, "print_long_text()");
+    log_message(log_buffer);
     return;
   }
   /* Copy destination width and height from the texture. */
