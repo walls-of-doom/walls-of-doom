@@ -39,22 +39,11 @@ void modify_rigid_matrix_point(const Game *const game, const int x, const int y,
   }
 }
 
-void modify_rigid_matrix_platform(Game *game, Platform *platform,
+void modify_rigid_matrix_platform(Game *game, Platform const *platform,
                                   const unsigned char delta) {
   int i;
   for (i = 0; i < platform->width; i++) {
     modify_rigid_matrix_point(game, platform->x + i, platform->y, delta);
-  }
-}
-
-void print_rigid_matrix(Game *game) {
-  size_t i;
-  size_t j;
-  for (i = 0; i < game->rigid_matrix_n; i++) {
-    for (j = 0; j < game->rigid_matrix_m; j++) {
-      printf("%c", game->rigid_matrix[j + i * game->rigid_matrix_m] + '0');
-    }
-    printf("\n");
   }
 }
 
