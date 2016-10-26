@@ -791,6 +791,7 @@ void print_game_result(const char *name, const unsigned int score,
   const ColorPair color = COLOR_PAIR_DEFAULT;
   char first_line[MAXIMUM_STRING_SIZE];
   char second_line[MAXIMUM_STRING_SIZE];
+  char *lines[3];
   sprintf(first_line, "%s died after making %d points.", name, score);
   if (position > 0) {
     sprintf(second_line, "%s got to position %d!", name, position);
@@ -798,8 +799,10 @@ void print_game_result(const char *name, const unsigned int score,
     sprintf(second_line, "%s didn't make it to the top scores.", name);
   }
   clear(renderer);
-  print_centered(get_lines() / 2 - 1, first_line, color, renderer);
-  print_centered(get_lines() / 2 + 1, second_line, color, renderer);
+  lines[0] = first_line;
+  lines[1] = "";
+  lines[2] = second_line;
+  print_centered_vertically(3, (const char *const *)lines, color, renderer);
   present(renderer);
 }
 
