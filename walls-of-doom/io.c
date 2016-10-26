@@ -159,8 +159,6 @@ static void set_render_color(SDL_Renderer *renderer, Color color) {
  */
 int initialize(SDL_Window **window, SDL_Renderer **renderer) {
   char log_buffer[MAXIMUM_STRING_SIZE];
-  int width = 1;
-  int height = 1;
   initialize_logger();
   initialize_profiler();
   initialize_settings();
@@ -199,9 +197,9 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
    * experimenting before creating the window.
    */
   /* Log the size of the window we are going to create. */
-  sprintf(log_buffer, "Creating a %dx%d window", width, height);
-  log_message(log_buffer);
   *window = create_window(&window_width, &window_height, &bar_height);
+  sprintf(log_buffer, "Created a %dx%d window", window_width, window_height);
+  log_message(log_buffer);
   if (*window == NULL) {
     sprintf(log_buffer, "SDL initialization error: %s", SDL_GetError());
     log_message(log_buffer);
