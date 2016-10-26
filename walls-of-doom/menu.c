@@ -5,11 +5,13 @@
 #include "game.h"
 #include "io.h"
 #include "logger.h"
+#include "memory.h"
 #include "physics.h"
 #include "platform.h"
 #include "random.h"
 #include "record.h"
 #include "settings.h"
+#include "text.h"
 #include "version.h"
 #include <SDL.h>
 #include <stdlib.h>
@@ -26,25 +28,49 @@ typedef struct Menu {
  * Writes the provided Menu for the user.
  */
 void write_menu(const Menu *const menu, SDL_Renderer *renderer) {
+  ColorPair color = COLOR_PAIR_DEFAULT;
   const size_t entries = menu->option_count + 1;
-  const unsigned int ENTRY_HEIGHT = 3;
-  const unsigned int height = entries * ENTRY_HEIGHT;
-  const int starting_y = (get_lines() - height) / 2;
-  int y = starting_y + 1;
+  const size_t string_count = 2 * entries - 1;
+  const char *const *const_strings = NULL;
+  char **strings = NULL;
+  char *source = NULL;
+  const char hint_format[] = "> %s <";
+  const size_t hint_size = strlen(hint_format) - 2;
+  size_t option_index;
   size_t i;
-  char buffer[MAXIMUM_STRING_SIZE];
-  SDL_RenderClear(renderer);
-  print_centered(y, menu->title, COLOR_PAIR_DEFAULT, renderer);
-  for (i = 0; i < menu->option_count; i++) {
-    char *string = menu->options[i];
-    if (i == menu->selected_option) {
-      sprintf(buffer, "> %s <", string);
-      string = buffer;
+  strings = resize_memory(strings, sizeof(char *) * string_count);
+  for (i = 0; i < string_count; i++) {
+    strings[i] = NULL;
+    strings[i] = resize_memory(strings[i], MAXIMUM_STRING_SIZE);
+    if (i == 0) {
+      copy_string(strings[i], menu->title, MAXIMUM_STRING_SIZE);
+    } else if (i % 2 == 0) {
+      /* Note that i == 0 is used for the title. */
+      option_index = (i - 2) / 2;
+      source = menu->options[option_index];
+      if (menu->selected_option == option_index) {
+        if (strlen(source) + 2 * hint_size < MAXIMUM_STRING_SIZE) {
+          sprintf(strings[i], hint_format, source);
+        } else {
+          copy_string(strings[i], source, MAXIMUM_STRING_SIZE);
+        }
+      } else {
+        copy_string(strings[i], source, MAXIMUM_STRING_SIZE);
+      }
+    } else {
+      copy_string(strings[i], "", MAXIMUM_STRING_SIZE);
     }
-    y += ENTRY_HEIGHT;
-    print_centered(y, string, COLOR_PAIR_DEFAULT, renderer);
   }
-  SDL_RenderPresent(renderer);
+  clear(renderer);
+  const_strings = (const char *const *)strings;
+  print_centered_vertically(string_count, const_strings, color, renderer);
+  present(renderer);
+  /* Free the strings. */
+  for (i = 0; i < string_count; i++) {
+    resize_memory(strings[i], 0);
+  }
+  /* Free the pointer array. */
+  resize_memory(strings, 0);
 }
 
 /**
