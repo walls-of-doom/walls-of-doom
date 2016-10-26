@@ -456,6 +456,9 @@ Code print_centered_horizontally(const int y, const int string_count,
     return CODE_ERROR;
   }
   for (i = 0; i < string_count; i++) {
+    if (*strings[i] == '\0') {
+      continue;
+    }
     surface = TTF_RenderText_Shaded(font, strings[i], foreground, background);
     if (surface == NULL) {
       sprintf(log_buffer, CREATE_SURFACE_FAIL, "print_centered_horizontally()");
