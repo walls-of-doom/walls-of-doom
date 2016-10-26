@@ -9,6 +9,7 @@
 #include "player.h"
 #include "profiler.h"
 #include "random.h"
+#include "record.h"
 #include "settings.h"
 #include "text.h"
 #include <SDL.h>
@@ -768,6 +769,50 @@ void print_game_result(const char *name, const unsigned int score,
   lines[2] = second_line;
   print_centered_vertically(3, (const char *const *)lines, color, renderer);
   present(renderer);
+}
+
+/**
+ * Converts a Record to a human-readable string.
+ */
+static void record_to_string(const Record *const record, char *dest,
+                             const int width) {
+  const char format[] = "%s%*.*s%d";
+  const char *name = record->name;
+  const int score = record->score;
+  char pad_string[MAXIMUM_STRING_SIZE];
+  int pad_length;
+  memset(pad_string, '.', MAXIMUM_STRING_SIZE - 1);
+  pad_string[MAXIMUM_STRING_SIZE - 1] = '\0';
+  pad_length = width - strlen(name) - count_digits(score);
+  sprintf(dest, format, name, pad_length, pad_length, pad_string, score);
+}
+
+void print_records(const size_t count, const Record *records,
+                   SDL_Renderer *renderer) {
+  const ColorPair pair = COLOR_PAIR_DEFAULT;
+  const int x_padding = 2 * get_padding() * get_font_width();
+  const int y_padding = 2 * get_padding() * get_font_height();
+  const int available_window_height = get_window_height() - y_padding;
+  const int text_lines_limit = available_window_height / get_font_height();
+  const size_t string_width =
+      (get_window_width() - x_padding) / get_font_width();
+  const size_t printed = min(count, text_lines_limit);
+  char **strings = NULL;
+  size_t i;
+  strings = resize_memory(strings, sizeof(char *) * printed);
+  for (i = 0; i < printed; i++) {
+    strings[i] = NULL;
+    strings[i] = resize_memory(strings[i], string_width);
+    record_to_string(records + i, strings[i], string_width - 1);
+  }
+  clear(renderer);
+  print_centered_vertically(printed, (const char *const *)strings, pair,
+                            renderer);
+  present(renderer);
+  for (i = 0; i < printed; i++) {
+    resize_memory(strings[i], 0);
+  }
+  resize_memory(strings, 0);
 }
 
 /**

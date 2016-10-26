@@ -8,6 +8,7 @@
 #include "game.h"
 #include "perk.h"
 #include "physics.h"
+#include "record.h"
 
 /**
  * Clears the screen.
@@ -97,6 +98,9 @@ void print_platform(const Platform *const platform,
 
 void print_game_result(const char *name, const unsigned int score,
                        const int position, SDL_Renderer *renderer);
+
+void print_records(const size_t count, const Record *records,
+                   SDL_Renderer *renderer);
 
 /**
  * Returns a BoundingBox that represents the playable area after removing bars

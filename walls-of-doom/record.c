@@ -215,40 +215,13 @@ size_t read_records(Record *destination, size_t destination_size) {
 }
 
 /**
- * Converts a Record to a human-readable string.
- */
-void record_to_string(const Record *const record, char *dest, const int width) {
-  const char format[] = "%s%*.*s%d";
-  const char *name = record->name;
-  const int score = record->score;
-  char pad_string[MAXIMUM_STRING_SIZE];
-  int pad_length;
-  memset(pad_string, '.', MAXIMUM_STRING_SIZE - 1);
-  pad_string[MAXIMUM_STRING_SIZE - 1] = '\0';
-  pad_length = width - strlen(name) - count_digits(score);
-  sprintf(dest, format, name, pad_length, pad_length, pad_string, score);
-}
-
-/**
  * Loads and presents the top scores on the screen.
  */
 Code top_scores(SDL_Renderer *renderer) {
   Milliseconds start = get_milliseconds();
   Record records[MAXIMUM_DISPLAYED_RECORDS];
-  char *strings[MAXIMUM_DISPLAYED_RECORDS] = {NULL};
   const size_t count = read_records(records, MAXIMUM_DISPLAYED_RECORDS);
-  ColorPair pair = COLOR_PAIR_DEFAULT;
-  size_t i;
-  for (i = 0; i < count; i++) {
-    strings[i] = resize_memory(strings[i], MAXIMUM_STRING_SIZE);
-    record_to_string(records + i, strings[i], get_columns());
-  }
-  clear(renderer);
-  print_centered_vertically(count, (const char **)strings, pair, renderer);
-  present(renderer);
-  for (i = 0; i < count; i++) {
-    resize_memory(strings[i], 0);
-  }
+  print_records(count, records, renderer);
   update_profiler("top_scores", get_milliseconds() - start);
   return wait_for_input();
 }
