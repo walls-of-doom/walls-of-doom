@@ -19,8 +19,6 @@
 #define BUY_LIFE_FORMAT(PRICE) "Bought an extra life for " STR(PRICE) " points."
 #define BUY_LIFE_MESSAGE BUY_LIFE_FORMAT(BUY_LIFE_PRICE)
 
-static void reposition(Game *const game, Platform *const platform);
-
 /**
  * Evaluates whether or not a Platform is completely outside of a BoundingBox.
  *
