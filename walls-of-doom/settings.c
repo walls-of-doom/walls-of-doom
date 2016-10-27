@@ -72,9 +72,9 @@ static int parse_line(const char **input, char *key, char *value) {
 
 static long parse_value(const char *value, const long minimum,
                         const long maximum, const long fallback) {
-  long integer = strtol(value, NULL, 10);
+  const long integer = strtol(value, NULL, 10);
   if (errno) {
-    log_message("Failed to read an integer for ");
+    log_message("Failed to read integer from input string!");
     errno = 0;
     return fallback;
   }

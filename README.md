@@ -45,9 +45,6 @@ SDL2_ttf     2.0.12
 SDL2_image    2.0.0
 ```
 
-The [build status](https://semaphoreci.com/walls-of-doom/walls-of-doom) is
-visible to everyone.
-
 # Building and Running
 
 ## Requirements
@@ -57,11 +54,9 @@ visible to everyone.
 The game should work on any Linux or BSD operating system with a desktop
 environment.
 
-Currently, there is no Windows support. [See the relevant
-issue](https://github.com/walls-of-doom/walls-of-doom/issues/38).
+Currently, there is no Windows support. [See the relevant issue](https://github.com/walls-of-doom/walls-of-doom/issues/38).
 
-OS X and macOS support is unknown. [See the relevant
-issue](https://github.com/walls-of-doom/walls-of-doom/issues/39).
+OS X and macOS support is unknown. [See the relevant issue](https://github.com/walls-of-doom/walls-of-doom/issues/39).
 
 ### CMake
 
@@ -82,14 +77,13 @@ Older versions of the abovementioned compilers are **very** likely to work too.
 
 You will need SDL 2, with the TrueType and Image libraries.
 
-## Building and installing
+## Building
 
 ```bash
 $ mkdir build
 $ cd build
 $ cmake ..
 $ make
-$ sudo make install
 ```
 
 > You can pass `-DENV32=1` to CMake to get a 32-bit build on a 64-bit system.
@@ -101,97 +95,39 @@ $ sudo make install
 ## Running the game
 
 ```bash
-$ walls-of-doom
+$ bash build/walls-of-doom/start-walls-of-doom.sh
 ```
 
 ## Running the tests
 
 ```bash
-$ ./build/tests/tests
+$ bash scripts/test.sh
 ```
-
-## Reformatting code and performing static analysis
-
-```bash
-$ bash reformat.sh
-```
-
-# Generating the Images
-
-```bash
-$ cd blender
-$ bash render.sh
-```
-
-And they should be written in to the output subdirectory.
-
-## Links
-
-All these images are posted on the [Imgur album of the project](http://imgur.com/a/kiOY2).
 
 # Coding Style
 
-The coding style is enforced by clang-format and the formatter can be ran with
+The coding style (LLVM style, but for C) is enforced by LLVM tools.
+
+## Running the formatter
 
 ```bash
 $ bash scripts/llvm/reformat.sh
 ```
 
-## Include Order
+## Performing static analysis
 
-The following include order should be respected in all implementation files
+```bash
+$ bash scripts/llvm/analyze.sh
+```
+
+## Include Order
 
 1. Main header
 2. Walls of Doom headers
 3. SDL 2 headers
 4. System headers
 
-# Implementation Notes
-
-These are notes on some of the modules of the project to help new developers get
-to know the project structure better without having to look into the source
-code.
-
-## IO
-
-Before using the IO capabilities of Walls of Doom, `initialize()` must be
-called. Before quitting the game, `finalize()` must be called to free associated
-resources.
-
-## Logger
-
-Walls of Doom has a very simple logger which can be used by the `log_message()`
-function. If for some reason logging fails, it fail silently and the program is
-not interrupted.
-
-If one must use the logger without initializing the other IO functions, the
-logger module may be independently initialized by calling `initialize_logger()`
-and finalized by calling `finalize_logger()`.
-
-## Menu
-
-Under the Menu name is grouped most of the logic that deals with handling user
-interactions outside of the game. This includes menu item selection, the top
-scores functionality and the auxiliary functions of these parts of the
-application.
-
-## Physics
-
-The Physics module is where most of the calculations and checks take place.
-Walking, falling, jumping, the fetching of perks, and death are some of the
-things that fall under the scope of this module.
-
-## Random
-
-Before using the PRNG, you can initialize it with the current time by calling
-`seed_random()`.
-
-This project uses the **[xoroshiro+](http://xoroshiro.di.unimi.it/)** algorithm
-to efficiently generate pseudo-random numbers with a big period.
-
-The convenience function that returns an integer in the specified range uses
-multiple random numbers modulo the next power of two to prevent the modulo bias
-that comes with more naive approaches.
+This include order should be respected in all source files.
 
 # License
 

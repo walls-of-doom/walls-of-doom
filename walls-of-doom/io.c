@@ -726,39 +726,38 @@ Code draw_player(const Player *const player, SDL_Renderer *renderer) {
  */
 Milliseconds draw_game(const Game *const game, SDL_Renderer *renderer) {
   Milliseconds draw_game_start = get_milliseconds();
-  Milliseconds start;
 
-  start = get_milliseconds();
+  profiler_begin("draw_game:clear");
   clear(renderer);
-  update_profiler("draw_game:clear", get_milliseconds() - start);
+  profiler_end("draw_game:clear");
 
-  start = get_milliseconds();
+  profiler_begin("draw_game:draw_top_bar");
   draw_top_bar(game->player, renderer);
-  update_profiler("draw_game:draw_top_bar", get_milliseconds() - start);
+  profiler_end("draw_game:draw_top_bar");
 
-  start = get_milliseconds();
+  profiler_begin("draw_game:draw_bottom_bar");
   draw_bottom_bar(game->message, renderer);
-  update_profiler("draw_game:draw_bottom_bar", get_milliseconds() - start);
+  profiler_end("draw_game:draw_bottom_bar");
 
-  start = get_milliseconds();
+  profiler_begin("draw_game:draw_borders");
   draw_borders(renderer);
-  update_profiler("draw_game:draw_borders", get_milliseconds() - start);
+  profiler_end("draw_game:draw_borders");
 
-  start = get_milliseconds();
+  profiler_begin("draw_game:draw_platforms");
   draw_platforms(game->platforms, game->platform_count, game->box, renderer);
-  update_profiler("draw_game:draw_platforms", get_milliseconds() - start);
+  profiler_end("draw_game:draw_platforms");
 
-  start = get_milliseconds();
+  profiler_begin("draw_game:draw_perk");
   draw_perk(game, renderer);
-  update_profiler("draw_game:draw_perk", get_milliseconds() - start);
+  profiler_end("draw_game:draw_perk");
 
-  start = get_milliseconds();
+  profiler_begin("draw_game:draw_player");
   draw_player(game->player, renderer);
-  update_profiler("draw_game:draw_player", get_milliseconds() - start);
+  profiler_end("draw_game:draw_player");
 
-  start = get_milliseconds();
+  profiler_begin("draw_game:present");
   present(renderer);
-  update_profiler("draw_game:present", get_milliseconds() - start);
+  profiler_end("draw_game:present");
 
   update_profiler("draw_game", get_milliseconds() - draw_game_start);
   return get_milliseconds() - draw_game_start;

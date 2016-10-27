@@ -64,7 +64,7 @@ unsigned char get_from_rigid_matrix(const Game *const game, const int x,
                                     const int y);
 void modify_rigid_matrix_point(const Game *const game, const int x, const int y,
                                const unsigned char delta);
-void modify_rigid_matrix_platform(Game *game, Platform *platform,
+void modify_rigid_matrix_platform(Game *game, Platform const *platform,
                                   const unsigned char delta);
 
 void print_rigid_matrix(Game *game);

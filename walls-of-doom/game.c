@@ -39,22 +39,11 @@ void modify_rigid_matrix_point(const Game *const game, const int x, const int y,
   }
 }
 
-void modify_rigid_matrix_platform(Game *game, Platform *platform,
+void modify_rigid_matrix_platform(Game *game, Platform const *platform,
                                   const unsigned char delta) {
   int i;
   for (i = 0; i < platform->width; i++) {
     modify_rigid_matrix_point(game, platform->x + i, platform->y, delta);
-  }
-}
-
-void print_rigid_matrix(Game *game) {
-  size_t i;
-  size_t j;
-  for (i = 0; i < game->rigid_matrix_n; i++) {
-    for (j = 0; j < game->rigid_matrix_m; j++) {
-      printf("%c", game->rigid_matrix[j + i * game->rigid_matrix_m] + '0');
-    }
-    printf("\n");
   }
 }
 
@@ -111,14 +100,15 @@ void destroy_game(Game *game) {
 }
 
 Milliseconds update_game(Game *const game) {
-  Milliseconds game_update_start = get_milliseconds();
+  Milliseconds game_update_start;
+  profiler_begin("update_game");
+  game_update_start = get_milliseconds();
   if (game->message_end_frame < game->frame) {
     game->message[0] = '\0';
   }
   update_platforms(game);
   update_perk(game);
-
-  update_profiler("update_game", get_milliseconds() - game_update_start);
+  profiler_end("update_game");
   return get_milliseconds() - game_update_start;
 }
 
