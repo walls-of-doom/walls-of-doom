@@ -45,9 +45,6 @@ SDL2_ttf     2.0.12
 SDL2_image    2.0.0
 ```
 
-The [build status](https://semaphoreci.com/walls-of-doom/walls-of-doom) is
-visible to everyone.
-
 # Building and Running
 
 ## Requirements
@@ -57,11 +54,9 @@ visible to everyone.
 The game should work on any Linux or BSD operating system with a desktop
 environment.
 
-Currently, there is no Windows support. [See the relevant
-issue](https://github.com/walls-of-doom/walls-of-doom/issues/38).
+Currently, there is no Windows support. [See the relevant issue](https://github.com/walls-of-doom/walls-of-doom/issues/38).
 
-OS X and macOS support is unknown. [See the relevant
-issue](https://github.com/walls-of-doom/walls-of-doom/issues/39).
+OS X and macOS support is unknown. [See the relevant issue](https://github.com/walls-of-doom/walls-of-doom/issues/39).
 
 ### CMake
 
@@ -82,14 +77,13 @@ Older versions of the abovementioned compilers are **very** likely to work too.
 
 You will need SDL 2, with the TrueType and Image libraries.
 
-## Building and installing
+## Building
 
 ```bash
 $ mkdir build
 $ cd build
 $ cmake ..
 $ make
-$ sudo make install
 ```
 
 > You can pass `-DENV32=1` to CMake to get a 32-bit build on a 64-bit system.
@@ -101,33 +95,14 @@ $ sudo make install
 ## Running the game
 
 ```bash
-$ walls-of-doom
+$ bash build/walls-of-doom/start-walls-of-doom.sh
 ```
 
 ## Running the tests
 
 ```bash
-$ ./build/tests/tests
+$ bash scripts/test.sh
 ```
-
-## Reformatting code and performing static analysis
-
-```bash
-$ bash reformat.sh
-```
-
-# Generating the Images
-
-```bash
-$ cd blender
-$ bash render.sh
-```
-
-And they should be written in to the output subdirectory.
-
-## Links
-
-All these images are posted on the [Imgur album of the project](http://imgur.com/a/kiOY2).
 
 # Coding Style
 
