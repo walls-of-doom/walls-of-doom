@@ -35,16 +35,23 @@ void generate_platforms(Platform *platforms, const BoundingBox *box,
     random_y = select_random_line_awarely(density, lines);
     density[random_y]++;
     platform->y = random_y + box->min_y;
-    platform->speed_x = 0;
-    platform->speed_y = 0;
+    platform->speed = 0;
     speed = PLATFORM_BASE_SPEED * random_integer(MINIMUM_SPEED, MAXIMUM_SPEED);
     /* Make about half the platforms go left and about half go right. */
     /* Make sure that the position is OK to trigger repositioning. */
     if (random_integer(0, 1)) {
-      platform->speed_x = speed;
+      platform->speed = speed;
     } else {
-      platform->speed_x = -speed;
+      platform->speed = -speed;
     }
   }
   resize_memory(density, 0);
+}
+
+/**
+ * Compares two Platforms and evaluates whether or not they are the same.
+ */
+int platform_equals(const Platform a, const Platform b) {
+  const int pos_equals = a.x == b.x && a.y == b.y;
+  return pos_equals && a.speed == b.speed && a.width == b.width;
 }

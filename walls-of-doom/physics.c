@@ -150,9 +150,9 @@ static void move_platform(Game *const game, Platform *const platform,
 }
 
 void move_platform_horizontally(Game *const game, Platform *const platform) {
-  const int normalized_speed = normalize(platform->speed_x);
+  const int normalized_speed = normalize(platform->speed);
   Player *const player = game->player;
-  if (should_move_at_current_frame(game, platform->speed_x)) {
+  if (should_move_at_current_frame(game, platform->speed)) {
     if (can_move_platform(game, platform, normalized_speed, 0)) {
       /* Fail fast if the platform is not on the same line. */
       if (player->y == platform->y) {
@@ -170,23 +170,6 @@ void move_platform_horizontally(Game *const game, Platform *const platform) {
       }
       move_platform(game, platform, normalized_speed, 0);
     }
-  }
-}
-
-void move_platform_vertically(Game *const game, Platform *const platform) {
-  Player *const player = game->player;
-  if (should_move_at_current_frame(game, platform->speed_y)) {
-    if (player->x >= platform->x && player->x < platform->x + platform->width) {
-      if (normalize(platform->speed_y) == 1) {
-        if (player->y == platform->y + 1) {
-        }
-      } else if (normalize(platform->speed_y) == -1) {
-        if (player->y == platform->y - 1) {
-          shove_player(game, 0, -1);
-        }
-      }
-    }
-    platform->y += normalize(platform->speed_y);
   }
 }
 
@@ -304,7 +287,9 @@ static void reposition(Game *const game, Platform *const platform) {
   memset(occupied, 0, occupied_size);
   /* Build a table of occupied rows. */
   for (i = 0; i < game->platform_count; i++) {
-    occupied[game->platforms[i].y - box->min_y] = 1;
+    if (!platform_equals(game->platforms[i], *platform)) {
+      occupied[game->platforms[i].y - box->min_y] = 1;
+    }
   }
   if (get_reposition_algorithm() == REPOSITION_SELECT_BLINDLY) {
     line = select_random_line_blindly(occupied, occupied_size);
@@ -312,29 +297,18 @@ static void reposition(Game *const game, Platform *const platform) {
     line = select_random_line_awarely(occupied, occupied_size);
   }
   resize_memory(occupied, 0);
-  /* To the right of the box. */
   if (platform->x > box->max_x) {
     subtract_platform(game, platform);
     /* The platform should be one tick inside the box. */
     platform->x = box->min_x - platform->width + 1;
     platform->y = line + box->min_y;
     add_platform(game, platform);
-    /* To the left of the box. */
   } else if (platform->x + platform->width < box->min_x) {
     subtract_platform(game, platform);
     /* The platform should be one tick inside the box. */
     platform->x = box->max_x;
     platform->y = line + box->min_y;
     add_platform(game, platform);
-    /* Above the box. */
-  } else if (platform->y < box->min_y) {
-    platform->x = random_integer(box->min_x, box->max_x - platform->width);
-    /* Must work when the player is in the last line */
-    /* Create it under the bounding box */
-    platform->y = box->max_y + 1;
-    /* Use the move function to keep the game in a valid state */
-    /* This is done this way to prevent superposition. */
-    move_platform_vertically(game, platform);
   }
 }
 
@@ -360,7 +334,6 @@ int is_out_of_bounding_box(Platform *const platform,
 
 void update_platform(Game *const game, Platform *const platform) {
   move_platform_horizontally(game, platform);
-  move_platform_vertically(game, platform);
   if (is_out_of_bounding_box(platform, game->box)) {
     reposition(game, platform);
   }
