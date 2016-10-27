@@ -303,6 +303,7 @@ static void reposition(Game *const game, Platform *const platform) {
   int line;
   size_t i;
   occupied = resize_memory(occupied, occupied_size);
+  memset(occupied, 0, occupied_size);
   /* Build a table of occupied rows. */
   for (i = 0; i < game->platform_count; i++) {
     occupied[game->platforms[i].y - box->min_y] = 1;
