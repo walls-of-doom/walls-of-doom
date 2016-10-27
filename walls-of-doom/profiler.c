@@ -19,10 +19,12 @@
 typedef struct ProfilerData {
   char identifier[MAXIMUM_DATA_IDENTIFIER_SIZE];
   Milliseconds sum;
+  Milliseconds stamp;
   unsigned long frequency;
 } ProfilerData;
 
 static size_t table_size = 0;
+
 /**
  * A very unoptimized table.
  *
@@ -41,6 +43,7 @@ ProfilerData *get_empty_data(const char *identifier) {
   ProfilerData empty_data;
   copy_string(empty_data.identifier, identifier, MAXIMUM_DATA_IDENTIFIER_SIZE);
   empty_data.sum = 0;
+  empty_data.stamp = 0;
   empty_data.frequency = 0;
   reallocated_table = resize_memory(table, new_size);
   if (reallocated_table != NULL) {
@@ -73,6 +76,22 @@ void update_profiler(const char *identifier, const Milliseconds delta) {
   ProfilerData *data = get_data(identifier);
   data->frequency++;
   data->sum += delta;
+}
+
+/**
+ * Begins the profiling of the execution of the provided identifier.
+ */
+void profiler_begin(const char *identifier) {
+  ProfilerData *data = get_data(identifier);
+  data->stamp = get_milliseconds();
+}
+
+/**
+ * Ends the profiling of the execution of the provided identifier.
+ */
+void profiler_end(const char *identifier) {
+  ProfilerData *data = get_data(identifier);
+  update_profiler(identifier, get_milliseconds() - data->stamp);
 }
 
 static double profiler_data_mean(const ProfilerData *const data) {

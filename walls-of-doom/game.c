@@ -100,14 +100,15 @@ void destroy_game(Game *game) {
 }
 
 Milliseconds update_game(Game *const game) {
-  Milliseconds game_update_start = get_milliseconds();
+  Milliseconds game_update_start;
+  profiler_begin("update_game");
+  game_update_start = get_milliseconds();
   if (game->message_end_frame < game->frame) {
     game->message[0] = '\0';
   }
   update_platforms(game);
   update_perk(game);
-
-  update_profiler("update_game", get_milliseconds() - game_update_start);
+  profiler_end("update_game");
   return get_milliseconds() - game_update_start;
 }
 

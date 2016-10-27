@@ -3,6 +3,7 @@
 #include "limits.h"
 #include "logger.h"
 #include "memory.h"
+#include "profiler.h"
 #include "random.h"
 #include "settings.h"
 #include <stdio.h>
@@ -689,6 +690,7 @@ void update_player_perk(Game *game) {
 }
 
 void update_player(Game *game, const Command command) {
+  profiler_begin("update_player");
   update_player_perk(game);
   process_command(game, command);
   /* This ordering makes the player run horizontally before falling.
@@ -699,4 +701,5 @@ void update_player(Game *game, const Command command) {
   /* Enable double jump if the player is standing over a platform. */
   update_double_jump(game);
   check_for_player_death(game);
+  profiler_end("update_player");
 }
