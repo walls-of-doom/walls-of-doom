@@ -1,6 +1,8 @@
 #include "color.h"
 #include <SDL.h>
 
+#define COLOR_STRING_SEPARATOR ','
+
 /* These colors work as fallback if settings fails. */
 Color COLOR_DEFAULT_FOREGROUND = {192, 192, 192, 255};
 Color COLOR_DEFAULT_BACKGROUND = {32, 32, 32, 255};
@@ -30,10 +32,10 @@ Color color_from_string(const char *string) {
 
 ColorPair color_pair_from_string(const char *string) {
   ColorPair pair;
-  char *const end = strchr(string, ',');
+  char *const end = strchr(string, COLOR_STRING_SEPARATOR);
   *end = '\0';
   pair.foreground = color_from_string(string);
-  *end = ',';
+  *end = COLOR_STRING_SEPARATOR;
   pair.background = color_from_string(end + 1);
   return pair;
 }
