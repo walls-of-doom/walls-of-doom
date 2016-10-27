@@ -13,7 +13,7 @@
 #define MAXIMUM_DATA_IDENTIFIER_SIZE 32
 
 #define OUTPUT_HEADER "Mean,Frequency,Identifier\n"
-#define OUTPUT_FORMAT "%.2f,%ld,%s\n"
+#define OUTPUT_FORMAT "\"%s\",%f,%ld\n"
 #define OUTPUT_FORMAT_SIZE 128
 
 typedef struct ProfilerData {
@@ -130,14 +130,12 @@ void write_statistics(void) {
   if (file) {
     /* Sort the table if we can write output. */
     sort_table();
-    fprintf(file, OUTPUT_HEADER);
     for (i = 0; i < table_size; i++) {
       mean = profiler_data_mean(table + i);
       frequency = table[i].frequency;
       identifier = table[i].identifier;
-      fprintf(file, OUTPUT_FORMAT, mean, frequency, identifier);
+      fprintf(file, OUTPUT_FORMAT, identifier, mean, frequency);
     }
-    fprintf(file, "\n");
     fclose(file);
   }
 }
