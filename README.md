@@ -146,53 +146,6 @@ The following include order should be respected in all implementation files
 3. SDL 2 headers
 4. System headers
 
-# Implementation Notes
-
-These are notes on some of the modules of the project to help new developers get
-to know the project structure better without having to look into the source
-code.
-
-## IO
-
-Before using the IO capabilities of Walls of Doom, `initialize()` must be
-called. Before quitting the game, `finalize()` must be called to free associated
-resources.
-
-## Logger
-
-Walls of Doom has a very simple logger which can be used by the `log_message()`
-function. If for some reason logging fails, it fail silently and the program is
-not interrupted.
-
-If one must use the logger without initializing the other IO functions, the
-logger module may be independently initialized by calling `initialize_logger()`
-and finalized by calling `finalize_logger()`.
-
-## Menu
-
-Under the Menu name is grouped most of the logic that deals with handling user
-interactions outside of the game. This includes menu item selection, the top
-scores functionality and the auxiliary functions of these parts of the
-application.
-
-## Physics
-
-The Physics module is where most of the calculations and checks take place.
-Walking, falling, jumping, the fetching of perks, and death are some of the
-things that fall under the scope of this module.
-
-## Random
-
-Before using the PRNG, you can initialize it with the current time by calling
-`seed_random()`.
-
-This project uses the **[xoroshiro+](http://xoroshiro.di.unimi.it/)** algorithm
-to efficiently generate pseudo-random numbers with a big period.
-
-The convenience function that returns an integer in the specified range uses
-multiple random numbers modulo the next power of two to prevent the modulo bias
-that comes with more naive approaches.
-
 # License
 
 It is licensed under the BSD 3-Clause license. See LICENSE.txt for more
