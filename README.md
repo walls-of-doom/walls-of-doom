@@ -106,20 +106,28 @@ $ bash scripts/test.sh
 
 # Coding Style
 
-The coding style is enforced by clang-format and the formatter can be ran with
+The coding style (LLVM style, but for C) is enforced by LLVM tools.
+
+## Running the formatter
 
 ```bash
 $ bash scripts/llvm/reformat.sh
 ```
 
-## Include Order
+## Performing static analysis
 
-The following include order should be respected in all implementation files
+```bash
+$ bash scripts/llvm/analyze.sh
+```
+
+## Include Order
 
 1. Main header
 2. Walls of Doom headers
 3. SDL 2 headers
 4. System headers
+
+This include order should be respected in all source files.
 
 # License
 
