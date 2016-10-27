@@ -6,12 +6,16 @@
 typedef struct Platform {
   int x;
   int y;
-  int speed_x;
-  int speed_y;
+  int speed;
   int width;
 } Platform;
 
 void generate_platforms(Platform *platforms, const BoundingBox *box,
                         const int count);
+
+/**
+ * Compares two Platforms and evaluates whether or not they are the same.
+ */
+int platform_equals(const Platform a, const Platform b);
 
 #endif
