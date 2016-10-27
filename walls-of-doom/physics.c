@@ -120,10 +120,37 @@ static int can_insert_platform(Game *const game, Platform *const platform) {
   return 1;
 }
 
+/**
+ * Evaluates whether or not the player is standing on a platform.
+ *
+ * This function takes into account the Invincibility perk, which makes the
+ * bottom border to be treated as a platform.
+ */
+static int is_standing_on_platform(const Game *const game) {
+  size_t i;
+  Platform *platform;
+  if (game->player->perk == PERK_POWER_INVINCIBILITY &&
+      game->player->y == game->box->max_y) {
+    return 1;
+  }
+  for (i = 0; i < game->platform_count; i++) {
+    platform = game->platforms + i;
+    if (is_over_platform(game->player->x, game->player->y, platform)) {
+      return 1;
+    }
+  }
+  return 0;
+}
+
 static int can_move_platform(Game *const game, Platform *const platform,
                              const int dx, const int dy) {
+  int can_move;
+  int x = game->player->x;
+  int y = game->player->y;
+  if (get_player_stops_platforms() && is_over_platform(x, y, platform)) {
+    return 0;
+  }
   /* If the platform would intersect with another platform, do not move it. */
-  int can_move = 0;
   subtract_platform(game, platform);
   platform->x += dx;
   platform->y += dy;
@@ -475,27 +502,6 @@ void update_player_horizontal_position(Game *game) {
 
 int is_jumping(const Player *const player) {
   return player->remaining_jump_height > 0;
-}
-
-/**
- * Evaluates whether or not the player is standing on a platform.
- *
- * This function takes into account the Invincibility perk, which makes the
- * bottom border to be treated as a platform.
- */
-int is_standing_on_platform(const Game *const game) {
-  size_t i;
-  if (game->player->perk == PERK_POWER_INVINCIBILITY &&
-      game->player->y == game->box->max_y) {
-    return 1;
-  }
-  for (i = 0; i < game->platform_count; i++) {
-    if (is_over_platform(game->player->x, game->player->y,
-                         game->platforms + i)) {
-      return 1;
-    }
-  }
-  return 0;
 }
 
 void process_jump(Game *const game) {
