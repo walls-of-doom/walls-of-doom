@@ -42,11 +42,9 @@ Code get_full_path(char *buffer, const char *filename);
 
 /**
  * Writes bytes to the indicated file from the provided source.
- *
- * Returns 0 in case of success.
  */
-int write_bytes(const char *filename, const void *source, const size_t size,
-                const size_t count);
+Code write_bytes(const char *filename, const void *source, const size_t size,
+                 const size_t count);
 
 /**
  * Reads bytes from the indicated file to the provided destination.

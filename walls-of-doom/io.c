@@ -74,14 +74,12 @@ static int get_tile_height(void) {
 
 /**
  * Initializes the global fonts.
- *
- * Returns 0 in case of success.
  */
-static int initialize_fonts(void) {
+static Code initialize_fonts(void) {
   char log_buffer[MAXIMUM_STRING_SIZE];
   TTF_Font *font = NULL;
   if (global_monospaced_font != NULL) {
-    return 0;
+    return CODE_OK;
   }
   /* We try to open the font if we need to initialize. */
   font = TTF_OpenFont(MONOSPACED_FONT_PATH, get_font_size());
@@ -89,30 +87,28 @@ static int initialize_fonts(void) {
   if (font == NULL) {
     sprintf(log_buffer, "TTF font opening error: %s", SDL_GetError());
     log_message(log_buffer);
-    return 1;
+    return CODE_ERROR;
   } else {
     global_monospaced_font = font;
   }
-  return 0;
+  return CODE_OK;
 }
 
 /**
  * Initializes the required font metrics.
- *
- * Returns 0 in case of success.
  */
-static int initialize_font_metrics(void) {
+static Code initialize_font_metrics(void) {
   int width;
   int height;
   TTF_Font *font = global_monospaced_font;
   if (TTF_GlyphMetrics(font, 'A', NULL, NULL, NULL, NULL, &width)) {
     log_message("Could not assess the width of a font");
-    return 1;
+    return CODE_ERROR;
   }
   height = TTF_FontHeight(font);
   global_monospaced_font_width = width;
   global_monospaced_font_height = height;
-  return 0;
+  return CODE_OK;
 }
 
 /**
@@ -134,16 +130,16 @@ static SDL_Window *create_window(int *width, int *height, int *bar_height) {
   return window;
 }
 
-int set_window_title_and_icon(SDL_Window *window) {
+static Code set_window_title_and_icon(SDL_Window *window) {
   SDL_Surface *icon_surface = IMG_Load(ICON_PATH);
   SDL_SetWindowTitle(window, GAME_NAME);
   if (icon_surface == NULL) {
     log_message("Failed to load the window icon");
-    return 1;
+    return CODE_ERROR;
   }
   SDL_SetWindowIcon(window, icon_surface);
   SDL_FreeSurface(icon_surface);
-  return 0;
+  return CODE_OK;
 }
 
 static void set_render_color(SDL_Renderer *renderer, Color color) {
@@ -154,10 +150,8 @@ static void set_render_color(SDL_Renderer *renderer, Color color) {
  * Initializes the required resources.
  *
  * Should only be called once, right after starting.
- *
- * Returns 0 in case of success.
  */
-int initialize(SDL_Window **window, SDL_Renderer **renderer) {
+Code initialize(SDL_Window **window, SDL_Renderer **renderer) {
   char log_buffer[MAXIMUM_STRING_SIZE];
   initialize_logger();
   initialize_profiler();
@@ -166,30 +160,30 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
   if (SDL_Init(SDL_INIT_VIDEO)) {
     sprintf(log_buffer, "SDL initialization error: %s", SDL_GetError());
     log_message(log_buffer);
-    return 1;
+    return CODE_ERROR;
   }
   /* Initialize TTF. */
   if (!TTF_WasInit()) {
     if (TTF_Init()) {
       sprintf(log_buffer, "TTF initialization error: %s", SDL_GetError());
       log_message(log_buffer);
-      return 1;
+      return CODE_ERROR;
     }
   }
   if (initialize_fonts()) {
     sprintf(log_buffer, "Failed to initialize fonts");
     log_message(log_buffer);
-    return 1;
+    return CODE_ERROR;
   }
   if (initialize_font_metrics()) {
     sprintf(log_buffer, "Failed to initialize font metrics");
     log_message(log_buffer);
-    return 1;
+    return CODE_ERROR;
   }
   if ((IMG_Init(IMG_FLAGS) & IMG_FLAGS) != IMG_FLAGS) {
     sprintf(log_buffer, "Failed to initialize required image support");
     log_message(log_buffer);
-    return 1;
+    return CODE_ERROR;
   }
   /**
    * The number of columns and the number of lines are fixed. However, the
@@ -203,7 +197,7 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
   if (*window == NULL) {
     sprintf(log_buffer, "SDL initialization error: %s", SDL_GetError());
     log_message(log_buffer);
-    return 1;
+    return CODE_ERROR;
   }
   /* Must disable text input to prevent a name capture bug. */
   SDL_StopTextInput();
@@ -211,7 +205,7 @@ int initialize(SDL_Window **window, SDL_Renderer **renderer) {
   *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED);
   set_render_color(*renderer, COLOR_DEFAULT_BACKGROUND);
   clear(*renderer);
-  return 0;
+  return CODE_OK;
 }
 
 static void finalize_cached_textures(void) {
@@ -233,10 +227,8 @@ static void finalize_fonts(void) {
  * Finalizes the acquired resources.
  *
  * Should only be called once, right before exiting.
- *
- * Returns 0 in case of success.
  */
-int finalize(SDL_Window **window, SDL_Renderer **renderer) {
+Code finalize(SDL_Window **window, SDL_Renderer **renderer) {
   finalize_cached_textures();
   finalize_fonts();
   SDL_DestroyRenderer(*renderer);
@@ -250,15 +242,7 @@ int finalize(SDL_Window **window, SDL_Renderer **renderer) {
   SDL_Quit();
   finalize_profiler();
   finalize_logger();
-  return 0;
-}
-
-/**
- * Initializes the color schemes used to render the game.
- */
-int initialize_color_schemes(void) {
-  /* Nothing to do for now. */
-  return 0;
+  return CODE_OK;
 }
 
 /**
@@ -348,11 +332,9 @@ Code print_absolute(const int x, const int y, const char *string,
 
 /**
  * Prints the provided string on the screen starting at (x, y).
- *
- * Returns 0 in case of success.
  */
-int print(const int x, const int y, const char *string,
-          const ColorPair color_pair, SDL_Renderer *renderer) {
+Code print(const int x, const int y, const char *string,
+           const ColorPair color_pair, SDL_Renderer *renderer) {
   const int absolute_x = get_tile_width() * x;
   const int absolute_y = get_bar_height() + get_tile_height() * (y - 1);
   return print_absolute(absolute_x, absolute_y, string, color_pair, renderer);
@@ -435,7 +417,7 @@ static Code render_borders(BoundingBox borders, SDL_Renderer *renderer) {
  * Prints the provided strings centered at the specified absolute line.
  */
 Code print_centered_horizontally(const int y, const int string_count,
-                                 const char *const *strings,
+                                 char const *const *const strings,
                                  const ColorPair color_pair,
                                  SDL_Renderer *renderer) {
   char log_buffer[MAXIMUM_STRING_SIZE];
@@ -482,20 +464,22 @@ Code print_centered_horizontally(const int y, const int string_count,
 /**
  * Prints the provided strings centered in the middle of the screen.
  */
-Code print_centered_vertically(int string_count, const char *const *strings,
+Code print_centered_vertically(const int string_count,
+                               char const *const *const strings,
                                const ColorPair color_pair,
                                SDL_Renderer *renderer) {
   const int text_line_height = global_monospaced_font_height;
   const int padding = 2 * get_padding() * global_monospaced_font_height;
   const int available_window_height = get_window_height() - padding;
   const int text_lines_limit = available_window_height / text_line_height;
+  int printed_count = string_count;
   int y;
   int i;
   if (string_count > text_lines_limit) {
-    string_count = text_lines_limit;
+    printed_count = text_lines_limit;
   }
   y = (get_window_height() - string_count * text_line_height) / 2;
-  for (i = 0; i < string_count; i++) {
+  for (i = 0; i < printed_count; i++) {
     print_centered_horizontally(y, 1, strings + i, color_pair, renderer);
     y += text_line_height;
   }
@@ -546,6 +530,13 @@ char *copy_first_line(char *source, char *destination) {
   } else {
     return source + 1;
   }
+}
+
+void print_menu(const int line_count, char const *const *const lines,
+                SDL_Renderer *renderer) {
+  clear(renderer);
+  print_centered_vertically(line_count, lines, COLOR_PAIR_DEFAULT, renderer);
+  present(renderer);
 }
 
 /**
@@ -630,10 +621,8 @@ static void write_top_bar_strings(const char *strings[],
 
 /**
  * Draws the top status bar on the screen for a given Player.
- *
- * Returns 0 if successful.
  */
-int draw_top_bar(const Player *const player, SDL_Renderer *renderer) {
+static void draw_top_bar(const Player *const player, SDL_Renderer *renderer) {
   char lives_buffer[MAXIMUM_STRING_SIZE];
   char score_buffer[MAXIMUM_STRING_SIZE];
   const char *strings[TOP_BAR_STRING_COUNT];
@@ -648,7 +637,6 @@ int draw_top_bar(const Player *const player, SDL_Renderer *renderer) {
   strings[2] = lives_buffer;
   strings[3] = score_buffer;
   write_top_bar_strings((const char **)strings, renderer);
-  return 0;
 }
 
 static void write_bottom_bar_string(const char *string,
@@ -664,7 +652,7 @@ static void write_bottom_bar_string(const char *string,
 /*
  * Draws the bottom status bar on the screen for a given Player.
  */
-void draw_bottom_bar(const char *message, SDL_Renderer *renderer) {
+static void draw_bottom_bar(const char *message, SDL_Renderer *renderer) {
   const Color color = COLOR_PAIR_BOTTOM_BAR.background;
   const int y = get_window_height() - bar_height;
   const int w = get_window_width();
@@ -676,7 +664,7 @@ void draw_bottom_bar(const char *message, SDL_Renderer *renderer) {
 /**
  * Draws the borders of the screen.
  */
-void draw_borders(SDL_Renderer *renderer) {
+static void draw_borders(SDL_Renderer *renderer) {
   BoundingBox borders;
   borders.min_x = 0;
   borders.max_x = get_columns() - 1;
@@ -685,8 +673,9 @@ void draw_borders(SDL_Renderer *renderer) {
   render_borders(borders, renderer);
 }
 
-int draw_platforms(const Platform *platforms, const size_t platform_count,
-                   const BoundingBox *box, SDL_Renderer *renderer) {
+static void draw_platforms(const Platform *platforms,
+                           const size_t platform_count, const BoundingBox *box,
+                           SDL_Renderer *renderer) {
   Platform p;
   int x;
   int y;
@@ -699,17 +688,17 @@ int draw_platforms(const Platform *platforms, const size_t platform_count,
     w = min(box->max_x, p.x + p.width - 1) - x + 1;
     draw_rectangle(x, y, w, 1, COLOR_PAIR_PLATFORM.foreground, renderer);
   }
-  return 0;
 }
 
-int has_active_perk(const Game *const game) { return game->perk != PERK_NONE; }
+static int has_active_perk(const Game *const game) {
+  return game->perk != PERK_NONE;
+}
 
-int draw_perk(const Game *const game, SDL_Renderer *renderer) {
+static void draw_perk(const Game *const game, SDL_Renderer *renderer) {
   const Color color = COLOR_PAIR_PERK.background;
   if (has_active_perk(game)) {
     draw_rectangle(game->perk_x, game->perk_y, 1, 1, color, renderer);
   }
-  return 0;
 }
 
 Code draw_player(const Player *const player, SDL_Renderer *renderer) {
@@ -825,18 +814,6 @@ void print_records(const size_t count, const Record *records,
     resize_memory(strings[i], 0);
   }
   resize_memory(strings, 0);
-}
-
-/**
- * Returns a BoundingBox that represents the playable box.
- */
-BoundingBox bounding_box_from_screen(void) {
-  BoundingBox box;
-  box.min_x = 1;
-  box.min_y = 1;
-  box.max_x = get_columns() - 2;
-  box.max_y = get_lines() - 2;
-  return box;
 }
 
 /**

@@ -24,19 +24,15 @@ void present(SDL_Renderer *renderer);
  * Initializes the required resources.
  *
  * Should only be called once, right after starting.
- *
- * Returns 0 in case of success.
  */
-int initialize(SDL_Window **window, SDL_Renderer **renderer);
+Code initialize(SDL_Window **window, SDL_Renderer **renderer);
 
 /**
  * Finalizes the acquired resources.
  *
  * Should only be called once, right before exiting.
- *
- * Returns 0 in case of success.
  */
-int finalize(SDL_Window **window, SDL_Renderer **renderer);
+Code finalize(SDL_Window **window, SDL_Renderer **renderer);
 
 /**
  * Reads a string from the user of up to size characters (including NUL).
@@ -63,11 +59,9 @@ Milliseconds draw_game(const Game *const game, SDL_Renderer *renderer);
 
 /**
  * Prints the provided string on the screen starting at (x, y).
- *
- * Returns 0 in case of success.
  */
-int print(const int x, const int y, const char *string, ColorPair color_pair,
-          SDL_Renderer *renderer);
+Code print(const int x, const int y, const char *string, ColorPair color_pair,
+           SDL_Renderer *renderer);
 
 /**
  * Prints the provided strings centered at the specified absolute line.
@@ -86,27 +80,21 @@ Code print_centered_vertically(const int string_count,
                                SDL_Renderer *renderer);
 
 /**
+ * Writes the menu, centralized in the string.
+ */
+void print_menu(const int line_count, char const *const *const lines,
+                SDL_Renderer *renderer);
+
+/**
  * Prints the provided string after formatting it to increase readability.
  */
 void print_long_text(char *string, SDL_Renderer *renderer);
-
-/**
- * Prints the provided Platform, respecting the BoundingBox.
- */
-void print_platform(const Platform *const platform,
-                    const BoundingBox *const box, SDL_Renderer *renderer);
 
 void print_game_result(const char *name, const unsigned int score,
                        const int position, SDL_Renderer *renderer);
 
 void print_records(const size_t count, const Record *records,
                    SDL_Renderer *renderer);
-
-/**
- * Returns a BoundingBox that represents the playable area after removing bars
- * and margins.
- */
-BoundingBox bounding_box_from_screen(void);
 
 /**
  * Reads the next command that needs to be processed.

@@ -28,10 +28,9 @@ typedef struct Menu {
  * Writes the provided Menu for the user.
  */
 void write_menu(const Menu *const menu, SDL_Renderer *renderer) {
-  ColorPair color = COLOR_PAIR_DEFAULT;
   const size_t entries = menu->option_count + 1;
   const size_t string_count = 2 * entries - 1;
-  const char *const *const_strings = NULL;
+  char const *const *const_strings = NULL;
   char **strings = NULL;
   char *source = NULL;
   const char hint_format[] = "> %s <";
@@ -39,6 +38,7 @@ void write_menu(const Menu *const menu, SDL_Renderer *renderer) {
   size_t option_index;
   size_t i;
   strings = resize_memory(strings, sizeof(char *) * string_count);
+  const_strings = (char const *const *)strings;
   for (i = 0; i < string_count; i++) {
     strings[i] = NULL;
     strings[i] = resize_memory(strings[i], MAXIMUM_STRING_SIZE);
@@ -61,16 +61,22 @@ void write_menu(const Menu *const menu, SDL_Renderer *renderer) {
       copy_string(strings[i], "", MAXIMUM_STRING_SIZE);
     }
   }
-  clear(renderer);
-  const_strings = (const char *const *)strings;
-  print_centered_vertically(string_count, const_strings, color, renderer);
-  present(renderer);
+  print_menu(string_count, const_strings, renderer);
   /* Free the strings. */
   for (i = 0; i < string_count; i++) {
     resize_memory(strings[i], 0);
   }
   /* Free the pointer array. */
   resize_memory(strings, 0);
+}
+
+static BoundingBox create_bounding_box(void) {
+  BoundingBox box;
+  box.min_x = 1;
+  box.min_y = 1;
+  box.max_x = get_columns() - 2;
+  box.max_y = get_lines() - 2;
+  return box;
 }
 
 /**
@@ -94,7 +100,7 @@ Code game(SDL_Renderer *renderer) {
   player.x = get_columns() / 2;
   player.y = get_lines() / 2;
 
-  box = bounding_box_from_screen();
+  box = create_bounding_box();
 
   generate_platforms(platforms, &box, get_platform_count());
 

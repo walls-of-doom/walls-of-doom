@@ -99,11 +99,9 @@ void log_access(Operation operation, const size_t bytes, const char *filename) {
 
 /**
  * Writes bytes to the indicated file from the provided source.
- *
- * Returns 0 in case of success.
  */
-int write_bytes(const char *filename, const void *source, const size_t size,
-                const size_t count) {
+Code write_bytes(const char *filename, const void *source, const size_t size,
+                 const size_t count) {
   char log_buffer[MAXIMUM_STRING_SIZE];
   unsigned long long_count;
   unsigned long long_written;
@@ -112,7 +110,7 @@ int write_bytes(const char *filename, const void *source, const size_t size,
   log_access(WRITE, size * count, filename);
   file = fopen(filename, "wb");
   if (file == NULL) {
-    return 1;
+    return CODE_ERROR;
   }
   written = fwrite(source, size, count, file);
   fclose(file);
@@ -121,9 +119,9 @@ int write_bytes(const char *filename, const void *source, const size_t size,
     long_written = (unsigned long)written;
     sprintf(log_buffer, WRITE_BYTES_COUNT_FORMAT, long_count, long_written);
     log_message(log_buffer);
-    return 2;
+    return CODE_ERROR;
   }
-  return 0;
+  return CODE_OK;
 }
 
 /**
