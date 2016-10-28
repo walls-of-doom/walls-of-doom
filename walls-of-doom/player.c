@@ -1,4 +1,5 @@
 #include "player.h"
+#include <stdlib.h>
 
 /**
  * Returns an initialized Player object with the provided name.
@@ -20,5 +21,6 @@ Player make_player(char *name) {
   player.score = 0;
   player.perk = PERK_NONE;
   player.perk_end_frame = 0;
+  player.investments = NULL;
   return player;
 }

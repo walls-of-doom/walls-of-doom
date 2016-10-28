@@ -1,6 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "investment.h"
 #include "perk.h"
 
 typedef struct Player {
@@ -23,6 +24,8 @@ typedef struct Player {
 
   Perk perk;
   unsigned long perk_end_frame;
+
+  Investment *investments;
 
 } Player;
 

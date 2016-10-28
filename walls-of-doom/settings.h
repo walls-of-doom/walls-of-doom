@@ -28,4 +28,12 @@ long get_padding(void);
 
 int get_player_stops_platforms(void);
 
+int get_investment_amount(void);
+
+int get_investment_period(void);
+
+int get_investment_maximum_factor(void);
+
+int get_investment_minimum_factor(void);
+
 #endif

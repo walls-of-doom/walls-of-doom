@@ -14,14 +14,35 @@
 
 #define DEFAULT_PLATFORM_COUNT 16
 #define MINIMUM_PLATFORM_COUNT 0
+
 #define MAXIMUM_FONT_SIZE 48
 #define DEFAULT_FONT_SIZE 20
 #define MINIMUM_FONT_SIZE 12
+
 #define DEFAULT_COLUMNS 80
 #define MINIMUM_COLUMNS 40
+
 #define DEFAULT_LINES 30
 #define MINIMUM_LINES 20
+
 #define DEFAULT_PLAYER_STOPS_PLATFORMS 0
+
+#define MAXIMUM_INVESTMENT_AMOUNT 12000
+#define DEFAULT_INVESTMENT_AMOUNT 60
+#define MINIMUM_INVESTMENT_AMOUNT 1
+
+/* The period of the investment, in seconds .*/
+#define MAXIMUM_INVESTMENT_PERIOD 300
+#define DEFAULT_INVESTMENT_PERIOD 15
+#define MINIMUM_INVESTMENT_PERIOD 1
+
+#define MAXIMUM_INVESTMENT_MAXIMUM_FACTOR 1000
+#define DEFAULT_INVESTMENT_MAXIMUM_FACTOR 140
+#define MINIMUM_INVESTMENT_MAXIMUM_FACTOR 100
+
+#define MAXIMUM_INVESTMENT_MINIMUM_FACTOR 1000
+#define DEFAULT_INVESTMENT_MINIMUM_FACTOR 90
+#define MINIMUM_INVESTMENT_MINIMUM_FACTOR 0
 
 /**
  * How many spaces should be left from the margins when printing text.
@@ -35,6 +56,10 @@ static long columns = DEFAULT_COLUMNS;
 static long lines = DEFAULT_LINES;
 static long padding = DEFAULT_PADDING;
 static int player_stops_platforms = DEFAULT_PLAYER_STOPS_PLATFORMS;
+static int investment_amount = DEFAULT_INVESTMENT_AMOUNT;
+static int investment_period = DEFAULT_INVESTMENT_PERIOD;
+static int investment_maximum_factor = DEFAULT_INVESTMENT_MAXIMUM_FACTOR;
+static int investment_minimum_factor = DEFAULT_INVESTMENT_MINIMUM_FACTOR;
 
 static int is_word_part(char character) {
   return !isspace(character) && character != '=';
@@ -159,12 +184,31 @@ void initialize_settings(void) {
     } else if (strcmp(key, "PLAYER_STOPS_PLATFORMS") == 0) {
       limits.fallback = DEFAULT_PLAYER_STOPS_PLATFORMS;
       player_stops_platforms = parse_boolean(value, limits.fallback);
+    } else if (strcmp(key, "INVESTMENT_AMOUNT") == 0) {
+      limits.minimum = MINIMUM_INVESTMENT_AMOUNT;
+      limits.maximum = MAXIMUM_INVESTMENT_AMOUNT;
+      limits.fallback = DEFAULT_INVESTMENT_AMOUNT;
+      investment_amount = parse_value(value, limits);
+    } else if (strcmp(key, "INVESTMENT_PERIOD") == 0) {
+      limits.minimum = MINIMUM_INVESTMENT_PERIOD;
+      limits.maximum = MAXIMUM_INVESTMENT_PERIOD;
+      limits.fallback = DEFAULT_INVESTMENT_PERIOD;
+      investment_period = parse_value(value, limits);
+    } else if (strcmp(key, "INVESTMENT_MAXIMUM_FACTOR") == 0) {
+      limits.minimum = MINIMUM_INVESTMENT_MAXIMUM_FACTOR;
+      limits.maximum = MAXIMUM_INVESTMENT_MAXIMUM_FACTOR;
+      limits.fallback = DEFAULT_INVESTMENT_MAXIMUM_FACTOR;
+      investment_maximum_factor = parse_value(value, limits);
+    } else if (strcmp(key, "INVESTMENT_MINIMUM_FACTOR") == 0) {
+      limits.minimum = MINIMUM_INVESTMENT_MINIMUM_FACTOR;
+      limits.maximum = MAXIMUM_INVESTMENT_MINIMUM_FACTOR;
+      limits.fallback = DEFAULT_INVESTMENT_MINIMUM_FACTOR;
+      investment_minimum_factor = parse_value(value, limits);
     } else {
       log_unused_key(key);
     }
   }
 }
-
 RepositionAlgorithm get_reposition_algorithm(void) {
   return reposition_algorithm;
 }
@@ -180,3 +224,11 @@ long get_lines(void) { return lines; }
 long get_padding(void) { return padding; }
 
 int get_player_stops_platforms(void) { return player_stops_platforms; }
+
+int get_investment_amount(void) { return investment_amount; }
+
+int get_investment_period(void) { return investment_period; }
+
+int get_investment_maximum_factor(void) { return investment_maximum_factor; }
+
+int get_investment_minimum_factor(void) { return investment_minimum_factor; }

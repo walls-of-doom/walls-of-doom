@@ -1,5 +1,6 @@
 #include "physics.h"
 #include "constants.h"
+#include "investment.h"
 #include "limits.h"
 #include "logger.h"
 #include "memory.h"
@@ -521,6 +522,38 @@ static void buy_life(Game *game) {
   }
 }
 
+static void update_player_investments(Game *game) {
+  Investment *swap;
+  Investment *investments = game->player->investments;
+  while (investments != NULL && investments->end <= game->played_frames) {
+    game->player->score += end_investment(*investments);
+    swap = investments->next;
+    resize_memory(investments, 0);
+    investments = swap;
+  }
+  game->player->investments = investments;
+}
+
+static void invest(Game *game) {
+  Investment *investments = game->player->investments;
+  Investment *investment = NULL;
+  if (game->player->score >= get_investment_amount()) {
+    investment = resize_memory(investment, sizeof(Investment));
+    game->player->score -= get_investment_amount();
+    investment->next = NULL;
+    investment->amount = get_investment_amount();
+    investment->end = game->played_frames + FPS * get_investment_period();
+    while (investments != NULL && investments->next != NULL) {
+      investments = investments->next;
+    }
+    if (investments == NULL) {
+      game->player->investments = investment;
+    } else {
+      investments->next = investment;
+    }
+  }
+}
+
 void process_command(Game *game, const Command command) {
   Player *player = game->player;
   if (command != COMMAND_NONE) {
@@ -543,6 +576,8 @@ void process_command(Game *game, const Command command) {
     process_jump(game);
   } else if (command == COMMAND_CONVERT) {
     buy_life(game);
+  } else if (command == COMMAND_INVEST) {
+    invest(game);
   }
 }
 
@@ -630,7 +665,7 @@ static void write_perk_fading_message(Game *game, const Perk perk,
   game_set_message(game, message, 1, 0);
 }
 
-void update_player_perk(Game *game) {
+static void update_player_perk(Game *game) {
   unsigned long end_frame;
   unsigned long remaining_frames;
   Player *player = game->player;
@@ -677,6 +712,7 @@ void update_player_perk(Game *game) {
 void update_player(Game *game, const Command command) {
   profiler_begin("update_player");
   update_player_perk(game);
+  update_player_investments(game);
   process_command(game, command);
   /* This ordering makes the player run horizontally before falling.
    * This seems to be the expected order from an user point-of-view. */

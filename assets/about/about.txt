@@ -23,4 +23,6 @@ Commands
 
   C                       - Convert points into a life
 
+  I                       - Invest points
+
   Q                       - Quit
