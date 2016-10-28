@@ -569,17 +569,30 @@ void check_for_player_death(Game *game) {
   }
 }
 
+static int can_move_up(const Game *game) {
+  const int x = game->player->x;
+  const int y = game->player->y;
+  if (y == game->box->min_y) {
+    return 1;
+  }
+  return !get_from_rigid_matrix(game, x, y - 1);
+}
+
 /**
  * Updates the vertical position of the player.
  */
 void update_player_vertical_position(Game *game) {
+  int falling_speed = PLAYER_FALLING_SPEED;
   if (is_jumping(game->player)) {
-    if (should_move_at_current_frame(game, PLAYER_JUMPING_SPEED)) {
-      move_player(game, 0, -1);
-      game->player->remaining_jump_height--;
+    if (can_move_up(game)) {
+      if (should_move_at_current_frame(game, PLAYER_JUMPING_SPEED)) {
+        move_player(game, 0, -1);
+        game->player->remaining_jump_height--;
+      }
+    } else {
+      game->player->remaining_jump_height = 0;
     }
   } else if (is_falling(game->player, game->platforms, game->platform_count)) {
-    int falling_speed = PLAYER_FALLING_SPEED;
     if (game->player->perk == PERK_POWER_LOW_GRAVITY) {
       falling_speed /= 2;
     }
