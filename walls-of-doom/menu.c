@@ -115,7 +115,7 @@ Code game(SDL_Renderer *renderer) {
 
 int main_menu(SDL_Renderer *renderer) {
   int should_quit = 0;
-  Code code;
+  Code code = CODE_OK;
   Menu menu;
   char title[MAXIMUM_STRING_SIZE];
   char *options[] = {"Play", "Top Scores", "Info", "Quit"};
