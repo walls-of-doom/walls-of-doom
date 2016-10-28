@@ -41,13 +41,13 @@ static int is_word_part(char character) {
 }
 
 static void skip_to_word(const char **input) {
-  while (*input != '\0' && !is_word_part(**input)) {
+  while (**input != '\0' && !is_word_part(**input)) {
     (*input)++;
   }
 }
 
 static void copy_word(const char **input, char *destination) {
-  while (*input != '\0' && is_word_part(**input)) {
+  while (**input != '\0' && is_word_part(**input)) {
     *destination++ = *(*input)++;
   }
   *destination = '\0';
