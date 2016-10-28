@@ -14,11 +14,6 @@ endif ()
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
 set (CMAKE_INCLUDE_CURRENT_DIR_IN_INTERFACE ON)
 
-# Even though Clang and GCC seem to require specific flags for ISO C90,
-# preserving this line seems the right thing to do as it may help with
-# unlisted compilers in our conditional chain below.
-set (CMAKE_C_STANDARD 90)
-
 set (CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 option (ENV32 "Generate code for a 32-bit environment.")
