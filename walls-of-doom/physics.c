@@ -376,24 +376,19 @@ void update_platforms(Game *const game) {
 }
 
 /**
- * Evaluates whether or not the Player is falling. Takes the physics field into
- * account.
+ * Evaluates whether or not the Player is falling.
  */
-int is_falling(const Player *const player, const Platform *platforms,
-               const size_t platform_count) {
-  size_t i;
+static int is_falling(const Game *const game) {
+  const Player *const player = game->player;
+  const int x = player->x;
+  const int y = player->y;
   if (!player->physics || player->perk == PERK_POWER_LEVITATION) {
     return 0;
   }
-  for (i = 0; i < platform_count; i++) {
-    if (player->y == platforms[i].y - 1) {
-      if (player->x >= platforms[i].x &&
-          player->x < platforms[i].x + platforms[i].width) {
-        return 0;
-      }
-    }
+  if (y == game->box->max_y) {
+    return 1;
   }
-  return 1;
+  return !get_from_rigid_matrix(game, x, y);
 }
 
 int is_touching_a_wall(const Player *const player,
@@ -592,7 +587,7 @@ void update_player_vertical_position(Game *game) {
     } else {
       game->player->remaining_jump_height = 0;
     }
-  } else if (is_falling(game->player, game->platforms, game->platform_count)) {
+  } else if (is_falling(game)) {
     if (game->player->perk == PERK_POWER_LOW_GRAVITY) {
       falling_speed /= 2;
     }
