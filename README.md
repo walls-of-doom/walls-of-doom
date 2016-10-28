@@ -60,9 +60,7 @@ OS X and macOS support is unknown. [See the relevant issue](https://github.com/w
 
 ### CMake
 
-You need an installation of CMake in order to build and install the project.
-The suggested 2.8.7 version in the CMake files distributed with the project may
-not be enough for what we use.
+You need an installation of CMake in order to build the project.
 
 ### An ANSI C compiler
 
@@ -87,8 +85,9 @@ $ make
 ```
 
 > You can pass `-DENV32=1` to CMake to get a 32-bit build on a 64-bit system.
+>
 > You can pass `-DSANITIZE=1` to CMake to get the LLVM undefined behavior sanitizer.
-
+>
 > Note that in order to build this 32-bit version, you will need the 32-bit
 > versions of all project dependencies.
 
