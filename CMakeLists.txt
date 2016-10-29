@@ -35,6 +35,4 @@ if ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
     endif ()
 endif ()
 
-add_subdirectory (unity)
 add_subdirectory (walls-of-doom)
-add_subdirectory (tests)
