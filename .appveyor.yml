@@ -50,4 +50,4 @@ after_build:
   # Package the artifact
 
 artifacts:
-  - path: walls-of-doom\Release\walls-of-doom.exe
+  - path: build\walls-of-doom\Release\walls-of-doom.exe
