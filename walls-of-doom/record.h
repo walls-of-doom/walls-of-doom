@@ -21,7 +21,7 @@ typedef struct Record {
  * If the name is too big to fit into the array, it is truncated to the maximum
  * possible size.
  */
-Record make_record(const char *const name, const int score);
+Record make_record(const char *name, const int score);
 
 /**
  * Writes the specified Record to to the system.

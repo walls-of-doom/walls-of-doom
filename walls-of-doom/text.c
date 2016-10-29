@@ -12,7 +12,7 @@
  * This function behaves similarly to strlcpy. However, because the latter may
  * not be available on all platforms, copy_string is used.
  */
-size_t copy_string(char *destination, const char *source, size_t size) {
+size_t copy_string(char *destination, const char *source, const size_t size) {
   char *d = destination;
   const char *s = source;
   size_t n = size;

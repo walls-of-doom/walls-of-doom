@@ -11,7 +11,7 @@ void seed_random(void);
 /**
  * Returns the next power of two bigger than the provided number.
  */
-unsigned long find_next_power_of_two(const unsigned long number);
+unsigned long find_next_power_of_two(unsigned long number);
 
 /**
  * Returns a random number in the range [minimum, maximum].
