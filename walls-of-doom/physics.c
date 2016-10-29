@@ -94,7 +94,7 @@ int should_move_at_current_frame(const Game *const game, const int speed) {
     return 0;
   } else {
     /* Only divide by abs(speed) after checking that speed != 0. */
-    multiple = FPS / (double)abs(speed) + 0.5;
+    multiple = (unsigned long)(FPS / (double)abs(speed) + 0.5);
     return game->frame % multiple == 0;
   }
 }
