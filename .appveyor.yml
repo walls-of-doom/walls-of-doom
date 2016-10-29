@@ -1,5 +1,5 @@
 # version format
-version: 1.3.0-{build}
+version: build-{build}
 
 # Build worker image (VM template)
 image: Visual Studio 2015
@@ -37,7 +37,7 @@ before_build:
 
   - echo Running cmake...
   - cd C:\walls-of-doom\build
-  - cmake -G "Visual Studio 12 2013" ..
+  - cmake -G "Visual Studio 12 2013" ..  # Only make a 32-bit version
 
   - echo Building the project...
   - cmake --build . --config Release
@@ -52,3 +52,14 @@ after_build:
 
 artifacts:
   - path: build\walls-of-doom\Release\walls-of-doom.zip
+    name: walls-of-doom-windows.zip
+
+deploy:
+  provider: GitHub
+  auth_token:
+    secure: JaO/fskUcLorWunMYql+CKy6Hwc26EBCYY1Re4owoiBgQEADsVXY9pdr+iAAjvPb
+  artifact: walls-of-doom-windows.zip
+  draft: false
+  prerelease: false
+  on:
+    appveyor_repo_tag: true  # Deploy only on tags
