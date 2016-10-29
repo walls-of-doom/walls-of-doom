@@ -49,12 +49,9 @@ SDL2_image    2.0.0
 
 ## Requirements
 
-### Linux
+The game works on any Linux or BSD OS with a desktop environment.
 
-The game should work on any Linux or BSD operating system with a desktop
-environment.
-
-Currently, there is no Windows support. [See the relevant issue](https://github.com/walls-of-doom/walls-of-doom/issues/38).
+Windows is fully supported and self-contained binaries are provided.
 
 OS X and macOS support is unknown. [See the relevant issue](https://github.com/walls-of-doom/walls-of-doom/issues/39).
 
