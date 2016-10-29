@@ -20,6 +20,8 @@ option (ENV32 "Generate code for a 32-bit environment.")
 option (ENV64 "Generate code for a 64-bit environment.")
 option (SANITIZE "Modify the program at compile-time to catch undefined behavior during program execution.")
 
+message (${CMAKE_C_COMPILER_ID})
+
 set (COMPILER_IS_GNU ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU"))
 set (COMPILER_IS_CLANG ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang"))
 set (COMPILER_IS_GNU_OR_CLANG ((COMPILER_IS_GNU) OR (COMPILER_IS_CLANG)))
@@ -38,6 +40,8 @@ if (COMPILER_IS_CLANG)
         set (CMAKE_C_FLAGS_BASE "${CMAKE_C_FLAGS_BASE} -fsanitize=undefined")
     endif ()
 endif ()
+
+message (${CMAKE_C_FLAGS_BASE})
 
 add_subdirectory (unity)
 add_subdirectory (walls-of-doom)
