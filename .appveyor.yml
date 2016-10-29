@@ -8,6 +8,12 @@ init: git config --global core.autocrlf input
 
 clone_folder: C:\walls-of-doom\
 
+platform:
+  - x86
+
+configuration:
+  - Release
+
 # Fetch repository as zip archive
 shallow_clone: true
 
@@ -41,3 +47,13 @@ before_build:
 
   - echo Building the project...
   - msbuild.exe walls-of-doom.sln
+
+build:
+  # parallel: true                  # Enable MSBuild parallel builds
+  # project: walls-of-doom.sln      # Path to Visual Studio solution or project
+
+after_build:
+  # Package the artifact
+
+artifacts:
+  - path: walls-of-doom\Release\walls-of-doom.exe
