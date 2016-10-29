@@ -8,12 +8,6 @@ init: git config --global core.autocrlf input
 
 clone_folder: C:\walls-of-doom\
 
-platform:
-  - x86
-
-configuration:
-  - Release
-
 # Fetch repository as zip archive
 shallow_clone: true
 
@@ -43,10 +37,10 @@ before_build:
 
   - echo Running cmake...
   - cd C:\walls-of-doom\build
-  - cmake ..
+  - cmake -G "Visual Studio 12 2013" ..
 
   - echo Building the project...
-  - msbuild.exe walls-of-doom.sln
+  - cmake --build . --config Release
 
 build:
   # parallel: true                  # Enable MSBuild parallel builds
