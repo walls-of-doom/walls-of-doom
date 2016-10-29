@@ -35,4 +35,8 @@ if ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
     endif ()
 endif ()
 
+if ("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
+    set (CMAKE_C_FLAGS_BASE "/D _CRT_SECURE_NO_WARNINGS=1")
+endif ()
+
 add_subdirectory (walls-of-doom)
