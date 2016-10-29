@@ -23,20 +23,15 @@ before_build:
   - copy SDL2-2.0.4\include\* C:\walls-of-doom\build\include\SDL2 > nul
   - copy SDL2-2.0.4\lib\x64\* C:\walls-of-doom\build\lib > nul
 
-  - appveyor DownloadFile http://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-2.0.1-VC.zip
-  - 7z x SDL2_image-devel-2.0.1-VC.zip > nul
-  - copy SDL2_image-2.0.1\include\* C:\walls-of-doom\build\include\SDL2 > nul
-  - copy SDL2_image-2.0.1\lib\x64\* C:\walls-of-doom\build\lib > nul
-
-  - appveyor DownloadFile http://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-devel-2.0.1-VC.zip
-  - 7z x SDL2_mixer-devel-2.0.1-VC.zip > nul
-  - copy SDL2_mixer-2.0.1\include\* C:\walls-of-doom\build\include\SDL2 > nul
-  - copy SDL2_mixer-2.0.1\lib\x64\* C:\walls-of-doom\build\lib > nul
-
   - appveyor DownloadFile https://www.libsdl.org/projects/SDL_ttf/release/SDL2_ttf-devel-2.0.14-VC.zip
   - 7z x SDL2_ttf-devel-2.0.14-VC.zip > nul
   - copy SDL2_ttf-2.0.14\include\* C:\walls-of-doom\build\include\SDL2 > nul
   - copy SDL2_ttf-2.0.14\lib\x64\* C:\walls-of-doom\build\lib > nul
+
+  - appveyor DownloadFile http://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-2.0.1-VC.zip
+  - 7z x SDL2_image-devel-2.0.1-VC.zip > nul
+  - copy SDL2_image-2.0.1\include\* C:\walls-of-doom\build\include\SDL2 > nul
+  - copy SDL2_image-2.0.1\lib\x64\* C:\walls-of-doom\build\lib > nul
 
   - set PATH=C:\walls-of-doom\build\;%PATH%
 
