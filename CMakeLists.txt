@@ -20,8 +20,8 @@ option (ENV32 "Generate code for a 32-bit environment.")
 option (ENV64 "Generate code for a 64-bit environment.")
 option (SANITIZE "Modify the program at compile-time to catch undefined behavior during program execution.")
 
-set (WALLS_OF_DOOM_IS_GCC "${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
-set (WALLS_OF_DOOM_IS_CLANG "${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
+set (WALLS_OF_DOOM_IS_GCC ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU"))
+set (WALLS_OF_DOOM_IS_CLANG ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang"))
 
 if (WALLS_OF_DOOM_IS_GCC OR WALLS_OF_DOOM_IS_CLANG)
     set (CMAKE_C_FLAGS_BASE "-Wall -Wextra -Werror -Wpedantic")
