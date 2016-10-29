@@ -1,7 +1,10 @@
 cmake_minimum_required (VERSION 2.8.7)
 
 set (CMAKE_MODULE_PATH ../cmake)
-set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS_BASE} -std=c89")
+
+if (WALLS_OF_DOOM_IS_GCC OR WALLS_OF_DOOM_IS_CLANG)
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS_BASE} -std=c89")
+endif ()
 
 find_package (SDL2 REQUIRED)
 find_package (SDL2_ttf REQUIRED)
