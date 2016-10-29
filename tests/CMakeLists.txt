@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.8.7)
 
 set (CMAKE_MODULE_PATH ../cmake)
 
-if (COMPILER_IS_GNU_OR_CLANG)
+if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS_BASE} -std=c89")
 endif ()
 
