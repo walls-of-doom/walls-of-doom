@@ -2,7 +2,6 @@
 #include "code.h"
 #include "constants.h"
 #include "logger.h"
-#include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
