@@ -1,5 +1,6 @@
 #include "color.h"
 #include <SDL.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define COLOR_STRING_SEPARATOR ','
