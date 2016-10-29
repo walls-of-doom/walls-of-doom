@@ -48,7 +48,7 @@ build:
 
 after_build:
   # Package the artifact
-  - 7z a walls-of-doom\Release\walls-of-doom.zip .\walls-of-doom\Release\walls-of-doom.exe .\lib\*.dll
+  - 7z a walls-of-doom\Release\walls-of-doom.zip .\walls-of-doom\Release\walls-of-doom.exe .\walls-of-doom\assets .\lib\*.dll
 
 artifacts:
   - path: build\walls-of-doom\Release\walls-of-doom.zip
