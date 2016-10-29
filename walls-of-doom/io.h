@@ -40,7 +40,7 @@ Code finalize(SDL_Window **window, SDL_Renderer **renderer);
  * The string will be echoed after the prompt, which starts at (x, y).
  */
 Code read_string(const int x, const int y, const char *prompt,
-                 char *destination, size_t size, SDL_Renderer *renderer);
+                 char *destination, const size_t size, SDL_Renderer *renderer);
 
 /**
  * Attempts to read a player name.
@@ -60,8 +60,8 @@ Milliseconds draw_game(const Game *const game, SDL_Renderer *renderer);
 /**
  * Prints the provided string on the screen starting at (x, y).
  */
-Code print(const int x, const int y, const char *string, ColorPair color_pair,
-           SDL_Renderer *renderer);
+Code print(const int x, const int y, const char *string,
+           const ColorPair color_pair, SDL_Renderer *renderer);
 
 /**
  * Prints the provided strings centered at the specified absolute line.

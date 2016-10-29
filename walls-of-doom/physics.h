@@ -25,15 +25,15 @@ int select_random_line_blindly(const unsigned char *lines, const int size);
  */
 int select_random_line_awarely(const unsigned char *lines, const int size);
 
-void update_platforms(Game *game);
+void update_platforms(Game *const game);
 
-void update_perk(Game *game);
+void update_perk(Game *const game);
 
 void update_player(Game *game, Command command);
 
 /**
  * Conceives a bonus perk to the player.
  */
-void conceive_bonus(Player *player, Perk perk);
+void conceive_bonus(Player *const player, const Perk perk);
 
 #endif

@@ -8,6 +8,7 @@
 #include "random.h"
 #include "settings.h"
 #include <stdio.h>
+#include <string.h>
 
 /* Should be the maximum frame count value for 5 seconds remaining. */
 #define MINIMUM_REMAINING_FRAMES_FOR_MESSAGE (6 * FPS - 1)
@@ -414,7 +415,7 @@ void reposition_player(Player *const player, const BoundingBox *const box) {
 /**
  * Conceives a bonus perk to the player.
  */
-void conceive_bonus(Player *const player, Perk perk) {
+void conceive_bonus(Player *const player, const Perk perk) {
   if (is_bonus_perk(perk)) {
     if (perk == PERK_BONUS_EXTRA_POINTS) {
       player->score += 60;

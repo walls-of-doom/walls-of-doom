@@ -417,7 +417,7 @@ static Code render_borders(BoundingBox borders, SDL_Renderer *renderer) {
  * Prints the provided strings centered at the specified absolute line.
  */
 Code print_centered_horizontally(const int y, const int string_count,
-                                 char const *const *const strings,
+                                 char const *const *strings,
                                  const ColorPair color_pair,
                                  SDL_Renderer *renderer) {
   char log_buffer[MAXIMUM_STRING_SIZE];
@@ -465,7 +465,7 @@ Code print_centered_horizontally(const int y, const int string_count,
  * Prints the provided strings centered in the middle of the screen.
  */
 Code print_centered_vertically(const int string_count,
-                               char const *const *const strings,
+                               char const *const *strings,
                                const ColorPair color_pair,
                                SDL_Renderer *renderer) {
   const int text_line_height = global_monospaced_font_height;

@@ -8,6 +8,7 @@
 #include "settings.h"
 #include <limits.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define MINIMUM_WIDTH 4
 #define MAXIMUM_WIDTH 16
