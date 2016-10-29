@@ -683,9 +683,9 @@ static void draw_platforms(const Platform *platforms,
   size_t i;
   for (i = 0; i < platform_count; i++) {
     p = platforms[i];
-    x = max(box->min_x, p.x);
+    x = max_int(box->min_x, p.x);
     y = p.y;
-    w = min(box->max_x, p.x + p.width - 1) - x + 1;
+    w = min_int(box->max_x, p.x + p.width - 1) - x + 1;
     draw_rectangle(x, y, w, 1, COLOR_PAIR_PLATFORM.foreground, renderer);
   }
 }
@@ -797,7 +797,7 @@ void print_records(const size_t count, const Record *records,
   const int text_lines_limit = available_window_height / get_font_height();
   const size_t string_width =
       (get_window_width() - x_padding) / get_font_width();
-  const size_t printed = min(count, text_lines_limit);
+  const size_t printed = min_int(count, text_lines_limit);
   char **strings = NULL;
   size_t i;
   strings = resize_memory(strings, sizeof(char *) * printed);

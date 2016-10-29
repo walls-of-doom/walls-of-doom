@@ -60,9 +60,9 @@ void test_get_random_perk_is_well_distributed(void) {
   /* Assess the distribution of the values. */
   for (i = 0; i < PERK_COUNT; i++) {
     count = counters[i];
-    minimum = min(minimum, count);
-    maximum = max(maximum, count);
-    maximum_deviation = max(maximum_deviation, abs(count - average));
+    minimum = min_int(minimum, count);
+    maximum = max_int(maximum, count);
+    maximum_deviation = max_int(maximum_deviation, abs(count - average));
     total += count;
   }
   if (maximum_deviation > maximum_allowed_deviation) {

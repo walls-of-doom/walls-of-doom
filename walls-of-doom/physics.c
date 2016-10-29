@@ -277,12 +277,12 @@ int select_random_line_awarely(const unsigned char *lines, const int size) {
     } else {
       if (i < size - 1) {
         /* Use the minimum distance to first occupied line above or below. */
-        distances[i] = min(distances[i], distances[i + 1] + 1);
+        distances[i] = min_int(distances[i], distances[i + 1] + 1);
       } else {
         distances[i] = 1;
       }
     }
-    maximum_distance = max(maximum_distance, distances[i]);
+    maximum_distance = max_int(maximum_distance, distances[i]);
   }
   /* Count how many occurrences of the maximum distance there are. */
   count = 0;

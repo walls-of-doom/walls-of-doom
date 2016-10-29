@@ -32,7 +32,7 @@ int count_digits(long value) {
 /**
  * Returns the smallest of two integers.
  */
-int min(const int a, const int b) {
+int min_int(const int a, const int b) {
   if (b > a) {
     return a;
   } else {
@@ -43,7 +43,7 @@ int min(const int a, const int b) {
 /**
  * Returns the biggest of two integers.
  */
-int max(const int a, const int b) {
+int max_int(const int a, const int b) {
   if (b < a) {
     return a;
   } else {
