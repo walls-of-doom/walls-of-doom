@@ -13,6 +13,6 @@ Milliseconds get_milliseconds(void);
 /**
  * Sleeps for the specified number of milliseconds or more.
  */
-void sleep(Milliseconds amount);
+void sleep_milliseconds(Milliseconds amount);
 
 #endif

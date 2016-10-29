@@ -185,7 +185,7 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
     drawing_delta = draw_game(game, renderer);
     /* Delay, if needed. */
     if (updating_delta + drawing_delta < interval) {
-      sleep(interval - updating_delta - drawing_delta);
+      sleep_milliseconds(interval - updating_delta - drawing_delta);
     }
     command = read_next_command();
     code = code_from_command(command);

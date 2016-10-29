@@ -12,7 +12,7 @@ Milliseconds get_milliseconds(void) { return SDL_GetTicks(); }
 /**
  * Sleeps for the specified number of milliseconds or more.
  */
-void sleep(Milliseconds amount) {
+void sleep_milliseconds(Milliseconds amount) {
   /* The biggest value representable by long on all platforms. */
   const Milliseconds maximum_sleep = 0x7FFFFFFFL;
   Uint32 ms;
