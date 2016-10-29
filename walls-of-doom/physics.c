@@ -534,14 +534,30 @@ static void update_player_investments(Game *game) {
   game->player->investments = investments;
 }
 
-static void invest(Game *game) {
+enum InvestmentType { INVESTMENT_TYPE_MINIMUM, INVESTMENT_TYPE_ALL };
+
+static int get_investment_total(Player *player, enum InvestmentType type) {
+  if (type == INVESTMENT_TYPE_MINIMUM) {
+    return get_investment_amount();
+  } else if (type == INVESTMENT_TYPE_ALL) {
+    return (player->score / get_investment_amount()) * get_investment_amount();
+  }
+  /* Unknown investment type. */
+  return 0;
+}
+
+static void invest(Game *game, enum InvestmentType type) {
+  const int amount = get_investment_total(game->player, type);
   Investment *investments = game->player->investments;
   Investment *investment = NULL;
-  if (game->player->score >= get_investment_amount()) {
+  if (amount == 0) {
+    return;
+  }
+  if (game->player->score >= amount) {
     investment = resize_memory(investment, sizeof(Investment));
-    game->player->score -= get_investment_amount();
+    game->player->score -= amount;
     investment->next = NULL;
-    investment->amount = get_investment_amount();
+    investment->amount = amount;
     investment->end = game->played_frames + FPS * get_investment_period();
     while (investments != NULL && investments->next != NULL) {
       investments = investments->next;
@@ -577,7 +593,9 @@ void process_command(Game *game, const Command command) {
   } else if (command == COMMAND_CONVERT) {
     buy_life(game);
   } else if (command == COMMAND_INVEST) {
-    invest(game);
+    invest(game, INVESTMENT_TYPE_MINIMUM);
+  } else if (command == COMMAND_INVEST_ALL) {
+    invest(game, INVESTMENT_TYPE_ALL);
   }
 }
 
