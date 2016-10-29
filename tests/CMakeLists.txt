@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.8.7)
 
 set (CMAKE_MODULE_PATH ../cmake)
 
-if (WALLS_OF_DOOM_IS_GCC OR WALLS_OF_DOOM_IS_CLANG)
+if (COMPILER_IS_GNU_OR_CLANG)
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS_BASE} -std=c89")
 endif ()
 
