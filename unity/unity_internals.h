@@ -13,10 +13,15 @@
 
 #include <setjmp.h>
 
-/* Unity Attempts to Auto-Detect Integer Types */
-/* Attempt 1: UINT_MAX, ULONG_MAX, etc in <stdint.h> */
-/* Attempt 2: UINT_MAX, ULONG_MAX, etc in <limits.h> */
-/* Attempt 3: Deduced from sizeof() macros */
+#ifndef UNITY_EXCLUDE_MATH_H
+#include <math.h>
+#endif
+
+/* Unity Attempts to Auto-Detect Integer Types
+ * Attempt 1: UINT_MAX, ULONG_MAX in <limits.h>, or default to 32 bits
+ * Attempt 2: UINTPTR_MAX in <stdint.h>, or default to same size as long
+ * The user may override any of these derived constants:
+ * UNITY_INT_WIDTH, UNITY_LONG_WIDTH, UNITY_POINTER_WIDTH */
 #ifndef UNITY_EXCLUDE_STDINT_H
 #include <stdint.h>
 #endif
@@ -25,30 +30,14 @@
 #include <limits.h>
 #endif
 
-#ifndef UNITY_EXCLUDE_SIZEOF
-#ifndef UINT_MAX
-#define UINT_MAX     (sizeof(unsigned int) * 256 - 1)
-#endif
-#ifndef ULONG_MAX
-#define ULONG_MAX    (sizeof(unsigned long) * 256 - 1)
-#endif
-#ifndef UINTPTR_MAX
-/*apparently this is not a constant expression: (sizeof(unsigned int *) * 256 - 1) so we have to just let this fall through */
-#endif
-#endif
+/*-------------------------------------------------------
+ * Guess Widths If Not Specified
+ *-------------------------------------------------------*/
 
-#ifndef UNITY_EXCLUDE_MATH_H
-#include <math.h>
-#endif
-
-/*------------------------------------------------------- */
-/* Guess Widths If Not Specified */
-/*------------------------------------------------------- */
-
-/* Determine the size of an int, if not already specificied. */
-/* We cannot use sizeof(int), because it is not yet defined */
-/* at this stage in the trnslation of the C program. */
-/* Therefore, infer it from UINT_MAX if possible. */
+/* Determine the size of an int, if not already specified.
+ * We cannot use sizeof(int), because it is not yet defined
+ * at this stage in the translation of the C program.
+ * Therefore, infer it from UINT_MAX if possible. */
 #ifndef UNITY_INT_WIDTH
   #ifdef UINT_MAX
     #if (UINT_MAX == 0xFFFF)
@@ -58,15 +47,12 @@
     #elif (UINT_MAX == 0xFFFFFFFFFFFFFFFF)
       #define UNITY_INT_WIDTH (64)
     #endif
-  #endif
-#endif
-#ifndef UNITY_INT_WIDTH
-  #define UNITY_INT_WIDTH (32)
+  #else /* Set to default */
+    #define UNITY_INT_WIDTH (32)
+  #endif /* UINT_MAX */
 #endif
 
-/* Determine the size of a long, if not already specified, */
-/* by following the process used above to define */
-/* UNITY_INT_WIDTH. */
+/* Determine the size of a long, if not already specified. */
 #ifndef UNITY_LONG_WIDTH
   #ifdef ULONG_MAX
     #if (ULONG_MAX == 0xFFFF)
@@ -76,44 +62,29 @@
     #elif (ULONG_MAX == 0xFFFFFFFFFFFFFFFF)
       #define UNITY_LONG_WIDTH (64)
     #endif
-  #endif
-#endif
-#ifndef UNITY_LONG_WIDTH
-  #define UNITY_LONG_WIDTH (32)
+  #else /* Set to default */
+    #define UNITY_LONG_WIDTH (32)
+  #endif /* ULONG_MAX */
 #endif
 
-/* Determine the size of a pointer, if not already specified, */
-/* by following the process used above to define */
-/* UNITY_INT_WIDTH. */
+/* Determine the size of a pointer, if not already specified. */
 #ifndef UNITY_POINTER_WIDTH
   #ifdef UINTPTR_MAX
-    #if (UINTPTR_MAX+0 <= 0xFFFF)
+    #if (UINTPTR_MAX <= 0xFFFF)
       #define UNITY_POINTER_WIDTH (16)
-    #elif (UINTPTR_MAX+0 <= 0xFFFFFFFF)
+    #elif (UINTPTR_MAX <= 0xFFFFFFFF)
       #define UNITY_POINTER_WIDTH (32)
-    #elif (UINTPTR_MAX+0 <= 0xFFFFFFFFFFFFFFFF)
+    #elif (UINTPTR_MAX <= 0xFFFFFFFFFFFFFFFF)
       #define UNITY_POINTER_WIDTH (64)
     #endif
-  #endif
-#endif
-#ifndef UNITY_POINTER_WIDTH
-  #ifdef INTPTR_MAX
-    #if (INTPTR_MAX+0 <= 0x7FFF)
-      #define UNITY_POINTER_WIDTH (16)
-    #elif (INTPTR_MAX+0 <= 0x7FFFFFFF)
-      #define UNITY_POINTER_WIDTH (32)
-    #elif (INTPTR_MAX+0 <= 0x7FFFFFFFFFFFFFFF)
-      #define UNITY_POINTER_WIDTH (64)
-    #endif
-  #endif
-#endif
-#ifndef UNITY_POINTER_WIDTH
-  #define UNITY_POINTER_WIDTH UNITY_LONG_WIDTH
+  #else /* Set to default */
+    #define UNITY_POINTER_WIDTH UNITY_LONG_WIDTH
+  #endif /* UINTPTR_MAX */
 #endif
 
-/*------------------------------------------------------- */
-/* Int Support (Define types based on detected sizes) */
-/*------------------------------------------------------- */
+/*-------------------------------------------------------
+ * Int Support (Define types based on detected sizes)
+ *-------------------------------------------------------*/
 
 #if (UNITY_INT_WIDTH == 32)
     typedef unsigned char   _UU8;
@@ -133,47 +104,40 @@
     #error Invalid UNITY_INT_WIDTH specified! (16 or 32 are supported)
 #endif
 
-/*------------------------------------------------------- */
-/* 64-bit Support */
-/*------------------------------------------------------- */
+/*-------------------------------------------------------
+ * 64-bit Support
+ *-------------------------------------------------------*/
 
 #ifndef UNITY_SUPPORT_64
-#if UNITY_LONG_WIDTH > 32
-#define UNITY_SUPPORT_64
-#endif
-#endif
-#ifndef UNITY_SUPPORT_64
-#if UNITY_POINTER_WIDTH > 32
-#define UNITY_SUPPORT_64
-#endif
+  #if UNITY_LONG_WIDTH == 64 || UNITY_POINTER_WIDTH == 64
+    #define UNITY_SUPPORT_64
+  #endif
 #endif
 
 #ifndef UNITY_SUPPORT_64
-
-/*No 64-bit Support */
-typedef _UU32 _U_UINT;
-typedef _US32 _U_SINT;
-
+    /* No 64-bit Support */
+    typedef _UU32 _U_UINT;
+    typedef _US32 _U_SINT;
 #else
 
-/*64-bit Support */
-#if (UNITY_LONG_WIDTH == 32)
+    /* 64-bit Support */
+  #if (UNITY_LONG_WIDTH == 32)
     typedef unsigned long long _UU64;
     typedef signed long long   _US64;
-#elif (UNITY_LONG_WIDTH == 64)
+  #elif (UNITY_LONG_WIDTH == 64)
     typedef unsigned long      _UU64;
     typedef signed long        _US64;
-#else
+  #else
     #error Invalid UNITY_LONG_WIDTH specified! (32 or 64 are supported)
-#endif
-typedef _UU64 _U_UINT;
-typedef _US64 _U_SINT;
+  #endif
+    typedef _UU64 _U_UINT;
+    typedef _US64 _U_SINT;
 
 #endif
 
-/*------------------------------------------------------- */
-/* Pointer Support */
-/*------------------------------------------------------- */
+/*-------------------------------------------------------
+ * Pointer Support
+ *-------------------------------------------------------*/
 
 #if (UNITY_POINTER_WIDTH == 32)
     typedef _UU32 _UP;
@@ -194,16 +158,16 @@ typedef _US64 _U_SINT;
 
 #ifndef UNITY_INTERNAL_PTR
 #define UNITY_INTERNAL_PTR UNITY_PTR_ATTRIBUTE const void*
-/*#define UNITY_INTERNAL_PTR UNITY_PTR_ATTRIBUTE const _UU8* */
+/* #define UNITY_INTERNAL_PTR UNITY_PTR_ATTRIBUTE const _UU8* */
 #endif
 
-/*------------------------------------------------------- */
-/* Float Support */
-/*------------------------------------------------------- */
+/*-------------------------------------------------------
+ * Float Support
+ *-------------------------------------------------------*/
 
 #ifdef UNITY_EXCLUDE_FLOAT
 
-/*No Floating Point Support */
+/* No Floating Point Support */
 #undef UNITY_INCLUDE_FLOAT
 #undef UNITY_FLOAT_PRECISION
 #undef UNITY_FLOAT_TYPE
@@ -215,7 +179,7 @@ typedef _US64 _U_SINT;
 #define UNITY_INCLUDE_FLOAT
 #endif
 
-/*Floating Point Support */
+/* Floating Point Support */
 #ifndef UNITY_FLOAT_PRECISION
 #define UNITY_FLOAT_PRECISION (0.00001f)
 #endif
@@ -225,11 +189,13 @@ typedef _US64 _U_SINT;
 typedef UNITY_FLOAT_TYPE _UF;
 
 #ifndef isinf
-#define isinf(n) (((1.0f / f_zero) == n) ? 1 : 0) || (((-1.0f / f_zero) == n) ? 1 : 0)
-#define UNITY_FLOAT_NEEDS_ZERO
+/* The value of Inf - Inf is NaN */
+#define isinf(n) (isnan((n) - (n)) && !isnan(n))
 #endif
 
 #ifndef isnan
+/* NaN is the only floating point value that does NOT equal itself.
+ * Therefore if n != n, then it is NaN. */
 #define isnan(n) ((n != n) ? 1 : 0)
 #endif
 
@@ -243,38 +209,44 @@ typedef UNITY_FLOAT_TYPE _UF;
 
 #endif
 
-/*------------------------------------------------------- */
-/* Double Float Support */
-/*------------------------------------------------------- */
+/*-------------------------------------------------------
+ * Double Float Support
+ *-------------------------------------------------------*/
 
-/*unlike FLOAT, we DON'T include by default */
+/* unlike FLOAT, we DON'T include by default */
 #ifndef UNITY_EXCLUDE_DOUBLE
-#ifndef UNITY_INCLUDE_DOUBLE
-#define UNITY_EXCLUDE_DOUBLE
-#endif
+  #ifndef UNITY_INCLUDE_DOUBLE
+  #define UNITY_EXCLUDE_DOUBLE
+  #endif
 #endif
 
 #ifdef UNITY_EXCLUDE_DOUBLE
 
-/*No Floating Point Support */
-#undef UNITY_DOUBLE_PRECISION
-#undef UNITY_DOUBLE_TYPE
-#undef UNITY_DOUBLE_VERBOSE
+  /* No Floating Point Support */
+  #undef UNITY_DOUBLE_PRECISION
+  #undef UNITY_DOUBLE_TYPE
+  #undef UNITY_DOUBLE_VERBOSE
 
-#ifdef UNITY_INCLUDE_DOUBLE
-#undef UNITY_INCLUDE_DOUBLE
-#endif
+  #ifdef UNITY_INCLUDE_DOUBLE
+    #undef UNITY_INCLUDE_DOUBLE
+  #endif
+
+  #ifdef UNITY_FLOAT_VERBOSE
+    typedef _UF _UD;
+    /* For parameter in UnityPrintFloat, double promotion required */
+  #endif
 
 #else
 
-/*Double Floating Point Support */
-#ifndef UNITY_DOUBLE_PRECISION
-#define UNITY_DOUBLE_PRECISION (1e-12f)
-#endif
-#ifndef UNITY_DOUBLE_TYPE
-#define UNITY_DOUBLE_TYPE double
-#endif
-typedef UNITY_DOUBLE_TYPE _UD;
+  /* Double Floating Point Support */
+  #ifndef UNITY_DOUBLE_PRECISION
+  #define UNITY_DOUBLE_PRECISION (1e-12f)
+  #endif
+
+  #ifndef UNITY_DOUBLE_TYPE
+  #define UNITY_DOUBLE_TYPE double
+  #endif
+  typedef UNITY_DOUBLE_TYPE _UD;
 
 #endif
 
@@ -284,16 +256,35 @@ typedef UNITY_DOUBLE_TYPE _UD;
 #endif
 #endif
 
-/*------------------------------------------------------- */
-/* Output Method: stdout (DEFAULT) */
-/*------------------------------------------------------- */
+/*-------------------------------------------------------
+ * Output Method: stdout (DEFAULT)
+ *-------------------------------------------------------*/
 #ifndef UNITY_OUTPUT_CHAR
-/*Default to using putchar, which is defined in stdio.h */
+/* Default to using putchar, which is defined in stdio.h */
 #include <stdio.h>
-#define UNITY_OUTPUT_CHAR(a) putchar(a)
+#define UNITY_OUTPUT_CHAR(a) (void)putchar(a)
 #else
-/*If defined as something else, make sure we declare it here so it's ready for use */
-extern int UNITY_OUTPUT_CHAR(int);
+  /* If defined as something else, make sure we declare it here so it's ready for use */
+  #ifndef UNITY_OMIT_OUTPUT_CHAR_HEADER_DECLARATION
+extern void UNITY_OUTPUT_CHAR(int);
+  #endif
+#endif
+
+#ifndef UNITY_OUTPUT_FLUSH
+/* Default to using fflush, which is defined in stdio.h */
+#include <stdio.h>
+#define UNITY_OUTPUT_FLUSH (void)fflush(stdout)
+#else
+  /* If defined as something else, make sure we declare it here so it's ready for use */
+  #ifndef UNITY_OMIT_OUTPUT_FLUSH_HEADER_DECLARATION
+extern void UNITY_OUTPUT_FLUSH(void);
+  #endif
+#endif
+
+#ifndef UNITY_OUTPUT_FLUSH
+#define UNITY_FLUSH_CALL()
+#else
+#define UNITY_FLUSH_CALL() UNITY_OUTPUT_FLUSH
 #endif
 
 #ifndef UNITY_PRINT_EOL
@@ -308,9 +299,9 @@ extern int UNITY_OUTPUT_CHAR(int);
 #define UNITY_OUTPUT_COMPLETE()
 #endif
 
-/*------------------------------------------------------- */
-/* Footprint */
-/*------------------------------------------------------- */
+/*-------------------------------------------------------
+ * Footprint
+ *-------------------------------------------------------*/
 
 #ifndef UNITY_LINE_TYPE
 #define UNITY_LINE_TYPE _U_UINT
@@ -320,12 +311,12 @@ extern int UNITY_OUTPUT_CHAR(int);
 #define UNITY_COUNTER_TYPE _U_UINT
 #endif
 
-/*------------------------------------------------------- */
-/* Language Features Available */
-/*------------------------------------------------------- */
+/*-------------------------------------------------------
+ * Language Features Available
+ *-------------------------------------------------------*/
 #if !defined(UNITY_WEAK_ATTRIBUTE) && !defined(UNITY_WEAK_PRAGMA)
 #   ifdef __GNUC__ /* includes clang */
-#       if !(defined(__WIN32__) && defined(__clang__))
+#       if !(defined(__WIN32__) && defined(__clang__)) && !defined(__TMS470__)
 #           define UNITY_WEAK_ATTRIBUTE __attribute__((weak))
 #       endif
 #   endif
@@ -337,9 +328,9 @@ extern int UNITY_OUTPUT_CHAR(int);
 #endif
 
 
-/*------------------------------------------------------- */
-/* Internal Structs Needed */
-/*------------------------------------------------------- */
+/*-------------------------------------------------------
+ * Internal Structs Needed
+ *-------------------------------------------------------*/
 
 typedef void (*UnityTestFunction)(void);
 
@@ -350,13 +341,7 @@ typedef void (*UnityTestFunction)(void);
 
 typedef enum
 {
-#if (UNITY_INT_WIDTH == 16)
-    UNITY_DISPLAY_STYLE_INT      = 2 + UNITY_DISPLAY_RANGE_INT + UNITY_DISPLAY_RANGE_AUTO,
-#elif (UNITY_INT_WIDTH  == 32)
-    UNITY_DISPLAY_STYLE_INT      = 4 + UNITY_DISPLAY_RANGE_INT + UNITY_DISPLAY_RANGE_AUTO,
-#elif (UNITY_INT_WIDTH  == 64)
-    UNITY_DISPLAY_STYLE_INT      = 8 + UNITY_DISPLAY_RANGE_INT + UNITY_DISPLAY_RANGE_AUTO,
-#endif
+UNITY_DISPLAY_STYLE_INT = sizeof(int)+ UNITY_DISPLAY_RANGE_INT + UNITY_DISPLAY_RANGE_AUTO,
     UNITY_DISPLAY_STYLE_INT8     = 1 + UNITY_DISPLAY_RANGE_INT,
     UNITY_DISPLAY_STYLE_INT16    = 2 + UNITY_DISPLAY_RANGE_INT,
     UNITY_DISPLAY_STYLE_INT32    = 4 + UNITY_DISPLAY_RANGE_INT,
@@ -364,25 +349,21 @@ typedef enum
     UNITY_DISPLAY_STYLE_INT64    = 8 + UNITY_DISPLAY_RANGE_INT,
 #endif
 
-#if (UNITY_INT_WIDTH == 16)
-    UNITY_DISPLAY_STYLE_UINT     = 2 + UNITY_DISPLAY_RANGE_UINT + UNITY_DISPLAY_RANGE_AUTO,
-#elif (UNITY_INT_WIDTH  == 32)
-    UNITY_DISPLAY_STYLE_UINT     = 4 + UNITY_DISPLAY_RANGE_UINT + UNITY_DISPLAY_RANGE_AUTO,
-#elif (UNITY_INT_WIDTH  == 64)
-    UNITY_DISPLAY_STYLE_UINT     = 8 + UNITY_DISPLAY_RANGE_UINT + UNITY_DISPLAY_RANGE_AUTO,
-#endif
+UNITY_DISPLAY_STYLE_UINT = sizeof(unsigned) + UNITY_DISPLAY_RANGE_UINT + UNITY_DISPLAY_RANGE_AUTO,
     UNITY_DISPLAY_STYLE_UINT8    = 1 + UNITY_DISPLAY_RANGE_UINT,
     UNITY_DISPLAY_STYLE_UINT16   = 2 + UNITY_DISPLAY_RANGE_UINT,
     UNITY_DISPLAY_STYLE_UINT32   = 4 + UNITY_DISPLAY_RANGE_UINT,
 #ifdef UNITY_SUPPORT_64
     UNITY_DISPLAY_STYLE_UINT64   = 8 + UNITY_DISPLAY_RANGE_UINT,
 #endif
+
     UNITY_DISPLAY_STYLE_HEX8     = 1 + UNITY_DISPLAY_RANGE_HEX,
     UNITY_DISPLAY_STYLE_HEX16    = 2 + UNITY_DISPLAY_RANGE_HEX,
     UNITY_DISPLAY_STYLE_HEX32    = 4 + UNITY_DISPLAY_RANGE_HEX,
 #ifdef UNITY_SUPPORT_64
     UNITY_DISPLAY_STYLE_HEX64    = 8 + UNITY_DISPLAY_RANGE_HEX,
 #endif
+
     UNITY_DISPLAY_STYLE_UNKNOWN
 } UNITY_DISPLAY_STYLE_T;
 
@@ -420,18 +401,18 @@ struct _Unity
 
 extern struct _Unity Unity;
 
-/*------------------------------------------------------- */
-/* Test Suite Management */
-/*------------------------------------------------------- */
+/*-------------------------------------------------------
+ * Test Suite Management
+ *-------------------------------------------------------*/
 
 void UnityBegin(const char* filename);
 int  UnityEnd(void);
 void UnityConcludeTest(void);
 void UnityDefaultTestRun(UnityTestFunction Func, const char* FuncName, const int FuncLineNum);
 
-/*------------------------------------------------------- */
-/* Details Support */
-/*------------------------------------------------------- */
+/*-------------------------------------------------------
+ * Details Support
+ *-------------------------------------------------------*/
 
 #ifdef UNITY_EXCLUDE_DETAILS
 #define UNITY_CLR_DETAILS()
@@ -451,9 +432,9 @@ void UnityDefaultTestRun(UnityTestFunction Func, const char* FuncName, const int
 #endif
 #endif
 
-/*------------------------------------------------------- */
-/* Test Output */
-/*------------------------------------------------------- */
+/*-------------------------------------------------------
+ * Test Output
+ *-------------------------------------------------------*/
 
 void UnityPrint(const char* string);
 void UnityPrintMask(const _U_UINT mask, const _U_UINT number);
@@ -463,16 +444,16 @@ void UnityPrintNumberUnsigned(const _U_UINT number);
 void UnityPrintNumberHex(const _U_UINT number, const char nibbles);
 
 #ifdef UNITY_FLOAT_VERBOSE
-void UnityPrintFloat(const _UF number);
+void UnityPrintFloat(const _UD number);
 #endif
 
-/*------------------------------------------------------- */
-/* Test Assertion Fuctions */
-/*------------------------------------------------------- */
-/*  Use the macros below this section instead of calling */
-/*  these directly. The macros have a consistent naming */
-/*  convention and will pull in file and line information */
-/*  for you. */
+/*-------------------------------------------------------
+ * Test Assertion Functions
+ *-------------------------------------------------------
+ *  Use the macros below this section instead of calling
+ *  these directly. The macros have a consistent naming
+ *  convention and will pull in file and line information
+ *  for you. */
 
 void UnityAssertEqualNumber(const _U_SINT expected,
                             const _U_SINT actual,
@@ -566,23 +547,23 @@ void UnityAssertDoubleSpecial(const _UD actual,
                               const UNITY_FLOAT_TRAIT_T style);
 #endif
 
-/*------------------------------------------------------- */
-/* Error Strings We Might Need */
-/*------------------------------------------------------- */
+/*-------------------------------------------------------
+ * Error Strings We Might Need
+ *-------------------------------------------------------*/
 
 extern const char UnityStrErrFloat[];
 extern const char UnityStrErrDouble[];
 extern const char UnityStrErr64[];
 
-/*------------------------------------------------------- */
-/* Test Running Macros */
-/*------------------------------------------------------- */
+/*-------------------------------------------------------
+ * Test Running Macros
+ *-------------------------------------------------------*/
 
 #define TEST_PROTECT() (setjmp(Unity.AbortFrame) == 0)
 
 #define TEST_ABORT() {longjmp(Unity.AbortFrame, 1);}
 
-/*This tricky series of macros gives us an optional line argument to treat it as RUN_TEST(func, num=__LINE__) */
+/* This tricky series of macros gives us an optional line argument to treat it as RUN_TEST(func, num=__LINE__) */
 #ifndef RUN_TEST
 #ifdef __STDC_VERSION__
 #if __STDC_VERSION__ >= 199901L
@@ -595,7 +576,7 @@ extern const char UnityStrErr64[];
 #endif
 #endif
 
-/*If we can't do the tricky version, we'll just have to require them to always include the line number */
+/* If we can't do the tricky version, we'll just have to require them to always include the line number */
 #ifndef RUN_TEST
 #ifdef CMOCK
 #define RUN_TEST(func, num) UnityDefaultTestRun(func, #func, num)
@@ -621,16 +602,25 @@ extern const char UnityStrErr64[];
 
 #define UNITY_UNUSED(x) (void)(sizeof(x))
 
-/*------------------------------------------------------- */
-/* Basic Fail and Ignore */
-/*------------------------------------------------------- */
+/*-----------------------------------------------
+ * Command Line Argument Support
+ *-----------------------------------------------*/
+
+#ifdef UNITY_USE_COMMAND_LINE_ARGS
+int UnityParseOptions(int argc, char** argv);
+int UnityTestMatches(void);
+#endif
+
+/*-------------------------------------------------------
+ * Basic Fail and Ignore
+ *-------------------------------------------------------*/
 
 #define UNITY_TEST_FAIL(line, message)   UnityFail(   (message), (UNITY_LINE_TYPE)(line))
 #define UNITY_TEST_IGNORE(line, message) UnityIgnore( (message), (UNITY_LINE_TYPE)(line))
 
-/*------------------------------------------------------- */
-/* Test Asserts */
-/*------------------------------------------------------- */
+/*-------------------------------------------------------
+ * Test Asserts
+ *-------------------------------------------------------*/
 
 #define UNITY_TEST_ASSERT(condition, line, message)                                              if (condition) {} else {UNITY_TEST_FAIL((UNITY_LINE_TYPE)(line), (message));}
 #define UNITY_TEST_ASSERT_NULL(pointer, line, message)                                           UNITY_TEST_ASSERT(((pointer) == NULL),  (UNITY_LINE_TYPE)(line), (message))
@@ -755,5 +745,5 @@ extern const char UnityStrErr64[];
 #define UNITY_TEST_ASSERT_DOUBLE_IS_NOT_DETERMINATE(actual, line, message)                       UnityAssertDoubleSpecial((_UD)(actual), (message), (UNITY_LINE_TYPE)(line), UNITY_FLOAT_IS_NOT_DET)
 #endif
 
-/*End of UNITY_INTERNALS_H */
+/* End of UNITY_INTERNALS_H */
 #endif
