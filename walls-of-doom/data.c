@@ -7,7 +7,11 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#ifdef _WIN32
+#include <windows.h>
+#else
 #include <unistd.h>
+#endif
 
 #define LOG_ACCESS_WRITE_FORMAT "Writing %lu bytes (%.2lf KiB) to %s"
 #define LOG_ACCESS_READ_FORMAT "Reading %lu bytes (%.2lf KiB) from %s"
@@ -56,7 +60,11 @@ Code get_full_path(char *buffer, const char *filename) {
   /* Create the data directory if it does not exist. */
   sprintf(buffer, "%s", DATA_DIRECTORY);
   if (stat(buffer, &status) == -1) {
+#ifdef _WIN32
+    CreateDirectory(buffer, NULL);
+#else
     mkdir(buffer, DATA_DIRECTORY_UMASK);
+#endif
   }
   /* Should not write from one buffer to the same buffer. */
   sprintf(buffer, "%s/%s", DATA_DIRECTORY, filename);
