@@ -65,10 +65,19 @@ static void skip_to_word(const char **input) {
 }
 
 static void copy_word(const char **input, char *destination) {
-  while (**input != '\0' && is_word_part(**input)) {
+  size_t free_bytes = SETTINGS_STRING_SIZE;
+  while (**input != '\0' && is_word_part(**input) && free_bytes > 1) {
     *destination++ = *(*input)++;
+    free_bytes--;
   }
   *destination = '\0';
+  free_bytes--;
+  /* Discard the rest of the word, if it wasn't completely copied. */
+  if (free_bytes == 0) {
+    while (**input != '\0' && is_word_part(**input)) {
+      (*input)++;
+    }
+  }
 }
 
 static void parse_word(const char **input, char *destination) {
