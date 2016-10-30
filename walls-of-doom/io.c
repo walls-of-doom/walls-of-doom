@@ -801,8 +801,8 @@ void print_records(const size_t count, const Record *records,
   const int y_padding = 2 * get_padding() * get_font_height();
   const int available_window_height = get_window_height() - y_padding;
   const int text_lines_limit = available_window_height / get_font_height();
-  const size_t string_width =
-      (get_window_width() - x_padding) / get_font_width();
+  const int text_width_in_pixels = get_window_width() - x_padding;
+  const size_t string_width = text_width_in_pixels / get_font_width();
   const size_t printed = min_int(count, text_lines_limit);
   char **strings = NULL;
   size_t i;
