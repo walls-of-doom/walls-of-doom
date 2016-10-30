@@ -13,54 +13,45 @@
 
 #define LOG_UNUSED_KEY_STRING_SIZE 64 + SETTINGS_STRING_SIZE
 
-#define DEFAULT_PLATFORM_COUNT 16
-#define MINIMUM_PLATFORM_COUNT 0
+/* The use of variables is preferred over symbolic constants, when possible. */
 
-#define MAXIMUM_FONT_SIZE 48
-#define DEFAULT_FONT_SIZE 20
-#define MINIMUM_FONT_SIZE 12
-
-#define DEFAULT_COLUMNS 80
-#define MINIMUM_COLUMNS 40
-
-#define DEFAULT_LINES 30
-#define MINIMUM_LINES 20
-
-#define DEFAULT_PLAYER_STOPS_PLATFORMS 0
-
-#define MAXIMUM_INVESTMENT_AMOUNT 12000
-#define DEFAULT_INVESTMENT_AMOUNT 60
-#define MINIMUM_INVESTMENT_AMOUNT 1
-
-/* The period of the investment, in seconds .*/
-#define MAXIMUM_INVESTMENT_PERIOD 300
-#define DEFAULT_INVESTMENT_PERIOD 15
-#define MINIMUM_INVESTMENT_PERIOD 1
-
-#define MAXIMUM_INVESTMENT_MAXIMUM_FACTOR 1000
-#define DEFAULT_INVESTMENT_MAXIMUM_FACTOR 140
-#define MINIMUM_INVESTMENT_MAXIMUM_FACTOR 100
-
-#define MAXIMUM_INVESTMENT_MINIMUM_FACTOR 1000
-#define DEFAULT_INVESTMENT_MINIMUM_FACTOR 90
-#define MINIMUM_INVESTMENT_MINIMUM_FACTOR 0
-
-/**
- * How many spaces should be left from the margins when printing text.
- */
-#define DEFAULT_PADDING 2
+/* How many spaces should be left from the margins when printing text. */
+static const int padding = 2;
 
 static RepositionAlgorithm reposition_algorithm = REPOSITION_SELECT_AWARELY;
-static long platform_count = DEFAULT_PLATFORM_COUNT;
-static int font_size = DEFAULT_FONT_SIZE;
-static long columns = DEFAULT_COLUMNS;
-static long lines = DEFAULT_LINES;
-static long padding = DEFAULT_PADDING;
-static int player_stops_platforms = DEFAULT_PLAYER_STOPS_PLATFORMS;
-static int investment_amount = DEFAULT_INVESTMENT_AMOUNT;
-static int investment_period = DEFAULT_INVESTMENT_PERIOD;
-static int investment_maximum_factor = DEFAULT_INVESTMENT_MAXIMUM_FACTOR;
-static int investment_minimum_factor = DEFAULT_INVESTMENT_MINIMUM_FACTOR;
+
+static const int MAXIMUM_FONT_SIZE = 48;
+static const int MINIMUM_FONT_SIZE = 12;
+static int font_size = 20;
+
+static const long MINIMUM_PLATFORM_COUNT = 0;
+static long platform_count = 16;
+
+static const long MINIMUM_COLUMNS = 40;
+static long columns = 80;
+
+static const long MINIMUM_LINES = 20;
+static long lines = 30;
+
+static int player_stops_platforms = 0;
+
+/* The period of the investment, in seconds .*/
+static const long MAXIMUM_INVESTMENT_PERIOD = 300;
+static const long MINIMUM_INVESTMENT_PERIOD = 1;
+static long investment_period = 15;
+
+static const long MAXIMUM_INVESTMENT_AMOUNT = 12000;
+static const long MINIMUM_INVESTMENT_AMOUNT = 1;
+static long investment_amount = 60;
+
+static const long MAXIMUM_INVESTMENT_MAXIMUM_FACTOR = 1000;
+static const long MINIMUM_INVESTMENT_MAXIMUM_FACTOR = 100;
+static long investment_maximum_factor = 140;
+
+static const long MAXIMUM_INVESTMENT_MINIMUM_FACTOR = 1000;
+static const long MINIMUM_INVESTMENT_MINIMUM_FACTOR = 0;
+static long investment_minimum_factor = 90;
+
 static RendererType renderer_type = RENDERER_HARDWARE;
 
 static int is_word_part(char character) {
@@ -154,22 +145,22 @@ void initialize_settings(void) {
     } else if (strcmp(key, "PLATFORM_COUNT") == 0) {
       limits.minimum = MINIMUM_PLATFORM_COUNT;
       limits.maximum = MAXIMUM_PLATFORM_COUNT;
-      limits.fallback = DEFAULT_PLATFORM_COUNT;
+      limits.fallback = platform_count;
       platform_count = parse_value(value, limits);
     } else if (strcmp(key, "FONT_SIZE") == 0) {
       limits.minimum = MINIMUM_FONT_SIZE;
       limits.maximum = MAXIMUM_FONT_SIZE;
-      limits.fallback = DEFAULT_FONT_SIZE;
+      limits.fallback = font_size;
       font_size = parse_value(value, limits);
     } else if (strcmp(key, "COLUMNS") == 0) {
       limits.minimum = MINIMUM_COLUMNS;
       limits.maximum = MAXIMUM_COLUMNS;
-      limits.fallback = DEFAULT_COLUMNS;
+      limits.fallback = columns;
       columns = parse_value(value, limits);
     } else if (strcmp(key, "LINES") == 0) {
       limits.minimum = MINIMUM_LINES;
       limits.maximum = MAXIMUM_LINES;
-      limits.fallback = DEFAULT_LINES;
+      limits.fallback = lines;
       lines = parse_value(value, limits);
     } else if (strcmp(key, "COLOR_PAIR_DEFAULT") == 0) {
       COLOR_PAIR_DEFAULT = parse_color(value);
@@ -184,27 +175,27 @@ void initialize_settings(void) {
     } else if (strcmp(key, "COLOR_PAIR_BOTTOM_BAR") == 0) {
       COLOR_PAIR_BOTTOM_BAR = parse_color(value);
     } else if (strcmp(key, "PLAYER_STOPS_PLATFORMS") == 0) {
-      limits.fallback = DEFAULT_PLAYER_STOPS_PLATFORMS;
+      limits.fallback = player_stops_platforms;
       player_stops_platforms = parse_boolean(value, limits.fallback);
     } else if (strcmp(key, "INVESTMENT_AMOUNT") == 0) {
       limits.minimum = MINIMUM_INVESTMENT_AMOUNT;
       limits.maximum = MAXIMUM_INVESTMENT_AMOUNT;
-      limits.fallback = DEFAULT_INVESTMENT_AMOUNT;
+      limits.fallback = investment_amount;
       investment_amount = parse_value(value, limits);
     } else if (strcmp(key, "INVESTMENT_PERIOD") == 0) {
       limits.minimum = MINIMUM_INVESTMENT_PERIOD;
       limits.maximum = MAXIMUM_INVESTMENT_PERIOD;
-      limits.fallback = DEFAULT_INVESTMENT_PERIOD;
+      limits.fallback = investment_period;
       investment_period = parse_value(value, limits);
     } else if (strcmp(key, "INVESTMENT_MAXIMUM_FACTOR") == 0) {
       limits.minimum = MINIMUM_INVESTMENT_MAXIMUM_FACTOR;
       limits.maximum = MAXIMUM_INVESTMENT_MAXIMUM_FACTOR;
-      limits.fallback = DEFAULT_INVESTMENT_MAXIMUM_FACTOR;
+      limits.fallback = investment_maximum_factor;
       investment_maximum_factor = parse_value(value, limits);
     } else if (strcmp(key, "INVESTMENT_MINIMUM_FACTOR") == 0) {
       limits.minimum = MINIMUM_INVESTMENT_MINIMUM_FACTOR;
       limits.maximum = MAXIMUM_INVESTMENT_MINIMUM_FACTOR;
-      limits.fallback = DEFAULT_INVESTMENT_MINIMUM_FACTOR;
+      limits.fallback = investment_minimum_factor;
       investment_minimum_factor = parse_value(value, limits);
     } else if (strcmp(key, "RENDERER_TYPE") == 0) {
       if (strcmp(value, "HARDWARE") == 0) {
@@ -217,6 +208,7 @@ void initialize_settings(void) {
     }
   }
 }
+
 RepositionAlgorithm get_reposition_algorithm(void) {
   return reposition_algorithm;
 }
