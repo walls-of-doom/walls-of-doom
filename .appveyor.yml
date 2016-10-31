@@ -37,7 +37,7 @@ before_build:
 
   - echo Running cmake...
   - cd C:\walls-of-doom\build
-  - cmake -G "Visual Studio 12 2013" ..  # Only make a 32-bit version
+  - cmake -G "Visual Studio 10 2010" ..  # Only make a 32-bit version
 
   - echo Building the project...
   - cmake --build . --config Release
