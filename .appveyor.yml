@@ -1,5 +1,8 @@
-# version format
 version: build-{build}
+
+branches:
+  except:
+    - appveyor-blacklisted
 
 # Build worker image (VM template)
 image: Visual Studio 2015
