@@ -2,7 +2,8 @@
 
 Walls of Doom is a minimalistic [platformer](https://en.wikipedia.org/wiki/Platform_game) written in [ANSI C](https://en.wikipedia.org/wiki/ANSI_C) using SDL 2.
 
-The game is still under development but is already playable on Linux.
+The game is under active development and is already playable on Windows, Linux,
+and BSDs.
 
 See [the GitHub issue tracker](https://github.com/walls-of-doom/walls-of-doom/issues)
 and have a look at [the releases page](https://github.com/walls-of-doom/walls-of-doom/releases).
@@ -49,9 +50,20 @@ SDL2_image    2.0.0
 
 ## Requirements
 
-The game works on any Linux or BSD OS with a desktop environment.
+### Hardware
+
+Software rendering is supported: you don't need a graphics card to run the game.
+
+The game, as of the version v1.3.0, uses less than 10 MiB of memory.
+
+### Operating System
 
 Windows is fully supported and self-contained binaries are provided.
+
++ Any version of Windows after Windows XP is good enough.
++ The C++ redistributables provided by Microsoft are required.
+
+The game works on any Linux or BSD OS with a desktop environment.
 
 OS X and macOS support is unknown. [See the relevant issue](https://github.com/walls-of-doom/walls-of-doom/issues/39).
 
