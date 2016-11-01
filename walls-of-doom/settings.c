@@ -61,6 +61,7 @@ static int investment_amount = DEFAULT_INVESTMENT_AMOUNT;
 static int investment_period = DEFAULT_INVESTMENT_PERIOD;
 static int investment_maximum_factor = DEFAULT_INVESTMENT_MAXIMUM_FACTOR;
 static int investment_minimum_factor = DEFAULT_INVESTMENT_MINIMUM_FACTOR;
+static RendererType renderer_type = RENDERER_HARDWARE;
 
 static int is_word_part(char character) {
   return !isspace(character) && character != '=';
@@ -205,6 +206,12 @@ void initialize_settings(void) {
       limits.maximum = MAXIMUM_INVESTMENT_MINIMUM_FACTOR;
       limits.fallback = DEFAULT_INVESTMENT_MINIMUM_FACTOR;
       investment_minimum_factor = parse_value(value, limits);
+    } else if (strcmp(key, "RENDERER_TYPE") == 0) {
+      if (strcmp(value, "HARDWARE") == 0) {
+        renderer_type = RENDERER_HARDWARE;
+      } else {
+        renderer_type = RENDERER_SOFTWARE;
+      }
     } else {
       log_unused_key(key);
     }
@@ -213,6 +220,8 @@ void initialize_settings(void) {
 RepositionAlgorithm get_reposition_algorithm(void) {
   return reposition_algorithm;
 }
+
+RendererType get_renderer_type(void) { return renderer_type; }
 
 long get_platform_count(void) { return platform_count; }
 

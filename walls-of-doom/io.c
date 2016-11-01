@@ -153,6 +153,7 @@ static void set_render_color(SDL_Renderer *renderer, Color color) {
  */
 Code initialize(SDL_Window **window, SDL_Renderer **renderer) {
   char log_buffer[MAXIMUM_STRING_SIZE];
+  Uint32 renderer_flags = 0;
   initialize_logger();
   initialize_profiler();
   initialize_settings();
@@ -202,7 +203,12 @@ Code initialize(SDL_Window **window, SDL_Renderer **renderer) {
   /* Must disable text input to prevent a name capture bug. */
   SDL_StopTextInput();
   set_window_title_and_icon(*window);
-  *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED);
+  if (get_renderer_type() == RENDERER_HARDWARE) {
+    renderer_flags = SDL_RENDERER_ACCELERATED;
+  } else {
+    renderer_flags = SDL_RENDERER_SOFTWARE;
+  }
+  *renderer = SDL_CreateRenderer(*window, -1, renderer_flags);
   set_render_color(*renderer, COLOR_DEFAULT_BACKGROUND);
   clear(*renderer);
   return CODE_OK;

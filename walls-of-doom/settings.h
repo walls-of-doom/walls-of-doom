@@ -12,6 +12,8 @@ typedef enum RepositionAlgorithm {
   REPOSITION_SELECT_AWARELY
 } RepositionAlgorithm;
 
+typedef enum RendererType { RENDERER_HARDWARE, RENDERER_SOFTWARE } RendererType;
+
 void initialize_settings(void);
 
 RepositionAlgorithm get_reposition_algorithm(void);
@@ -35,5 +37,7 @@ int get_investment_period(void);
 int get_investment_maximum_factor(void);
 
 int get_investment_minimum_factor(void);
+
+RendererType get_renderer_type(void);
 
 #endif
