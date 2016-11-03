@@ -19,6 +19,7 @@ set (CMAKE_EXPORT_COMPILE_COMMANDS 1)
 option (ENV32 "Generate code for a 32-bit environment.")
 option (ENV64 "Generate code for a 64-bit environment.")
 option (SANITIZE "Modify the program at compile-time to catch undefined behavior during program execution.")
+option (OPTIMIZE_SIZE "Optimize for program size.")
 
 if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
     set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -Wpedantic")
@@ -26,6 +27,9 @@ if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_C_COMPILER_ID}" STREQUAL
         set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
     elseif (ENV64)
         set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64")
+    endif ()
+    if (OPTIMIZE_SIZE)
+        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Os")
     endif ()
 endif ()
 
