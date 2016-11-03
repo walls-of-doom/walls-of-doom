@@ -19,6 +19,7 @@ add_library (walls-of-doom-base
     constants.h
     data.h data.c
     game.h game.c
+    hash.h hash.c
     investment.h investment.c
     io.h io.c
     logger.h logger.c
@@ -34,6 +35,7 @@ add_library (walls-of-doom-base
     record.h record.c
     settings.h settings.c
     sort.h sort.c
+    table.h table.c
     text.h text.c
     version.h)
 
