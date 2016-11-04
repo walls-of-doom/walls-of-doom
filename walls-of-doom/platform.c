@@ -33,7 +33,7 @@ void generate_platforms(Platform *platforms, BoundingBox *box, int count) {
     density[random_y]++;
     platform->y = random_y + box->min_y;
     platform->speed = 0;
-    speed = PLATFORM_BASE_SPEED * random_integer(min_speed, max_speed);
+    speed = random_integer(min_speed, max_speed);
     /* Make about half the platforms go left and about half go right. */
     /* Make sure that the position is OK to trigger repositioning. */
     if (random_integer(0, 1)) {

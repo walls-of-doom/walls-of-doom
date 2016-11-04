@@ -27,11 +27,6 @@
  */
 #define FPS 30
 
-/**
- * The base speed of the platforms. This number may be multiplied by up to 3.
- */
-#define PLATFORM_BASE_SPEED 4
-
 #define PLAYER_RUNNING_SPEED 9
 
 #define PLAYER_FALLING_SPEED 12
