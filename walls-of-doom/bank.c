@@ -4,22 +4,41 @@
 #include "random.h"
 #include "settings.h"
 
-static long calculate_playable_area(Game const *const game) {
-  long area = 0;
+static double get_average_width(Game const *const game) {
+  double total = 0;
   size_t i;
   for (i = 0; i != game->platform_count; ++i) {
-    area += game->platforms[i].width;
+    total += game->platforms[i].width;
   }
-  return area;
+  return total / (double)game->platform_count;
+}
+
+static double get_average_speed(Game const *const game) {
+  double total = 0;
+  size_t i;
+  for (i = 0; i != game->platform_count; ++i) {
+    total += game->platforms[i].speed;
+  }
+  return total / (double)game->platform_count;
 }
 
 /**
  * Returns a normalized value (from 0 to 1) indicating the game difficulty.
  */
 static double get_difficulty(Game const *const game) {
-  const double playable_area = (double)bounding_box_area(game->box);
-  const double platform_area = (double)calculate_playable_area(game);
-  return (playable_area - platform_area) / playable_area;
+  const int min_width = get_platform_min_width();
+  const int max_width = get_platform_max_width();
+  const int min_speed = get_platform_min_speed();
+  const int max_speed = get_platform_max_speed();
+  const double avg_width = (min_width + max_width) / 2;
+  const double avg_speed = (min_speed + max_speed) / 2;
+  const double game_avg_width = get_average_width(game);
+  const double game_avg_speed = get_average_speed(game);
+  /* Wider platforms make the game easier. */
+  const double width_ratio = avg_width / game_avg_width;
+  /* Faster platforms make the game harder. */
+  const double speed_ratio = game_avg_speed / avg_speed;
+  return width_ratio * speed_ratio;
 }
 
 int collect_investment(Game const *const game, const Investment investment) {
