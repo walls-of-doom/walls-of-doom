@@ -48,4 +48,6 @@ int get_platform_max_speed(void);
 
 int get_platform_min_speed(void);
 
+int is_logging_player_score(void);
+
 #endif

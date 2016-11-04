@@ -733,6 +733,9 @@ static void update_player_perk(Game *game) {
 
 void update_player(Game *game, const Command command) {
   profiler_begin("update_player");
+  if (game->player->physics) {
+    log_player_score(game->played_frames, game->player->score);
+  }
   update_player_perk(game);
   update_player_investments(game);
   process_command(game, command);

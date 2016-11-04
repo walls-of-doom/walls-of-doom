@@ -60,6 +60,8 @@ static int platform_min_width = 4;
 static int platform_max_speed = 4;
 static int platform_min_speed = 1;
 
+static int logging_player_score = 0;
+
 static int is_word_part(char character) {
   return !isspace(character) && character != '=';
 }
@@ -192,6 +194,9 @@ void initialize_settings(void) {
     } else if (strcmp(key, "PLAYER_STOPS_PLATFORMS") == 0) {
       limits.fallback = player_stops_platforms;
       player_stops_platforms = parse_boolean(value, limits.fallback);
+    } else if (strcmp(key, "LOGGING_PLAYER_SCORE") == 0) {
+      limits.fallback = logging_player_score;
+      logging_player_score = parse_boolean(value, limits.fallback);
     } else if (strcmp(key, "INVESTMENT_AMOUNT") == 0) {
       limits.minimum = MINIMUM_INVESTMENT_AMOUNT;
       limits.maximum = MAXIMUM_INVESTMENT_AMOUNT;
@@ -277,3 +282,5 @@ int get_platform_min_width(void) { return platform_min_width; }
 int get_platform_max_speed(void) { return platform_max_speed; }
 
 int get_platform_min_speed(void) { return platform_min_speed; }
+
+int is_logging_player_score(void) { return logging_player_score; }

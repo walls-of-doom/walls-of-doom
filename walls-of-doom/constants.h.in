@@ -60,8 +60,6 @@
 #define RECORD_TABLE_FILE_NAME "records.txt"
 #define RECORD_ARRAY_SIZE 512
 
-#define LOG_FILE_NAME "log.txt"
-
 #define PROFILER_FILE_NAME "performance.txt"
 
 #endif
