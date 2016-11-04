@@ -1,8 +1,8 @@
-#include "investment.h"
 #include "bank.h"
+#include "game.h"
+#include "investment.h"
 #include "random.h"
 #include "settings.h"
-#include "game.h"
 
 static long calculate_playable_area(Game const *const game) {
   long area = 0;
@@ -23,9 +23,11 @@ static double get_difficulty(Game const *const game) {
 }
 
 int collect_investment(Game const *const game, const Investment investment) {
-  const int maximum_return = get_investment_maximum_factor();
-  const int minimum_return = get_investment_minimum_factor();
-  const int normalized_max = (int)(get_difficulty(game) * maximum_return);
-  const int random_factor = random_integer(minimum_return, normalized_max);
+  const int max_return = get_investment_maximum_factor();
+  const int min_return = get_investment_minimum_factor();
+  const int difference = max_return - min_return;
+  const int normalized_delta = (int)(get_difficulty(game) * difference);
+  const int normalized_max_return = min_return + normalized_delta;
+  const int random_factor = random_integer(min_return, normalized_max_return);
   return random_factor * investment.amount / 100;
 }
