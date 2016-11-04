@@ -33,6 +33,7 @@ add_library (walls-of-doom-base
     profiler.h profiler.c
     random.h random.c
     record.h record.c
+    score.h
     settings.h settings.c
     sort.h sort.c
     text.h text.c

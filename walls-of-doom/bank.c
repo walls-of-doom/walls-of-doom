@@ -3,6 +3,7 @@
 #include "investment.h"
 #include "logger.h"
 #include "random.h"
+#include "score.h"
 #include "settings.h"
 #include <stdlib.h>
 
@@ -34,8 +35,6 @@ static void log_difficulty(const double difficulty) {
  * Returns a normalized value (from 0 to 1) indicating the game difficulty.
  */
 static double get_difficulty(Game const *const game) {
-  /* Log the difficulty coefficient once. */
-  static int logged_difficulty = 0;
   const int min_width = get_platform_min_width();
   const int max_width = get_platform_max_width();
   const int min_speed = get_platform_min_speed();
@@ -49,6 +48,8 @@ static double get_difficulty(Game const *const game) {
   /* Faster platforms make the game harder. */
   const double speed_ratio = game_avg_speed / avg_speed;
   const double difficulty = width_ratio * speed_ratio;
+  /* Log the difficulty coefficient once. */
+  static int logged_difficulty = 0;
   if (!logged_difficulty) {
     log_difficulty(difficulty);
     logged_difficulty = 1;
@@ -57,11 +58,11 @@ static double get_difficulty(Game const *const game) {
 }
 
 int collect_investment(Game const *const game, const Investment investment) {
-  const int max_return = get_investment_maximum_factor();
-  const int min_return = get_investment_minimum_factor();
-  const int difference = max_return - min_return;
-  const int normalized_delta = (int)(get_difficulty(game) * difference);
-  const int normalized_max_return = min_return + normalized_delta;
-  const int random_factor = random_integer(min_return, normalized_max_return);
+  const Score max_return = get_investment_maximum_factor();
+  const Score min_return = get_investment_minimum_factor();
+  const Score difference = max_return - min_return;
+  const Score normalized_delta = (Score)(get_difficulty(game) * difference);
+  const Score normalized_max_return = min_return + normalized_delta;
+  const Score random_factor = random_integer(min_return, normalized_max_return);
   return random_factor * investment.amount / 100;
 }

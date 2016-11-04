@@ -178,7 +178,7 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
   Code code = CODE_OK;
   while (!is_termination_code(code) && game->player->lives != 0) {
     if (game->played_frames == next_played_frames_score) {
-      game->player->score++;
+      player_score_add(game->player, 1);
       next_played_frames_score += FPS;
     }
     updating_delta = update_game(game);

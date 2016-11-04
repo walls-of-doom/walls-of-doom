@@ -7,6 +7,7 @@
 #include "memory.h"
 #include "profiler.h"
 #include "random.h"
+#include "score.h"
 #include "settings.h"
 #include <stdio.h>
 #include <string.h>
@@ -419,7 +420,7 @@ void reposition_player(Player *const player, const BoundingBox *const box) {
 void conceive_bonus(Player *const player, const Perk perk) {
   if (is_bonus_perk(perk)) {
     if (perk == PERK_BONUS_EXTRA_POINTS) {
-      player->score += 60;
+      player_score_add(player, 60);
     } else if (perk == PERK_BONUS_EXTRA_LIFE) {
       player->lives += 1;
     }
@@ -518,7 +519,7 @@ void process_jump(Game *const game) {
 
 static void buy_life(Game *game) {
   if (game->player->score >= BUY_LIFE_PRICE) {
-    game->player->score -= BUY_LIFE_PRICE;
+    player_score_sub(game->player, BUY_LIFE_PRICE);
     game->player->lives++;
     game_set_message(game, BUY_LIFE_MESSAGE, 1, 1);
   }
@@ -528,7 +529,7 @@ static void update_player_investments(Game *game) {
   Investment *swap;
   Investment *investments = game->player->investments;
   while (investments != NULL && investments->end <= game->played_frames) {
-    game->player->score += collect_investment(game, *investments);
+    player_score_add(game->player, collect_investment(game, *investments));
     swap = investments->next;
     resize_memory(investments, 0);
     investments = swap;
@@ -539,10 +540,11 @@ static void update_player_investments(Game *game) {
 enum InvestmentType { INVESTMENT_TYPE_MINIMUM, INVESTMENT_TYPE_ALL };
 
 static int get_investment_total(Player *player, enum InvestmentType type) {
+  const Score base_amount = get_investment_amount();
   if (type == INVESTMENT_TYPE_MINIMUM) {
-    return get_investment_amount();
+    return base_amount;
   } else if (type == INVESTMENT_TYPE_ALL) {
-    return (player->score / get_investment_amount()) * get_investment_amount();
+    return (player->score / base_amount) * base_amount;
   }
   /* Unknown investment type. */
   return 0;
@@ -557,7 +559,7 @@ static void invest(Game *game, enum InvestmentType type) {
   }
   if (game->player->score >= amount) {
     investment = resize_memory(investment, sizeof(Investment));
-    game->player->score -= amount;
+    player_score_sub(game->player, amount);
     investment->next = NULL;
     investment->amount = amount;
     investment->end = game->played_frames + FPS * get_investment_period();

@@ -3,6 +3,7 @@
 
 #include "investment.h"
 #include "perk.h"
+#include "score.h"
 
 typedef struct Player {
 
@@ -20,7 +21,8 @@ typedef struct Player {
   int remaining_jump_height;
 
   int lives;
-  int score;
+
+  Score score;
 
   Perk perk;
   unsigned long perk_end_frame;
@@ -35,5 +37,9 @@ typedef struct Player {
  * An initialized Player object is an object which is ready to start a game.
  */
 Player make_player(char *name);
+
+void player_score_add(Player *player, const Score score);
+
+void player_score_sub(Player *player, const Score score);
 
 #endif

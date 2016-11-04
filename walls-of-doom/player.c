@@ -1,5 +1,10 @@
 #include "player.h"
+#include "logger.h"
+#include <limits.h>
 #include <stdlib.h>
+
+#define MAXIMUM_PLAYER_SCORE LONG_MAX
+#define MINIMUM_PLAYER_SCORE 0
 
 /**
  * Returns an initialized Player object with the provided name.
@@ -23,4 +28,24 @@ Player make_player(char *name) {
   player.perk_end_frame = 0;
   player.investments = NULL;
   return player;
+}
+
+void player_score_add(Player *player, const Score score) {
+  const Score maximum_add = MAXIMUM_PLAYER_SCORE - player->score;
+  if (maximum_add >= score) {
+    player->score += score;
+  } else {
+    log_message("Prevented Player score overflow!");
+    player->score = MAXIMUM_PLAYER_SCORE;
+  }
+}
+
+void player_score_sub(Player *player, const Score score) {
+  const Score maximum_sub = player->score - MINIMUM_PLAYER_SCORE;
+  if (maximum_sub >= score) {
+    player->score -= score;
+  } else {
+    log_message("Prevented Player score underflow!");
+    player->score = MINIMUM_PLAYER_SCORE;
+  }
 }

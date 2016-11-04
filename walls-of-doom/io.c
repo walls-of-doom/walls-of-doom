@@ -637,7 +637,7 @@ static void draw_top_bar(const Player *const player, SDL_Renderer *renderer) {
     perk_name = get_perk_name(player->perk);
   }
   sprintf(lives_buffer, "Lives: %d", player->lives);
-  sprintf(score_buffer, "Score: %d", player->score);
+  sprintf(score_buffer, "Score: %ld", player->score);
   strings[0] = GAME_NAME;
   strings[1] = perk_name;
   strings[2] = lives_buffer;
