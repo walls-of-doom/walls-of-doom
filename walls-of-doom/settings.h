@@ -40,4 +40,12 @@ int get_investment_minimum_factor(void);
 
 RendererType get_renderer_type(void);
 
+int get_platform_max_width(void);
+
+int get_platform_min_width(void);
+
+int get_platform_max_speed(void);
+
+int get_platform_min_speed(void);
+
 #endif

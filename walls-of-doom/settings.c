@@ -54,6 +54,12 @@ static long investment_minimum_factor = 90;
 
 static RendererType renderer_type = RENDERER_HARDWARE;
 
+static int platform_max_width = 16;
+static int platform_min_width = 4;
+
+static int platform_max_speed = 4;
+static int platform_min_speed = 1;
+
 static int is_word_part(char character) {
   return !isspace(character) && character != '=';
 }
@@ -206,6 +212,26 @@ void initialize_settings(void) {
       limits.maximum = MAXIMUM_INVESTMENT_MINIMUM_FACTOR;
       limits.fallback = investment_minimum_factor;
       investment_minimum_factor = parse_value(value, limits);
+    } else if (strcmp(key, "PLATFORM_MAXIMUM_WIDTH") == 0) {
+      limits.minimum = 1;
+      limits.maximum = 65535;
+      limits.fallback = platform_max_width;
+      platform_max_width = parse_value(value, limits);
+    } else if (strcmp(key, "PLATFORM_MINIMUM_WIDTH") == 0) {
+      limits.minimum = 1;
+      limits.maximum = 65535;
+      limits.fallback = platform_min_width;
+      platform_min_width = parse_value(value, limits);
+    } else if (strcmp(key, "PLATFORM_MAXIMUM_SPEED") == 0) {
+      limits.minimum = 1;
+      limits.maximum = 65535;
+      limits.fallback = platform_max_speed;
+      platform_max_speed = parse_value(value, limits);
+    } else if (strcmp(key, "PLATFORM_MINIMUM_SPEED") == 0) {
+      limits.minimum = 1;
+      limits.maximum = 65535;
+      limits.fallback = platform_min_speed;
+      platform_min_speed = parse_value(value, limits);
     } else if (strcmp(key, "RENDERER_TYPE") == 0) {
       if (strcmp(value, "HARDWARE") == 0) {
         renderer_type = RENDERER_HARDWARE;
@@ -243,3 +269,11 @@ int get_investment_period(void) { return investment_period; }
 int get_investment_maximum_factor(void) { return investment_maximum_factor; }
 
 int get_investment_minimum_factor(void) { return investment_minimum_factor; }
+
+int get_platform_max_width(void) { return platform_max_width; }
+
+int get_platform_min_width(void) { return platform_min_width; }
+
+int get_platform_max_speed(void) { return platform_max_speed; }
+
+int get_platform_min_speed(void) { return platform_min_speed; }

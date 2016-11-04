@@ -10,18 +10,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MINIMUM_WIDTH 4
-#define MAXIMUM_WIDTH 16
-
-/* The platform speed bounds, these are multiplied by the base speed. */
-#define MINIMUM_SPEED 1
-#define MAXIMUM_SPEED 4
-
-void generate_platforms(Platform *platforms, const BoundingBox *box,
-                        const int count) {
-  Platform *platform;
+void generate_platforms(Platform *platforms, BoundingBox *box, int count) {
+  const int min_width = get_platform_min_width();
+  const int max_width = get_platform_max_width();
+  const int min_speed = get_platform_min_speed();
+  const int max_speed = get_platform_max_speed();
   const int lines = box->max_y - box->min_y + 1;
   unsigned char *density = NULL;
+  Platform *platform;
   int random_y;
   int speed;
   int i;
@@ -29,7 +25,7 @@ void generate_platforms(Platform *platforms, const BoundingBox *box,
   memset(density, 0, lines);
   for (i = 0; i < count; i++) {
     platform = platforms + i;
-    platform->width = random_integer(MINIMUM_WIDTH, MAXIMUM_WIDTH);
+    platform->width = random_integer(min_width, max_width);
     /* Subtract two to remove the borders. */
     /* Subtract one after this to prevent platform being after the screen. */
     platform->x = random_integer(0, get_columns() - 2 - 1) + box->min_x;
@@ -37,7 +33,7 @@ void generate_platforms(Platform *platforms, const BoundingBox *box,
     density[random_y]++;
     platform->y = random_y + box->min_y;
     platform->speed = 0;
-    speed = PLATFORM_BASE_SPEED * random_integer(MINIMUM_SPEED, MAXIMUM_SPEED);
+    speed = PLATFORM_BASE_SPEED * random_integer(min_speed, max_speed);
     /* Make about half the platforms go left and about half go right. */
     /* Make sure that the position is OK to trigger repositioning. */
     if (random_integer(0, 1)) {
