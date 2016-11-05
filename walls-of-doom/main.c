@@ -25,7 +25,7 @@ void log_unrecognized_argument(const char *argument) {
 }
 
 ParserResult parse_argument(const char *argument) {
-  if (strcmp(argument, "--version") == 0) {
+  if (string_equals(argument, "--version")) {
     printf("%s\n", WALLS_OF_DOOM_VERSION);
     return PARSER_RESULT_QUIT;
   } else {

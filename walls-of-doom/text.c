@@ -70,6 +70,11 @@ size_t copy_string_up_to(char *destination, const char *begin, const char *end,
 }
 
 /**
+ * Compares two strings to determine whether or not they are equal.
+ */
+int string_equals(const char *a, const char *b) { return strcmp(a, b) == 0; }
+
+/**
  * Returns a pointer to the start of the text of the string.
  *
  * This is either the first character which is not a space or '\0'.

@@ -3,6 +3,7 @@
 #include "constants.h"
 #include "data.h"
 #include "logger.h"
+#include "text.h"
 #include <ctype.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -150,95 +151,95 @@ void initialize_settings(void) {
   struct Limits limits;
   read_characters(SETTINGS_FILE, input, SETTINGS_BUFFER_SIZE);
   while (parse_line(&read, key, value)) {
-    if (strcmp(key, "REPOSITION_ALGORITHM") == 0) {
-      if (strcmp(value, "REPOSITION_SELECT_BLINDLY") == 0) {
+    if (string_equals(key, "REPOSITION_ALGORITHM")) {
+      if (string_equals(value, "REPOSITION_SELECT_BLINDLY")) {
         reposition_algorithm = REPOSITION_SELECT_BLINDLY;
         log_message("Set the reposition algorithm to SELECT_BLINDLY");
-      } else if (strcmp(value, "REPOSITION_SELECT_AWARELY") == 0) {
+      } else if (string_equals(value, "REPOSITION_SELECT_AWARELY")) {
         reposition_algorithm = REPOSITION_SELECT_AWARELY;
         log_message("Set the reposition algorithm to SELECT_AWARELY");
       }
       /* Did not match any existing algorithm, do not change the default. */
-    } else if (strcmp(key, "PLATFORM_COUNT") == 0) {
+    } else if (string_equals(key, "PLATFORM_COUNT")) {
       limits.minimum = MINIMUM_PLATFORM_COUNT;
       limits.maximum = MAXIMUM_PLATFORM_COUNT;
       limits.fallback = platform_count;
       platform_count = parse_value(value, limits);
-    } else if (strcmp(key, "FONT_SIZE") == 0) {
+    } else if (string_equals(key, "FONT_SIZE")) {
       limits.minimum = MINIMUM_FONT_SIZE;
       limits.maximum = MAXIMUM_FONT_SIZE;
       limits.fallback = font_size;
       font_size = parse_value(value, limits);
-    } else if (strcmp(key, "COLUMNS") == 0) {
+    } else if (string_equals(key, "COLUMNS")) {
       limits.minimum = MINIMUM_COLUMNS;
       limits.maximum = MAXIMUM_COLUMNS;
       limits.fallback = columns;
       columns = parse_value(value, limits);
-    } else if (strcmp(key, "LINES") == 0) {
+    } else if (string_equals(key, "LINES")) {
       limits.minimum = MINIMUM_LINES;
       limits.maximum = MAXIMUM_LINES;
       limits.fallback = lines;
       lines = parse_value(value, limits);
-    } else if (strcmp(key, "COLOR_PAIR_DEFAULT") == 0) {
+    } else if (string_equals(key, "COLOR_PAIR_DEFAULT")) {
       COLOR_PAIR_DEFAULT = parse_color(value);
-    } else if (strcmp(key, "COLOR_PAIR_PERK") == 0) {
+    } else if (string_equals(key, "COLOR_PAIR_PERK")) {
       COLOR_PAIR_PERK = parse_color(value);
-    } else if (strcmp(key, "COLOR_PAIR_PLAYER") == 0) {
+    } else if (string_equals(key, "COLOR_PAIR_PLAYER")) {
       COLOR_PAIR_PLAYER = parse_color(value);
-    } else if (strcmp(key, "COLOR_PAIR_TOP_BAR") == 0) {
+    } else if (string_equals(key, "COLOR_PAIR_TOP_BAR")) {
       COLOR_PAIR_TOP_BAR = parse_color(value);
-    } else if (strcmp(key, "COLOR_PAIR_PLATFORM") == 0) {
+    } else if (string_equals(key, "COLOR_PAIR_PLATFORM")) {
       COLOR_PAIR_PLATFORM = parse_color(value);
-    } else if (strcmp(key, "COLOR_PAIR_BOTTOM_BAR") == 0) {
+    } else if (string_equals(key, "COLOR_PAIR_BOTTOM_BAR")) {
       COLOR_PAIR_BOTTOM_BAR = parse_color(value);
-    } else if (strcmp(key, "PLAYER_STOPS_PLATFORMS") == 0) {
+    } else if (string_equals(key, "PLAYER_STOPS_PLATFORMS")) {
       limits.fallback = player_stops_platforms;
       player_stops_platforms = parse_boolean(value, limits.fallback);
-    } else if (strcmp(key, "LOGGING_PLAYER_SCORE") == 0) {
+    } else if (string_equals(key, "LOGGING_PLAYER_SCORE")) {
       limits.fallback = logging_player_score;
       logging_player_score = parse_boolean(value, limits.fallback);
-    } else if (strcmp(key, "INVESTMENT_AMOUNT") == 0) {
+    } else if (string_equals(key, "INVESTMENT_AMOUNT")) {
       limits.minimum = MINIMUM_INVESTMENT_AMOUNT;
       limits.maximum = MAXIMUM_INVESTMENT_AMOUNT;
       limits.fallback = investment_amount;
       investment_amount = parse_value(value, limits);
-    } else if (strcmp(key, "INVESTMENT_PERIOD") == 0) {
+    } else if (string_equals(key, "INVESTMENT_PERIOD")) {
       limits.minimum = MINIMUM_INVESTMENT_PERIOD;
       limits.maximum = MAXIMUM_INVESTMENT_PERIOD;
       limits.fallback = investment_period;
       investment_period = parse_value(value, limits);
-    } else if (strcmp(key, "INVESTMENT_MAXIMUM_FACTOR") == 0) {
+    } else if (string_equals(key, "INVESTMENT_MAXIMUM_FACTOR")) {
       limits.minimum = MINIMUM_INVESTMENT_MAXIMUM_FACTOR;
       limits.maximum = MAXIMUM_INVESTMENT_MAXIMUM_FACTOR;
       limits.fallback = investment_maximum_factor;
       investment_maximum_factor = parse_value(value, limits);
-    } else if (strcmp(key, "INVESTMENT_MINIMUM_FACTOR") == 0) {
+    } else if (string_equals(key, "INVESTMENT_MINIMUM_FACTOR")) {
       limits.minimum = MINIMUM_INVESTMENT_MINIMUM_FACTOR;
       limits.maximum = MAXIMUM_INVESTMENT_MINIMUM_FACTOR;
       limits.fallback = investment_minimum_factor;
       investment_minimum_factor = parse_value(value, limits);
-    } else if (strcmp(key, "PLATFORM_MAXIMUM_WIDTH") == 0) {
+    } else if (string_equals(key, "PLATFORM_MAXIMUM_WIDTH")) {
       limits.minimum = 1;
       limits.maximum = 65535;
       limits.fallback = platform_max_width;
       platform_max_width = parse_value(value, limits);
-    } else if (strcmp(key, "PLATFORM_MINIMUM_WIDTH") == 0) {
+    } else if (string_equals(key, "PLATFORM_MINIMUM_WIDTH")) {
       limits.minimum = 1;
       limits.maximum = 65535;
       limits.fallback = platform_min_width;
       platform_min_width = parse_value(value, limits);
-    } else if (strcmp(key, "PLATFORM_MAXIMUM_SPEED") == 0) {
+    } else if (string_equals(key, "PLATFORM_MAXIMUM_SPEED")) {
       limits.minimum = 1;
       limits.maximum = 65535;
       limits.fallback = platform_max_speed;
       platform_max_speed = parse_value(value, limits);
-    } else if (strcmp(key, "PLATFORM_MINIMUM_SPEED") == 0) {
+    } else if (string_equals(key, "PLATFORM_MINIMUM_SPEED")) {
       limits.minimum = 1;
       limits.maximum = 65535;
       limits.fallback = platform_min_speed;
       platform_min_speed = parse_value(value, limits);
-    } else if (strcmp(key, "RENDERER_TYPE") == 0) {
-      if (strcmp(value, "HARDWARE") == 0) {
+    } else if (string_equals(key, "RENDERER_TYPE")) {
+      if (string_equals(value, "HARDWARE")) {
         renderer_type = RENDERER_HARDWARE;
       } else {
         renderer_type = RENDERER_SOFTWARE;

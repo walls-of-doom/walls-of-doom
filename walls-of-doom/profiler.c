@@ -60,7 +60,7 @@ ProfilerData *get_data(const char *identifier) {
   int found = 0;
   size_t i;
   for (i = 0; i < table_size && !found; i++) {
-    found = strcmp(identifier, table[i].identifier) == 0;
+    found = string_equals(identifier, table[i].identifier);
   }
   if (!found) {
     return get_empty_data(identifier);
