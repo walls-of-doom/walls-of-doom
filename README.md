@@ -46,7 +46,7 @@ SDL2_ttf     2.0.12
 SDL2_image    2.0.0
 ```
 
-##
+## AppVeyor
 
 [![Build Status](https://ci.appveyor.com/api/projects/status/1gparjoqw7upxhod/branch/master?svg=true)](https://ci.appveyor.com/project/walls-of-doom/walls-of-doom/branch/master)
 
@@ -65,18 +65,24 @@ SDL2_image    2.0.1
 
 ### Hardware
 
-Software rendering is supported: you don't need a graphics card to run the game.
+Because software rendering is supported, a graphics card is not required.
 
-The game, as of the version v1.3.0, uses less than 10 MiB of memory.
+The game needs less than 10 MiB of free memory to run.
 
 ### Operating System
 
+#### Windows
+
 Windows is fully supported and self-contained binaries are provided.
 
-+ Any version of Windows after Windows XP is good enough.
++ Windows XP or later is required.
 + The C++ redistributables provided by Microsoft are required.
 
+#### Linux and BSD
+
 The game works on any Linux or BSD OS with a desktop environment.
+
+#### macOS
 
 OS X and macOS support is unknown. [See the relevant issue](https://github.com/walls-of-doom/walls-of-doom/issues/39).
 
