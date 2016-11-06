@@ -46,6 +46,19 @@ SDL2_ttf     2.0.12
 SDL2_image    2.0.0
 ```
 
+##
+
+[![Build Status](https://ci.appveyor.com/api/projects/status/1gparjoqw7upxhod/branch/master?svg=true)](https://ci.appveyor.com/project/walls-of-doom/walls-of-doom/branch/master)
+
+This build servers builds under Windows using Visual Studio 2015 for Visual
+Studio 2010, which is required for Windows XP compatibility.
+
+```
+SDL2          2.0.4
+SDL2_ttf     2.0.14
+SDL2_image    2.0.1
+```
+
 # Building and Running
 
 ## Requirements
