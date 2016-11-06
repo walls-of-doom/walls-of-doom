@@ -62,3 +62,8 @@ deploy:
   prerelease: false
   on:
     appveyor_repo_tag: true  # Deploy only on tags
+
+notifications:
+  - provider: Email
+    to:
+      - mafagafogigante@gmail.com
