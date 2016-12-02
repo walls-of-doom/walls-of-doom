@@ -8,6 +8,7 @@ LINES = 48
 
 FONT_SIZE = 20
 
+# Change to SOFTWARE if hardware rendering is not available.
 RENDERER_TYPE = HARDWARE
 
 PLATFORM_COUNT = 16
