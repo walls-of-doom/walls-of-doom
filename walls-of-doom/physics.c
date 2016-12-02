@@ -439,6 +439,30 @@ void conceive_bonus(Player *const player, const Perk perk) {
   }
 }
 
+static void reverse_platform(Platform *const platform) {
+  platform->speed = -platform->speed;
+}
+
+static void apply_to_platforms(Game *const game, void (*f)(Platform *const p)) {
+  size_t i;
+  for (i = 0; i != game->platform_count; ++i) {
+    f(game->platforms + i);
+  }
+}
+
+/**
+ * Process the start of a curse.
+ */
+void process_curse(Game *const game, const Perk perk) {
+  if (is_curse_perk(perk)) {
+    if (perk == PERK_CURSE_REVERSE_PLATFORMS) {
+      apply_to_platforms(game, reverse_platform);
+    }
+  } else {
+    log_message("Called process_curse with a Perk that is not a curse!");
+  }
+}
+
 void update_perk(Game *const game) {
   unsigned long next_perk_frame = game->perk_end_frame;
   next_perk_frame += PERK_INTERVAL_IN_FRAMES;
@@ -684,8 +708,12 @@ static void update_player_perk(Game *game) {
         /* calculate when the next perk is going to be created */
         /* Attribute the Perk to the Player */
         player->perk = perk;
-        if (is_bonus_perk(perk)) {
-          conceive_bonus(player, perk);
+        if (is_bonus_perk(perk) || is_curse_perk(perk)) {
+          if (is_bonus_perk(perk)) {
+            conceive_bonus(player, perk);
+          } else {
+            process_curse(game, perk);
+          }
           /* The perk ended now. */
           player->perk_end_frame = game->played_frames;
           /* Could set it to the next frame so that the check above */

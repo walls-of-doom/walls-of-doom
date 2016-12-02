@@ -6,8 +6,12 @@ char *get_perk_symbol(void) { return " "; }
 
 Perk get_random_perk(void) { return random_integer(0, PERK_COUNT - 1); }
 
-int is_bonus_perk(Perk perk) {
+int is_bonus_perk(const Perk perk) {
   return perk == PERK_BONUS_EXTRA_POINTS || perk == PERK_BONUS_EXTRA_LIFE;
+}
+
+int is_curse_perk(const Perk perk) {
+  return perk == PERK_CURSE_REVERSE_PLATFORMS;
 }
 
 /**
@@ -26,6 +30,8 @@ char *get_perk_name(Perk perk) {
     return "Super Jump";
   } else if (perk == PERK_POWER_TIME_STOP) {
     return "Time Stop";
+  } else if (perk == PERK_CURSE_REVERSE_PLATFORMS) {
+    return "Reverse Platforms";
   } else if (perk == PERK_BONUS_EXTRA_POINTS) {
     return "Extra Points";
   } else if (perk == PERK_BONUS_EXTRA_LIFE) {

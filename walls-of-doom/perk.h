@@ -15,6 +15,7 @@ typedef enum Perk {
   PERK_POWER_LOW_GRAVITY,
   PERK_POWER_SUPER_JUMP,
   PERK_POWER_TIME_STOP,
+  PERK_CURSE_REVERSE_PLATFORMS,
   PERK_BONUS_EXTRA_POINTS,
   PERK_BONUS_EXTRA_LIFE,
   PERK_COUNT,
@@ -25,7 +26,9 @@ char *get_perk_symbol(void);
 
 Perk get_random_perk(void);
 
-int is_bonus_perk(Perk perk);
+int is_bonus_perk(const Perk perk);
+
+int is_curse_perk(const Perk perk);
 
 /**
  * Returns the name of the provided Perk.
