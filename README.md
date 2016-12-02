@@ -8,6 +8,10 @@ and BSDs.
 See [the GitHub issue tracker](https://github.com/walls-of-doom/walls-of-doom/issues)
 and have a look at [the releases page](https://github.com/walls-of-doom/walls-of-doom/releases).
 
+## Screenshot
+
+![Screenshot](https://raw.githubusercontent.com/walls-of-doom/walls-of-doom/master/screenshots/screenshot.png)
+
 # Continuous Integration Status
 
 ## Travis CI
