@@ -25,4 +25,6 @@ Commands
 
   I                       - Invest points
 
+  P                       - Pause the game
+
   Q                       - Quit
