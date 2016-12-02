@@ -155,8 +155,15 @@ static Code set_window_title_and_icon(SDL_Window *window) {
   return CODE_OK;
 }
 
-static void set_render_color(SDL_Renderer *renderer, Color color) {
+static void set_color(SDL_Renderer *renderer, Color color) {
   SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+}
+
+static void swap_color(SDL_Renderer *renderer, SDL_Color *color) {
+  SDL_Color swap;
+  SDL_GetRenderDrawColor(renderer, &swap.r, &swap.g, &swap.b, &swap.a);
+  SDL_SetRenderDrawColor(renderer, color->r, color->g, color->b, color->a);
+  *color = swap;
 }
 
 /**
@@ -222,7 +229,7 @@ Code initialize(SDL_Window **window, SDL_Renderer **renderer) {
     renderer_flags = SDL_RENDERER_SOFTWARE;
   }
   *renderer = SDL_CreateRenderer(*window, -1, renderer_flags);
-  set_render_color(*renderer, COLOR_DEFAULT_BACKGROUND);
+  set_color(*renderer, COLOR_DEFAULT_BACKGROUND);
   clear(*renderer);
   return CODE_OK;
 }
@@ -351,19 +358,6 @@ Code print(const int x, const int y, const char *string,
   const int absolute_x = get_tile_width() * x;
   const int absolute_y = get_bar_height() + get_tile_height() * (y - 1);
   return print_absolute(absolute_x, absolute_y, string, color_pair, renderer);
-}
-
-static void swap_color(SDL_Renderer *renderer, SDL_Color *color) {
-  unsigned char r;
-  unsigned char g;
-  unsigned char b;
-  unsigned char a;
-  SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a);
-  SDL_SetRenderDrawColor(renderer, color->r, color->g, color->b, color->a);
-  color->r = r;
-  color->g = g;
-  color->b = b;
-  color->a = a;
 }
 
 static SDL_Rect make_top_bar_rectangle(void) {
@@ -818,7 +812,7 @@ void print_records(const size_t count, const Record *records,
  *
  * For simplicity, the user should only be able to enter letters and numbers.
  */
-int is_valid_input_character(char c) { return isalnum(c); }
+static int is_valid_input_character(char c) { return isalnum(c); }
 
 /**
  * Prints a string starting from (x, y) but limits to its first limit
