@@ -14,6 +14,8 @@
 
 #define LOG_UNUSED_KEY_STRING_SIZE 64 + SETTINGS_STRING_SIZE
 
+#define COMMENT_SYMBOL '#'
+
 /* The use of variables is preferred over symbolic constants, when possible. */
 
 /* How many spaces should be left from the margins when printing text. */
@@ -94,7 +96,25 @@ static void parse_word(const char **input, char *destination) {
   copy_word(input, destination);
 }
 
+static int is_comment_start(const char character) {
+  return character == COMMENT_SYMBOL;
+}
+
+static void skip_comments(const char **input) {
+  while (is_comment_start(**input)) {
+    /* Skip to the next line. */
+    while (**input != '\n' && **input != '\0') {
+      (*input)++;
+    }
+    /* Skip to the next token. */
+    while (isspace(**input)) {
+      (*input)++;
+    }
+  }
+}
+
 static int parse_line(const char **input, char *key, char *value) {
+  skip_comments(input);
   parse_word(input, key);
   parse_word(input, value);
   return *key != '\0' && *value != '\0';
