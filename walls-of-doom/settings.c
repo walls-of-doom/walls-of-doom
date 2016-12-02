@@ -101,10 +101,12 @@ static int is_comment_start(const char character) {
 }
 
 static void skip_comments(const char **input) {
-  while (is_comment_start(**input)) {
-    /* Skip to the next line. */
-    while (**input != '\n' && **input != '\0') {
-      (*input)++;
+  while (isspace(**input) || is_comment_start(**input)) {
+    if (is_comment_start(**input)) {
+      /* Skip to the next line. */
+      while (**input != '\n' && **input != '\0') {
+        (*input)++;
+      }
     }
     /* Skip to the next token. */
     while (isspace(**input)) {
