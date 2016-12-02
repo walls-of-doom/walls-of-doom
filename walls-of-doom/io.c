@@ -271,7 +271,7 @@ Code finalize(SDL_Window **window, SDL_Renderer **renderer) {
  * A name is considered to be valid if it has at least two characters after
  * being trimmed.
  */
-int is_valid_player_name(const char *player_name) {
+static int is_valid_player_name(const char *player_name) {
   char buffer[MAXIMUM_PLAYER_NAME_SIZE];
   copy_string(buffer, player_name, MAXIMUM_PLAYER_NAME_SIZE);
   trim_string(buffer);
@@ -503,30 +503,6 @@ static void remove_first_breaks(char *string) {
       /* Not a newline, we can erase again. */
       preserve = 0;
     }
-  }
-}
-
-int count_lines(char *const buffer) {
-  size_t counter = 0;
-  size_t i = 0;
-  while (buffer[i] != '\0') {
-    if (buffer[i] == '\n') {
-      counter++;
-    }
-    i++;
-  }
-  return counter;
-}
-
-char *copy_first_line(char *source, char *destination) {
-  while (*source != '\0' && *source != '\n') {
-    *destination++ = *source++;
-  }
-  *destination = '\0';
-  if (*source == '\0') {
-    return source;
-  } else {
-    return source + 1;
   }
 }
 
