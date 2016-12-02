@@ -70,6 +70,8 @@ Game create_game(Player *player, Platform *platforms,
   game.frame = 0;
   game.played_frames = 0;
 
+  game.paused = 0;
+
   game.box = box;
 
   game.perk = PERK_NONE;
@@ -177,6 +179,20 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
   Command command = COMMAND_NONE;
   Code code = CODE_OK;
   while (!is_termination_code(code) && game->player->lives != 0) {
+    /**
+     * This is the pause trap.
+     * The rest of the loop is only reached when the game is not paused.
+     */
+    if (game->paused) {
+      /* This is blocking I/O, differently to what is done when not paused. */
+      command = wait_for_next_command();
+      /* Quitting is still handled right as it is done by the command code. */
+      code = code_from_command(command);
+      if (command == COMMAND_PAUSE) {
+        game->paused = 0;
+      }
+      continue;
+    }
     if (game->played_frames == next_played_frames_score) {
       player_score_add(game->player, 1);
       next_played_frames_score += FPS;
@@ -191,6 +207,10 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
     code = code_from_command(command);
     update_player(game, command);
     game->frame++;
+    /* The physics module should not have to handle pausing. */
+    if (command == COMMAND_PAUSE) {
+      game->paused = 1;
+    }
   }
   if (code != CODE_CLOSE) {
     register_score(game, renderer);

@@ -32,6 +32,8 @@ typedef struct Game {
    */
   unsigned long played_frames;
 
+  int paused;
+
   Perk perk;
   int perk_x;
   int perk_y;

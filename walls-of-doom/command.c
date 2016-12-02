@@ -34,6 +34,8 @@ static Command command_from_event(const SDL_Event event) {
         return COMMAND_INVEST_ALL;
       }
       return COMMAND_INVEST;
+    } else if (sym == SDLK_p) {
+      return COMMAND_PAUSE;
     } else if (sym == SDLK_q) {
       return COMMAND_QUIT;
     }
