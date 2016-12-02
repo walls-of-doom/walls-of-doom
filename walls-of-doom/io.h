@@ -96,26 +96,4 @@ void print_game_result(const char *name, const unsigned int score,
 void print_records(const size_t count, const Record *records,
                    SDL_Renderer *renderer);
 
-/**
- * Reads the next command that needs to be processed.
- *
- * This is the last pending command.
- *
- * This function consumes the whole input buffer and returns either
- * COMMAND_NONE (if no other Command could be produced by what was in the input
- * buffer) or the last Command different than COMMAND_NONE that could be
- * produced by what was in the input buffer.
- */
-Command read_next_command(void);
-
-/**
- * Waits for the next command, blocking indefinitely.
- */
-Command wait_for_next_command(void);
-
-/**
- * Waits for any user input, blocking indefinitely.
- */
-Code wait_for_input(void);
-
 #endif

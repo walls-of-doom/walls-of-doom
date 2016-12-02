@@ -27,12 +27,7 @@ typedef enum Command {
 /**
  * Reads the next command that needs to be processed.
  *
- * This is the last pending command.
- *
- * This function consumes the whole input buffer and returns either
- * COMMAND_NONE (if no other Command could be produced by what was in the input
- * buffer) or the last Command different than COMMAND_NONE that could be
- * produced by what was in the input buffer.
+ * This is the last processable pending command or COMMAND_NONE.
  */
 Command read_next_command(void);
 
