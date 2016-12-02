@@ -1,6 +1,10 @@
 # Optimized for 1920 x 1080 screens (or multiples).
-COLUMNS = 104
-LINES = 50
+# More two columns are used in border calculations.
+# 1920 / (94 + 2) = 20
+COLUMNS = 94
+# More two lines are used in border calculations.
+# (1080 - (40 * 2)) / (48 + 2) = 20
+LINES = 48
 
 FONT_SIZE = 20
 
