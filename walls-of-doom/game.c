@@ -124,9 +124,9 @@ Milliseconds update_game(Game *const game) {
 void game_set_message(Game *const game, const char *message,
                       const unsigned long duration,
                       const unsigned int priority) {
-  int last_message_expired = game->message_end_frame <= game->frame;
-  int last_message_has_lower_priority = game->message_priority <= priority;
-  if (last_message_expired || last_message_has_lower_priority) {
+  const int last_has_expired = game->message_end_frame <= game->frame;
+  const int last_has_lower_priority = game->message_priority <= priority;
+  if (last_has_expired || last_has_lower_priority) {
     game->message_end_frame = game->frame + duration * FPS;
     game->message_priority = priority;
     copy_string(game->message, message, MAXIMUM_STRING_SIZE);
