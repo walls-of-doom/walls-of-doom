@@ -90,9 +90,6 @@ void print_menu(const int line_count, char const *const *const lines,
  */
 void print_long_text(char *string, SDL_Renderer *renderer);
 
-void print_game_result(const char *name, const unsigned int score,
-                       const int position, SDL_Renderer *renderer);
-
 void print_records(const size_t count, const Record *records,
                    SDL_Renderer *renderer);
 

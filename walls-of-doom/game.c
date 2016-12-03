@@ -133,6 +133,28 @@ void game_set_message(Game *const game, const char *message,
   }
 }
 
+static void print_game_result(const Player *player, const int position,
+                              SDL_Renderer *renderer) {
+  const char *name = player->name;
+  const Score score = player->score;
+  const ColorPair color = COLOR_PAIR_DEFAULT;
+  char first_line[MAXIMUM_STRING_SIZE];
+  char second_line[MAXIMUM_STRING_SIZE];
+  char *lines[3];
+  lines[0] = first_line;
+  lines[1] = "";
+  lines[2] = second_line;
+  sprintf(first_line, "%s died after making %ld points.", name, score);
+  if (position > 0) {
+    sprintf(second_line, "%s got to position %d!", name, position);
+  } else {
+    sprintf(second_line, "%s didn't make it to the top scores.", name);
+  }
+  clear(renderer);
+  print_centered_vertically(3, (const char **)lines, color, renderer);
+  present(renderer);
+}
+
 void register_score(const Game *const game, SDL_Renderer *renderer) {
   const Player *const player = game->player;
   /* Log that we are registering the score */
@@ -154,7 +176,7 @@ void register_score(const Game *const game, SDL_Renderer *renderer) {
   sprintf(buffer, "Saved the record successfully");
   log_message(buffer);
 
-  print_game_result(player->name, player->score, position, renderer);
+  print_game_result(player, position, renderer);
   wait_for_input();
 }
 

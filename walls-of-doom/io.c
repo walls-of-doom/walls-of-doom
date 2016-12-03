@@ -719,26 +719,6 @@ Milliseconds draw_game(const Game *const game, SDL_Renderer *renderer) {
   return get_milliseconds() - draw_game_start;
 }
 
-void print_game_result(const char *name, const unsigned int score,
-                       const int position, SDL_Renderer *renderer) {
-  const ColorPair color = COLOR_PAIR_DEFAULT;
-  char first_line[MAXIMUM_STRING_SIZE];
-  char second_line[MAXIMUM_STRING_SIZE];
-  char *lines[3];
-  sprintf(first_line, "%s died after making %d points.", name, score);
-  if (position > 0) {
-    sprintf(second_line, "%s got to position %d!", name, position);
-  } else {
-    sprintf(second_line, "%s didn't make it to the top scores.", name);
-  }
-  clear(renderer);
-  lines[0] = first_line;
-  lines[1] = "";
-  lines[2] = second_line;
-  print_centered_vertically(3, (const char *const *)lines, color, renderer);
-  present(renderer);
-}
-
 /**
  * Converts a Record to a human-readable string.
  */
