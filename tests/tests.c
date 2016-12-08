@@ -1,5 +1,4 @@
 #include "unity.h"
-
 #include "data.h"
 #include "io.h"
 #include "logger.h"
@@ -8,7 +7,6 @@
 #include "random.h"
 #include "sort.h"
 #include "text.h"
-
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -16,6 +14,8 @@
 #define SMALL_STRING_BUFFER_SIZE 64
 /* Should be big enoguh for the wrap_at_right_margin tests. */
 #define LARGE_STRING_BUFFER_SIZE 2048
+
+#define RESIZE_MEMORY_SIZE 4096
 
 #define WRAP_TEST_SOURCE "assets/tests/wrap-test-source.txt"
 #define WRAP_TEST_WIDTH_10 "assets/tests/wrap-test-width-10.txt"
@@ -27,6 +27,17 @@ int compare_unsigned_char(const void *pointer_a, const void *pointer_b) {
   unsigned char a = *(unsigned char *)(pointer_a);
   unsigned char b = *(unsigned char *)(pointer_b);
   return a < b ? -1 : a == b ? 0 : 1;
+}
+
+void test_resize_memory(void) {
+  unsigned char *chunk = NULL;
+  TEST_ASSERT_TRUE(chunk == NULL);
+  chunk = resize_memory(chunk, RESIZE_MEMORY_SIZE);
+  TEST_ASSERT_TRUE(chunk != NULL);
+  /* If allocation worked, we can write to this chunk. */
+  memset(chunk, INT_MAX, RESIZE_MEMORY_SIZE);
+  chunk = resize_memory(chunk, 0);
+  TEST_ASSERT_TRUE(chunk == NULL);
 }
 
 void test_normalize(void) {
@@ -382,6 +393,7 @@ void test_generate_platforms_avoids_multiple_platforms_on_the_same_line(void) {
     }
   }
   resize_memory(platforms, 0);
+  resize_memory(y_counter, 0);
 }
 
 void test_find_next_power_of_two_works_for_zero(void) {
@@ -571,6 +583,7 @@ void test_select_random_line_awarely_with_occupied_middle_line(void) {
 int main(void) {
   UNITY_BEGIN();
   log_message("Started running tests");
+  RUN_TEST(test_resize_memory);
   RUN_TEST(test_normalize);
   RUN_TEST(test_get_random_perk_is_well_distributed);
   RUN_TEST(test_get_full_path_checks_for_buffer_overflow);
