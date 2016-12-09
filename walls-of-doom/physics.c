@@ -42,6 +42,24 @@ static int is_over_platform(const Player *player,
   return 0;
 }
 
+/* Width and height are the width and height of the matrix tile. */
+static int violates_rigid_matrix(const Game *game, int x, int y, int w, int h) {
+  if (get_from_rigid_matrix(game, x / w, y / h)) {
+    return 1;
+  }
+  if (x % w != 0 && get_from_rigid_matrix(game, x / w + 1, y / h)) {
+    return 1;
+  }
+  if (y % h != 0 && get_from_rigid_matrix(game, x / w, y / h + 1)) {
+    return 1;
+  }
+  if (x % w != 0 && y % h != 0 &&
+      get_from_rigid_matrix(game, x / w + 1, y / h + 1)) {
+    return 1;
+  }
+  return 0;
+}
+
 /**
  * Evaluates whether or not the given x and y pair is a valid position for the
  * player to occupy.
@@ -59,7 +77,7 @@ static int is_valid_move(const Game *const game, const int x, const int y) {
       return 0;
     }
   }
-  return !get_from_rigid_matrix(game, x, y);
+  return !violates_rigid_matrix(game, x, y, game->tile_w, game->tile_h);
 }
 
 /**
