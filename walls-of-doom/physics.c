@@ -11,6 +11,7 @@
 #include "settings.h"
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 /* Should be the maximum frame count value for 5 seconds remaining. */
 #define MINIMUM_REMAINING_FRAMES_FOR_MESSAGE (6 * FPS - 1)
@@ -149,6 +150,18 @@ static int should_move_at_current_frame(const Game *const game,
     /* If multiple == 0, the framerate is not enough for this speed. */
     /* If multiple == 1, the object should move at every frame. */
     return multiple < 2 || game->frame % multiple == 0;
+  }
+}
+
+static int get_pending_movement(const Game *const game, const int speed) {
+  const unsigned int i = game->frame % FPS;
+  const double slice = speed / (double)FPS;
+  if (game->frame == 0) {
+    return 0;
+  } else if (game->frame % FPS == 0) {
+    return floor(FPS * slice) - floor((FPS - 1) * slice);
+  } else {
+    return floor(i * slice) - floor((i - 1) * slice);
   }
 }
 
@@ -528,12 +541,14 @@ void update_perk(Game *const game) {
  * in that direction.
  */
 void update_player_horizontal_position(Game *game) {
-  if (should_move_at_current_frame(game, game->player->speed_x)) {
-    if (game->player->speed_x > 0) {
-      move_player(game, 1, 0);
-    } else if ((game->player->speed_x) < 0) {
-      move_player(game, -1, 0);
-    }
+  int pending_movement = get_pending_movement(game, game->player->speed_x);
+  while (pending_movement > 0) {
+    move_player(game, 1, 0);
+    pending_movement--;
+  }
+  while (pending_movement < 0) {
+    move_player(game, -1, 0);
+    pending_movement++;
   }
 }
 
@@ -542,14 +557,15 @@ static int is_jumping(const Player *const player) {
 }
 
 void process_jump(Game *const game) {
+  const int jumping_height = game->tile_h * PLAYER_JUMPING_HEIGHT;
   if (is_standing_on_platform(game)) {
-    game->player->remaining_jump_height = PLAYER_JUMPING_HEIGHT;
+    game->player->remaining_jump_height = jumping_height;
     if (game->player->perk == PERK_POWER_SUPER_JUMP) {
       game->player->remaining_jump_height *= 2;
     }
   } else if (game->player->can_double_jump) {
     game->player->can_double_jump = 0;
-    game->player->remaining_jump_height += PLAYER_JUMPING_HEIGHT / 2;
+    game->player->remaining_jump_height += jumping_height / 2;
     if (game->player->perk == PERK_POWER_SUPER_JUMP) {
       game->player->remaining_jump_height *= 2;
     }
@@ -672,23 +688,29 @@ static int can_move_up(const Game *game) {
  * Updates the vertical position of the player.
  */
 void update_player_vertical_position(Game *game) {
-  int jumping_speed = PLAYER_JUMPING_SPEED * game->tile_h;
-  int falling_speed = PLAYER_FALLING_SPEED * game->tile_h;
+  const int jumping_speed = PLAYER_JUMPING_SPEED * game->tile_h;
+  const int falling_speed = PLAYER_FALLING_SPEED * game->tile_h;
+  int pending;
   if (is_jumping(game->player)) {
     if (can_move_up(game)) {
-      if (should_move_at_current_frame(game, jumping_speed)) {
+      pending = get_pending_movement(game, jumping_speed);
+      while (pending > 0) {
         move_player(game, 0, -1);
         game->player->remaining_jump_height--;
+        pending--;
       }
     } else {
       game->player->remaining_jump_height = 0;
     }
   } else if (is_falling(game)) {
     if (game->player->perk == PERK_POWER_LOW_GRAVITY) {
-      falling_speed /= 2;
+      pending = get_pending_movement(game, falling_speed / 2);
+    } else {
+      pending = get_pending_movement(game, falling_speed);
     }
-    if (should_move_at_current_frame(game, falling_speed)) {
+    while (pending > 0) {
       move_player(game, 0, 1);
+      pending--;
     }
   }
 }
