@@ -74,6 +74,14 @@ Game create_game(Player *player, Platform *platforms,
 
   game.box = box;
 
+  game.tile_w = get_tile_width();
+  game.tile_h = get_tile_height();
+
+  player->w = game.tile_w;
+  player->h = game.tile_h;
+
+  reposition_player(&game);
+
   game.perk = PERK_NONE;
   game.perk_x = 0;
   game.perk_y = 0;

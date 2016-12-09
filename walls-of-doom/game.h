@@ -34,6 +34,9 @@ typedef struct Game {
 
   int paused;
 
+  int tile_w;
+  int tile_h;
+
   Perk perk;
   int perk_x;
   int perk_y;

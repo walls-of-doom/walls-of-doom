@@ -97,8 +97,6 @@ Code game(SDL_Renderer *renderer) {
   }
 
   player = make_player(name);
-  player.x = get_columns() / 2;
-  player.y = get_lines() / 2;
 
   box = create_bounding_box();
 

@@ -15,6 +15,11 @@ int bounding_box_contains(const BoundingBox *a, const int x, const int y);
  */
 int bounding_box_equals(const BoundingBox *a, const BoundingBox *const b);
 
+/**
+ * Checks for overlap of two BoundingBox objects.
+ */
+int bounding_box_overlaps(const BoundingBox *a, const BoundingBox *const b);
+
 long bounding_box_area(const BoundingBox *box);
 
 #endif

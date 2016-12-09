@@ -16,6 +16,23 @@ int bounding_box_equals(const BoundingBox *a, const BoundingBox *const b) {
   return min_equals && max_equals;
 }
 
+/**
+ * Checks for overlap of two BoundingBox objects.
+ */
+int bounding_box_overlaps(const BoundingBox *a, const BoundingBox *const b) {
+  /* Two boxes overlap if, and only if, a corner is contained in another. */
+  if (bounding_box_contains(a, b->min_x, b->min_y)) {
+    return 1;
+  } else if (bounding_box_contains(a, b->min_x, b->max_y)) {
+    return 1;
+  } else if (bounding_box_contains(a, b->max_x, b->min_y)) {
+    return 1;
+  } else if (bounding_box_contains(a, b->max_x, b->max_y)) {
+    return 1;
+  }
+  return 0;
+}
+
 long bounding_box_area(const BoundingBox *box) {
   const long w = box->max_x - box->min_x + 1;
   const long h = box->max_y - box->min_y + 1;

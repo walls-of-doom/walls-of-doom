@@ -25,7 +25,7 @@
 /**
  * The number of frames per second the engine renders.
  */
-#define FPS 30
+#define FPS 60
 
 #define PLAYER_RUNNING_SPEED 9
 

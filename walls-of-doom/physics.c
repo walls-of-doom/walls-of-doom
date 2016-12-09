@@ -23,20 +23,23 @@
 #define BUY_LIFE_FORMAT(PRICE) "Bought an extra life for " STR(PRICE) " points."
 #define BUY_LIFE_MESSAGE BUY_LIFE_FORMAT(BUY_LIFE_PRICE)
 
-/**
- * Evaluates whether or not a point is within a Platform.
- */
-static int is_within_platform(const int x, const int y,
-                              const Platform *const platform) {
-  const int p_min_x = platform->x;
-  const int p_max_x = platform->x + platform->width - 1;
-  const int p_y = platform->y;
-  return y == p_y && x >= p_min_x && x <= p_max_x;
+static BoundingBox derive_box(const Game *game, const int x, const int y) {
+  BoundingBox box;
+  box.min_x = x;
+  box.min_y = y;
+  box.max_x = box.min_x + game->tile_w;
+  box.max_y = box.min_y + game->tile_h;
+  return box;
 }
 
-static int is_over_platform(const int x, const int y,
+static int is_over_platform(const Player *player,
                             const Platform *const platform) {
-  return is_within_platform(x, y + 1, platform);
+  if (player->y + player->h == platform->y) {
+    if (player->x < platform->x + platform->width) {
+      return player->x + player->w > platform->x;
+    }
+  }
+  return 0;
 }
 
 /**
@@ -115,7 +118,9 @@ static int should_move_at_current_frame(const Game *const game,
   } else {
     /* Only divide by abs(speed) after checking that speed != 0. */
     multiple = (unsigned long)(FPS / (double)abs(speed) + 0.5);
-    return game->frame % multiple == 0;
+    /* If multiple == 0, the framerate is not enough for this speed. */
+    /* If multiple == 1, the object should move at every frame. */
+    return multiple < 2 || game->frame % multiple == 0;
   }
 }
 
@@ -157,9 +162,8 @@ static int is_standing_on_platform(const Game *const game) {
 static int can_move_platform(Game *const game, Platform *const platform,
                              const int dx, const int dy) {
   int can_move;
-  int x = game->player->x;
-  int y = game->player->y;
-  if (get_player_stops_platforms() && is_over_platform(x, y, platform)) {
+  if (get_player_stops_platforms() &&
+      is_over_platform(game->player, platform)) {
     return 0;
   }
   /* If the platform would intersect with another platform, do not move it. */
@@ -205,7 +209,7 @@ static void move_platform_horizontally(Game *const game,
             shove_player(game, -1, 0, 0);
           }
         }
-      } else if (is_over_platform(player->x, player->y, platform)) {
+      } else if (is_over_platform(player, platform)) {
         shove_player(game, normalized_speed, 0, 1);
       }
       move_platform(game, platform, normalized_speed, 0);
@@ -395,19 +399,25 @@ static int is_falling(const Game *const game) {
   const Player *const player = game->player;
   const int x = player->x;
   const int y = player->y;
+  const int under_tile_x = x / player->w;
+  const int under_tile_y = y / player->h + 1;
   if (!player->physics || player->perk == PERK_POWER_LEVITATION) {
     return 0;
   }
   if (y == game->box->max_y) {
     return 1;
   }
-  return !get_from_rigid_matrix(game, x, y);
+  return !get_from_rigid_matrix(game, under_tile_x, under_tile_y);
 }
 
-static int is_touching_a_wall(const Player *const player,
-                              const BoundingBox *const box) {
-  const int horizontally = player->x < box->min_x || player->x > box->max_x;
-  const int vertically = player->y < box->min_y || player->y > box->max_y;
+static int is_touching_a_wall(Game *game) {
+  const Player *player = game->player;
+  const int min_x = game->box->min_x * game->tile_w;
+  const int max_x = game->box->max_x * game->tile_w;
+  const int min_y = game->box->min_y * game->tile_h;
+  const int max_y = game->box->max_y * game->tile_h;
+  const int horizontally = player->x < min_x || player->x > max_x;
+  const int vertically = player->y < min_y || player->y > max_y;
   return horizontally || vertically;
 }
 
@@ -419,9 +429,12 @@ static int get_bounding_box_center_y(const BoundingBox *const box) {
   return box->min_y + (box->max_y - box->min_y + 1) / 2;
 }
 
-void reposition_player(Player *const player, const BoundingBox *const box) {
-  player->x = get_bounding_box_center_x(box);
-  player->y = get_bounding_box_center_y(box);
+void reposition_player(Game *const game) {
+  const BoundingBox *const box = game->box;
+  const int x = get_bounding_box_center_x(box);
+  const int y = get_bounding_box_center_y(box);
+  game->player->x = x * game->tile_w;
+  game->player->y = y * game->tile_h;
 }
 
 /**
@@ -576,13 +589,13 @@ void process_command(Game *game, const Command command) {
   /* Update the player running state */
   if (command == COMMAND_LEFT) {
     if (player->speed_x == 0) {
-      player->speed_x = -PLAYER_RUNNING_SPEED;
+      player->speed_x = -(PLAYER_RUNNING_SPEED * game->tile_w);
     } else if (player->speed_x > 0) {
       player->speed_x = 0;
     }
   } else if (command == COMMAND_RIGHT) {
     if (player->speed_x == 0) {
-      player->speed_x = PLAYER_RUNNING_SPEED;
+      player->speed_x = PLAYER_RUNNING_SPEED * game->tile_w;
     } else if (player->speed_x < 0) {
       player->speed_x = 0;
     }
@@ -602,11 +615,10 @@ void process_command(Game *game, const Command command) {
  */
 static void check_for_player_death(Game *game) {
   Player *player = game->player;
-  BoundingBox *box = game->box;
   /* Kill the player if it is touching a wall. */
-  if (is_touching_a_wall(player, box)) {
+  if (is_touching_a_wall(game)) {
     player->lives--;
-    reposition_player(player, box);
+    reposition_player(game);
     /* Unset physics collisions for the player. */
     player->physics = 0;
     player->speed_x = 0;
@@ -628,7 +640,7 @@ static int can_move_up(const Game *game) {
  * Updates the vertical position of the player.
  */
 void update_player_vertical_position(Game *game) {
-  int falling_speed = PLAYER_FALLING_SPEED;
+  int falling_speed = PLAYER_FALLING_SPEED * game->tile_h;
   if (is_jumping(game->player)) {
     if (can_move_up(game)) {
       if (should_move_at_current_frame(game, PLAYER_JUMPING_SPEED)) {
@@ -681,6 +693,13 @@ static void write_perk_fading_message(Game *game, const Perk perk,
   game_set_message(game, message, 1, 0);
 }
 
+static int is_touching_perk(const Game *const game) {
+  const Player *player = game->player;
+  const BoundingBox player_box = derive_box(game, player->x, player->y);
+  const BoundingBox perk_box = derive_box(game, game->perk_x, game->perk_y);
+  return bounding_box_overlaps(&player_box, &perk_box);
+}
+
 static void update_player_perk(Game *game) {
   unsigned long end_frame;
   unsigned long remaining_frames;
@@ -699,7 +718,7 @@ static void update_player_perk(Game *game) {
       }
     }
     if (game->perk != PERK_NONE) {
-      if (game->perk_x == player->x && game->perk_y == player->y) {
+      if (is_touching_perk(game)) {
         /* Copy the Perk to transfer it to the Player */
         perk = game->perk;
         /* Remove the Perk from the screen */

@@ -20,6 +20,10 @@ void clear(SDL_Renderer *renderer);
  */
 void present(SDL_Renderer *renderer);
 
+int get_tile_width(void);
+
+int get_tile_height(void);
+
 /**
  * Initializes the required resources.
  *

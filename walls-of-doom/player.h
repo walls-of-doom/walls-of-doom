@@ -11,6 +11,8 @@ typedef struct Player {
 
   int x;
   int y;
+  int w;
+  int h;
   int speed_x;
   int speed_y;
 

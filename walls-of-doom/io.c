@@ -65,11 +65,9 @@ static int get_font_width(void) { return global_monospaced_font_width; }
 
 static int get_font_height(void) { return global_monospaced_font_height; }
 
-static int get_tile_width(void) {
-  return get_window_width() / (get_columns() + 2);
-}
+int get_tile_width(void) { return get_window_width() / (get_columns() + 2); }
 
-static int get_tile_height(void) {
+int get_tile_height(void) {
   return (get_window_height() - 2 * get_bar_height()) / (get_lines() + 2);
 }
 
@@ -570,6 +568,15 @@ static void draw_absolute_rectangle(const int x, const int y, const int w,
   swap_color(renderer, &swap);
 }
 
+static void draw_absolute_tile_rectangle(int x, int y, Color color,
+                                         SDL_Renderer *renderer) {
+  const int w = get_tile_width();
+  const int h = get_tile_height();
+  x += get_border_width();
+  y += get_bar_height() + get_border_height();
+  draw_absolute_rectangle(x, y, w, h, color, renderer);
+}
+
 /**
  * Draws a relative rectangle based on the provided coordinates.
  */
@@ -664,14 +671,14 @@ static int has_active_perk(const Game *const game) {
 static void draw_perk(const Game *const game, SDL_Renderer *renderer) {
   const Color color = COLOR_PAIR_PERK.background;
   if (has_active_perk(game)) {
-    draw_rectangle(game->perk_x, game->perk_y, 1, 1, color, renderer);
+    draw_absolute_tile_rectangle(game->perk_x, game->perk_y, color, renderer);
   }
 }
 
 Code draw_player(const Player *const player, SDL_Renderer *renderer) {
   const int x = player->x;
   const int y = player->y;
-  draw_rectangle(x, y, 1, 1, COLOR_PAIR_PLAYER.foreground, renderer);
+  draw_absolute_tile_rectangle(x, y, COLOR_PAIR_PLAYER.foreground, renderer);
   return CODE_OK;
 }
 
