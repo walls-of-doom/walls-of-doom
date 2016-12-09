@@ -32,6 +32,16 @@ static BoundingBox derive_box(const Game *game, const int x, const int y) {
   return box;
 }
 
+static int has_rigid_support(const Game *game, int x, int y, int w, int h) {
+  if (get_from_rigid_matrix(game, x / w, y / h + 1)) {
+    return 1;
+  }
+  if (x % w != 0) {
+    return get_from_rigid_matrix(game, x / w + 1, y / h + 1);
+  }
+  return 0;
+}
+
 static int is_over_platform(const Player *player,
                             const Platform *const platform) {
   if (player->y + player->h == platform->y) {
@@ -171,10 +181,14 @@ static int can_insert_platform(Game *const game, Platform *const platform) {
  * bottom border to be treated as a platform.
  */
 static int is_standing_on_platform(const Game *const game) {
-  if (game->player->y == game->box->max_y) {
+  const int x = game->player->x;
+  const int y = game->player->y;
+  const int w = game->player->w;
+  const int h = game->player->h;
+  if (y == game->box->max_y) {
     return game->player->perk == PERK_POWER_INVINCIBILITY;
   }
-  return get_from_rigid_matrix(game, game->player->x, game->player->y + 1);
+  return has_rigid_support(game, x, y, w, h);
 }
 
 static int can_move_platform(Game *const game, Platform *const platform,
@@ -410,16 +424,6 @@ void update_platforms(Game *const game) {
   }
 }
 
-static int has_rigid_support(const Game *game, int x, int y, int w, int h) {
-  if (get_from_rigid_matrix(game, x / w, y / h + 1)) {
-    return 1;
-  }
-  if (x % w != 0) {
-    return get_from_rigid_matrix(game, x / w + 1, y / h + 1);
-  }
-  return 0;
-}
-
 /**
  * Evaluates whether or not the Player is falling.
  */
@@ -533,7 +537,7 @@ void update_player_horizontal_position(Game *game) {
   }
 }
 
-int is_jumping(const Player *const player) {
+static int is_jumping(const Player *const player) {
   return player->remaining_jump_height > 0;
 }
 
@@ -668,10 +672,11 @@ static int can_move_up(const Game *game) {
  * Updates the vertical position of the player.
  */
 void update_player_vertical_position(Game *game) {
+  int jumping_speed = PLAYER_JUMPING_SPEED * game->tile_h;
   int falling_speed = PLAYER_FALLING_SPEED * game->tile_h;
   if (is_jumping(game->player)) {
     if (can_move_up(game)) {
-      if (should_move_at_current_frame(game, PLAYER_JUMPING_SPEED)) {
+      if (should_move_at_current_frame(game, jumping_speed)) {
         move_player(game, 0, -1);
         game->player->remaining_jump_height--;
       }
