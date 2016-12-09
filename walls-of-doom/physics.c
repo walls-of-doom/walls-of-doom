@@ -392,6 +392,16 @@ void update_platforms(Game *const game) {
   }
 }
 
+static int has_rigid_support(const Game *game, int x, int y, int w, int h) {
+  if (get_from_rigid_matrix(game, x / w, y / h + 1)) {
+    return 1;
+  }
+  if (x % w != 0) {
+    return get_from_rigid_matrix(game, x / w + 1, y / h + 1);
+  }
+  return 0;
+}
+
 /**
  * Evaluates whether or not the Player is falling.
  */
@@ -399,15 +409,15 @@ static int is_falling(const Game *const game) {
   const Player *const player = game->player;
   const int x = player->x;
   const int y = player->y;
-  const int under_tile_x = x / player->w;
-  const int under_tile_y = y / player->h + 1;
+  const int w = player->w;
+  const int h = player->h;
   if (!player->physics || player->perk == PERK_POWER_LEVITATION) {
     return 0;
   }
   if (y == game->box->max_y) {
     return 1;
   }
-  return !get_from_rigid_matrix(game, under_tile_x, under_tile_y);
+  return !has_rigid_support(game, x, y, w, h);
 }
 
 static int is_touching_a_wall(Game *game) {
