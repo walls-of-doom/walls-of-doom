@@ -240,21 +240,9 @@ static void move_platform(Game *const game, Platform *const platform,
 static void move_platform_horizontally(Game *const game,
                                        Platform *const platform) {
   const int normalized_speed = normalize(platform->speed);
-  Player *const player = game->player;
   if (should_move_at_current_frame(game, platform->speed)) {
     if (can_move_platform(game, platform, normalized_speed, 0)) {
-      /* Fail fast if the platform is not on the same line. */
-      if (player->y == platform->y) {
-        if (normalized_speed == 1) {
-          if (player->x == platform->x + platform->width) {
-            shove_player(game, 1, 0, 0);
-          }
-        } else if (normalized_speed == -1) {
-          if (player->x == platform->x - 1) {
-            shove_player(game, -1, 0, 0);
-          }
-        }
-      } else if (is_over_platform(player, platform)) {
+      if (is_standing_on_platform(game)) {
         shove_player(game, normalized_speed, 0, 1);
       }
       move_platform(game, platform, normalized_speed, 0);
