@@ -28,8 +28,8 @@ static BoundingBox derive_box(const Game *game, const int x, const int y) {
   BoundingBox box;
   box.min_x = x;
   box.min_y = y;
-  box.max_x = box.min_x + game->tile_w;
-  box.max_y = box.min_y + game->tile_h;
+  box.max_x = box.min_x + game->tile_w - 1;
+  box.max_y = box.min_y + game->tile_h - 1;
   return box;
 }
 
