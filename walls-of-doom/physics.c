@@ -74,17 +74,17 @@ static int violates_rigid_matrix(const Game *game, int x, int y, int w, int h) {
 static int is_valid_move(const Game *const game, const int x, const int y) {
   if (game->player->perk == PERK_POWER_INVINCIBILITY) {
     /* If it is invincible, it shouldn't move into walls. */
-    if (game->box->min_x - 1 == x) {
+    if (x == game->box->min_x - 1) {
       return 0;
-    } else if (game->box->max_x + 1 == x) {
+    } else if (x + game->player->w - 1 == game->box->max_x + 1) {
       return 0;
-    } else if (game->box->min_y - 1 == y) {
+    } else if (y == game->box->min_y - 1) {
       return 0;
-    } else if (game->box->max_y + 1 == y) {
+    } else if (y + game->player->h - 1 == game->box->max_y + 1) {
       return 0;
     }
   }
-  return !violates_rigid_matrix(game, x, y, game->tile_w, game->tile_h);
+  return !violates_rigid_matrix(game, x, y, game->player->w, game->player->h);
 }
 
 /**
@@ -93,12 +93,15 @@ static int is_valid_move(const Game *const game, const int x, const int y) {
  * This moves the player at most one position on each axis.
  */
 static void move_player(Game *game, int x, int y) {
-  /**
-   * Ignore magnitude, take just -1, 0, or 1.
-   * It is good to reuse x and y to avoid multiple integers for the same axis.
+  /* It is OK to reuse x and y to prevent multiple integers for the same axis.
    */
+  /* Ignore magnitude, take just -1, 0, or 1. */
   x = normalize(x);
   y = normalize(y);
+  /* Just in case a compiler cannot optimize this case away. */
+  if (x == 0 && y == 0) {
+    return;
+  }
   if (is_valid_move(game, game->player->x + x, game->player->y + y)) {
     game->player->x += x;
     game->player->y += y;
@@ -120,35 +123,6 @@ static void shove_player(Game *game, int x, int y, int standing) {
     }
   }
   move_player(game, 0, y);
-}
-
-/**
- * Evaluates whether or not an object with the specified speed should move in
- * the current frame of the provided Game.
- *
- * Speed may be any integer, this function is robust enough to handle
- * nonpositive integers.
- */
-static int should_move_at_current_frame(const Game *const game,
-                                        const int speed) {
-  /* Reasoning for rounding a double. */
-  /* Let FPS = 30 and speed = 16, if we perform integer division, we will get */
-  /* one. This would be much faster than a speed of 16 would actually be as */
-  /* ideally the object would be moved at every 1.875 frame. Therefore, it is */
-  /* much better to update it at every other frame than at every frame. This */
-  /* shows that the expected behavior is reached by rounding a precise */
-  /* division rather than by truncating the quotient. */
-  /* Play it safe with floating point errors. */
-  unsigned long multiple;
-  if (speed == 0 || game->frame == 0) {
-    return 0;
-  } else {
-    /* Only divide by abs(speed) after checking that speed != 0. */
-    multiple = (unsigned long)(FPS / (double)abs(speed) + 0.5);
-    /* If multiple == 0, the framerate is not enough for this speed. */
-    /* If multiple == 1, the object should move at every frame. */
-    return multiple < 2 || game->frame % multiple == 0;
-  }
 }
 
 static int get_pending_movement(const Game *const game, const int speed) {
@@ -199,10 +173,29 @@ static int is_standing_on_platform(const Game *const game) {
   const int y = game->player->y;
   const int w = game->player->w;
   const int h = game->player->h;
-  if (y == game->box->max_y) {
+  if (y + h - 1 == game->box->max_y) {
     return game->player->perk == PERK_POWER_INVINCIBILITY;
   }
   return has_rigid_support(game, x, y, w, h);
+}
+
+static int is_in_front_of_platform(const Player *const player,
+                                   const Platform *const platform) {
+  if (platform->speed < 0) {
+    if (player->x + player->w != platform->x) {
+      return 0;
+    }
+  } else {
+    if (platform->x + platform->w != player->x) {
+      return 0;
+    }
+  }
+  if (player->y < platform->y + platform->h) {
+    if (player->y + player->h > platform->y) {
+      return 1;
+    }
+  }
+  return 0;
 }
 
 static int can_move_platform(Game *const game, Platform *const platform,
@@ -241,13 +234,19 @@ static void move_platform(Game *const game, Platform *const platform,
 static void move_platform_horizontally(Game *const game,
                                        Platform *const platform) {
   const int normalized_speed = normalize(platform->speed);
-  if (should_move_at_current_frame(game, platform->speed)) {
+  /* This could be made more efficient by handling each direction separately. */
+  int pending = abs(get_pending_movement(game, platform->speed));
+  while (pending) {
     if (can_move_platform(game, platform, normalized_speed, 0)) {
+      if (is_in_front_of_platform(game->player, platform)) {
+        shove_player(game, normalized_speed, 0, 0);
+      }
       if (is_over_platform(game->player, platform)) {
         shove_player(game, normalized_speed, 0, 1);
       }
       move_platform(game, platform, normalized_speed, 0);
     }
+    pending--;
   }
 }
 

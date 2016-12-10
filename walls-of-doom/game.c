@@ -77,7 +77,7 @@ Game create_game(Player *player) {
 
   game.player = player;
   game.platform_count = platform_count;
-  game.platforms = resize_memory(NULL, sizeof(Platform) * game.platform_count);
+  game.platforms = resize_memory(NULL, sizeof(Platform) * platform_count);
 
   game.frame = 0;
   game.played_frames = 0;
