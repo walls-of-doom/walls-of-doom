@@ -11,7 +11,7 @@ static double get_average_width(Game const *const game) {
   double total = 0.0;
   size_t i;
   for (i = 0; i != game->platform_count; ++i) {
-    total += game->platforms[i].width;
+    total += game->platforms[i].w;
   }
   return total / (double)game->platform_count;
 }

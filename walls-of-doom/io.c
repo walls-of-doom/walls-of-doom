@@ -577,18 +577,6 @@ static void draw_absolute_tile_rectangle(int x, int y, Color color,
   draw_absolute_rectangle(x, y, w, h, color, renderer);
 }
 
-/**
- * Draws a relative rectangle based on the provided coordinates.
- */
-static void draw_rectangle(int x, int y, int w, int h, Color color,
-                           SDL_Renderer *renderer) {
-  x = get_border_width() + x * get_tile_width();
-  y = get_bar_height() + get_border_height() + y * get_tile_height();
-  w = w * get_tile_width();
-  h = h * get_tile_height();
-  draw_absolute_rectangle(x, y, w, h, color, renderer);
-}
-
 static void write_top_bar_strings(const char *strings[],
                                   SDL_Renderer *renderer) {
   const ColorPair color_pair = COLOR_PAIR_TOP_BAR;
@@ -650,17 +638,20 @@ static void draw_borders(SDL_Renderer *renderer) { render_borders(renderer); }
 static void draw_platforms(const Platform *platforms,
                            const size_t platform_count, const BoundingBox *box,
                            SDL_Renderer *renderer) {
+  const Color color = COLOR_PAIR_PLATFORM.foreground;
   Platform p;
   int x;
   int y;
   int w;
+  int h;
   size_t i;
   for (i = 0; i < platform_count; i++) {
     p = platforms[i];
     x = max_int(box->min_x, p.x);
-    y = p.y;
-    w = min_int(box->max_x, p.x + p.width - 1) - x + 1;
-    draw_rectangle(x, y, w, 1, COLOR_PAIR_PLATFORM.foreground, renderer);
+    y = p.y + get_bar_height() + get_border_height();
+    w = min_int(box->max_x, p.x + p.w - 1) - x + 1;
+    h = p.h;
+    draw_absolute_rectangle(get_border_width() + x, y, w, h, color, renderer);
   }
 }
 

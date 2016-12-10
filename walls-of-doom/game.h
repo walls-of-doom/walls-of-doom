@@ -58,8 +58,7 @@ typedef struct Game {
 /**
  * Creates a new Game object with the provided objects.
  */
-Game create_game(Player *player, Platform *platforms,
-                 const size_t platform_count, BoundingBox *box);
+Game create_game(Player *player);
 
 void destroy_game(Game *game);
 

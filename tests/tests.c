@@ -377,7 +377,7 @@ void test_generate_platforms_avoids_multiple_platforms_on_the_same_line(void) {
   box.min_y = 0;
   box.max_x = platform_count - 1;
   box.max_y = platform_count - 1;
-  generate_platforms(platforms, &box, platform_count);
+  generate_platforms(platforms, &box, platform_count, 1, 1);
   /* Each platform in platforms should have a different y coordinate. */
   for (i = 0; i < platform_count; i++) {
     y = platforms[i].y;

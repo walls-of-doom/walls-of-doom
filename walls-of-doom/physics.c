@@ -34,11 +34,11 @@ static BoundingBox derive_box(const Game *game, const int x, const int y) {
 }
 
 static int has_rigid_support(const Game *game, int x, int y, int w, int h) {
-  if (get_from_rigid_matrix(game, x / w, y / h + 1)) {
-    return 1;
-  }
-  if (x % w != 0) {
-    return get_from_rigid_matrix(game, x / w + 1, y / h + 1);
+  int i;
+  for (i = 0; i < w; i++) {
+    if (get_from_rigid_matrix(game, x + i, y + h)) {
+      return 1;
+    }
   }
   return 0;
 }
@@ -46,7 +46,7 @@ static int has_rigid_support(const Game *game, int x, int y, int w, int h) {
 static int is_over_platform(const Player *player,
                             const Platform *const platform) {
   if (player->y + player->h == platform->y) {
-    if (player->x < platform->x + platform->width) {
+    if (player->x < platform->x + platform->w) {
       return player->x + player->w > platform->x;
     }
   }
@@ -55,18 +55,14 @@ static int is_over_platform(const Player *player,
 
 /* Width and height are the width and height of the matrix tile. */
 static int violates_rigid_matrix(const Game *game, int x, int y, int w, int h) {
-  if (get_from_rigid_matrix(game, x / w, y / h)) {
-    return 1;
-  }
-  if (x % w != 0 && get_from_rigid_matrix(game, x / w + 1, y / h)) {
-    return 1;
-  }
-  if (y % h != 0 && get_from_rigid_matrix(game, x / w, y / h + 1)) {
-    return 1;
-  }
-  if (x % w != 0 && y % h != 0 &&
-      get_from_rigid_matrix(game, x / w + 1, y / h + 1)) {
-    return 1;
+  int i;
+  int j;
+  for (i = 0; i < w; i++) {
+    for (j = 0; j < h; j++) {
+      if (get_from_rigid_matrix(game, x + i, y + j)) {
+        return 1;
+      }
+    }
   }
   return 0;
 }
@@ -179,9 +175,12 @@ static void add_platform(Game *const game, Platform *const platform) {
  */
 static int can_insert_platform(Game *const game, Platform *const platform) {
   int i;
-  for (i = 0; i < platform->width; i++) {
-    if (get_from_rigid_matrix(game, platform->x + i, platform->y)) {
-      return 0;
+  int j;
+  for (i = 0; i < platform->w; i++) {
+    for (j = 0; i < platform->h; i++) {
+      if (get_from_rigid_matrix(game, platform->x + i, platform->y + j)) {
+        return 0;
+      }
     }
   }
   return 1;
@@ -357,6 +356,7 @@ static void reposition(Game *const game, Platform *const platform) {
   const BoundingBox *const box = game->box;
   /* The occupied size may be smaller than the array actually is. */
   const int occupied_size = get_lines() - 2;
+  const int tile_h = game->tile_h;
   unsigned char *occupied = NULL;
   int line;
   size_t i;
@@ -365,7 +365,7 @@ static void reposition(Game *const game, Platform *const platform) {
   /* Build a table of occupied rows. */
   for (i = 0; i < game->platform_count; i++) {
     if (!platform_equals(game->platforms[i], *platform)) {
-      occupied[game->platforms[i].y - box->min_y] = 1;
+      occupied[(game->platforms[i].y - box->min_y) / tile_h] = 1;
     }
   }
   if (get_reposition_algorithm() == REPOSITION_SELECT_BLINDLY) {
@@ -377,14 +377,14 @@ static void reposition(Game *const game, Platform *const platform) {
   if (platform->x > box->max_x) {
     subtract_platform(game, platform);
     /* The platform should be one tick inside the box. */
-    platform->x = box->min_x - platform->width + 1;
-    platform->y = line + box->min_y;
+    platform->x = box->min_x - platform->w + 1;
+    platform->y = box->min_y + tile_h * line;
     add_platform(game, platform);
-  } else if (platform->x + platform->width < box->min_x) {
+  } else if (platform->x + platform->w < box->min_x) {
     subtract_platform(game, platform);
     /* The platform should be one tick inside the box. */
     platform->x = box->max_x;
-    platform->y = line + box->min_y;
+    platform->y = box->min_y + tile_h * line;
     add_platform(game, platform);
   }
 }
@@ -399,7 +399,7 @@ static void reposition(Game *const game, Platform *const platform) {
 int is_out_of_bounding_box(Platform *const platform,
                            const BoundingBox *const box) {
   const int min_x = platform->x;
-  const int max_x = platform->x + platform->width;
+  const int max_x = platform->x + platform->w;
   if (max_x < box->min_x || min_x > box->max_x) {
     return 1;
   } else if (platform->y < box->min_y || platform->y > box->max_y) {
@@ -443,15 +443,21 @@ static int is_falling(const Game *const game) {
   return !has_rigid_support(game, x, y, w, h);
 }
 
-static int is_touching_a_wall(Game *game) {
-  const Player *player = game->player;
-  const int min_x = game->box->min_x * game->tile_w;
-  const int max_x = game->box->max_x * game->tile_w;
-  const int min_y = game->box->min_y * game->tile_h;
-  const int max_y = game->box->max_y * game->tile_h;
-  const int horizontally = player->x < min_x || player->x > max_x;
-  const int vertically = player->y < min_y || player->y > max_y;
-  return horizontally || vertically;
+static int is_touching_a_wall(const Game *const game) {
+  /**
+   * As in the maximum values for the boxes, the maximum is the last used pixel.
+   */
+  const int b_min_x = game->box->min_x;
+  const int b_max_x = game->box->max_x;
+  const int b_min_y = game->box->min_y;
+  const int b_max_y = game->box->max_y;
+  const int p_min_x = game->player->x;
+  const int p_max_x = game->player->x + game->player->w - 1;
+  const int p_min_y = game->player->y;
+  const int p_max_y = game->player->y + game->player->h - 1;
+  const int in_x = p_min_x < b_min_x || p_max_x > b_max_x;
+  const int in_y = p_min_y < b_min_y || p_max_y > b_max_y;
+  return in_x || in_y;
 }
 
 static int get_bounding_box_center_x(const BoundingBox *const box) {
@@ -466,8 +472,8 @@ void reposition_player(Game *const game) {
   const BoundingBox *const box = game->box;
   const int x = get_bounding_box_center_x(box);
   const int y = get_bounding_box_center_y(box);
-  game->player->x = x * game->tile_w;
-  game->player->y = y * game->tile_h;
+  game->player->x = x;
+  game->player->y = y;
 }
 
 /**

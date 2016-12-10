@@ -70,23 +70,12 @@ void write_menu(const Menu *const menu, SDL_Renderer *renderer) {
   resize_memory(strings, 0);
 }
 
-static BoundingBox create_bounding_box(void) {
-  BoundingBox box;
-  box.min_x = 0;
-  box.min_y = 0;
-  box.max_x = get_columns() - 1;
-  box.max_y = get_lines() - 1;
-  return box;
-}
-
 /**
  * Enters the game.
  */
 Code game(SDL_Renderer *renderer) {
   char name[MAXIMUM_PLAYER_NAME_SIZE];
   Player player;
-  Platform platforms[MAXIMUM_PLATFORM_COUNT];
-  BoundingBox box;
   Game game;
   Code code;
 
@@ -98,11 +87,7 @@ Code game(SDL_Renderer *renderer) {
 
   player = make_player(name);
 
-  box = create_bounding_box();
-
-  generate_platforms(platforms, &box, get_platform_count());
-
-  game = create_game(&player, platforms, get_platform_count(), &box);
+  game = create_game(&player);
 
   code = run_game(&game, renderer);
 
