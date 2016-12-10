@@ -145,21 +145,25 @@ static void add_platform(Game *const game, Platform *const platform) {
   modify_rigid_matrix_platform(game, platform, 1);
 }
 
-/**
- * Returns whether or not the platform can be inserted in the game without
- * overlapping any existing platforms.
- */
-static int can_insert_platform(Game *const game, Platform *const platform) {
+static int is_free_on_matrix(Game *const game, int x, int y, int w, int h) {
   int i;
   int j;
-  for (i = 0; i < platform->w; i++) {
-    for (j = 0; i < platform->h; i++) {
-      if (get_from_rigid_matrix(game, platform->x + i, platform->y + j)) {
+  for (i = 0; i != w; i++) {
+    for (j = 0; j != h; j++) {
+      if (get_from_rigid_matrix(game, x + i, y + j)) {
         return 0;
       }
     }
   }
   return 1;
+}
+
+/**
+ * Returns whether or not the platform can be inserted in the game without
+ * overlapping any existing platforms.
+ */
+static int can_insert_platform(Game *const game, Platform *const p) {
+  return is_free_on_matrix(game, p->x, p->y, p->w, p->h);
 }
 
 /**
@@ -198,21 +202,37 @@ static int is_in_front_of_platform(const Player *const player,
   return 0;
 }
 
-static int can_move_platform(Game *const game, Platform *const platform,
-                             const int dx, const int dy) {
-  int can_move;
-  if (get_player_stops_platforms() &&
-      is_over_platform(game->player, platform)) {
+static int can_move_platform(Game *const game, Platform *p, int dx, int dy) {
+  int can_move = 1;
+  if (get_player_stops_platforms() && is_over_platform(game->player, p)) {
     return 0;
   }
-  /* If the platform would intersect with another platform, do not move it. */
-  subtract_platform(game, platform);
-  platform->x += dx;
-  platform->y += dy;
-  can_move = can_insert_platform(game, platform);
-  platform->x -= dx;
-  platform->y -= dy;
-  add_platform(game, platform);
+  if (dx == 0 && dy == 0) {
+    return 1;
+  }
+  /* There are two optimized paths for unidirectional movement. */
+  if (dx == 0) {
+    if (dy < 0) {
+      return is_free_on_matrix(game, p->x, p->y + dy, p->w, -dy);
+    } else if (dy > 0) {
+      return is_free_on_matrix(game, p->x, p->y + p->h, p->w, dy);
+    }
+  } else if (dy == 0) {
+    if (dx < 0) {
+      return is_free_on_matrix(game, p->x + dx, p->y, -dx, p->h);
+    } else if (dx > 0) {
+      return is_free_on_matrix(game, p->x + p->w, p->y, dx, p->h);
+    }
+  } else {
+    /* If the platform would intersect with another platform, do not move it. */
+    subtract_platform(game, p);
+    p->x += dx;
+    p->y += dy;
+    can_move = can_insert_platform(game, p);
+    p->x -= dx;
+    p->y -= dy;
+    add_platform(game, p);
+  }
   return can_move;
 }
 
