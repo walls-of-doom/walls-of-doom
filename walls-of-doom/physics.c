@@ -525,8 +525,8 @@ void update_perk(Game *const game) {
     game->perk = PERK_NONE;
   } else if (game->played_frames == next_perk_frame) {
     game->perk = get_random_perk();
-    game->perk_x = random_integer(game->box->min_x, game->box->max_x);
-    game->perk_y = random_integer(game->box->min_y, game->box->max_y);
+    game->perk_x = random_integer(0, get_columns() - 1) * game->tile_w;
+    game->perk_y = random_integer(0, get_lines() - 1) * game->tile_h;
     game->perk_end_frame = game->played_frames + PERK_SCREEN_DURATION_IN_FRAMES;
   }
 }
