@@ -663,18 +663,50 @@ static int has_active_perk(const Game *const game) {
   return game->perk != PERK_NONE;
 }
 
+static void draw_resized_perk(int x, int y, int w, int h, double f,
+                              SDL_Renderer *renderer) {
+  /* The scaled values. */
+  const int s_w = (int)(f * w);
+  const int s_h = (int)(f * h);
+  /* The foreground variables. */
+  const Color f_color = COLOR_PAIR_PERK.background;
+  int f_x;
+  int f_y;
+  int f_w = s_w;
+  int f_h = s_h;
+  /* The background variables. */
+  const Color b_color = mix_colors(COLOR_PAIR_DEFAULT.background, f_color);
+  int b_x;
+  int b_y;
+  int b_w = s_w;
+  int b_h = s_h;
+  /* If the width or height is reduced by 2, reduce back and front. */
+  /* Otherwise, reduce inner on each side and interpolate back. */
+  if ((w - s_w) % 2 == 1) {
+    b_w = s_w + 1;
+    f_w = s_w - 1;
+  }
+  if ((h - s_h) % 2 == 1) {
+    b_h = s_h + 1;
+    f_h = s_h - 1;
+  }
+  f_x = x + (w - f_w) / 2;
+  f_y = y + (h - f_h) / 2;
+  b_x = x + (w - b_w) / 2;
+  b_y = y + (h - b_h) / 2;
+  draw_absolute_rectangle(b_x, b_y, b_w, b_h, b_color, renderer);
+  draw_absolute_rectangle(f_x, f_y, f_w, f_h, f_color, renderer);
+}
+
 static void draw_active_perk(const Game *const game, SDL_Renderer *renderer) {
-  const Color color = COLOR_PAIR_PERK.background;
   const int interval = PERK_FADING_INTERVAL;
   const int x_padding = get_border_width();
   const int y_padding = get_bar_height() + get_border_height();
   const int remaining = (int)(game->perk_end_frame - game->played_frames);
   const double fraction = min_int(interval, remaining) / (double)interval;
-  const int w = (int)(game->tile_w * fraction);
-  const int h = (int)(game->tile_h * fraction);
-  const int x = x_padding + game->perk_x + (game->tile_w - w) / 2;
-  const int y = y_padding + game->perk_y + (game->tile_h - h) / 2;
-  draw_absolute_rectangle(x, y, w, h, color, renderer);
+  const int x = x_padding + game->perk_x;
+  const int y = y_padding + game->perk_y;
+  draw_resized_perk(x, y, game->tile_w, game->tile_h, fraction, renderer);
 }
 
 static void draw_perk(const Game *const game, SDL_Renderer *renderer) {

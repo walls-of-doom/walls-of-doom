@@ -2,8 +2,6 @@
 #include "logger.h"
 #include "random.h"
 
-char *get_perk_symbol(void) { return " "; }
-
 Perk get_random_perk(void) { return random_integer(0, PERK_COUNT - 1); }
 
 int is_bonus_perk(const Perk perk) {
