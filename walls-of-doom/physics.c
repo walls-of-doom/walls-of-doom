@@ -88,13 +88,15 @@ static int is_valid_move(const Game *const game, const int x, const int y) {
 }
 
 /**
- * Moves the player by the provided x and y directions. This moves the player
- * at most one position on each axis.
+ * Moves the player by the provided x and y directions.
+ *
+ * This moves the player at most one position on each axis.
  */
 static void move_player(Game *game, int x, int y) {
-  /* Ignore magnitude, take just -1, 0, or 1. */
-  /* It is good to reuse these variables to prevent mistakes by having */
-  /* multiple integers for the same axis. */
+  /**
+   * Ignore magnitude, take just -1, 0, or 1.
+   * It is good to reuse x and y to avoid multiple integers for the same axis.
+   */
   x = normalize(x);
   y = normalize(y);
   if (is_valid_move(game, game->player->x + x, game->player->y + y)) {
@@ -241,7 +243,7 @@ static void move_platform_horizontally(Game *const game,
   const int normalized_speed = normalize(platform->speed);
   if (should_move_at_current_frame(game, platform->speed)) {
     if (can_move_platform(game, platform, normalized_speed, 0)) {
-      if (is_standing_on_platform(game)) {
+      if (is_over_platform(game->player, platform)) {
         shove_player(game, normalized_speed, 0, 1);
       }
       move_platform(game, platform, normalized_speed, 0);
