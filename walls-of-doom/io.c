@@ -26,6 +26,8 @@
 
 #define MINIMUM_BAR_HEIGHT 20
 
+#define PERK_FADING_INTERVAL FPS
+
 #define IMG_FLAGS IMG_INIT_PNG
 
 static TTF_Font *global_monospaced_font = NULL;
@@ -639,6 +641,8 @@ static void draw_platforms(const Platform *platforms,
                            const size_t platform_count, const BoundingBox *box,
                            SDL_Renderer *renderer) {
   const Color color = COLOR_PAIR_PLATFORM.foreground;
+  const int x_padding = get_border_width();
+  const int y_padding = get_bar_height() + get_border_height();
   Platform p;
   int x;
   int y;
@@ -647,11 +651,11 @@ static void draw_platforms(const Platform *platforms,
   size_t i;
   for (i = 0; i < platform_count; i++) {
     p = platforms[i];
-    x = max_int(box->min_x, p.x);
-    y = p.y + get_bar_height() + get_border_height();
-    w = min_int(box->max_x, p.x + p.w - 1) - x + 1;
+    x = x_padding + max_int(box->min_x, p.x);
+    y = y_padding + p.y;
+    w = min_int(box->max_x, p.x + p.w - 1) - (x - x_padding) + 1;
     h = p.h;
-    draw_absolute_rectangle(get_border_width() + x, y, w, h, color, renderer);
+    draw_absolute_rectangle(x, y, w, h, color, renderer);
   }
 }
 
@@ -659,10 +663,23 @@ static int has_active_perk(const Game *const game) {
   return game->perk != PERK_NONE;
 }
 
-static void draw_perk(const Game *const game, SDL_Renderer *renderer) {
+static void draw_active_perk(const Game *const game, SDL_Renderer *renderer) {
   const Color color = COLOR_PAIR_PERK.background;
+  const int interval = PERK_FADING_INTERVAL;
+  const int x_padding = get_border_width();
+  const int y_padding = get_bar_height() + get_border_height();
+  const int remaining = (int)(game->perk_end_frame - game->played_frames);
+  const double fraction = min_int(interval, remaining) / (double)interval;
+  const int w = (int)(game->tile_w * fraction);
+  const int h = (int)(game->tile_h * fraction);
+  const int x = x_padding + game->perk_x + (game->tile_w - w) / 2;
+  const int y = y_padding + game->perk_y + (game->tile_h - h) / 2;
+  draw_absolute_rectangle(x, y, w, h, color, renderer);
+}
+
+static void draw_perk(const Game *const game, SDL_Renderer *renderer) {
   if (has_active_perk(game)) {
-    draw_absolute_tile_rectangle(game->perk_x, game->perk_y, color, renderer);
+    draw_active_perk(game, renderer);
   }
 }
 
