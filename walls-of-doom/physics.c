@@ -125,16 +125,24 @@ static void shove_player(Game *game, int x, int y, int standing) {
   move_player(game, 0, y);
 }
 
-static int get_pending_movement(const Game *const game, const int speed) {
-  const unsigned int i = game->frame % FPS;
+static int get_absolute_pending_movement(unsigned long frame, int speed) {
+  const unsigned int i = frame % FPS;
   const double slice = speed / (double)FPS;
-  if (game->frame == 0) {
+  if (frame == 0) {
     return 0;
-  } else if (game->frame % FPS == 0) {
-    return floor(FPS * slice) - floor((FPS - 1) * slice);
-  } else {
+  }
+  if (i) {
     return floor(i * slice) - floor((i - 1) * slice);
   }
+  return floor(FPS * slice) - floor((FPS - 1) * slice);
+}
+
+static int get_pending_movement(const Game *const game, const int speed) {
+  const int normalized = normalize(speed);
+  if (speed == 0) {
+    return 0;
+  }
+  return normalized * get_absolute_pending_movement(game->frame, abs(speed));
 }
 
 static void subtract_platform(Game *const game, Platform *const platform) {
