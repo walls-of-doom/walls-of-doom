@@ -3,7 +3,7 @@
 #include "box.h"
 #include "constants.h"
 #include "data.h"
-#include "io.h"
+#include "high-io.h"
 #include "logger.h"
 #include "memory.h"
 #include "menu.h"
@@ -175,7 +175,7 @@ static void print_game_result(const Player *player, const int position,
     sprintf(second_line, "%s didn't make it to the top scores.", name);
   }
   clear(renderer);
-  print_centered_vertically(3, (const char **)lines, color, renderer);
+  print_centered_vertically(3, lines, color, renderer);
   present(renderer);
 }
 

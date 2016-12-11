@@ -3,7 +3,7 @@
 #include "constants.h"
 #include "data.h"
 #include "game.h"
-#include "io.h"
+#include "high-io.h"
 #include "logger.h"
 #include "memory.h"
 #include "physics.h"
@@ -30,7 +30,6 @@ typedef struct Menu {
 void write_menu(const Menu *const menu, SDL_Renderer *renderer) {
   const size_t entries = menu->option_count + 1;
   const size_t string_count = 2 * entries - 1;
-  char const *const *const_strings = NULL;
   char **strings = NULL;
   char *source = NULL;
   const char hint_format[] = "> %s <";
@@ -38,7 +37,6 @@ void write_menu(const Menu *const menu, SDL_Renderer *renderer) {
   size_t option_index;
   size_t i;
   strings = resize_memory(strings, sizeof(char *) * string_count);
-  const_strings = (char const *const *)strings;
   for (i = 0; i < string_count; i++) {
     strings[i] = NULL;
     strings[i] = resize_memory(strings[i], MAXIMUM_STRING_SIZE);
@@ -61,7 +59,7 @@ void write_menu(const Menu *const menu, SDL_Renderer *renderer) {
       copy_string(strings[i], "", MAXIMUM_STRING_SIZE);
     }
   }
-  print_menu(string_count, const_strings, renderer);
+  print_menu(string_count, strings, renderer);
   /* Free the strings. */
   for (i = 0; i < string_count; i++) {
     resize_memory(strings[i], 0);
