@@ -126,22 +126,15 @@ static void shove_player(Game *game, int x, int y, int standing) {
 }
 
 static int get_absolute_pending_movement(unsigned long frame, int speed) {
-  const unsigned int i = frame % FPS;
+  /* Should move slice after every frame. */
   const double slice = speed / (double)FPS;
-  if (frame == 0) {
-    return 0;
-  }
-  if (i) {
-    return floor(i * slice) - floor((i - 1) * slice);
-  }
-  return floor(FPS * slice) - floor((FPS - 1) * slice);
+  /* To reduce floating point error, normalize frame to [FPS, 2 FPS - 1]. */
+  frame = frame % FPS + FPS;
+  return floor(frame * slice) - floor((frame - 1) * slice);
 }
 
 static int get_pending_movement(const Game *const game, const int speed) {
   const int normalized = normalize(speed);
-  if (speed == 0) {
-    return 0;
-  }
   return normalized * get_absolute_pending_movement(game->frame, abs(speed));
 }
 
