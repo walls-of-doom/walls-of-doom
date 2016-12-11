@@ -17,6 +17,8 @@ Player make_player(char *name) {
   /* Initialize the player to the corner so that it is in a valid state. */
   player.x = 0;
   player.y = 0;
+  player.w = 0;
+  player.h = 0;
   player.speed_x = 0;
   player.speed_y = 0;
   player.physics = 0;

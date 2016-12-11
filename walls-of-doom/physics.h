@@ -31,6 +31,8 @@ void update_perk(Game *const game);
 
 void update_player(Game *game, Command command);
 
+void reposition_player(Game *const game);
+
 /**
  * Conceives a bonus perk to the player.
  */

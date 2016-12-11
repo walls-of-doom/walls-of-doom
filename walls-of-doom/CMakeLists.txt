@@ -12,6 +12,7 @@ configure_file (constants.h.in constants.h)
 add_library (walls-of-doom-base
     about.h about.c
     bank.h bank.c
+    base-io.h base-io.c
     box.h box.c
     clock.h clock.c
     code.h code.c
@@ -20,8 +21,8 @@ add_library (walls-of-doom-base
     constants.h
     data.h data.c
     game.h game.c
+    high-io.h high-io.c
     investment.h
-    io.h io.c
     logger.h logger.c
     memory.h memory.c
     menu.h menu.c
@@ -38,6 +39,10 @@ add_library (walls-of-doom-base
     sort.h sort.c
     text.h text.c
     version.h)
+
+if (UNIX)
+    target_link_libraries (walls-of-doom-base m)
+endif (UNIX)
 
 find_package (SDL2 REQUIRED)
 find_package (SDL2_ttf REQUIRED)

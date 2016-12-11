@@ -61,6 +61,14 @@ Color color_from_rgb(unsigned char r, unsigned char g, unsigned char b) {
   return color;
 }
 
+Color mix_colors(Color a, Color b) {
+  a.r = ((int)a.r + (int)b.r) / 2;
+  a.g = ((int)a.g + (int)b.g) / 2;
+  a.b = ((int)a.b + (int)b.b) / 2;
+  a.a = ((int)a.a + (int)b.a) / 2;
+  return a;
+}
+
 SDL_Color to_sdl_color(Color color) {
   SDL_Color sdl_color;
   sdl_color.r = color.r;

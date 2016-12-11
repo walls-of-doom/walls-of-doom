@@ -3,7 +3,7 @@
 #include "box.h"
 #include "constants.h"
 #include "data.h"
-#include "io.h"
+#include "high-io.h"
 #include "logger.h"
 #include "memory.h"
 #include "menu.h"
@@ -21,7 +21,7 @@ static size_t get_rigid_matrix_index(const Game *const game, const int x,
                                      const int y) {
   const int base_x = x - game->box->min_x;
   const int base_y = y - game->box->min_y;
-  return base_x + base_y * game->rigid_matrix_m;
+  return base_x + base_y * game->rigid_matrix_n;
 }
 
 unsigned char get_from_rigid_matrix(const Game *const game, const int x,
@@ -41,9 +41,12 @@ void modify_rigid_matrix_point(const Game *const game, const int x, const int y,
 
 void modify_rigid_matrix_platform(Game *game, Platform const *platform,
                                   const unsigned char delta) {
-  int i;
-  for (i = 0; i < platform->width; i++) {
-    modify_rigid_matrix_point(game, platform->x + i, platform->y, delta);
+  int x;
+  int y;
+  for (x = 0; x < platform->w; ++x) {
+    for (y = 0; y < platform->h; ++y) {
+      modify_rigid_matrix_point(game, platform->x + x, platform->y + y, delta);
+    }
   }
 }
 
@@ -55,24 +58,44 @@ static void initialize_rigid_matrix(Game *game) {
   }
 }
 
+static void initialize_bounding_box(Game *game) {
+  game->box->min_x = 0;
+  game->box->min_y = 0;
+  game->box->max_x = game->tile_w * get_columns() - 1;
+  game->box->max_y = game->tile_h * get_lines() - 1;
+}
+
 /**
  * Creates a new Game object with the provided objects.
  */
-Game create_game(Player *player, Platform *platforms,
-                 const size_t platform_count, BoundingBox *box) {
-  size_t rigit_matrix_bytes;
+Game create_game(Player *player) {
+  const int tile_w = get_tile_width();
+  const int tile_h = get_tile_height();
+  const int platform_count = get_platform_count();
+  size_t rigid_matrix_bytes;
   Game game;
 
   game.player = player;
-  game.platforms = platforms;
   game.platform_count = platform_count;
+  game.platforms = resize_memory(NULL, sizeof(Platform) * platform_count);
 
   game.frame = 0;
   game.played_frames = 0;
 
   game.paused = 0;
 
-  game.box = box;
+  game.tile_w = tile_w;
+  game.tile_h = tile_h;
+
+  player->w = tile_w;
+  player->h = tile_h;
+
+  game.box = resize_memory(NULL, sizeof(BoundingBox));
+  initialize_bounding_box(&game);
+
+  generate_platforms(game.platforms, game.box, platform_count, tile_w, tile_h);
+
+  reposition_player(&game);
 
   game.perk = PERK_NONE;
   game.perk_x = 0;
@@ -80,12 +103,11 @@ Game create_game(Player *player, Platform *platforms,
   /* Don't start with a Perk on the screen. */
   game.perk_end_frame = PERK_SCREEN_DURATION_IN_FRAMES;
 
-  game.rigid_matrix_n = box->max_y - box->min_y + 1;
-  game.rigid_matrix_m = box->max_x - box->min_x + 1;
-  game.rigid_matrix_size = game.rigid_matrix_n * game.rigid_matrix_m;
-  game.rigid_matrix = NULL;
-  rigit_matrix_bytes = sizeof(unsigned char) * game.rigid_matrix_size;
-  game.rigid_matrix = resize_memory(game.rigid_matrix, rigit_matrix_bytes);
+  game.rigid_matrix_m = game.box->max_y - game.box->min_y + 1;
+  game.rigid_matrix_n = game.box->max_x - game.box->min_x + 1;
+  game.rigid_matrix_size = game.rigid_matrix_m * game.rigid_matrix_n;
+  rigid_matrix_bytes = sizeof(unsigned char) * game.rigid_matrix_size;
+  game.rigid_matrix = resize_memory(NULL, rigid_matrix_bytes);
   initialize_rigid_matrix(&game);
 
   game.message[0] = '\0';
@@ -99,6 +121,8 @@ Game create_game(Player *player, Platform *platforms,
 
 void destroy_game(Game *game) {
   game->rigid_matrix = resize_memory(game->rigid_matrix, 0);
+  game->box = resize_memory(game->box, 0);
+  game->platforms = resize_memory(game->platforms, 0);
 }
 
 Milliseconds update_game(Game *const game) {
@@ -151,7 +175,7 @@ static void print_game_result(const Player *player, const int position,
     sprintf(second_line, "%s didn't make it to the top scores.", name);
   }
   clear(renderer);
-  print_centered_vertically(3, (const char **)lines, color, renderer);
+  print_centered_vertically(3, lines, color, renderer);
   present(renderer);
 }
 

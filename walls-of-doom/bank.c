@@ -10,8 +10,8 @@
 static double get_average_width(Game const *const game) {
   double total = 0.0;
   size_t i;
-  for (i = 0; i != game->platform_count; ++i) {
-    total += game->platforms[i].width;
+  for (i = game->platform_count - 1; i; --i) {
+    total += game->platforms[i].w;
   }
   return total / (double)game->platform_count;
 }
@@ -19,7 +19,7 @@ static double get_average_width(Game const *const game) {
 static double get_average_speed(Game const *const game) {
   double total = 0.0;
   size_t i;
-  for (i = 0; i != game->platform_count; ++i) {
+  for (i = game->platform_count - 1; i; --i) {
     total += abs(game->platforms[i].speed);
   }
   return total / (double)game->platform_count;
@@ -35,10 +35,10 @@ static void log_difficulty(const double difficulty) {
  * Returns a normalized value (from 0 to 1) indicating the game difficulty.
  */
 static double get_difficulty(Game const *const game) {
-  const int min_width = get_platform_min_width();
-  const int max_width = get_platform_max_width();
-  const int min_speed = get_platform_min_speed();
-  const int max_speed = get_platform_max_speed();
+  const int min_width = get_platform_min_width() * game->tile_w;
+  const int max_width = get_platform_max_width() * game->tile_w;
+  const int min_speed = get_platform_min_speed() * game->tile_w;
+  const int max_speed = get_platform_max_speed() * game->tile_w;
   const double avg_width = (min_width + max_width) / 2.0;
   const double avg_speed = (min_speed + max_speed) / 2.0;
   const double game_avg_width = get_average_width(game);
