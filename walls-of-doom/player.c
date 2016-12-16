@@ -29,6 +29,7 @@ Player make_player(char *name) {
   player.perk = PERK_NONE;
   player.perk_end_frame = 0;
   player.investments = NULL;
+  player.graphics = NULL;
   return player;
 }
 

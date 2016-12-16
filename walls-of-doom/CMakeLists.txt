@@ -21,6 +21,7 @@ add_library (walls-of-doom-base
     constants.h
     data.h data.c
     game.h game.c
+    graphics.h graphics.c
     high-io.h high-io.c
     investment.h
     logger.h logger.c
@@ -31,6 +32,7 @@ add_library (walls-of-doom-base
     physics.h physics.c
     platform.h platform.c
     player.h player.c
+    point.h point.c
     profiler.h profiler.c
     random.h random.c
     record.h record.c

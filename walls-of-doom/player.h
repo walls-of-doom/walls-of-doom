@@ -4,6 +4,7 @@
 #include "investment.h"
 #include "perk.h"
 #include "score.h"
+#include "graphics.h"
 
 typedef struct Player {
 
@@ -30,6 +31,8 @@ typedef struct Player {
   unsigned long perk_end_frame;
 
   Investment *investments;
+
+  Graphics *graphics;
 
 } Player;
 
