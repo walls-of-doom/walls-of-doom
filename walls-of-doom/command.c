@@ -1,4 +1,5 @@
 #include "command.h"
+#include "joystick.h"
 #include <SDL.h>
 
 /**
@@ -39,6 +40,10 @@ static Command command_from_event(const SDL_Event event) {
     } else if (sym == SDLK_q) {
       return COMMAND_QUIT;
     }
+  } else if (event.type == SDL_JOYAXISMOTION) {
+    return command_from_joystick_event(event);
+  } else if (event.type == SDL_JOYBUTTONDOWN) {
+    return command_from_joystick_event(event);
   }
   return COMMAND_NONE;
 }

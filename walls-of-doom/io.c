@@ -2,6 +2,7 @@
 #include "clock.h"
 #include "constants.h"
 #include "game.h"
+#include "joystick.h"
 #include "logger.h"
 #include "memory.h"
 #include "numeric.h"
@@ -27,6 +28,8 @@
 #define MINIMUM_BAR_HEIGHT 20
 
 #define IMG_FLAGS IMG_INIT_PNG
+
+#define SDL_INIT_FLAGS SDL_INIT_VIDEO | SDL_INIT_JOYSTICK
 
 static TTF_Font *global_monospaced_font = NULL;
 
@@ -178,11 +181,13 @@ Code initialize(SDL_Window **window, SDL_Renderer **renderer) {
   initialize_profiler();
   initialize_settings();
   /* Initialize SDL. */
-  if (SDL_Init(SDL_INIT_VIDEO)) {
+  if (SDL_Init(SDL_INIT_FLAGS)) {
     sprintf(log_buffer, "SDL initialization error: %s", SDL_GetError());
     log_message(log_buffer);
     return CODE_ERROR;
   }
+  /* Initialize joystick support after main initialization. */
+  initialize_joystick();
   /* Initialize TTF. */
   if (!TTF_WasInit()) {
     if (TTF_Init()) {
@@ -251,6 +256,7 @@ static void finalize_fonts(void) {
  */
 Code finalize(SDL_Window **window, SDL_Renderer **renderer) {
   finalize_fonts();
+  finalize_joystick();
   SDL_DestroyRenderer(*renderer);
   SDL_DestroyWindow(*window);
   *window = NULL;

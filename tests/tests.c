@@ -1,4 +1,3 @@
-#include "unity.h"
 #include "data.h"
 #include "io.h"
 #include "logger.h"
@@ -7,6 +6,7 @@
 #include "random.h"
 #include "sort.h"
 #include "text.h"
+#include "unity.h"
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
