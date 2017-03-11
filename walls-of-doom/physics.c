@@ -9,9 +9,9 @@
 #include "random.h"
 #include "score.h"
 #include "settings.h"
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
-#include <math.h>
 
 /* Should be the maximum frame count value for 5 seconds remaining. */
 #define MINIMUM_REMAINING_FRAMES_FOR_MESSAGE (6 * FPS - 1)

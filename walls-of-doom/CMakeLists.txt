@@ -24,6 +24,7 @@ add_library (walls-of-doom-base
     graphics.h graphics.c
     high-io.h high-io.c
     investment.h
+    joystick.h joystick.c
     logger.h logger.c
     memory.h memory.c
     menu.h menu.c

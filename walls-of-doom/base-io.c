@@ -2,6 +2,7 @@
 #include "clock.h"
 #include "constants.h"
 #include "game.h"
+#include "joystick.h"
 #include "logger.h"
 #include "memory.h"
 #include "numeric.h"
@@ -29,6 +30,8 @@
 #define PERK_FADING_INTERVAL FPS
 
 #define IMG_FLAGS IMG_INIT_PNG
+
+#define SDL_INIT_FLAGS SDL_INIT_VIDEO | SDL_INIT_JOYSTICK
 
 static Font *global_monospaced_font = NULL;
 
@@ -185,11 +188,12 @@ Code initialize(Window **window, Renderer **renderer) {
   initialize_profiler();
   initialize_settings();
   /* Initialize SDL. */
-  if (SDL_Init(SDL_INIT_VIDEO)) {
+  if (SDL_Init(SDL_INIT_FLAGS)) {
     sprintf(log_buffer, "SDL initialization error: %s", SDL_GetError());
     log_message(log_buffer);
     return CODE_ERROR;
   }
+  initialize_joystick();
   /* Initialize TTF. */
   if (!TTF_WasInit()) {
     if (TTF_Init()) {
@@ -258,6 +262,7 @@ static void finalize_fonts(void) {
  */
 Code finalize(Window **window, Renderer **renderer) {
   finalize_fonts();
+  finalize_joystick();
   SDL_DestroyRenderer(*renderer);
   SDL_DestroyWindow(*window);
   *window = NULL;

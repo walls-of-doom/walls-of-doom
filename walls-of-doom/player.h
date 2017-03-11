@@ -1,10 +1,10 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "graphics.h"
 #include "investment.h"
 #include "perk.h"
 #include "score.h"
-#include "graphics.h"
 
 typedef struct Player {
 

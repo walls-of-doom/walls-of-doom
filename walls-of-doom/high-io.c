@@ -1,5 +1,5 @@
-#include "base-io.h"
 #include "high-io.h"
+#include "base-io.h"
 #include "clock.h"
 #include "constants.h"
 #include "game.h"
