@@ -1,6 +1,11 @@
 COLUMNS = 100
 LINES = 50
 
+# You can provide your own window dimensions.
+# Uncomment the following lines to try it.
+# WIDTH = 640
+# HEIGHT = 360
+
 FONT_SIZE = 20
 
 # Change to SOFTWARE if hardware rendering is not available.
@@ -14,6 +19,7 @@ PLATFORM_MINIMUM_SPEED = 4
 
 REPOSITION_ALGORITHM = REPOSITION_SELECT_AWARELY
 
+# Logging the player score may negatively impact game performance.
 LOGGING_PLAYER_SCORE = 0
 
 PLAYER_STOPS_PLATFORMS = 0

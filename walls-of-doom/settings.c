@@ -6,6 +6,7 @@
 #include "text.h"
 #include <ctype.h>
 #include <errno.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -35,6 +36,12 @@ static long columns = 80;
 
 static const long MINIMUM_LINES = 20;
 static long lines = 30;
+
+/* SDL has a limit at 16384. */
+static const long MAXIMUM_DIMENSION = 16384;
+static const long MINIMUM_DIMENSION = 240;
+static int width = -1;
+static int height = -1;
 
 static int player_stops_platforms = 0;
 
@@ -202,6 +209,16 @@ void initialize_settings(void) {
       limits.maximum = MAXIMUM_LINES;
       limits.fallback = lines;
       lines = parse_value(value, limits);
+    } else if (string_equals(key, "WIDTH")) {
+      limits.minimum = MINIMUM_DIMENSION;
+      limits.maximum = MAXIMUM_DIMENSION;
+      limits.fallback = width;
+      width = parse_value(value, limits);
+    } else if (string_equals(key, "HEIGHT")) {
+      limits.minimum = MINIMUM_DIMENSION;
+      limits.maximum = MAXIMUM_DIMENSION;
+      limits.fallback = height;
+      height = parse_value(value, limits);
     } else if (string_equals(key, "COLOR_PAIR_DEFAULT")) {
       COLOR_PAIR_DEFAULT = parse_color(value);
     } else if (string_equals(key, "COLOR_PAIR_PERK")) {
@@ -285,6 +302,10 @@ int get_font_size(void) { return font_size; }
 long get_columns(void) { return columns; }
 
 long get_lines(void) { return lines; }
+
+int get_requested_window_width(void) { return width; }
+
+int get_requested_window_height(void) { return height; }
 
 long get_padding(void) { return padding; }
 

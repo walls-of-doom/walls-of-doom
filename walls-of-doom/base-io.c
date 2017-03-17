@@ -150,10 +150,17 @@ static Window *create_window(int *width, int *height, int *bar_height) {
   const char *title = GAME_NAME;
   const int x = SDL_WINDOWPOS_CENTERED;
   const int y = SDL_WINDOWPOS_CENTERED;
+  int w = get_requested_window_width();
+  int h = get_requested_window_height();
   Uint32 flags = SDL_WINDOW_FULLSCREEN_DESKTOP;
   int line_height;
-  /* Width and height do not matter because it is fullscreen. */
-  Window *window = SDL_CreateWindow(title, x, y, 1, 1, flags);
+  Window *window;
+  if (w > 0 && h > 0) {
+    log_message("Got requested width and height, setting fullscreen...");
+    /* Do NOT use desktop resolution, use what we provided. */
+    flags = SDL_WINDOW_FULLSCREEN;
+  }
+  window = SDL_CreateWindow(title, x, y, w, h, flags);
   SDL_GetWindowSize(window, width, height);
   line_height = (*height - 2 * MINIMUM_BAR_HEIGHT) / get_lines();
   *bar_height = (*height - get_lines() * line_height) / 2;

@@ -26,6 +26,10 @@ long get_columns(void);
 
 long get_lines(void);
 
+int get_requested_window_width(void);
+
+int get_requested_window_height(void);
+
 long get_padding(void);
 
 int get_player_stops_platforms(void);
