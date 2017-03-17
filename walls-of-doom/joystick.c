@@ -33,6 +33,8 @@ Command command_from_joystick_event(const SDL_Event event) {
   if (event.type == SDL_JOYBUTTONDOWN) {
     if (event.jbutton.button == 2) {
       return COMMAND_JUMP;
+    } else if (event.jbutton.button == 9) {
+      return COMMAND_ENTER;
     }
   } else if (event.type == SDL_JOYAXISMOTION) {
     if (abs(event.jaxis.value) > JOYSTICK_DEAD_ZONE) {
