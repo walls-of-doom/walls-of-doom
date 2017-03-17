@@ -513,6 +513,10 @@ void conceive_bonus(Player *const player, const Perk perk) {
   }
 }
 
+static void accelerate_platform(Platform *const platform) {
+  platform->speed = platform->speed + platform->speed / 2;
+}
+
 static void reverse_platform(Platform *const platform) {
   platform->speed = -platform->speed;
 }
@@ -529,7 +533,9 @@ static void apply_to_platforms(Game *const game, void (*f)(Platform *const p)) {
  */
 void process_curse(Game *const game, const Perk perk) {
   if (is_curse_perk(perk)) {
-    if (perk == PERK_CURSE_REVERSE_PLATFORMS) {
+    if (perk == PERK_CURSE_ACCELERATE_PLATFORMS) {
+      apply_to_platforms(game, accelerate_platform);
+    } else if (perk == PERK_CURSE_REVERSE_PLATFORMS) {
       apply_to_platforms(game, reverse_platform);
     }
   } else {

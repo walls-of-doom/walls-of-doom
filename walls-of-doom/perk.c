@@ -9,7 +9,9 @@ int is_bonus_perk(const Perk perk) {
 }
 
 int is_curse_perk(const Perk perk) {
-  return perk == PERK_CURSE_REVERSE_PLATFORMS;
+  int is_accelerate_platforms = perk == PERK_CURSE_ACCELERATE_PLATFORMS;
+  int is_reverse_platforms = perk == PERK_CURSE_REVERSE_PLATFORMS;
+  return is_accelerate_platforms || is_reverse_platforms;
 }
 
 /**
@@ -28,6 +30,8 @@ char *get_perk_name(Perk perk) {
     return "Super Jump";
   } else if (perk == PERK_POWER_TIME_STOP) {
     return "Time Stop";
+  } else if (perk == PERK_CURSE_ACCELERATE_PLATFORMS) {
+    return "Accelerate Platforms";
   } else if (perk == PERK_CURSE_REVERSE_PLATFORMS) {
     return "Reverse Platforms";
   } else if (perk == PERK_BONUS_EXTRA_POINTS) {
