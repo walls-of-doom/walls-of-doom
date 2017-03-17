@@ -120,6 +120,7 @@ Game create_game(Player *player) {
 }
 
 void destroy_game(Game *game) {
+  destroy_player(game->player);
   game->rigid_matrix = resize_memory(game->rigid_matrix, 0);
   game->box = resize_memory(game->box, 0);
   game->platforms = resize_memory(game->platforms, 0);

@@ -83,7 +83,7 @@ Code game(SDL_Renderer *renderer) {
     return code;
   }
 
-  player = make_player(name);
+  player = create_player(name);
 
   game = create_game(&player);
 

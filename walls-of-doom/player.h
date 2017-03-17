@@ -41,7 +41,8 @@ typedef struct Player {
  *
  * An initialized Player object is an object which is ready to start a game.
  */
-Player make_player(char *name);
+Player create_player(char *name);
+void destroy_player(Player *player);
 
 void player_score_add(Player *player, const Score score);
 

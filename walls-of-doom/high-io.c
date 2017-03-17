@@ -158,6 +158,25 @@ static void draw_absolute_rectangle(const int x, const int y, const int w,
   swap_color(renderer, &swap);
 }
 
+/**
+ * Draws a shaded absolute rectangle based on the provided coordinates.
+ */
+static void draw_shaded_absolute_rectangle(const int x, const int y,
+                                           const int w, const int h,
+                                           Color color, Renderer *renderer) {
+
+  SDL_Color swap = to_sdl_color(color);
+  SDL_Rect rectangle;
+  rectangle.x = x;
+  rectangle.y = y;
+  rectangle.w = w;
+  rectangle.h = h;
+  swap_color(renderer, &swap);
+  SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+  SDL_RenderFillRect(renderer, &rectangle);
+  swap_color(renderer, &swap);
+}
+
 static void draw_absolute_tile_rectangle(int x, int y, Color color,
                                          Renderer *renderer) {
   const int w = get_tile_width();
@@ -165,6 +184,15 @@ static void draw_absolute_tile_rectangle(int x, int y, Color color,
   x += get_border_width();
   y += get_bar_height() + get_border_height();
   draw_absolute_rectangle(x, y, w, h, color, renderer);
+}
+
+static void draw_shaded_absolute_tile_rectangle(int x, int y, Color color,
+                                                Renderer *renderer) {
+  const int w = get_tile_width();
+  const int h = get_tile_height();
+  x += get_border_width();
+  y += get_bar_height() + get_border_height();
+  draw_shaded_absolute_rectangle(x, y, w, h, color, renderer);
 }
 
 static void write_top_bar_strings(char *strings[], Renderer *renderer) {
@@ -302,9 +330,20 @@ static void draw_perk(const Game *const game, Renderer *renderer) {
 }
 
 Code draw_player(const Player *const player, Renderer *renderer) {
-  const int x = player->x;
-  const int y = player->y;
-  draw_absolute_tile_rectangle(x, y, COLOR_PAIR_PLAYER.foreground, renderer);
+  int x = player->x;
+  int y = player->y;
+  size_t i;
+  const size_t head = player->graphics->trail_head;
+  const size_t size = player->graphics->trail_size;
+  const size_t capacity = player->graphics->trail_capacity;
+  Color color = COLOR_PAIR_PLAYER.foreground;
+  draw_absolute_tile_rectangle(x, y, color, renderer);
+  for (i = 0; i < size; i++) {
+    x = player->graphics->trail[(head + i) % capacity].x;
+    y = player->graphics->trail[(head + i) % capacity].y;
+    color.a = (unsigned char)((i + 1) * (255.0 / (capacity + 1)));
+    draw_shaded_absolute_tile_rectangle(x, y, color, renderer);
+  }
   return CODE_OK;
 }
 
