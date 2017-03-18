@@ -198,8 +198,7 @@ void register_score(const Game *const game, SDL_Renderer *renderer) {
   scoreboard_index = save_record(&record);
   position = scoreboard_index + 1;
 
-  sprintf(buffer, "Saved the record successfully");
-  log_message(buffer);
+  log_message("Saved the record successfully");
 
   print_game_result(player, position, renderer);
   wait_for_input();
