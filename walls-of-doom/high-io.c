@@ -3,6 +3,7 @@
 #include "clock.h"
 #include "constants.h"
 #include "game.h"
+#include "joystick.h"
 #include "logger.h"
 #include "memory.h"
 #include "numeric.h"
@@ -528,6 +529,10 @@ Code read_string(const int x, const int y, const char *prompt,
           written--;
           should_rerender = 1;
         } else if (event.key.keysym.sym == SDLK_RETURN) {
+          is_done = 1;
+        }
+      } else if (event.type == SDL_JOYBUTTONDOWN) {
+        if (command_from_joystick_event(event) == COMMAND_ENTER) {
           is_done = 1;
         }
       } else if (event.type == SDL_TEXTINPUT) {
