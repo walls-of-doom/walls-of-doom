@@ -7,10 +7,19 @@
 
 #define JOYSTICK_DEAD_ZONE 4096
 
+/* DualShock constants. L3 and R3 are the analog sticks pressed down. */
 #define DUALSHOCK_TRIANGLE 0
 #define DUALSHOCK_CIRCLE 1
 #define DUALSHOCK_CROSS 2
 #define DUALSHOCK_SQUARE 3
+#define DUALSHOCK_L1 4
+#define DUALSHOCK_L2 6
+#define DUALSHOCK_L3 10
+#define DUALSHOCK_R1 5
+#define DUALSHOCK_R2 7
+#define DUALSHOCK_R3 11
+#define DUALSHOCK_SELECT 8
+#define DUALSHOCK_START 9
 
 static SDL_Joystick *shared_joystick = NULL;
 
@@ -42,9 +51,9 @@ Command command_from_joystick_event(const SDL_Event event) {
       return COMMAND_CONVERT;
     } else if (event.jbutton.button == DUALSHOCK_CROSS) {
       return COMMAND_JUMP;
-    } else if (event.jbutton.button == 9) {
+    } else if (event.jbutton.button == DUALSHOCK_START) {
       return COMMAND_ENTER;
-    } else if (event.jbutton.button == 8) {
+    } else if (event.jbutton.button == DUALSHOCK_SELECT) {
       return COMMAND_PAUSE;
     }
   } else if (event.type == SDL_JOYAXISMOTION) {
