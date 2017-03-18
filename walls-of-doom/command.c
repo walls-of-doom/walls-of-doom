@@ -92,7 +92,7 @@ Code wait_for_input(void) {
       if (event.type == SDL_QUIT) {
         return CODE_QUIT;
       }
-      if (event.type == SDL_KEYDOWN) {
+      if (event.type == SDL_KEYDOWN || event.type == SDL_JOYBUTTONDOWN) {
         return CODE_OK;
       }
     } else {
