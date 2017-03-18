@@ -7,6 +7,11 @@
 
 #define JOYSTICK_DEAD_ZONE 4096
 
+#define DUALSHOCK_TRIANGLE 0
+#define DUALSHOCK_CIRCLE 1
+#define DUALSHOCK_CROSS 2
+#define DUALSHOCK_SQUARE 3
+
 static SDL_Joystick *shared_joystick = NULL;
 
 static void log_joystick_count() {
@@ -31,10 +36,16 @@ void initialize_joystick() {
 
 Command command_from_joystick_event(const SDL_Event event) {
   if (event.type == SDL_JOYBUTTONDOWN) {
-    if (event.jbutton.button == 2) {
+    if (event.jbutton.button == DUALSHOCK_TRIANGLE) {
+      return COMMAND_INVEST;
+    } else if (event.jbutton.button == DUALSHOCK_CIRCLE) {
+      return COMMAND_CONVERT;
+    } else if (event.jbutton.button == DUALSHOCK_CROSS) {
       return COMMAND_JUMP;
     } else if (event.jbutton.button == 9) {
       return COMMAND_ENTER;
+    } else if (event.jbutton.button == 8) {
+      return COMMAND_PAUSE;
     }
   } else if (event.type == SDL_JOYAXISMOTION) {
     if (abs(event.jaxis.value) > JOYSTICK_DEAD_ZONE) {
