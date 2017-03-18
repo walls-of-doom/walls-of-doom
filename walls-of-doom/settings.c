@@ -46,6 +46,8 @@ static int height = -1;
 
 static int player_stops_platforms = 0;
 
+static int joystick_profile = JOYSTICK_PROFILE_DUALSHOCK;
+
 static InvestmentMode investment_mode = INVESTMENT_MODE_PROPORTIONAL;
 
 /* The period of the investment, in seconds .*/
@@ -270,6 +272,12 @@ void initialize_settings(void) {
     } else if (string_equals(key, "LOGGING_PLAYER_SCORE")) {
       limits.fallback = logging_player_score;
       logging_player_score = parse_boolean(value, limits.fallback);
+    } else if (string_equals(key, "JOYSTICK_PROFILE")) {
+      if (string_equals(value, "XBOX")) {
+        joystick_profile = JOYSTICK_PROFILE_XBOX;
+      } else if (string_equals(value, "DUALSHOCK")) {
+        joystick_profile = JOYSTICK_PROFILE_DUALSHOCK;
+      }
     } else if (string_equals(key, "INVESTMENT_MODE")) {
       for (i = 0; i < INVESTMENT_MODE_COUNT; ++i) {
         if (string_equals(value, get_investment_mode_name(i))) {
@@ -354,6 +362,8 @@ int get_requested_window_height(void) { return height; }
 long get_padding(void) { return padding; }
 
 int get_player_stops_platforms(void) { return player_stops_platforms; }
+
+int get_joystick_profile() { return joystick_profile; }
 
 InvestmentMode get_investment_mode(void) { return investment_mode; }
 

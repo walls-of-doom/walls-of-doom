@@ -2,10 +2,27 @@
 #include "command.h"
 #include "constants.h"
 #include "logger.h"
+#include "settings.h"
 
 #include <SDL.h>
 
 #define JOYSTICK_DEAD_ZONE 4096
+
+#define XBOX_A 0
+#define XBOX_B 1
+#define XBOX_X 2
+#define XBOX_Y 3
+#define XBOX_BACK 4
+#define XBOX_GUIDE 5
+#define XBOX_START 6
+#define XBOX_LEFTSTICK 7
+#define XBOX_RIGHTSTICK 8
+#define XBOX_LEFTSHOULDER 9
+#define XBOX_RIGHTSHOULDER 10
+#define XBOX_DPAD_UP 11
+#define XBOX_DPAD_DOWN 12
+#define XBOX_DPAD_LEFT 13
+#define XBOX_DPAD_RIGHT 14
 
 /* DualShock constants. L3 and R3 are the analog sticks pressed down. */
 #define DUALSHOCK_TRIANGLE 0
@@ -43,17 +60,57 @@ void initialize_joystick() {
   }
 }
 
+static int get_invest_button() {
+  if (get_joystick_profile() == JOYSTICK_PROFILE_XBOX) {
+    return XBOX_Y;
+  } else {
+    return DUALSHOCK_TRIANGLE;
+  }
+}
+
+static int get_convert_button() {
+  if (get_joystick_profile() == JOYSTICK_PROFILE_XBOX) {
+    return XBOX_B;
+  } else {
+    return DUALSHOCK_CIRCLE;
+  }
+}
+
+static int get_jump_button() {
+  if (get_joystick_profile() == JOYSTICK_PROFILE_XBOX) {
+    return XBOX_A;
+  } else {
+    return DUALSHOCK_CROSS;
+  }
+}
+
+static int get_enter_button() {
+  if (get_joystick_profile() == JOYSTICK_PROFILE_XBOX) {
+    return XBOX_START;
+  } else {
+    return DUALSHOCK_START;
+  }
+}
+
+static int get_pause_button() {
+  if (get_joystick_profile() == JOYSTICK_PROFILE_XBOX) {
+    return XBOX_BACK;
+  } else {
+    return DUALSHOCK_SELECT;
+  }
+}
+
 Command command_from_joystick_event(const SDL_Event event) {
   if (event.type == SDL_JOYBUTTONDOWN) {
-    if (event.jbutton.button == DUALSHOCK_TRIANGLE) {
+    if (event.jbutton.button == get_invest_button()) {
       return COMMAND_INVEST;
-    } else if (event.jbutton.button == DUALSHOCK_CIRCLE) {
+    } else if (event.jbutton.button == get_convert_button()) {
       return COMMAND_CONVERT;
-    } else if (event.jbutton.button == DUALSHOCK_CROSS) {
+    } else if (event.jbutton.button == get_jump_button()) {
       return COMMAND_JUMP;
-    } else if (event.jbutton.button == DUALSHOCK_START) {
+    } else if (event.jbutton.button == get_enter_button()) {
       return COMMAND_ENTER;
-    } else if (event.jbutton.button == DUALSHOCK_SELECT) {
+    } else if (event.jbutton.button == get_pause_button()) {
       return COMMAND_PAUSE;
     }
   } else if (event.type == SDL_JOYAXISMOTION) {

@@ -9,6 +9,9 @@
 #define MAXIMUM_COLUMNS 384
 #define MAXIMUM_LINES 200
 
+#define JOYSTICK_PROFILE_XBOX 0
+#define JOYSTICK_PROFILE_DUALSHOCK 1
+
 typedef enum RepositionAlgorithm {
   REPOSITION_SELECT_BLINDLY,
   REPOSITION_SELECT_AWARELY
@@ -35,6 +38,8 @@ int get_requested_window_height(void);
 long get_padding(void);
 
 int get_player_stops_platforms(void);
+
+int get_joystick_profile(void);
 
 InvestmentMode get_investment_mode(void);
 
