@@ -7,11 +7,12 @@ void graphics_update_trail(Graphics *graphics, int x, int y) {
   const size_t head = graphics->trail_head;
   const size_t size = graphics->trail_size;
   const size_t index = (head + size) % graphics->trail_capacity;
-  graphics->trail_head = (head + 1) % graphics->trail_capacity;
   graphics->trail[index].x = x;
   graphics->trail[index].y = y;
   if (graphics->trail_size < graphics->trail_capacity) {
     graphics->trail_size++;
+  } else {
+    graphics->trail_head = (head + 1) % graphics->trail_capacity;
   }
 }
 
