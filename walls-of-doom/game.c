@@ -230,9 +230,12 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
      * The rest of the loop is only reached when the game is not paused.
      */
     if (game->paused) {
-      /* This is blocking I/O, differently to what is done when not paused. */
-      command = wait_for_next_command();
+      drawing_delta = draw_game(game, renderer);
+      if (drawing_delta < interval) {
+        sleep_milliseconds(interval - drawing_delta);
+      }
       /* Quitting is still handled right as it is done by the command code. */
+      command = read_next_command();
       code = code_from_command(command);
       if (command == COMMAND_PAUSE) {
         game->paused = 0;
