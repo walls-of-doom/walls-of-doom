@@ -614,21 +614,26 @@ static void update_player_investments(Game *game) {
   game->player->investments = investments;
 }
 
-enum InvestmentType { INVESTMENT_TYPE_MINIMUM, INVESTMENT_TYPE_ALL };
-
-static int get_investment_total(Player *player, enum InvestmentType type) {
+static int get_investment_total(Player *player, InvestmentMode mode) {
   const Score base_amount = get_investment_amount();
-  if (type == INVESTMENT_TYPE_MINIMUM) {
+  const double proportion = get_investment_proportion();
+  Score product;
+  if (mode == INVESTMENT_MODE_FIXED) {
     return base_amount;
-  } else if (type == INVESTMENT_TYPE_ALL) {
-    return (player->score / base_amount) * base_amount;
+  } else if (mode == INVESTMENT_MODE_PROPORTIONAL) {
+    product = player->score * proportion;
+    if (product >= base_amount) {
+      return product;
+    } else {
+      return base_amount;
+    }
   }
   /* Unknown investment type. */
   return 0;
 }
 
-static void invest(Game *game, enum InvestmentType type) {
-  const int amount = get_investment_total(game->player, type);
+static void invest(Game *game, InvestmentMode mode) {
+  const int amount = get_investment_total(game->player, mode);
   Investment *investments = game->player->investments;
   Investment *investment = NULL;
   if (amount == 0) {
@@ -674,9 +679,7 @@ void process_command(Game *game, const Command command) {
   } else if (command == COMMAND_CONVERT) {
     buy_life(game);
   } else if (command == COMMAND_INVEST) {
-    invest(game, INVESTMENT_TYPE_MINIMUM);
-  } else if (command == COMMAND_INVEST_ALL) {
-    invest(game, INVESTMENT_TYPE_ALL);
+    invest(game, get_investment_mode());
   }
 }
 

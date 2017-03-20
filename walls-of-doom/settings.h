@@ -1,6 +1,8 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
+#include "investment.h"
+
 /* These maximums are made public so that static allocation is possible. */
 
 #define MAXIMUM_PLATFORM_COUNT 256
@@ -34,13 +36,17 @@ long get_padding(void);
 
 int get_player_stops_platforms(void);
 
+InvestmentMode get_investment_mode(void);
+
 int get_investment_amount(void);
+
+double get_investment_proportion(void);
 
 int get_investment_period(void);
 
-int get_investment_maximum_factor(void);
+double get_investment_maximum_factor(void);
 
-int get_investment_minimum_factor(void);
+double get_investment_minimum_factor(void);
 
 RendererType get_renderer_type(void);
 
