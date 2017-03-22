@@ -31,6 +31,7 @@ typedef struct Game {
    * Count of frames on which the player was active (not in the initial state).
    */
   unsigned long played_frames;
+  unsigned long limit_played_frames;
 
   int paused;
 

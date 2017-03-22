@@ -209,17 +209,22 @@ static void write_top_bar_strings(char *strings[], Renderer *renderer) {
 /**
  * Draws the top status bar on the screen for a given Player.
  */
-static void draw_top_bar(const Player *const player, Renderer *renderer) {
+static void draw_top_bar(const Game *game, Renderer *renderer) {
+  const Player *player = game->player;
   char lives_buffer[MAXIMUM_STRING_SIZE];
   char score_buffer[MAXIMUM_STRING_SIZE];
+  char time_buffer[MAXIMUM_STRING_SIZE];
   char *strings[TOP_BAR_STRING_COUNT];
   char *perk_name = "No Power";
+  const unsigned long limit = game->limit_played_frames;
+  double time_left = (limit - game->played_frames) / (double)FPS;
+  sprintf(time_buffer, "%.2lf s", time_left);
   if (player->perk != PERK_NONE) {
     perk_name = get_perk_name(player->perk);
   }
   sprintf(lives_buffer, "Lives: %d", player->lives);
   sprintf(score_buffer, "Score: %ld", player->score);
-  strings[0] = GAME_NAME;
+  strings[0] = time_buffer;
   strings[1] = perk_name;
   strings[2] = lives_buffer;
   strings[3] = score_buffer;
@@ -361,7 +366,7 @@ Milliseconds draw_game(const Game *const game, Renderer *renderer) {
   profiler_end("draw_game:clear");
 
   profiler_begin("draw_game:draw_top_bar");
-  draw_top_bar(game->player, renderer);
+  draw_top_bar(game, renderer);
   profiler_end("draw_game:draw_top_bar");
 
   profiler_begin("draw_game:draw_bottom_bar");

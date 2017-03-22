@@ -17,6 +17,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define DEFAULT_LIMIT_PLAYED_MINUTES 2
+#define DEFAULT_LIMIT_PLAYED_SECONDS DEFAULT_LIMIT_PLAYED_MINUTES * 60
+#define DEFAULT_LIMIT_PLAYED_FRAMES DEFAULT_LIMIT_PLAYED_SECONDS *FPS
+
 static size_t get_rigid_matrix_index(const Game *const game, const int x,
                                      const int y) {
   const int base_x = x - game->box->min_x;
@@ -81,6 +85,7 @@ Game create_game(Player *player) {
 
   game.frame = 0;
   game.played_frames = 0;
+  game.limit_played_frames = DEFAULT_LIMIT_PLAYED_FRAMES;
 
   game.paused = 0;
 
@@ -224,7 +229,10 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
   Milliseconds updating_delta = 0;
   Command command = COMMAND_NONE;
   Code code = CODE_OK;
-  while (!is_termination_code(code) && game->player->lives != 0) {
+  int *lives = &game->player->lives;
+  unsigned long *played = &game->played_frames;
+  unsigned long limit = game->limit_played_frames;
+  while (!is_termination_code(code) && *lives != 0 && *played < limit) {
     /**
      * This is the pause trap.
      * The rest of the loop is only reached when the game is not paused.
