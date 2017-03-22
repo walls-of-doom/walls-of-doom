@@ -200,6 +200,7 @@ Code initialize(Window **window, Renderer **renderer) {
     log_message(log_buffer);
     return CODE_ERROR;
   }
+  SDL_ShowCursor(SDL_DISABLE);
   initialize_joystick();
   /* Initialize TTF. */
   if (!TTF_WasInit()) {
