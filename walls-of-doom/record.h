@@ -21,7 +21,7 @@ typedef struct Record {
  * If the name is too big to fit into the array, it is truncated to the maximum
  * possible size.
  */
-Record make_record(const char *name, const int score);
+Record make_record(const char *name, int score);
 
 /**
  * Writes the specified Record to to the system.
@@ -29,7 +29,7 @@ Record make_record(const char *name, const int score);
  * Returns the index of the provided record in the record table or -1 if it
  * didn't make it to the table.
  */
-int save_record(const Record *const record);
+int save_record(Record *record);
 
 /**
  * Reads Records from the system into the specified destination. Reading at
@@ -39,9 +39,6 @@ int save_record(const Record *const record);
  */
 size_t read_records(Record *destination, size_t destination_size);
 
-/**
- * Loads and presents the top scores on the screen.
- */
-Code top_scores(SDL_Renderer *renderer);
+Code top_scores(SDL_Renderer *renderer, CommandTable *table);
 
 #endif

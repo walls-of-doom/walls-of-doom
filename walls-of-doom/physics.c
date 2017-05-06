@@ -43,8 +43,7 @@ static int has_rigid_support(const Game *game, int x, int y, int w, int h) {
   return 0;
 }
 
-static int is_over_platform(const Player *player,
-                            const Platform *const platform) {
+static int is_over_platform(const Player *player, const Platform *const platform) {
   if (player->y + player->h == platform->y) {
     if (player->x < platform->x + platform->w) {
       return player->x + player->w > platform->x;
@@ -184,8 +183,7 @@ static int is_standing_on_platform(const Game *const game) {
   return has_rigid_support(game, x, y, w, h);
 }
 
-static int is_in_front_of_platform(const Player *const player,
-                                   const Platform *const platform) {
+static int is_in_front_of_platform(const Player *const player, const Platform *const platform) {
   if (platform->speed < 0) {
     if (player->x + player->w != platform->x) {
       return 0;
@@ -242,8 +240,7 @@ static int can_move_platform(Game *const game, Platform *p, int dx, int dy) {
  *
  * This function keeps the cached rigid body matrix in the Game object valid.
  */
-static void move_platform(Game *const game, Platform *const platform,
-                          const int dx, const int dy) {
+static void move_platform(Game *const game, Platform *const platform, const int dx, const int dy) {
   if (can_move_platform(game, platform, dx, dy)) {
     subtract_platform(game, platform);
     platform->x += dx;
@@ -252,8 +249,7 @@ static void move_platform(Game *const game, Platform *const platform,
   }
 }
 
-static void move_platform_horizontally(Game *const game,
-                                       Platform *const platform) {
+static void move_platform_horizontally(Game *const game, Platform *const platform) {
   const int normalized_speed = normalize(platform->speed);
   /* This could be made more efficient by handling each direction separately. */
   int pending = abs(get_pending_movement(game, platform->speed));
@@ -418,8 +414,7 @@ static void reposition(Game *const game, Platform *const platform) {
  * Returns 1 if the platform is to the left or to the right of the bounding box.
  * Returns 2 if the platform is above or below the bounding box.
  */
-int is_out_of_bounding_box(Platform *const platform,
-                           const BoundingBox *const box) {
+int is_out_of_bounding_box(Platform *const platform, const BoundingBox *const box) {
   const int min_x = platform->x;
   const int max_x = platform->x + platform->w;
   if (max_x < box->min_x || min_x > box->max_x) {
@@ -513,13 +508,9 @@ void conceive_bonus(Player *const player, const Perk perk) {
   }
 }
 
-static void accelerate_platform(Platform *const platform) {
-  platform->speed = platform->speed + platform->speed / 2;
-}
+static void accelerate_platform(Platform *const platform) { platform->speed = platform->speed + platform->speed / 2; }
 
-static void reverse_platform(Platform *const platform) {
-  platform->speed = -platform->speed;
-}
+static void reverse_platform(Platform *const platform) { platform->speed = -platform->speed; }
 
 static void apply_to_platforms(Game *const game, void (*f)(Platform *const p)) {
   size_t i;
@@ -574,9 +565,7 @@ void update_player_horizontal_position(Game *game) {
   }
 }
 
-static int is_jumping(const Player *const player) {
-  return player->remaining_jump_height > 0;
-}
+static int is_jumping(const Player *const player) { return player->remaining_jump_height > 0; }
 
 void process_jump(Game *const game) {
   const int jumping_height = game->tile_h * PLAYER_JUMPING_HEIGHT;
@@ -656,30 +645,29 @@ static void invest(Game *game, InvestmentMode mode) {
   }
 }
 
-void process_command(Game *game, const Command command) {
-  Player *player = game->player;
-  if (command != COMMAND_NONE) {
+void process_command(Game *game, Player *player) {
+  double *table = player->table->status;
+  if (table[COMMAND_LEFT]) {
+    double speed = -table[COMMAND_LEFT] * PLAYER_RUNNING_SPEED * game->tile_w;
+    player->speed_x = (int)speed;
     player->physics = 1;
+  } else if (table[COMMAND_RIGHT]) {
+    double speed = table[COMMAND_RIGHT] * PLAYER_RUNNING_SPEED * game->tile_w;
+    player->speed_x = (int)speed;
+    player->physics = 1;
+  } else {
+    player->speed_x = (int)0.0;
   }
-  /* Update the player running state */
-  if (command == COMMAND_LEFT) {
-    if (player->speed_x == 0) {
-      player->speed_x = -(PLAYER_RUNNING_SPEED * game->tile_w);
-    } else if (player->speed_x > 0) {
-      player->speed_x = 0;
-    }
-  } else if (command == COMMAND_RIGHT) {
-    if (player->speed_x == 0) {
-      player->speed_x = PLAYER_RUNNING_SPEED * game->tile_w;
-    } else if (player->speed_x < 0) {
-      player->speed_x = 0;
-    }
-  } else if (command == COMMAND_JUMP) {
+  if (table[COMMAND_JUMP]) {
     process_jump(game);
-  } else if (command == COMMAND_CONVERT) {
+    table[COMMAND_JUMP] = 0.0;
+    player->physics = 1;
+  } else if (table[COMMAND_CONVERT]) {
     buy_life(game);
-  } else if (command == COMMAND_INVEST) {
+    table[COMMAND_CONVERT] = 0.0;
+  } else if (table[COMMAND_INVEST]) {
     invest(game, get_investment_mode());
+    table[COMMAND_INVEST] = 0.0;
   }
 }
 
@@ -758,8 +746,7 @@ static void write_perk_faded_message(Game *game, const Perk perk) {
   game_set_message(game, message, 1, 0);
 }
 
-static void write_perk_fading_message(Game *game, const Perk perk,
-                                      const unsigned long remaining_frames) {
+static void write_perk_fading_message(Game *game, const Perk perk, const unsigned long remaining_frames) {
   const int seconds = remaining_frames / FPS;
   char message[MAXIMUM_STRING_SIZE];
   const char *perk_name = get_perk_name(perk);
@@ -834,15 +821,15 @@ static void update_player_graphics(Game *game) {
   graphics_update_trail(game->player->graphics, x, y);
 }
 
-void update_player(Game *game, const Command command) {
+void update_player(Game *game, Player *player) {
   profiler_begin("update_player");
-  if (game->player->physics) {
-    log_player_score(game->played_frames, game->player->score);
+  if (player->physics) {
+    log_player_score(game->played_frames, player->score);
   }
   update_player_graphics(game);
   update_player_perk(game);
   update_player_investments(game);
-  process_command(game, command);
+  process_command(game, player);
   /* This ordering makes the player run horizontally before falling.
    * This seems to be the expected order from an user point-of-view. */
   update_player_horizontal_position(game);

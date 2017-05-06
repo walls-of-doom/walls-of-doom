@@ -8,10 +8,7 @@
 #include <SDL.h>
 #include <stdio.h>
 
-typedef enum ParserResult {
-  PARSER_RESULT_CONTINUE,
-  PARSER_RESULT_QUIT
-} ParserResult;
+typedef enum ParserResult { PARSER_RESULT_CONTINUE, PARSER_RESULT_QUIT } ParserResult;
 
 void log_unrecognized_argument(const char *argument) {
   const size_t start_size = 128;

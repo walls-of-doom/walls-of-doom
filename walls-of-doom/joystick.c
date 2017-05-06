@@ -6,8 +6,6 @@
 
 #include <SDL.h>
 
-#define JOYSTICK_DEAD_ZONE 4096
-
 #define XBOX_A 0
 #define XBOX_B 1
 #define XBOX_X 2
@@ -100,31 +98,36 @@ static int get_pause_button() {
   }
 }
 
+Command command_from_joystick_button(Uint8 button) {
+  if (button == get_invest_button()) {
+    return COMMAND_INVEST;
+  } else if (button == get_convert_button()) {
+    return COMMAND_CONVERT;
+  } else if (button == get_jump_button()) {
+    return COMMAND_JUMP;
+  } else if (button == get_enter_button()) {
+    return COMMAND_ENTER;
+  } else if (button == get_pause_button()) {
+    return COMMAND_PAUSE;
+  }
+  return COMMAND_NONE;
+}
+
 Command command_from_joystick_event(const SDL_Event event) {
-  if (event.type == SDL_JOYBUTTONDOWN) {
-    if (event.jbutton.button == get_invest_button()) {
-      return COMMAND_INVEST;
-    } else if (event.jbutton.button == get_convert_button()) {
-      return COMMAND_CONVERT;
-    } else if (event.jbutton.button == get_jump_button()) {
-      return COMMAND_JUMP;
-    } else if (event.jbutton.button == get_enter_button()) {
-      return COMMAND_ENTER;
-    } else if (event.jbutton.button == get_pause_button()) {
-      return COMMAND_PAUSE;
-    }
+  if (event.type == SDL_JOYBUTTONDOWN || event.type == SDL_JOYBUTTONUP) {
+    return command_from_joystick_button(event.jbutton.button);
   } else if (event.type == SDL_JOYAXISMOTION) {
     if (abs(event.jaxis.value) > JOYSTICK_DEAD_ZONE) {
       if (event.jaxis.axis == 0) {
         if (event.jaxis.value > 0) {
           return COMMAND_RIGHT;
-        } else {
+        } else if (event.jaxis.value < 0) {
           return COMMAND_LEFT;
         }
       } else {
         if (event.jaxis.value > 0) {
           return COMMAND_DOWN;
-        } else {
+        } else if (event.jaxis.value < 0) {
           return COMMAND_UP;
         }
       }

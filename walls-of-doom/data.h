@@ -43,27 +43,23 @@ Code get_full_path(char *buffer, const char *filename);
 /**
  * Writes bytes to the indicated file from the provided source.
  */
-Code write_bytes(const char *filename, const void *source, const size_t size,
-                 const size_t count);
+Code write_bytes(const char *filename, const void *source, const size_t size, const size_t count);
 
 /**
  * Reads bytes from the indicated file to the provided destination.
  */
-Code read_bytes(const char *filename, void *destination, const size_t size,
-                const size_t count);
+Code read_bytes(const char *filename, void *destination, const size_t size, const size_t count);
 
 /**
  * Reads characters from the indicated file into the provided character string.
  */
-Code read_characters(const char *const filename, char *destination,
-                     const size_t destination_size);
+Code read_characters(const char *const filename, char *destination, const size_t destination_size);
 
 /**
  * Reads integers from the indicated file into the provided array.
  *
  * Returns the number of integers read.
  */
-size_t read_integers(const char *const filename, int *integer_array,
-                     const size_t integer_array_size);
+size_t read_integers(const char *const filename, int *integer_array, const size_t integer_array_size);
 
 #endif

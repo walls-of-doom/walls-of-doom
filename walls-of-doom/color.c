@@ -42,9 +42,7 @@ ColorPair color_pair_from_string(const char *string) {
   return pair;
 }
 
-int color_equals(Color a, Color b) {
-  return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
-}
+int color_equals(Color a, Color b) { return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a; }
 
 int color_pair_equals(ColorPair a, ColorPair b) {
   const int fore_equals = color_equals(a.foreground, b.foreground);

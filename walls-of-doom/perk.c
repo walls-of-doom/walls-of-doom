@@ -4,9 +4,7 @@
 
 Perk get_random_perk(void) { return random_integer(0, PERK_COUNT - 1); }
 
-int is_bonus_perk(const Perk perk) {
-  return perk == PERK_BONUS_EXTRA_POINTS || perk == PERK_BONUS_EXTRA_LIFE;
-}
+int is_bonus_perk(const Perk perk) { return perk == PERK_BONUS_EXTRA_POINTS || perk == PERK_BONUS_EXTRA_LIFE; }
 
 int is_curse_perk(const Perk perk) {
   int is_accelerate_platforms = perk == PERK_CURSE_ACCELERATE_PLATFORMS;

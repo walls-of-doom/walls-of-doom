@@ -45,8 +45,7 @@ size_t copy_string(char *destination, const char *source, const size_t size) {
  *
  * NUL terminates the destination string, unless size == 0.
  */
-size_t copy_string_up_to(char *destination, const char *begin, const char *end,
-                         const size_t size) {
+size_t copy_string_up_to(char *destination, const char *begin, const char *end, const size_t size) {
   char *d = destination;
   const char *s = begin;
   /* Copy only size - 1 characters in order to NUL terminate. */

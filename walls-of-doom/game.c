@@ -21,30 +21,30 @@
 #define DEFAULT_LIMIT_PLAYED_SECONDS DEFAULT_LIMIT_PLAYED_MINUTES * 60
 #define DEFAULT_LIMIT_PLAYED_FRAMES DEFAULT_LIMIT_PLAYED_SECONDS *FPS
 
-static size_t get_rigid_matrix_index(const Game *const game, const int x,
-                                     const int y) {
+void print_command_table(CommandTable *table);
+
+char *command_to_string(Command command);
+
+static size_t get_rigid_matrix_index(const Game *const game, const int x, const int y) {
   const int base_x = x - game->box->min_x;
   const int base_y = y - game->box->min_y;
   return base_x + base_y * game->rigid_matrix_n;
 }
 
-unsigned char get_from_rigid_matrix(const Game *const game, const int x,
-                                    const int y) {
+unsigned char get_from_rigid_matrix(const Game *const game, const int x, const int y) {
   if (bounding_box_contains(game->box, x, y)) {
     return game->rigid_matrix[get_rigid_matrix_index(game, x, y)];
   }
   return 0;
 }
 
-void modify_rigid_matrix_point(const Game *const game, const int x, const int y,
-                               const unsigned char delta) {
+void modify_rigid_matrix_point(const Game *const game, const int x, const int y, const unsigned char delta) {
   if (bounding_box_contains(game->box, x, y)) {
     game->rigid_matrix[get_rigid_matrix_index(game, x, y)] += delta;
   }
 }
 
-void modify_rigid_matrix_platform(Game *game, Platform const *platform,
-                                  const unsigned char delta) {
+void modify_rigid_matrix_platform(Game *game, Platform const *platform, const unsigned char delta) {
   int x;
   int y;
   for (x = 0; x < platform->w; ++x) {
@@ -151,8 +151,7 @@ Milliseconds update_game(Game *const game) {
  *
  * This function prevents buffer overflow by truncating the message.
  */
-void game_set_message(Game *const game, const char *message,
-                      const unsigned long duration,
+void game_set_message(Game *const game, const char *message, const unsigned long duration,
                       const unsigned int priority) {
   const int last_has_expired = game->message_end_frame <= game->frame;
   const int last_has_lower_priority = game->message_priority <= priority;
@@ -163,8 +162,7 @@ void game_set_message(Game *const game, const char *message,
   }
 }
 
-static void print_game_result(const Player *player, const int position,
-                              SDL_Renderer *renderer) {
+static void print_game_result(const Player *player, const int position, SDL_Renderer *renderer) {
   const char *name = player->name;
   const Score score = player->score;
   const ColorPair color = COLOR_PAIR_DEFAULT;
@@ -187,7 +185,6 @@ static void print_game_result(const Player *player, const int position,
 
 void register_score(const Game *const game, SDL_Renderer *renderer) {
   const Player *const player = game->player;
-  /* Log that we are registering the score */
   char buffer[MAXIMUM_STRING_SIZE];
   const char *format = "Started registering a score of %d points for %s";
   Record record;
@@ -195,28 +192,12 @@ void register_score(const Game *const game, SDL_Renderer *renderer) {
   int position;
   sprintf(buffer, format, player->score, player->name, renderer);
   log_message(buffer);
-
-  /* The name has already been entered to make the Player object. */
   record = make_record(player->name, player->score);
-
-  /* Write the Record to disk */
   scoreboard_index = save_record(&record);
   position = scoreboard_index + 1;
-
   log_message("Saved the record successfully");
-
   print_game_result(player, position, renderer);
-  wait_for_input();
-}
-
-static Code code_from_command(const Command command) {
-  if (command == COMMAND_CLOSE) {
-    return CODE_CLOSE;
-  } else if (command == COMMAND_QUIT) {
-    return CODE_QUIT;
-  } else {
-    return CODE_OK;
-  }
+  wait_for_input(game->player->table);
 }
 
 /**
@@ -227,25 +208,25 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
   const Milliseconds interval = 1000 / FPS;
   Milliseconds drawing_delta = 0;
   Milliseconds updating_delta = 0;
-  Command command = COMMAND_NONE;
   Code code = CODE_OK;
   int *lives = &game->player->lives;
   unsigned long *played = &game->played_frames;
   unsigned long limit = game->limit_played_frames;
-  while (!is_termination_code(code) && *lives != 0 && *played < limit) {
-    /**
-     * This is the pause trap.
-     * The rest of the loop is only reached when the game is not paused.
-     */
+  CommandTable table;
+  initialize_command_table(&table);
+  while (!game->player->table->status[COMMAND_QUIT] && *lives != 0 && *played < limit) {
     if (game->paused) {
       drawing_delta = draw_game(game, renderer);
       if (drawing_delta < interval) {
         sleep_milliseconds(interval - drawing_delta);
       }
-      /* Quitting is still handled right as it is done by the command code. */
-      command = read_next_command();
-      code = code_from_command(command);
-      if (command == COMMAND_PAUSE) {
+      read_commands(game->player->table);
+      if (test_command_table(game->player->table, COMMAND_CLOSE, 200)) {
+        code = CODE_CLOSE;
+      } else if (test_command_table(game->player->table, COMMAND_CLOSE, 200)) {
+        code = CODE_QUIT;
+      }
+      if (test_command_table(game->player->table, COMMAND_PAUSE, 200)) {
         game->paused = 0;
       }
       continue;
@@ -256,16 +237,13 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
     }
     updating_delta = update_game(game);
     drawing_delta = draw_game(game, renderer);
-    /* Delay, if needed. */
     if (updating_delta + drawing_delta < interval) {
       sleep_milliseconds(interval - updating_delta - drawing_delta);
     }
-    command = read_next_command();
-    code = code_from_command(command);
-    update_player(game, command);
+    read_commands(game->player->table);
+    update_player(game, game->player);
     game->frame++;
-    /* The physics module should not have to handle pausing. */
-    if (command == COMMAND_PAUSE) {
+    if (test_command_table(game->player->table, COMMAND_PAUSE, 200)) {
       game->paused = 1;
     }
   }

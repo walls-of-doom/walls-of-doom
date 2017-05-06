@@ -74,9 +74,7 @@ int get_font_height(void) { return global_monospaced_font_height; }
 
 int get_tile_width(void) { return get_window_width() / (get_columns() + 2); }
 
-int get_tile_height(void) {
-  return (get_window_height() - 2 * get_bar_height()) / (get_lines() + 2);
-}
+int get_tile_height(void) { return (get_window_height() - 2 * get_bar_height()) / (get_lines() + 2); }
 
 int get_border_width(void) {
   const int center_width = get_window_width();
@@ -285,8 +283,7 @@ Code finalize(Window **window, Renderer **renderer) {
   return CODE_OK;
 }
 
-Code print_absolute(const int x, const int y, const char *string,
-                    const ColorPair color_pair, Renderer *renderer) {
+Code print_absolute(const int x, const int y, const char *string, const ColorPair color_pair, Renderer *renderer) {
   char log_buffer[MAXIMUM_STRING_SIZE];
   const SDL_Color foreground = to_sdl_color(color_pair.foreground);
   const SDL_Color background = to_sdl_color(color_pair.background);
@@ -327,6 +324,9 @@ static void remove_first_breaks(char *string) {
   char c;
   size_t i;
   int preserve = 0;
+  if (string == NULL) {
+    return;
+  }
   for (i = 0; string[i] != '\0'; i++) {
     c = string[i];
     if (c == '\n') {
@@ -385,8 +385,7 @@ void print_long_text(char *string, Renderer *renderer) {
 /**
  * Prints the provided strings centered at the specified absolute line.
  */
-Code print_centered_horizontally(const int y, const int string_count,
-                                 char **strings, const ColorPair color_pair,
+Code print_centered_horizontally(const int y, const int string_count, char **strings, const ColorPair color_pair,
                                  Renderer *renderer) {
   char log_buffer[MAXIMUM_STRING_SIZE];
   const SDL_Color foreground = to_sdl_color(color_pair.foreground);
@@ -432,8 +431,7 @@ Code print_centered_horizontally(const int y, const int string_count,
 /**
  * Prints the provided strings centered in the middle of the screen.
  */
-Code print_centered_vertically(const int string_count, char **strings,
-                               const ColorPair color_pair, Renderer *renderer) {
+Code print_centered_vertically(const int string_count, char **strings, const ColorPair color_pair, Renderer *renderer) {
   const int text_line_height = global_monospaced_font_height;
   const int padding = 2 * get_padding() * global_monospaced_font_height;
   const int available_window_height = get_window_height() - padding;

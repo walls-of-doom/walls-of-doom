@@ -107,8 +107,7 @@ void log_access(Operation operation, const size_t bytes, const char *filename) {
 /**
  * Writes bytes to the indicated file from the provided source.
  */
-Code write_bytes(const char *filename, const void *source, const size_t size,
-                 const size_t count) {
+Code write_bytes(const char *filename, const void *source, const size_t size, const size_t count) {
   char log_buffer[MAXIMUM_STRING_SIZE];
   unsigned long long_count;
   unsigned long long_written;
@@ -134,8 +133,7 @@ Code write_bytes(const char *filename, const void *source, const size_t size,
 /**
  * Reads bytes from the indicated file to the provided destination.
  */
-Code read_bytes(const char *filename, void *destination, const size_t size,
-                const size_t count) {
+Code read_bytes(const char *filename, void *destination, const size_t size, const size_t count) {
   char log_buffer[MAXIMUM_STRING_SIZE];
   unsigned long long_count;
   unsigned long long_read;
@@ -164,8 +162,7 @@ Code read_bytes(const char *filename, void *destination, const size_t size,
 /**
  * Reads characters from the indicated file into the provided character string.
  */
-Code read_characters(const char *const filename, char *destination,
-                     const size_t destination_size) {
+Code read_characters(const char *const filename, char *destination, const size_t destination_size) {
   FILE *file;
   size_t copied = 0;
   int c; /* Must be an integer because it may be EOF */
@@ -195,14 +192,12 @@ Code read_characters(const char *const filename, char *destination,
  *
  * Returns the number of integers read.
  */
-size_t read_integers(const char *const filename, int *integer_array,
-                     const size_t integer_array_size) {
+size_t read_integers(const char *const filename, int *integer_array, const size_t integer_array_size) {
   FILE *file;
   size_t next_index = 0;
   file = fopen(filename, "r");
   if (file) {
-    while (next_index < integer_array_size &&
-           fscanf(file, "%d", &integer_array[next_index]) != EOF) {
+    while (next_index < integer_array_size && fscanf(file, "%d", &integer_array[next_index]) != EOF) {
       next_index++;
     }
     fclose(file);

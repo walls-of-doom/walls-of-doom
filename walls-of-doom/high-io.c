@@ -43,8 +43,7 @@ static int is_valid_player_name(const char *player_name) {
  *
  * Returns a Code, which may indicate that the player tried to quit.
  */
-Code read_player_name(char *destination, const size_t maximum_size,
-                      Renderer *renderer) {
+Code read_player_name(char *destination, const size_t maximum_size, Renderer *renderer) {
   int x;
   int y;
   Code code = CODE_ERROR;
@@ -126,8 +125,7 @@ static Code render_borders(Renderer *renderer) {
 /**
  * Prints the provided string on the screen starting at (x, y).
  */
-Code print(const int x, const int y, const char *string,
-           const ColorPair color_pair, Renderer *renderer) {
+Code print(const int x, const int y, const char *string, const ColorPair color_pair, Renderer *renderer) {
   const int absolute_x = get_tile_width() * x;
   const int absolute_y = get_bar_height() + get_tile_height() * (y - 1);
   return print_absolute(absolute_x, absolute_y, string, color_pair, renderer);
@@ -145,8 +143,7 @@ void print_menu(int line_count, char **lines, Renderer *renderer) {
 /**
  * Draws an absolute rectangle based on the provided coordinates.
  */
-static void draw_absolute_rectangle(const int x, const int y, const int w,
-                                    const int h, Color color,
+static void draw_absolute_rectangle(const int x, const int y, const int w, const int h, Color color,
                                     Renderer *renderer) {
   SDL_Color swap = to_sdl_color(color);
   SDL_Rect rectangle;
@@ -162,9 +159,8 @@ static void draw_absolute_rectangle(const int x, const int y, const int w,
 /**
  * Draws a shaded absolute rectangle based on the provided coordinates.
  */
-static void draw_shaded_absolute_rectangle(const int x, const int y,
-                                           const int w, const int h,
-                                           Color color, Renderer *renderer) {
+static void draw_shaded_absolute_rectangle(const int x, const int y, const int w, const int h, Color color,
+                                           Renderer *renderer) {
 
   SDL_Color swap = to_sdl_color(color);
   SDL_Rect rectangle;
@@ -178,8 +174,7 @@ static void draw_shaded_absolute_rectangle(const int x, const int y,
   swap_color(renderer, &swap);
 }
 
-static void draw_absolute_tile_rectangle(int x, int y, Color color,
-                                         Renderer *renderer) {
+static void draw_absolute_tile_rectangle(int x, int y, Color color, Renderer *renderer) {
   const int w = get_tile_width();
   const int h = get_tile_height();
   x += get_border_width();
@@ -187,8 +182,7 @@ static void draw_absolute_tile_rectangle(int x, int y, Color color,
   draw_absolute_rectangle(x, y, w, h, color, renderer);
 }
 
-static void draw_shaded_absolute_tile_rectangle(int x, int y, Color color,
-                                                Renderer *renderer) {
+static void draw_shaded_absolute_tile_rectangle(int x, int y, Color color, Renderer *renderer) {
   const int w = get_tile_width();
   const int h = get_tile_height();
   x += get_border_width();
@@ -257,8 +251,7 @@ static void draw_bottom_bar(const char *message, Renderer *renderer) {
  */
 static void draw_borders(Renderer *renderer) { render_borders(renderer); }
 
-static void draw_platforms(const Platform *platforms,
-                           const size_t platform_count, const BoundingBox *box,
+static void draw_platforms(const Platform *platforms, const size_t platform_count, const BoundingBox *box,
                            Renderer *renderer) {
   const Color color = COLOR_PAIR_PLATFORM.foreground;
   const int x_padding = get_border_width();
@@ -279,12 +272,9 @@ static void draw_platforms(const Platform *platforms,
   }
 }
 
-static int has_active_perk(const Game *const game) {
-  return game->perk != PERK_NONE;
-}
+static int has_active_perk(const Game *const game) { return game->perk != PERK_NONE; }
 
-static void draw_resized_perk(int x, int y, int w, int h, double f,
-                              Renderer *renderer) {
+static void draw_resized_perk(int x, int y, int w, int h, double f, Renderer *renderer) {
   /* The scaled values. */
   const int s_w = (int)(f * w);
   const int s_h = (int)(f * h);
@@ -400,8 +390,7 @@ Milliseconds draw_game(const Game *const game, Renderer *renderer) {
 /**
  * Converts a Record to a human-readable string.
  */
-static void record_to_string(const Record *const record, char *dest,
-                             const int width) {
+static void record_to_string(const Record *const record, char *dest, const int width) {
   const char format[] = "%s%*.*s%d";
   const char *name = record->name;
   const int score = record->score;
@@ -413,8 +402,7 @@ static void record_to_string(const Record *const record, char *dest,
   sprintf(dest, format, name, pad_length, pad_length, pad_string, score);
 }
 
-void print_records(const size_t count, const Record *records,
-                   Renderer *renderer) {
+void print_records(const size_t count, const Record *records, Renderer *renderer) {
   const ColorPair pair = COLOR_PAIR_DEFAULT;
   const int x_padding = 2 * get_padding() * get_font_width();
   const int y_padding = 2 * get_padding() * get_font_height();
@@ -451,8 +439,7 @@ static int is_valid_input_character(char c) { return isalnum(c); }
  * Prints a string starting from (x, y) but limits to its first limit
  * characters.
  */
-static void print_limited(const int x, const int y, const char *string,
-                          const size_t limit, Renderer *renderer) {
+static void print_limited(const int x, const int y, const char *string, const size_t limit, Renderer *renderer) {
   const char ellipsis[] = "...";
   const size_t string_length = strlen(string);
   const size_t ellipsis_length = strlen(ellipsis);
@@ -484,8 +471,8 @@ static void print_limited(const int x, const int y, const char *string,
 /**
  * Reads a string from the user of up to size characters (including NUL).
  */
-Code read_string(const int x, const int y, const char *prompt,
-                 char *destination, const size_t size, Renderer *renderer) {
+Code read_string(const int x, const int y, const char *prompt, char *destination, const size_t size,
+                 Renderer *renderer) {
   const int buffer_x = x + (strlen(prompt) + 1) * get_font_width();
   const int padding_size = get_padding() * get_font_width();
   const int buffer_view_size = get_window_width() - buffer_x - padding_size;

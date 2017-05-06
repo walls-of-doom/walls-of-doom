@@ -65,12 +65,9 @@ void destroy_game(Game *game);
 
 Milliseconds update_game(Game *const game);
 
-unsigned char get_from_rigid_matrix(const Game *const game, const int x,
-                                    const int y);
-void modify_rigid_matrix_point(const Game *const game, const int x, const int y,
-                               const unsigned char delta);
-void modify_rigid_matrix_platform(Game *game, Platform const *platform,
-                                  const unsigned char delta);
+unsigned char get_from_rigid_matrix(const Game *const game, const int x, const int y);
+void modify_rigid_matrix_point(const Game *const game, const int x, const int y, const unsigned char delta);
+void modify_rigid_matrix_platform(Game *game, Platform const *platform, const unsigned char delta);
 
 /**
  * Changes the game message to the provided text, for the provided duration.
@@ -79,9 +76,7 @@ void modify_rigid_matrix_platform(Game *game, Platform const *platform,
  *
  * This function prevents buffer overflow by truncating the message.
  */
-void game_set_message(Game *const game, const char *message,
-                      const unsigned long duration,
-                      const unsigned int priority);
+void game_set_message(Game *const game, const char *message, const unsigned long duration, const unsigned int priority);
 
 /**
  * Runs the main game loop for the Game object and registers the player score.

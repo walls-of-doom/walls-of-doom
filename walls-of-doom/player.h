@@ -1,6 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "command.h"
 #include "graphics.h"
 #include "investment.h"
 #include "perk.h"
@@ -9,6 +10,8 @@
 typedef struct Player {
 
   char *name;
+
+  CommandTable *table;
 
   int x;
   int y;
@@ -41,7 +44,7 @@ typedef struct Player {
  *
  * An initialized Player object is an object which is ready to start a game.
  */
-Player create_player(char *name);
+Player create_player(char name[64], CommandTable *pTable);
 void destroy_player(Player *player);
 
 void player_score_add(Player *player, const Score score);

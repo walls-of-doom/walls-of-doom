@@ -16,16 +16,15 @@
  *
  * The string will be echoed after the prompt, which starts at (x, y).
  */
-Code read_string(const int x, const int y, const char *prompt,
-                 char *destination, const size_t size, Renderer *renderer);
+Code read_string(const int x, const int y, const char *prompt, char *destination, const size_t size,
+                 Renderer *renderer);
 
 /**
  * Attempts to read a player name.
  *
  * Returns a Code, which may indicate that the player tried to quit.
  */
-Code read_player_name(char *destination, const size_t maximum_size,
-                      Renderer *renderer);
+Code read_player_name(char *destination, const size_t maximum_size, Renderer *renderer);
 
 /**
  * Draws a full game to the screen.
@@ -37,8 +36,7 @@ Milliseconds draw_game(const Game *const game, Renderer *renderer);
 /**
  * Prints the provided string on the screen starting at (x, y).
  */
-Code print(const int x, const int y, const char *string,
-           const ColorPair color_pair, Renderer *renderer);
+Code print(const int x, const int y, const char *string, const ColorPair color_pair, Renderer *renderer);
 
 /**
  * Writes the menu, centralized in the string.

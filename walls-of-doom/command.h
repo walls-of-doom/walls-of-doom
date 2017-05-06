@@ -1,7 +1,9 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
+#include "clock.h"
 #include "code.h"
+#include <stdbool.h>
 
 /**
  * The Command enumerated type represents the different commands the user may
@@ -21,23 +23,25 @@ typedef enum Command {
   COMMAND_INVEST_ALL,
   COMMAND_PAUSE,
   COMMAND_QUIT,
-  COMMAND_CLOSE
+  COMMAND_CLOSE,
+  COMMAND_COUNT
 } Command;
 
-/**
- * Reads the next command that needs to be processed.
- *
- * This is the last processable pending command or COMMAND_NONE.
- */
-Command read_next_command(void);
+typedef struct CommandTable {
+  double status[COMMAND_COUNT];
+  Milliseconds last_issued[COMMAND_COUNT];
+  Milliseconds last_modified[COMMAND_COUNT];
+} CommandTable;
 
-/**
- * Waits for the next command, blocking indefinitely.
- */
-Command wait_for_next_command(void);
+void initialize_command_table(CommandTable *table);
+
+bool test_command_table(CommandTable *table, enum Command command, Milliseconds repetition_delay);
+
+void read_commands(CommandTable *table);
+
 /**
  * Waits for any user input, blocking indefinitely.
  */
-Code wait_for_input(void);
+Code wait_for_input(CommandTable *table);
 
 #endif

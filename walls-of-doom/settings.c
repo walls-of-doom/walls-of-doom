@@ -81,9 +81,7 @@ static int platform_min_speed = 1;
 
 static int logging_player_score = 0;
 
-static int is_word_part(char character) {
-  return !isspace(character) && character != '=';
-}
+static int is_word_part(char character) { return !isspace(character) && character != '='; }
 
 static void skip_to_word(const char **input) {
   while (**input != '\0' && !is_word_part(**input)) {
@@ -112,9 +110,7 @@ static void parse_word(const char **input, char *destination) {
   copy_word(input, destination);
 }
 
-static int is_comment_start(const char character) {
-  return character == COMMENT_SYMBOL;
-}
+static int is_comment_start(const char character) { return character == COMMENT_SYMBOL; }
 
 static void skip_comments(const char **input) {
   while (isspace(**input) || is_comment_start(**input)) {
@@ -195,9 +191,7 @@ static int parse_boolean(const char *value, const int fallback) {
   return (int)parse_value(value, boolean_limits);
 }
 
-static ColorPair parse_color(const char *string) {
-  return color_pair_from_string(string);
-}
+static ColorPair parse_color(const char *string) { return color_pair_from_string(string); }
 
 static void log_unused_key(const char *key) {
   char log_buffer[LOG_UNUSED_KEY_STRING_SIZE];
@@ -341,9 +335,7 @@ void initialize_settings(void) {
   }
 }
 
-RepositionAlgorithm get_reposition_algorithm(void) {
-  return reposition_algorithm;
-}
+RepositionAlgorithm get_reposition_algorithm(void) { return reposition_algorithm; }
 
 RendererType get_renderer_type(void) { return renderer_type; }
 

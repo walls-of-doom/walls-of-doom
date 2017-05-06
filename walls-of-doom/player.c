@@ -1,4 +1,5 @@
 #include "player.h"
+#include "command.h"
 #include "graphics.h"
 #include "logger.h"
 #include <limits.h>
@@ -14,9 +15,10 @@
  *
  * An initialized Player object is an object which is ready to start a game.
  */
-Player create_player(char *name) {
+Player create_player(char name[64], CommandTable *table) {
   Player player;
   player.name = name;
+  player.table = table;
   /* Initialize the player to the corner so that it is in a valid state. */
   player.x = 0;
   player.y = 0;

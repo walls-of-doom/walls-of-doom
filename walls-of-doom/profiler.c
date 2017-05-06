@@ -94,9 +94,7 @@ void profiler_end(const char *identifier) {
   update_profiler(identifier, get_milliseconds() - data->stamp);
 }
 
-static double profiler_data_mean(const ProfilerData *const data) {
-  return data->sum / (double)data->frequency;
-}
+static double profiler_data_mean(const ProfilerData *const data) { return data->sum / (double)data->frequency; }
 
 static void profiler_data_copy_base_id(const ProfilerData *data, char *dest) {
   char *colon = strchr(data->identifier, ':');
@@ -130,9 +128,7 @@ static int profiler_data_greater_than(const void *a, const void *b) {
   return -1;
 }
 
-void sort_table(void) {
-  sort(table, table_size, sizeof(ProfilerData), profiler_data_greater_than);
-}
+void sort_table(void) { sort(table, table_size, sizeof(ProfilerData), profiler_data_greater_than); }
 
 void write_statistics(void) {
   char path[MAXIMUM_PATH_SIZE];

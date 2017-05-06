@@ -12,10 +12,7 @@
 #define JOYSTICK_PROFILE_XBOX 0
 #define JOYSTICK_PROFILE_DUALSHOCK 1
 
-typedef enum RepositionAlgorithm {
-  REPOSITION_SELECT_BLINDLY,
-  REPOSITION_SELECT_AWARELY
-} RepositionAlgorithm;
+typedef enum RepositionAlgorithm { REPOSITION_SELECT_BLINDLY, REPOSITION_SELECT_AWARELY } RepositionAlgorithm;
 
 typedef enum RendererType { RENDERER_HARDWARE, RENDERER_SOFTWARE } RendererType;
 

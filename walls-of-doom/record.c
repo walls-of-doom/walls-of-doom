@@ -47,9 +47,7 @@ int compare_records(const Record *const a, const Record *const b) {
   };
 }
 
-int compare_void_records(const void *a, const void *b) {
-  return compare_records((const Record *)a, (const Record *)b);
-}
+int compare_void_records(const void *a, const void *b) { return compare_records((const Record *)a, (const Record *)b); }
 
 /**
  * Writes the default records to the RecordTable.
@@ -161,7 +159,7 @@ void write_table(const RecordTable *const table) {
 /**
  * Writes the specified Record to to the system.
  */
-int save_record(const Record *const record) {
+int save_record(Record *record) {
   int (*comparator)(const void *a, const void *b) = &compare_void_records;
   int record_index;
   RecordTable table;
@@ -214,14 +212,11 @@ size_t read_records(Record *destination, size_t destination_size) {
   return i;
 }
 
-/**
- * Loads and presents the top scores on the screen.
- */
-Code top_scores(SDL_Renderer *renderer) {
+Code top_scores(SDL_Renderer *renderer, CommandTable *table) {
   Milliseconds start = get_milliseconds();
   Record records[MAXIMUM_DISPLAYED_RECORDS];
   const size_t count = read_records(records, MAXIMUM_DISPLAYED_RECORDS);
   print_records(count, records, renderer);
   update_profiler("top_scores", get_milliseconds() - start);
-  return wait_for_input();
+  return wait_for_input(table);
 }
