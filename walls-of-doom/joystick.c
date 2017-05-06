@@ -7,6 +7,7 @@
 #include <SDL.h>
 
 #define JOYSTICK_DEAD_ZONE 4096
+#define MAXIMUM_JOYSTICK_AXIS_VALUE 32768
 
 #define XBOX_A 0
 #define XBOX_B 1
@@ -100,19 +101,24 @@ static int get_pause_button() {
   }
 }
 
+Command command_from_joystick_button(const Uint8 button) {
+  if (button == get_invest_button()) {
+    return COMMAND_INVEST;
+  } else if (button == get_convert_button()) {
+    return COMMAND_CONVERT;
+  } else if (button == get_jump_button()) {
+    return COMMAND_JUMP;
+  } else if (button == get_enter_button()) {
+    return COMMAND_ENTER;
+  } else if (button == get_pause_button()) {
+    return COMMAND_PAUSE;
+  }
+  return COMMAND_NONE;
+}
+
 Command command_from_joystick_event(const SDL_Event event) {
   if (event.type == SDL_JOYBUTTONDOWN) {
-    if (event.jbutton.button == get_invest_button()) {
-      return COMMAND_INVEST;
-    } else if (event.jbutton.button == get_convert_button()) {
-      return COMMAND_CONVERT;
-    } else if (event.jbutton.button == get_jump_button()) {
-      return COMMAND_JUMP;
-    } else if (event.jbutton.button == get_enter_button()) {
-      return COMMAND_ENTER;
-    } else if (event.jbutton.button == get_pause_button()) {
-      return COMMAND_PAUSE;
-    }
+    return command_from_joystick_event(event);
   } else if (event.type == SDL_JOYAXISMOTION) {
     if (abs(event.jaxis.value) > JOYSTICK_DEAD_ZONE) {
       if (event.jaxis.axis == 0) {
@@ -131,6 +137,37 @@ Command command_from_joystick_event(const SDL_Event event) {
     }
   }
   return COMMAND_NONE;
+}
+
+void digest_joystick_event(const SDL_Event event, Player *player) {
+  double magnitude;
+  double *table = player->commands;
+  if (event.type == SDL_JOYBUTTONDOWN) {
+    table[command_from_joystick_event(event)] = 1.0;
+  } else if (event.type == SDL_JOYBUTTONUP) {
+    table[command_from_joystick_event(event)] = 0.0;
+  } else if (event.type == SDL_JOYAXISMOTION) {
+    if (abs(event.jaxis.value) > JOYSTICK_DEAD_ZONE) {
+      magnitude = event.jaxis.value / (double)MAXIMUM_JOYSTICK_AXIS_VALUE;
+      if (event.jaxis.axis == 0) {
+        if (event.jaxis.value > 0) {
+          table[COMMAND_RIGHT] = magnitude;
+          table[COMMAND_LEFT] = 0.0;
+        } else {
+          table[COMMAND_RIGHT] = 0.0;
+          table[COMMAND_LEFT] = magnitude;
+        }
+      } else {
+        if (event.jaxis.value > 0) {
+          table[COMMAND_DOWN] = magnitude;
+          table[COMMAND_UP] = 0.0;
+        } else {
+          table[COMMAND_UP] = magnitude;
+          table[COMMAND_DOWN] = 0.0;
+        }
+      }
+    }
+  }
 }
 
 void finalize_joystick() {

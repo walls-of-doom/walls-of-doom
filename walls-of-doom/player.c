@@ -15,8 +15,12 @@
  * An initialized Player object is an object which is ready to start a game.
  */
 Player create_player(char *name) {
+  int i;
   Player player;
   player.name = name;
+  for (i = 0; i < COMMAND_COUNT; i++) {
+    player.commands[i] = 0.0;
+  }
   /* Initialize the player to the corner so that it is in a valid state. */
   player.x = 0;
   player.y = 0;

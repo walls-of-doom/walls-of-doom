@@ -21,7 +21,8 @@ typedef enum Command {
   COMMAND_INVEST_ALL,
   COMMAND_PAUSE,
   COMMAND_QUIT,
-  COMMAND_CLOSE
+  COMMAND_CLOSE,
+  COMMAND_COUNT
 } Command;
 
 /**

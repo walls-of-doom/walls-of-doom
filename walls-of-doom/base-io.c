@@ -327,6 +327,9 @@ static void remove_first_breaks(char *string) {
   char c;
   size_t i;
   int preserve = 0;
+  if (string == NULL) {
+    return;
+  }
   for (i = 0; string[i] != '\0'; i++) {
     c = string[i];
     if (c == '\n') {

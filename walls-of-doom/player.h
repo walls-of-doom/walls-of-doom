@@ -1,6 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "command.h"
 #include "graphics.h"
 #include "investment.h"
 #include "perk.h"
@@ -9,6 +10,9 @@
 typedef struct Player {
 
   char *name;
+
+  /* All the active commands and their magnitude. */
+  double commands[COMMAND_COUNT];
 
   int x;
   int y;
