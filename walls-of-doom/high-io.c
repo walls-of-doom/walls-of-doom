@@ -218,7 +218,7 @@ static void draw_top_bar(const Game *game, Renderer *renderer) {
   char *perk_name = "No Power";
   const unsigned long limit = game->limit_played_frames;
   double time_left = (limit - game->played_frames) / (double)FPS;
-  sprintf(time_buffer, "%.2lf s", time_left);
+  sprintf(time_buffer, "%.2f s", time_left);
   if (player->perk != PERK_NONE) {
     perk_name = get_perk_name(player->perk);
   }
