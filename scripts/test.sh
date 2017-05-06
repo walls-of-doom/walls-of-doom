@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 #
 # This is the script used to run the tests in Semaphore CI
-cd build/tests/
+cd build
+make
+cd tests
 ./tests
 cd ../../
