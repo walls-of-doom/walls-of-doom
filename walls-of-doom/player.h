@@ -12,7 +12,7 @@ typedef struct Player {
   char *name;
 
   /* All the active commands and their magnitude. */
-  double commands[COMMAND_COUNT];
+  CommandTable table;
 
   int x;
   int y;

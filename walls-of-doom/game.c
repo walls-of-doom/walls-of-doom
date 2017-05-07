@@ -232,7 +232,8 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
   int *lives = &game->player->lives;
   unsigned long *played = &game->played_frames;
   unsigned long limit = game->limit_played_frames;
-  while (!is_termination_code(code) && *lives != 0 && *played < limit) {
+  while (!game->player->table.table[COMMAND_QUIT] && *lives != 0 &&
+         *played < limit) {
     /**
      * This is the pause trap.
      * The rest of the loop is only reached when the game is not paused.
@@ -260,12 +261,11 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
     if (updating_delta + drawing_delta < interval) {
       sleep_milliseconds(interval - updating_delta - drawing_delta);
     }
-    command = read_next_command();
-    code = code_from_command(command);
-    update_player(game, command);
+    read_commands(&game->player->table);
+    update_player(game, game->player);
     game->frame++;
     /* The physics module should not have to handle pausing. */
-    if (command == COMMAND_PAUSE) {
+    if (game->player->table.table[COMMAND_PAUSE]) {
       game->paused = 1;
     }
   }

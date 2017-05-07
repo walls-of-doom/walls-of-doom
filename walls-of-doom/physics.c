@@ -656,30 +656,31 @@ static void invest(Game *game, InvestmentMode mode) {
   }
 }
 
-void process_command(Game *game, const Command command) {
-  Player *player = game->player;
-  if (command != COMMAND_NONE) {
-    player->physics = 1;
-  }
+void process_command(Game *game, Player *player) {
+  double speed = 0.0;
+  double *table = player->table.table;
   /* Update the player running state */
-  if (command == COMMAND_LEFT) {
-    if (player->speed_x == 0) {
-      player->speed_x = -(PLAYER_RUNNING_SPEED * game->tile_w);
-    } else if (player->speed_x > 0) {
-      player->speed_x = 0;
-    }
-  } else if (command == COMMAND_RIGHT) {
-    if (player->speed_x == 0) {
-      player->speed_x = PLAYER_RUNNING_SPEED * game->tile_w;
-    } else if (player->speed_x < 0) {
-      player->speed_x = 0;
-    }
-  } else if (command == COMMAND_JUMP) {
+  if (table[COMMAND_LEFT]) {
+    speed = -table[COMMAND_LEFT] * PLAYER_RUNNING_SPEED * game->tile_w;
+    player->speed_x = speed;
+    player->physics = 1;
+  } else if (table[COMMAND_RIGHT]) {
+    speed = table[COMMAND_RIGHT] * PLAYER_RUNNING_SPEED * game->tile_w;
+    player->speed_x = speed;
+    player->physics = 1;
+  } else {
+    player->speed_x = 0.0;
+  }
+  if (table[COMMAND_JUMP]) {
     process_jump(game);
-  } else if (command == COMMAND_CONVERT) {
+    table[COMMAND_JUMP] = 0.0;
+    player->physics = 1;
+  } else if (table[COMMAND_CONVERT]) {
     buy_life(game);
-  } else if (command == COMMAND_INVEST) {
+    table[COMMAND_CONVERT] = 0.0;
+  } else if (table[COMMAND_INVEST]) {
     invest(game, get_investment_mode());
+    table[COMMAND_INVEST] = 0.0;
   }
 }
 
@@ -834,15 +835,15 @@ static void update_player_graphics(Game *game) {
   graphics_update_trail(game->player->graphics, x, y);
 }
 
-void update_player(Game *game, const Command command) {
+void update_player(Game *game, Player *player) {
   profiler_begin("update_player");
-  if (game->player->physics) {
-    log_player_score(game->played_frames, game->player->score);
+  if (player->physics) {
+    log_player_score(game->played_frames, player->score);
   }
   update_player_graphics(game);
   update_player_perk(game);
   update_player_investments(game);
-  process_command(game, command);
+  process_command(game, player);
   /* This ordering makes the player run horizontally before falling.
    * This seems to be the expected order from an user point-of-view. */
   update_player_horizontal_position(game);

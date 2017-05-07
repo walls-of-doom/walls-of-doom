@@ -29,7 +29,7 @@ void update_platforms(Game *const game);
 
 void update_perk(Game *const game);
 
-void update_player(Game *game, Command command);
+void update_player(Game *game, Player *player);
 
 void reposition_player(Game *const game);
 

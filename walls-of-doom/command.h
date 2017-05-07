@@ -25,6 +25,12 @@ typedef enum Command {
   COMMAND_COUNT
 } Command;
 
+typedef struct CommandTable { double table[COMMAND_COUNT]; } CommandTable;
+
+void initialize_command_table(CommandTable *table);
+
+void read_commands(CommandTable *table);
+
 /**
  * Reads the next command that needs to be processed.
  *

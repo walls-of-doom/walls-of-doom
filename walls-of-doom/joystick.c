@@ -139,9 +139,8 @@ Command command_from_joystick_event(const SDL_Event event) {
   return COMMAND_NONE;
 }
 
-void digest_joystick_event(const SDL_Event event, Player *player) {
+void digest_joystick_event(const SDL_Event event, double *table) {
   double magnitude;
-  double *table = player->commands;
   if (event.type == SDL_JOYBUTTONDOWN) {
     table[command_from_joystick_event(event)] = 1.0;
   } else if (event.type == SDL_JOYBUTTONUP) {
