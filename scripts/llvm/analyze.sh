@@ -6,7 +6,7 @@ if [ ! -f $COMPILATION_DATABASE ]; then
 fi
 
 echo Analyzing...
-clang-tidy walls-of-doom/*.[c]
-clang-tidy tests/*.[c]
+clang-check -analyze walls-of-doom/*.[c]
+clang-check -analyze tests/*.[c]
 
 echo "Done after $SECONDS seconds."

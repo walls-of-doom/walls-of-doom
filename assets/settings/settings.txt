@@ -1,15 +1,18 @@
-# Optimized for 1920 x 1080 screens (or multiples).
-# More two columns are used in border calculations.
-# 1920 / (94 + 2) = 20
-COLUMNS = 94
-# More two lines are used in border calculations.
-# (1080 - (40 * 2)) / (48 + 2) = 20
-LINES = 48
+COLUMNS = 100
+LINES = 50
+
+# You can provide your own window dimensions.
+# Uncomment the following lines to try it.
+# WIDTH = 640
+# HEIGHT = 360
 
 FONT_SIZE = 20
 
 # Change to SOFTWARE if hardware rendering is not available.
 RENDERER_TYPE = HARDWARE
+
+# Can be either DUALSHOCK or XBOX.
+JOYSTICK_PROFILE = DUALSHOCK
 
 PLATFORM_COUNT = 16
 PLATFORM_MAXIMUM_WIDTH = 16
@@ -19,7 +22,8 @@ PLATFORM_MINIMUM_SPEED = 4
 
 REPOSITION_ALGORITHM = REPOSITION_SELECT_AWARELY
 
-LOGGING_PLAYER_SCORE = 1
+# Logging the player score may negatively impact game performance.
+LOGGING_PLAYER_SCORE = 0
 
 PLAYER_STOPS_PLATFORMS = 0
 
@@ -29,7 +33,14 @@ COLOR_PAIR_TOP_BAR = 222222FF,FF6961FF
 COLOR_PAIR_PLATFORM = BBBBBBFF,AAAAAAFF
 COLOR_PAIR_BOTTOM_BAR = 222222FF,6699CCFF
 
-INVESTMENT_AMOUNT = 60
+# How investments are made.
+# Either FIXED or PROPORTIONAL.
+# FIXED invests a fixed amount of points.
+# PROPORTIONAL invests a proportion of points, or the minimum amount.
+INVESTMENT_MODE = PROPORTIONAL
+INVESTMENT_AMOUNT = 50
+INVESTMENT_PROPORTION = 0.4
 INVESTMENT_PERIOD = 15
-INVESTMENT_MINIMUM_FACTOR = 90
-INVESTMENT_MAXIMUM_FACTOR = 140
+# Return rules, from 75% to 150% of what was invested.
+INVESTMENT_MINIMUM_FACTOR = 0.75
+INVESTMENT_MAXIMUM_FACTOR = 1.50

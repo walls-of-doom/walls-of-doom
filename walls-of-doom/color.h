@@ -33,6 +33,7 @@ int color_pair_equals(ColorPair a, ColorPair b);
 
 SDL_Color to_sdl_color(Color color);
 Color color_from_rgb(unsigned char r, unsigned char g, unsigned char b);
+Color mix_colors(Color a, Color b);
 ColorPair color_pair_from_colors(Color foreground, Color background);
 
 #endif

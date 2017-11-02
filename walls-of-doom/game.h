@@ -31,8 +31,12 @@ typedef struct Game {
    * Count of frames on which the player was active (not in the initial state).
    */
   unsigned long played_frames;
+  unsigned long limit_played_frames;
 
   int paused;
+
+  int tile_w;
+  int tile_h;
 
   Perk perk;
   int perk_x;
@@ -55,8 +59,7 @@ typedef struct Game {
 /**
  * Creates a new Game object with the provided objects.
  */
-Game create_game(Player *player, Platform *platforms,
-                 const size_t platform_count, BoundingBox *box);
+Game create_game(Player *player);
 
 void destroy_game(Game *game);
 

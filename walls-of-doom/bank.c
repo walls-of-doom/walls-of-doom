@@ -10,8 +10,8 @@
 static double get_average_width(Game const *const game) {
   double total = 0.0;
   size_t i;
-  for (i = 0; i != game->platform_count; ++i) {
-    total += game->platforms[i].width;
+  for (i = game->platform_count - 1; i; --i) {
+    total += game->platforms[i].w;
   }
   return total / (double)game->platform_count;
 }
@@ -19,7 +19,7 @@ static double get_average_width(Game const *const game) {
 static double get_average_speed(Game const *const game) {
   double total = 0.0;
   size_t i;
-  for (i = 0; i != game->platform_count; ++i) {
+  for (i = game->platform_count - 1; i; --i) {
     total += abs(game->platforms[i].speed);
   }
   return total / (double)game->platform_count;
@@ -35,10 +35,10 @@ static void log_difficulty(const double difficulty) {
  * Returns a normalized value (from 0 to 1) indicating the game difficulty.
  */
 static double get_difficulty(Game const *const game) {
-  const int min_width = get_platform_min_width();
-  const int max_width = get_platform_max_width();
-  const int min_speed = get_platform_min_speed();
-  const int max_speed = get_platform_max_speed();
+  const int min_width = get_platform_min_width() * game->tile_w;
+  const int max_width = get_platform_max_width() * game->tile_w;
+  const int min_speed = get_platform_min_speed() * game->tile_w;
+  const int max_speed = get_platform_max_speed() * game->tile_w;
   const double avg_width = (min_width + max_width) / 2.0;
   const double avg_speed = (min_speed + max_speed) / 2.0;
   const double game_avg_width = get_average_width(game);
@@ -58,11 +58,16 @@ static double get_difficulty(Game const *const game) {
 }
 
 int collect_investment(Game const *const game, const Investment investment) {
-  const Score max_return = get_investment_maximum_factor();
-  const Score min_return = get_investment_minimum_factor();
-  const Score difference = max_return - min_return;
-  const Score normalized_delta = (Score)(get_difficulty(game) * difference);
-  const Score normalized_max_return = min_return + normalized_delta;
-  const Score random_factor = random_integer(min_return, normalized_max_return);
-  return random_factor * investment.amount / 100;
+  /* We generate random integers instead of doubles. */
+  /* Therefore we have to scale the double up then divide by an integer. */
+  const int scaling_factor = 1000;
+  const double max_return = get_investment_maximum_factor();
+  const double min_return = get_investment_minimum_factor();
+  const double difference = max_return - min_return;
+  const double normalized_delta = get_difficulty(game) * difference;
+  const double normalized_max_return = min_return + normalized_delta;
+  const int min_random = scaling_factor * min_return;
+  const int max_random = scaling_factor * normalized_max_return;
+  const double random_factor = random_integer(min_random, max_random);
+  return random_factor * investment.amount / scaling_factor;
 }

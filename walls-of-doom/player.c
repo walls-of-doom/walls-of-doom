@@ -1,4 +1,6 @@
 #include "player.h"
+#include "command.h"
+#include "graphics.h"
 #include "logger.h"
 #include <limits.h>
 #include <stdlib.h>
@@ -6,17 +8,22 @@
 #define MAXIMUM_PLAYER_SCORE LONG_MAX
 #define MINIMUM_PLAYER_SCORE 0
 
+#define DEFAULT_TRAIL_SIZE 4
+
 /**
  * Returns an initialized Player object with the provided name.
  *
  * An initialized Player object is an object which is ready to start a game.
  */
-Player make_player(char *name) {
+Player create_player(char *name) {
   Player player;
   player.name = name;
+  initialize_command_table(&player.table);
   /* Initialize the player to the corner so that it is in a valid state. */
   player.x = 0;
   player.y = 0;
+  player.w = 0;
+  player.h = 0;
   player.speed_x = 0;
   player.speed_y = 0;
   player.physics = 0;
@@ -27,7 +34,14 @@ Player make_player(char *name) {
   player.perk = PERK_NONE;
   player.perk_end_frame = 0;
   player.investments = NULL;
+  player.graphics = create_graphics(DEFAULT_TRAIL_SIZE);
   return player;
+}
+
+void destroy_player(Player *player) {
+  if (player != NULL) {
+    destroy_graphics(player->graphics);
+  }
 }
 
 void player_score_add(Player *player, const Score score) {

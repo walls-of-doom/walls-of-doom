@@ -1,12 +1,12 @@
-#include "unity.h"
 #include "data.h"
-#include "io.h"
+#include "high-io.h"
 #include "logger.h"
 #include "memory.h"
 #include "numeric.h"
 #include "random.h"
 #include "sort.h"
 #include "text.h"
+#include "unity.h"
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -35,7 +35,7 @@ void test_resize_memory(void) {
   chunk = resize_memory(chunk, RESIZE_MEMORY_SIZE);
   TEST_ASSERT_TRUE(chunk != NULL);
   /* If allocation worked, we can write to this chunk. */
-  memset(chunk, INT_MAX, RESIZE_MEMORY_SIZE);
+  memset(chunk, 255, RESIZE_MEMORY_SIZE);
   chunk = resize_memory(chunk, 0);
   TEST_ASSERT_TRUE(chunk == NULL);
 }
@@ -85,7 +85,7 @@ void test_get_full_path_checks_for_buffer_overflow(void) {
   char buffer[MAXIMUM_PATH_SIZE];
   char big_filename[MAXIMUM_PATH_SIZE];
   Code code;
-  memset(big_filename, '0', MAXIMUM_PATH_SIZE);
+  memset(big_filename, 'A', MAXIMUM_PATH_SIZE);
   big_filename[MAXIMUM_PATH_SIZE - 1] = '\0';
   code = get_full_path(buffer, big_filename);
   TEST_ASSERT_EQUAL(CODE_ERROR, code);
@@ -377,7 +377,7 @@ void test_generate_platforms_avoids_multiple_platforms_on_the_same_line(void) {
   box.min_y = 0;
   box.max_x = platform_count - 1;
   box.max_y = platform_count - 1;
-  generate_platforms(platforms, &box, platform_count);
+  generate_platforms(platforms, &box, platform_count, 1, 1);
   /* Each platform in platforms should have a different y coordinate. */
   for (i = 0; i < platform_count; i++) {
     y = platforms[i].y;

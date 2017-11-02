@@ -3,7 +3,7 @@
 #include "constants.h"
 #include "data.h"
 #include "game.h"
-#include "io.h"
+#include "high-io.h"
 #include "logger.h"
 #include "memory.h"
 #include "physics.h"
@@ -30,7 +30,6 @@ typedef struct Menu {
 void write_menu(const Menu *const menu, SDL_Renderer *renderer) {
   const size_t entries = menu->option_count + 1;
   const size_t string_count = 2 * entries - 1;
-  char const *const *const_strings = NULL;
   char **strings = NULL;
   char *source = NULL;
   const char hint_format[] = "> %s <";
@@ -38,7 +37,6 @@ void write_menu(const Menu *const menu, SDL_Renderer *renderer) {
   size_t option_index;
   size_t i;
   strings = resize_memory(strings, sizeof(char *) * string_count);
-  const_strings = (char const *const *)strings;
   for (i = 0; i < string_count; i++) {
     strings[i] = NULL;
     strings[i] = resize_memory(strings[i], MAXIMUM_STRING_SIZE);
@@ -61,7 +59,7 @@ void write_menu(const Menu *const menu, SDL_Renderer *renderer) {
       copy_string(strings[i], "", MAXIMUM_STRING_SIZE);
     }
   }
-  print_menu(string_count, const_strings, renderer);
+  print_menu(string_count, strings, renderer);
   /* Free the strings. */
   for (i = 0; i < string_count; i++) {
     resize_memory(strings[i], 0);
@@ -70,23 +68,12 @@ void write_menu(const Menu *const menu, SDL_Renderer *renderer) {
   resize_memory(strings, 0);
 }
 
-static BoundingBox create_bounding_box(void) {
-  BoundingBox box;
-  box.min_x = 0;
-  box.min_y = 0;
-  box.max_x = get_columns() - 1;
-  box.max_y = get_lines() - 1;
-  return box;
-}
-
 /**
  * Enters the game.
  */
 Code game(SDL_Renderer *renderer) {
   char name[MAXIMUM_PLAYER_NAME_SIZE];
   Player player;
-  Platform platforms[MAXIMUM_PLATFORM_COUNT];
-  BoundingBox box;
   Game game;
   Code code;
 
@@ -96,15 +83,9 @@ Code game(SDL_Renderer *renderer) {
     return code;
   }
 
-  player = make_player(name);
-  player.x = get_columns() / 2;
-  player.y = get_lines() / 2;
+  player = create_player(name);
 
-  box = create_bounding_box();
-
-  generate_platforms(platforms, &box, get_platform_count());
-
-  game = create_game(&player, platforms, get_platform_count(), &box);
+  game = create_game(&player);
 
   code = run_game(&game, renderer);
 

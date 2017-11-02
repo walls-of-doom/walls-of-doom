@@ -2,10 +2,12 @@
 #include "color.h"
 #include "constants.h"
 #include "data.h"
+#include "investment.h"
 #include "logger.h"
 #include "text.h"
 #include <ctype.h>
 #include <errno.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -36,7 +38,17 @@ static long columns = 80;
 static const long MINIMUM_LINES = 20;
 static long lines = 30;
 
+/* SDL has a limit at 16384. */
+static const long MAXIMUM_DIMENSION = 16384;
+static const long MINIMUM_DIMENSION = 240;
+static int width = -1;
+static int height = -1;
+
 static int player_stops_platforms = 0;
+
+static int joystick_profile = JOYSTICK_PROFILE_DUALSHOCK;
+
+static InvestmentMode investment_mode = INVESTMENT_MODE_PROPORTIONAL;
 
 /* The period of the investment, in seconds .*/
 static const long MAXIMUM_INVESTMENT_PERIOD = 300;
@@ -47,13 +59,17 @@ static const long MAXIMUM_INVESTMENT_AMOUNT = 12000;
 static const long MINIMUM_INVESTMENT_AMOUNT = 1;
 static long investment_amount = 60;
 
-static const long MAXIMUM_INVESTMENT_MAXIMUM_FACTOR = 1000;
-static const long MINIMUM_INVESTMENT_MAXIMUM_FACTOR = 100;
-static long investment_maximum_factor = 140;
+static const double MAXIMUM_INVESTMENT_PROPORTION = 1.0;
+static const double MINIMUM_INVESTMENT_PROPORTION = 0.1;
+static double investment_proportion = 60;
 
-static const long MAXIMUM_INVESTMENT_MINIMUM_FACTOR = 1000;
-static const long MINIMUM_INVESTMENT_MINIMUM_FACTOR = 0;
-static long investment_minimum_factor = 90;
+static const double MAXIMUM_INVESTMENT_MAXIMUM_FACTOR = 5.0;
+static const double MINIMUM_INVESTMENT_MAXIMUM_FACTOR = 1.0;
+static double investment_maximum_factor = 1.50;
+
+static const double MAXIMUM_INVESTMENT_MINIMUM_FACTOR = 0.0;
+static const double MINIMUM_INVESTMENT_MINIMUM_FACTOR = 1.0;
+static double investment_minimum_factor = 0.75;
 
 static RendererType renderer_type = RENDERER_HARDWARE;
 
@@ -128,6 +144,30 @@ struct Limits {
   long fallback;
 };
 
+struct DoubleLimits {
+  double minimum;
+  double maximum;
+  double fallback;
+};
+
+static double parse_double(const char *value, struct DoubleLimits limits) {
+  double number;
+  errno = 0;
+  number = strtod(value, NULL);
+  if (errno) {
+    log_message("Failed to read double from input string!");
+    errno = 0;
+    return limits.fallback;
+  }
+  if (number < limits.minimum) {
+    return limits.minimum;
+  }
+  if (number > limits.maximum) {
+    return limits.maximum;
+  }
+  return number;
+}
+
 static long parse_value(const char *value, struct Limits limits) {
   long integer;
   errno = 0;
@@ -171,6 +211,8 @@ void initialize_settings(void) {
   char value[SETTINGS_STRING_SIZE];
   const char *read = input;
   struct Limits limits;
+  struct DoubleLimits double_limits;
+  int i;
   read_characters(SETTINGS_FILE, input, SETTINGS_BUFFER_SIZE);
   while (parse_line(&read, key, value)) {
     if (string_equals(key, "REPOSITION_ALGORITHM")) {
@@ -202,6 +244,16 @@ void initialize_settings(void) {
       limits.maximum = MAXIMUM_LINES;
       limits.fallback = lines;
       lines = parse_value(value, limits);
+    } else if (string_equals(key, "WIDTH")) {
+      limits.minimum = MINIMUM_DIMENSION;
+      limits.maximum = MAXIMUM_DIMENSION;
+      limits.fallback = width;
+      width = parse_value(value, limits);
+    } else if (string_equals(key, "HEIGHT")) {
+      limits.minimum = MINIMUM_DIMENSION;
+      limits.maximum = MAXIMUM_DIMENSION;
+      limits.fallback = height;
+      height = parse_value(value, limits);
     } else if (string_equals(key, "COLOR_PAIR_DEFAULT")) {
       COLOR_PAIR_DEFAULT = parse_color(value);
     } else if (string_equals(key, "COLOR_PAIR_PERK")) {
@@ -220,26 +272,43 @@ void initialize_settings(void) {
     } else if (string_equals(key, "LOGGING_PLAYER_SCORE")) {
       limits.fallback = logging_player_score;
       logging_player_score = parse_boolean(value, limits.fallback);
+    } else if (string_equals(key, "JOYSTICK_PROFILE")) {
+      if (string_equals(value, "XBOX")) {
+        joystick_profile = JOYSTICK_PROFILE_XBOX;
+      } else if (string_equals(value, "DUALSHOCK")) {
+        joystick_profile = JOYSTICK_PROFILE_DUALSHOCK;
+      }
+    } else if (string_equals(key, "INVESTMENT_MODE")) {
+      for (i = 0; i < INVESTMENT_MODE_COUNT; ++i) {
+        if (string_equals(value, get_investment_mode_name(i))) {
+          investment_mode = i;
+        }
+      }
     } else if (string_equals(key, "INVESTMENT_AMOUNT")) {
       limits.minimum = MINIMUM_INVESTMENT_AMOUNT;
       limits.maximum = MAXIMUM_INVESTMENT_AMOUNT;
       limits.fallback = investment_amount;
       investment_amount = parse_value(value, limits);
+    } else if (string_equals(key, "INVESTMENT_PROPORTION")) {
+      double_limits.minimum = MINIMUM_INVESTMENT_PROPORTION;
+      double_limits.maximum = MAXIMUM_INVESTMENT_PROPORTION;
+      double_limits.fallback = investment_proportion;
+      investment_proportion = parse_double(value, double_limits);
     } else if (string_equals(key, "INVESTMENT_PERIOD")) {
       limits.minimum = MINIMUM_INVESTMENT_PERIOD;
       limits.maximum = MAXIMUM_INVESTMENT_PERIOD;
       limits.fallback = investment_period;
       investment_period = parse_value(value, limits);
     } else if (string_equals(key, "INVESTMENT_MAXIMUM_FACTOR")) {
-      limits.minimum = MINIMUM_INVESTMENT_MAXIMUM_FACTOR;
-      limits.maximum = MAXIMUM_INVESTMENT_MAXIMUM_FACTOR;
-      limits.fallback = investment_maximum_factor;
-      investment_maximum_factor = parse_value(value, limits);
+      double_limits.minimum = MINIMUM_INVESTMENT_MAXIMUM_FACTOR;
+      double_limits.maximum = MAXIMUM_INVESTMENT_MAXIMUM_FACTOR;
+      double_limits.fallback = investment_maximum_factor;
+      investment_maximum_factor = parse_double(value, double_limits);
     } else if (string_equals(key, "INVESTMENT_MINIMUM_FACTOR")) {
-      limits.minimum = MINIMUM_INVESTMENT_MINIMUM_FACTOR;
-      limits.maximum = MAXIMUM_INVESTMENT_MINIMUM_FACTOR;
-      limits.fallback = investment_minimum_factor;
-      investment_minimum_factor = parse_value(value, limits);
+      double_limits.minimum = MINIMUM_INVESTMENT_MINIMUM_FACTOR;
+      double_limits.maximum = MAXIMUM_INVESTMENT_MINIMUM_FACTOR;
+      double_limits.fallback = investment_minimum_factor;
+      investment_minimum_factor = parse_double(value, double_limits);
     } else if (string_equals(key, "PLATFORM_MAXIMUM_WIDTH")) {
       limits.minimum = 1;
       limits.maximum = 65535;
@@ -286,17 +355,27 @@ long get_columns(void) { return columns; }
 
 long get_lines(void) { return lines; }
 
+int get_requested_window_width(void) { return width; }
+
+int get_requested_window_height(void) { return height; }
+
 long get_padding(void) { return padding; }
 
 int get_player_stops_platforms(void) { return player_stops_platforms; }
 
+int get_joystick_profile() { return joystick_profile; }
+
+InvestmentMode get_investment_mode(void) { return investment_mode; }
+
 int get_investment_amount(void) { return investment_amount; }
+
+double get_investment_proportion(void) { return investment_proportion; }
 
 int get_investment_period(void) { return investment_period; }
 
-int get_investment_maximum_factor(void) { return investment_maximum_factor; }
+double get_investment_maximum_factor(void) { return investment_maximum_factor; }
 
-int get_investment_minimum_factor(void) { return investment_minimum_factor; }
+double get_investment_minimum_factor(void) { return investment_minimum_factor; }
 
 int get_platform_max_width(void) { return platform_max_width; }
 
