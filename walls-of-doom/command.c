@@ -124,7 +124,7 @@ Command read_next_command(void) {
  * Waits for the next command, blocking indefinitely.
  */
 Command wait_for_next_command(void) {
-  Command command;
+  Command command = COMMAND_NONE;
   SDL_Event event;
   int got_command = 0;
   while (!got_command) {
