@@ -2,7 +2,6 @@
 #include "joystick.h"
 #include "player.h"
 #include <SDL.h>
-#include <stdio.h>
 
 /**
  * Returns the Command value corresponding to the provided key combination.
@@ -56,16 +55,32 @@ static Command command_from_event(const SDL_Event event) {
   return COMMAND_NONE;
 }
 
+static int is_toggled_command(Command command) {
+  return command == COMMAND_PAUSE;
+}
+
 /**
  * Returns the Command value corresponding to the provided input code.
  */
 static void digest_event(const SDL_Event event, double *table) {
+  Command command;
   if (event.type == SDL_QUIT) {
     table[COMMAND_CLOSE] = 1.0;
   } else if (event.type == SDL_KEYDOWN) {
-    table[command_from_key(event.key.keysym)] = 1.0;
+    command = command_from_key(event.key.keysym);
+    if (is_toggled_command(command)) {
+      if (!event.key.repeat) {
+        table[command] = !table[command];
+      }
+    } else {
+      table[command] = 1.0;
+    }
   } else if (event.type == SDL_KEYUP) {
-    table[command_from_key(event.key.keysym)] = 0.0;
+    command = command_from_key(event.key.keysym);
+    if (is_toggled_command(command)) {
+    } else {
+      table[command] = 0.0;
+    }
   } else if (event.type == SDL_JOYAXISMOTION) {
     digest_joystick_event(event, table);
   } else if (event.type == SDL_JOYBUTTONDOWN) {
