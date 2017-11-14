@@ -6,8 +6,6 @@
 
 #include <stdbool.h>
 
-#include <SDL.h>
-
 /**
  * Returns the Command value corresponding to the provided key combination.
  */
@@ -43,12 +41,12 @@ static Command command_from_key(const SDL_Keysym keysym) {
   return COMMAND_NONE;
 }
 
-void set_command_table(CommandTable *table, Command command, double value, Milliseconds time) {
+static void set_command_table(CommandTable *table, Command command, double value, Milliseconds time) {
   table->status[command] = value;
   table->last_modified[command] = time;
 }
 
-void digest_joystick_event(CommandTable *table, SDL_Event event) {
+static void digest_joystick_event(CommandTable *table, SDL_Event event) {
   if (table == NULL) {
     return;
   }
