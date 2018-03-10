@@ -22,7 +22,9 @@ option (SANITIZE "Modify the program at compile-time to catch undefined behavior
 option (OPTIMIZE_SIZE "Optimize for program size.")
 
 if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU" OR "${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -Wpedantic")
+    add_definitions (-Wall)
+    add_definitions (-Wextra)
+    add_definitions (-Werror)
     if (ENV32)
         set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
     elseif (ENV64)
