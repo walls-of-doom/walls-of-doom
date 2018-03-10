@@ -32,12 +32,12 @@ void *resize_memory(void *pointer, size_t size) {
     return NULL;
   }
   if (size > MAXIMUM_MEMORY_SIZE) {
-    log_message("Attempted to allocate more than one gibibyte");
+    log_message("Attempted to allocate more than the maximum memory size.");
     exit(EXIT_FAILURE);
   }
   p = realloc(pointer, size);
   if (p == NULL) {
-    log_message("Failed to to resize memory");
+    log_message("Failed to to resize memory.");
     exit(EXIT_FAILURE);
   }
   return p;

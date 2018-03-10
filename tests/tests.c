@@ -580,7 +580,7 @@ void test_select_random_line_awarely_with_occupied_middle_line(void) {
 
 int main(void) {
   UNITY_BEGIN();
-  log_message("Started running tests");
+  log_message("Started running tests.");
   RUN_TEST(test_resize_memory);
   RUN_TEST(test_normalize);
   RUN_TEST(test_get_random_perk_is_well_distributed);
@@ -629,6 +629,6 @@ int main(void) {
   RUN_TEST(test_select_random_line_awarely_with_two_empty_lines);
   RUN_TEST(test_select_random_line_awarely_with_three_empty_lines);
   RUN_TEST(test_select_random_line_awarely_with_occupied_middle_line);
-  log_message("Finished running tests");
+  log_message("Finished running tests.");
   return UNITY_END();
 }

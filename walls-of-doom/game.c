@@ -119,7 +119,7 @@ Game create_game(Player *player) {
   game.message_end_frame = 0;
   game.message_priority = 0;
 
-  log_message("Finished creating the game");
+  log_message("Finished creating the game.");
 
   return game;
 }
@@ -186,7 +186,7 @@ static void print_game_result(const Player *player, const int position, SDL_Rend
 void register_score(const Game *const game, SDL_Renderer *renderer) {
   const Player *const player = game->player;
   char buffer[MAXIMUM_STRING_SIZE];
-  const char *format = "Started registering a score of %d points for %s";
+  const char *format = "Started registering a score of %d points for %s.";
   Record record;
   int scoreboard_index;
   int position;
@@ -195,7 +195,7 @@ void register_score(const Game *const game, SDL_Renderer *renderer) {
   record = make_record(player->name, player->score);
   scoreboard_index = save_record(&record);
   position = scoreboard_index + 1;
-  log_message("Saved the record successfully");
+  log_message("Saved the record successfully.");
   print_game_result(player, position, renderer);
   wait_for_input(game->player->table);
 }

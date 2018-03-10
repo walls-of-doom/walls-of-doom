@@ -22,12 +22,6 @@ typedef struct RecordTable {
   Record records[RECORD_ARRAY_SIZE];
 } RecordTable;
 
-/**
- * Creates a new Record from the provided data.
- *
- * If the name is too big to fit into the array, it is truncated to the maximum
- * possible size.
- */
 Record make_record(const char *name, const int score) {
   Record record;
   /* Safely copy the provided name into the array. */
@@ -49,11 +43,6 @@ int compare_records(const Record *const a, const Record *const b) {
 
 int compare_void_records(const void *a, const void *b) { return compare_records((const Record *)a, (const Record *)b); }
 
-/**
- * Writes the default records to the RecordTable.
- *
- * All records are properly initialized, independently of the table size.
- */
 void populate_table_with_default_records(RecordTable *table) {
   Record empty_record;
   static char *names[] = {"Adam", "Bree", "Cora", "Dave", "Elmo"};
@@ -135,7 +124,7 @@ void read_table(RecordTable *table) {
   }
   if (read_error) {
     populate_table_with_default_records(table);
-    log_message("Populated the table with the default records");
+    log_message("Populated the table with the default records.");
   }
   resize_memory(buffer, 0);
 }
@@ -175,11 +164,11 @@ int save_record(Record *record) {
     table.records[table.record_count] = *record;
     table.record_count++;
   }
-  log_message("Added the record to the record table");
+  log_message("Added the record to the record table.");
   /* Sort the table records. */
   sort((void *)table.records, table.record_count, sizeof(Record), comparator);
   reverse((void *)table.records, table.record_count, sizeof(Record));
-  log_message("Sorted the record table");
+  log_message("Sorted the record table.");
   /* Write the table to disk. */
   write_table(&table);
   /* Find the index of the provided record. */
@@ -191,8 +180,7 @@ int save_record(Record *record) {
 }
 
 /**
- * Reads Records from the system into the specified destination. Reading at
- * most destination_size Records.
+ * Reads Records from the system into the specified destination. Reading at most destination_size Records.
  *
  * Returns how many Records were actually read.
  */

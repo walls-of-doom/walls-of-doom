@@ -26,8 +26,8 @@ static double get_average_speed(Game const *const game) {
 }
 
 static void log_difficulty(const double difficulty) {
-  char log_buffer[128];
-  sprintf(log_buffer, "Difficulty is %f", difficulty);
+  char log_buffer[MAXIMUM_STRING_SIZE];
+  sprintf(log_buffer, "Difficulty is %f.", difficulty);
   log_message(log_buffer);
 }
 
@@ -66,8 +66,8 @@ int collect_investment(Game const *const game, const Investment investment) {
   const double difference = max_return - min_return;
   const double normalized_delta = get_difficulty(game) * difference;
   const double normalized_max_return = min_return + normalized_delta;
-  const int min_random = scaling_factor * min_return;
-  const int max_random = scaling_factor * normalized_max_return;
+  const int min_random = (int)(scaling_factor * min_return);
+  const int max_random = (int)(scaling_factor * normalized_max_return);
   const double random_factor = random_integer(min_random, max_random);
-  return random_factor * investment.amount / scaling_factor;
+  return (int)(random_factor * investment.amount / scaling_factor);
 }

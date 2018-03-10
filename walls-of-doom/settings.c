@@ -167,7 +167,7 @@ static double parse_double(const char *value, struct DoubleLimits limits) {
   return number;
 }
 
-static long parse_value(const char *value, struct Limits limits) {
+static long parse_integer(const char *value, struct Limits limits) {
   long integer;
   errno = 0;
   integer = strtol(value, NULL, 10);
@@ -191,14 +191,14 @@ static int parse_boolean(const char *value, const int fallback) {
   boolean_limits.minimum = 0;
   boolean_limits.maximum = 1;
   boolean_limits.fallback = fallback;
-  return (int)parse_value(value, boolean_limits);
+  return (int)parse_integer(value, boolean_limits);
 }
 
 static ColorPair parse_color(const char *string) { return color_pair_from_string(string); }
 
 static void log_unused_key(const char *key) {
   char log_buffer[LOG_UNUSED_KEY_STRING_SIZE];
-  sprintf(log_buffer, "Unused settings key: %s", key);
+  sprintf(log_buffer, "Unused settings key: %s.", key);
   log_message(log_buffer);
 }
 
@@ -224,47 +224,47 @@ void initialize_settings(void) {
     if (string_equals(key, "REPOSITION_ALGORITHM")) {
       if (string_equals(value, "REPOSITION_SELECT_BLINDLY")) {
         reposition_algorithm = REPOSITION_SELECT_BLINDLY;
-        log_message("Set the reposition algorithm to SELECT_BLINDLY");
+        log_message("Set the reposition algorithm to SELECT_BLINDLY.");
       } else if (string_equals(value, "REPOSITION_SELECT_AWARELY")) {
         reposition_algorithm = REPOSITION_SELECT_AWARELY;
-        log_message("Set the reposition algorithm to SELECT_AWARELY");
+        log_message("Set the reposition algorithm to SELECT_AWARELY.");
       }
       /* Did not match any existing algorithm, do not change the default. */
     } else if (string_equals(key, "PLATFORM_COUNT")) {
       limits.minimum = MINIMUM_PLATFORM_COUNT;
       limits.maximum = MAXIMUM_PLATFORM_COUNT;
       limits.fallback = platform_count;
-      platform_count = parse_value(value, limits);
+      platform_count = parse_integer(value, limits);
     } else if (string_equals(key, "FONT_SIZE")) {
       limits.minimum = MINIMUM_FONT_SIZE;
       limits.maximum = MAXIMUM_FONT_SIZE;
       limits.fallback = font_size;
-      font_size = parse_value(value, limits);
+      font_size = parse_integer(value, limits);
     } else if (string_equals(key, "WIDTH")) {
       limits.minimum = MINIMUM_DIMENSION;
       limits.maximum = MAXIMUM_DIMENSION;
       limits.fallback = width;
-      width = parse_value(value, limits);
+      width = parse_integer(value, limits);
     } else if (string_equals(key, "HEIGHT")) {
       limits.minimum = MINIMUM_DIMENSION;
       limits.maximum = MAXIMUM_DIMENSION;
       limits.fallback = height;
-      height = parse_value(value, limits);
+      height = parse_integer(value, limits);
     } else if (string_equals(key, "TILE_WIDTH")) {
       limits.minimum = MINIMUM_TILE_DIMENSION;
       limits.maximum = MAXIMUM_TILE_DIMENSION;
       limits.fallback = tile_width;
-      tile_width = parse_value(value, limits);
+      tile_width = parse_integer(value, limits);
     } else if (string_equals(key, "TILE_HEIGHT")) {
       limits.minimum = MINIMUM_TILE_DIMENSION;
       limits.maximum = MAXIMUM_TILE_DIMENSION;
       limits.fallback = tile_height;
-      tile_height = parse_value(value, limits);
+      tile_height = parse_integer(value, limits);
     } else if (string_equals(key, "BAR_HEIGHT")) {
       limits.minimum = MINIMUM_TILE_DIMENSION;
       limits.maximum = MAXIMUM_TILE_DIMENSION;
       limits.fallback = bar_height;
-      bar_height = parse_value(value, limits);
+      bar_height = parse_integer(value, limits);
     } else if (string_equals(key, "COLOR_PAIR_DEFAULT")) {
       COLOR_PAIR_DEFAULT = parse_color(value);
     } else if (string_equals(key, "COLOR_PAIR_PERK")) {
@@ -299,7 +299,7 @@ void initialize_settings(void) {
       limits.minimum = MINIMUM_INVESTMENT_AMOUNT;
       limits.maximum = MAXIMUM_INVESTMENT_AMOUNT;
       limits.fallback = investment_amount;
-      investment_amount = parse_value(value, limits);
+      investment_amount = parse_integer(value, limits);
     } else if (string_equals(key, "INVESTMENT_PROPORTION")) {
       double_limits.minimum = MINIMUM_INVESTMENT_PROPORTION;
       double_limits.maximum = MAXIMUM_INVESTMENT_PROPORTION;
@@ -309,7 +309,7 @@ void initialize_settings(void) {
       limits.minimum = MINIMUM_INVESTMENT_PERIOD;
       limits.maximum = MAXIMUM_INVESTMENT_PERIOD;
       limits.fallback = investment_period;
-      investment_period = parse_value(value, limits);
+      investment_period = parse_integer(value, limits);
     } else if (string_equals(key, "INVESTMENT_MAXIMUM_FACTOR")) {
       double_limits.minimum = MINIMUM_INVESTMENT_MAXIMUM_FACTOR;
       double_limits.maximum = MAXIMUM_INVESTMENT_MAXIMUM_FACTOR;
@@ -324,22 +324,22 @@ void initialize_settings(void) {
       limits.minimum = 1;
       limits.maximum = 65535;
       limits.fallback = platform_max_width;
-      platform_max_width = parse_value(value, limits);
+      platform_max_width = parse_integer(value, limits);
     } else if (string_equals(key, "PLATFORM_MINIMUM_WIDTH")) {
       limits.minimum = 1;
       limits.maximum = 65535;
       limits.fallback = platform_min_width;
-      platform_min_width = parse_value(value, limits);
+      platform_min_width = parse_integer(value, limits);
     } else if (string_equals(key, "PLATFORM_MAXIMUM_SPEED")) {
       limits.minimum = 1;
       limits.maximum = 65535;
       limits.fallback = platform_max_speed;
-      platform_max_speed = parse_value(value, limits);
+      platform_max_speed = parse_integer(value, limits);
     } else if (string_equals(key, "PLATFORM_MINIMUM_SPEED")) {
       limits.minimum = 1;
       limits.maximum = 65535;
       limits.fallback = platform_min_speed;
-      platform_min_speed = parse_value(value, limits);
+      platform_min_speed = parse_integer(value, limits);
     } else if (string_equals(key, "RENDERER_TYPE")) {
       if (string_equals(value, "HARDWARE")) {
         renderer_type = RENDERER_HARDWARE;

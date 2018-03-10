@@ -59,11 +59,11 @@ Code read_player_name(char *destination, const size_t maximum_size, Renderer *re
     if (code == CODE_QUIT) {
       return CODE_QUIT;
     } else if (code == CODE_OK) {
-      sprintf(log_buffer, "Read '%s' from the user", destination);
+      sprintf(log_buffer, "Read %s from the user.", destination);
       log_message(log_buffer);
       /* Trim the name the user entered. */
       trim_string(destination);
-      sprintf(log_buffer, "Trimmed the input to '%s'", destination);
+      sprintf(log_buffer, "Trimmed the input to %s.", destination);
       log_message(log_buffer);
       valid_name = is_valid_player_name(destination);
     }

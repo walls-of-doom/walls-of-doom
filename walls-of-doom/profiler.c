@@ -51,7 +51,7 @@ ProfilerData *get_empty_data(const char *identifier) {
     table_size++;
     table[table_size - 1] = empty_data;
   } else {
-    log_message("Failed to reallocate table");
+    log_message("Failed to reallocate table.");
   }
   return table + table_size - 1;
 }
@@ -162,6 +162,6 @@ Code finalize_profiler(void) {
   write_statistics();
   table = resize_memory(table, 0);
   table_size = 0;
-  log_message("Freed the profiler table");
+  log_message("Freed the profiler table.");
   return CODE_OK;
 }

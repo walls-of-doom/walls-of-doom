@@ -16,7 +16,7 @@ void log_unrecognized_argument(const char *argument) {
   const size_t string_size = start_size + input_size + 1;
   char *string = NULL;
   string = resize_memory(string, string_size);
-  sprintf(string, "Unrecognized argument: %s", argument);
+  sprintf(string, "Unrecognized argument: %s.", argument);
   log_message(string);
   resize_memory(string, 0);
 }

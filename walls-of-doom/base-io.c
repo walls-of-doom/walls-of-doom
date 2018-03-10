@@ -80,7 +80,7 @@ static Code initialize_fonts(void) {
   font = TTF_OpenFont(MONOSPACED_FONT_PATH, get_font_size());
   /* If it failed, we log an error. */
   if (font == NULL) {
-    sprintf(log_buffer, "TTF font opening error: %s", SDL_GetError());
+    sprintf(log_buffer, "TTF font opening error: %s.", SDL_GetError());
     log_message(log_buffer);
     return CODE_ERROR;
   } else {
@@ -97,7 +97,7 @@ static Code initialize_font_metrics(void) {
   int height;
   Font *font = global_monospaced_font;
   if (TTF_GlyphMetrics(font, 'A', NULL, NULL, NULL, NULL, &width)) {
-    log_message("Could not assess the width of a font");
+    log_message("Could not assess the width of a font.");
     return CODE_ERROR;
   }
   height = TTF_FontHeight(font);
@@ -115,15 +115,10 @@ static Window *create_window(int *width, int *height) {
   const char *title = GAME_NAME;
   const int x = SDL_WINDOWPOS_CENTERED;
   const int y = SDL_WINDOWPOS_CENTERED;
-  int w = get_window_width();
-  int h = get_window_height();
-  Uint32 flags = SDL_WINDOW_INPUT_FOCUS;
+  const int w = get_window_width();
+  const int h = get_window_height();
+  const Uint32 flags = SDL_WINDOW_INPUT_FOCUS;
   Window *window;
-  if (w > 0 && h > 0) {
-    log_message("Got requested width and height, setting fullscreen...");
-    /* Do NOT use desktop resolution, use what we provided. */
-    flags = SDL_WINDOW_INPUT_FOCUS;
-  }
   window = SDL_CreateWindow(title, x, y, w, h, flags);
   SDL_GetWindowSize(window, width, height);
   return window;
@@ -133,7 +128,7 @@ static Code set_window_title_and_icon(Window *window) {
   SDL_Surface *icon_surface = IMG_Load(ICON_PATH);
   SDL_SetWindowTitle(window, GAME_NAME);
   if (icon_surface == NULL) {
-    log_message("Failed to load the window icon");
+    log_message("Failed to load the icon.");
     return CODE_ERROR;
   }
   SDL_SetWindowIcon(window, icon_surface);
@@ -157,7 +152,7 @@ Code initialize(Window **window, Renderer **renderer) {
   initialize_profiler();
   initialize_settings();
   if (SDL_Init(SDL_INIT_FLAGS)) {
-    sprintf(log_buffer, "SDL initialization error: %s", SDL_GetError());
+    sprintf(log_buffer, "SDL initialization error: %s.", SDL_GetError());
     log_message(log_buffer);
     return CODE_ERROR;
   }
@@ -165,13 +160,13 @@ Code initialize(Window **window, Renderer **renderer) {
   initialize_joystick();
   if (!TTF_WasInit()) {
     if (TTF_Init()) {
-      sprintf(log_buffer, "TTF initialization error: %s", SDL_GetError());
+      sprintf(log_buffer, "TTF initialization error: %s.", SDL_GetError());
       log_message(log_buffer);
       return CODE_ERROR;
     }
   }
   if ((IMG_Init(IMG_FLAGS) & IMG_FLAGS) != IMG_FLAGS) {
-    sprintf(log_buffer, "Failed to initialize required image support");
+    sprintf(log_buffer, "Failed to initialize required image support.");
     log_message(log_buffer);
     return CODE_ERROR;
   }
@@ -182,20 +177,20 @@ Code initialize(Window **window, Renderer **renderer) {
    */
   /* Log the size of the window we are going to create. */
   *window = create_window(&window_width, &window_height);
-  sprintf(log_buffer, "Created a %dx%d window", window_width, window_height);
+  sprintf(log_buffer, "Created a %dx%d window.", window_width, window_height);
   log_message(log_buffer);
   if (*window == NULL) {
-    sprintf(log_buffer, "SDL initialization error: %s", SDL_GetError());
+    sprintf(log_buffer, "SDL initialization error: %s.", SDL_GetError());
     log_message(log_buffer);
     return CODE_ERROR;
   }
   if (initialize_fonts()) {
-    sprintf(log_buffer, "Failed to initialize fonts");
+    sprintf(log_buffer, "Failed to initialize fonts.");
     log_message(log_buffer);
     return CODE_ERROR;
   }
   if (initialize_font_metrics()) {
-    sprintf(log_buffer, "Failed to initialize font metrics");
+    sprintf(log_buffer, "Failed to initialize font metrics.");
     log_message(log_buffer);
     return CODE_ERROR;
   }

@@ -40,7 +40,7 @@ static SDL_Joystick *shared_joystick = NULL;
 
 static void log_joystick_count() {
   char log_buffer[MAXIMUM_STRING_SIZE];
-  sprintf(log_buffer, "Joystick count: %d", SDL_NumJoysticks());
+  sprintf(log_buffer, "Joystick count is %d.", SDL_NumJoysticks());
   log_message(log_buffer);
 }
 

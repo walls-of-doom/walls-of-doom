@@ -13,11 +13,11 @@
 #include <unistd.h>
 #endif
 
-#define LOG_ACCESS_WRITE_FORMAT "Writing %lu bytes (%.2lf KiB) to %s"
-#define LOG_ACCESS_READ_FORMAT "Reading %lu bytes (%.2lf KiB) from %s"
+#define LOG_ACCESS_WRITE_FORMAT "Writing %lu bytes (%.2lf KiB) to %s."
+#define LOG_ACCESS_READ_FORMAT "Reading %lu bytes (%.2lf KiB) from %s."
 
-#define WRITE_BYTES_COUNT_FORMAT "Expected to write %lu but actually wrote %lu"
-#define READ_BYTES_COUNT_FORMAT "Expected to read %lu but actually read %lu"
+#define WRITE_BYTES_COUNT_FORMAT "Expected to write %lu but actually wrote %lu!"
+#define READ_BYTES_COUNT_FORMAT "Expected to read %lu but actually read %lu!"
 
 #define DATA_DIRECTORY "data"
 
