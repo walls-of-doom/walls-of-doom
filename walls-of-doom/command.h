@@ -1,7 +1,6 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
-#include "boolean.h"
 #include "clock.h"
 #include "code.h"
 
@@ -34,7 +33,7 @@ typedef struct CommandTable {
 
 void initialize_command_table(CommandTable *table);
 
-Boolean test_command_table(CommandTable *table, enum Command command, Milliseconds repetition_delay);
+int test_command_table(CommandTable *table, enum Command command, Milliseconds repetition_delay);
 
 void read_commands(CommandTable *table);
 

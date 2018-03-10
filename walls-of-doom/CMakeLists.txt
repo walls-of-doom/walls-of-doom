@@ -11,7 +11,6 @@ configure_file (constants.h.in constants.h)
 
 set (walls-of-doom-sources
     about.h about.c
-    boolean.h
     bank.h bank.c
     base-io.h base-io.c
     box.h box.c
