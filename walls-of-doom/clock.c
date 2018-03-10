@@ -1,6 +1,6 @@
 #include "clock.h"
+
 #include <SDL.h>
-#include <limits.h>
 
 /**
  * Returns a number of milliseconds.
