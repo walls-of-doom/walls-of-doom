@@ -2,11 +2,11 @@
 
 Walls of Doom is a minimalistic [platformer](https://en.wikipedia.org/wiki/Platform_game) written in [ANSI C](https://en.wikipedia.org/wiki/ANSI_C) using SDL 2.
 
-The game is under active development and is already playable on Windows, Linux,
-and BSDs.
+The game should work under Windows, Linux, and everything that SDL 2 supports.
 
-See [the GitHub issue tracker](https://github.com/walls-of-doom/walls-of-doom/issues)
-and have a look at [the releases page](https://github.com/walls-of-doom/walls-of-doom/releases).
+See [the GitHub issue tracker](https://github.com/walls-of-doom/walls-of-doom/issues) and have a look at [the releases page](https://github.com/walls-of-doom/walls-of-doom/releases).
+
+Because of old decisions, the game is resolution-dependent. You can tweak the settings file to change the window size.
 
 ## Screenshot
 
@@ -18,8 +18,7 @@ and have a look at [the releases page](https://github.com/walls-of-doom/walls-of
 
 [![Build Status](https://travis-ci.org/walls-of-doom/walls-of-doom.svg?branch=master)](https://travis-ci.org/walls-of-doom/walls-of-doom)
 
-This build servers uses Ubuntu 14.04.3 64-bit, and builds with the following
-configurations:
+This build servers uses Ubuntu 14.04.3 64-bit, and builds with the following configurations:
 
 ```
 Clang         3.5.0
@@ -39,9 +38,7 @@ SDL2_image    2.0.0
 
 [![Build Status](https://semaphoreci.com/api/v1/walls-of-doom/walls-of-doom/branches/master/shields_badge.svg)](https://semaphoreci.com/walls-of-doom/walls-of-doom)
 
-This build server uses Ubuntu 14.04 64-bit and builds with the following
-configuration:
-
+This build server uses Ubuntu 14.04 64-bit and builds with the following configuration:
 
 ```
 GCC           4.8.4
@@ -54,8 +51,7 @@ SDL2_image    2.0.0
 
 [![Build Status](https://ci.appveyor.com/api/projects/status/1gparjoqw7upxhod/branch/master?svg=true)](https://ci.appveyor.com/project/walls-of-doom/walls-of-doom/branch/master)
 
-This build servers builds under Windows using Visual Studio 2015 for Visual
-Studio 2010, which is required for Windows XP compatibility.
+This build servers builds under Windows using Visual Studio 2015 for Visual Studio 2010, which is required for Windows XP compatibility.
 
 ```
 SDL2          2.0.4
@@ -118,16 +114,11 @@ $ make
 
 > You can pass `-DENV32=1` to CMake to get a 32-bit build on a 64-bit system.
 >
-> Note that to build the 32-bit version, you need 32-bit versions of all the
-> dependencies.
+> Note that to build the 32-bit version, you need 32-bit versions of all the dependencies.
 >
 > You can pass `-DSANITIZE=1` to CMake to get the LLVM undefined behavior sanitizer.
 
-It is suggested that you pass `-DCMAKE_BUILD_TYPE="Release"` to CMake if you want
-a build to play the game, as it will generate more optimized compiled program.
-
-Additionally, if you want to further make use of compiler optimizations, you can
-pass `-DCMAKE_C_FLAGS="-march=..."` where the ellipsis should be the target architecture.
+It is suggested that you pass `-DCMAKE_BUILD_TYPE="Release"` to CMake if you want a build to play the game, as it will generate more optimized code.
 
 ## Running the game
 
@@ -168,5 +159,4 @@ This include order should be respected in all source files.
 
 # License
 
-It is licensed under the BSD 3-Clause license. See LICENSE.txt for more
-information.
+It is licensed under the BSD 3-Clause license. See LICENSE.txt for more information.
