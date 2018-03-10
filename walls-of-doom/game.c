@@ -65,8 +65,8 @@ static void initialize_rigid_matrix(Game *game) {
 static void initialize_bounding_box(Game *game) {
   game->box->min_x = 0;
   game->box->min_y = 0;
-  game->box->max_x = game->tile_w * get_columns() - 1;
-  game->box->max_y = game->tile_h * get_lines() - 1;
+  game->box->max_x = get_window_width();
+  game->box->max_y = get_window_height() - 2 * get_bar_height();
 }
 
 /**

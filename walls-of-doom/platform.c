@@ -30,7 +30,7 @@ void generate_platforms(Platform *platforms, const BoundingBox *const box, const
     platform->w = random_integer(min_width, max_width);
     /* Subtract two to remove the borders. */
     /* Subtract one after this to prevent platform being after the screen. */
-    platform->x = random_integer(0, get_columns() - 2 - 1) * width + box->min_x;
+    platform->x = random_integer(0, bounding_box_width(box)) + box->min_x;
     random_y = select_random_line_awarely(density, lines);
     density[random_y]++;
     platform->y = random_y * height + box->min_y;

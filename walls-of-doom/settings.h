@@ -6,11 +6,9 @@
 /* These maximums are made public so that static allocation is possible. */
 
 #define MAXIMUM_PLATFORM_COUNT 256
-#define MAXIMUM_COLUMNS 384
-#define MAXIMUM_LINES 200
 
-#define JOYSTICK_PROFILE_XBOX 0
-#define JOYSTICK_PROFILE_DUALSHOCK 1
+#define JOYSTICK_PROFILE_XBOX 1
+#define JOYSTICK_PROFILE_DUALSHOCK 2
 
 typedef enum RepositionAlgorithm { REPOSITION_SELECT_BLINDLY, REPOSITION_SELECT_AWARELY } RepositionAlgorithm;
 
@@ -24,13 +22,15 @@ long get_platform_count(void);
 
 int get_font_size(void);
 
-long get_columns(void);
+int get_window_width(void);
 
-long get_lines(void);
+int get_window_height(void);
 
-int get_requested_window_width(void);
+int get_tile_width(void);
 
-int get_requested_window_height(void);
+int get_tile_height(void);
+
+int get_bar_height(void);
 
 long get_padding(void);
 

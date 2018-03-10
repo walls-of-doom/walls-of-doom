@@ -33,6 +33,8 @@ int bounding_box_overlaps(const BoundingBox *a, const BoundingBox *const b) {
   return 0;
 }
 
+int bounding_box_width(const BoundingBox *a) { return a->max_x - a->min_x; }
+
 long bounding_box_area(const BoundingBox *box) {
   const long w = box->max_x - box->min_x + 1;
   const long h = box->max_y - box->min_y + 1;

@@ -25,38 +25,11 @@ void clear(Renderer *renderer);
  */
 void present(Renderer *renderer);
 
-int get_window_width(void);
-
-int get_window_height(void);
-
-/**
- * Returns the height of the top and bottom bars.
- */
-int get_bar_height(void);
-
 Font *get_font(void);
 
 int get_font_width(void);
 
 int get_font_height(void);
-
-int get_tile_width(void);
-
-int get_tile_height(void);
-
-int get_border_width(void);
-
-int get_border_height(void);
-
-/**
- * Returns the tile width on the screen.
- */
-int get_tile_width(void);
-
-/**
- * Returns the tile height on the screen.
- */
-int get_tile_height(void);
 
 /**
  * Swap the renderer color by the provided color.

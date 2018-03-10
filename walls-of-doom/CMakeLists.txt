@@ -11,6 +11,7 @@ configure_file (constants.h.in constants.h)
 
 set (walls-of-doom-sources
     about.h about.c
+    boolean.h
     bank.h bank.c
     base-io.h base-io.c
     box.h box.c
@@ -55,7 +56,7 @@ find_package (SDL2_image REQUIRED)
 include_directories (${SDL2_INCLUDE_DIR} ${SDL2_TTF_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
 target_link_libraries (walls-of-doom-base ${SDL2_LIBRARY} ${SDL2_TTF_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
 
-add_executable (walls-of-doom main.c ${walls-of-doom-sources} boolean.h)
+add_executable (walls-of-doom main.c ${walls-of-doom-sources})
 if (UNIX)
     target_link_libraries (walls-of-doom m)
 endif (UNIX)

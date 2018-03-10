@@ -1,5 +1,6 @@
 #include "physics.h"
 #include "bank.h"
+#include "base-io.h"
 #include "constants.h"
 #include "investment.h"
 #include "limits.h"
@@ -373,7 +374,7 @@ int select_random_line_awarely(const unsigned char *lines, const int size) {
 static void reposition(Game *const game, Platform *const platform) {
   const BoundingBox *const box = game->box;
   /* The occupied size may be smaller than the array actually is. */
-  const int occupied_size = get_lines() - 2;
+  const int occupied_size = (get_window_height() - 2 * get_bar_height()) / get_tile_height();
   const int tile_h = game->tile_h;
   unsigned char *occupied = NULL;
   int line;
@@ -539,19 +540,18 @@ void update_perk(Game *const game) {
   next_perk_frame += PERK_INTERVAL_IN_FRAMES;
   next_perk_frame -= PERK_SCREEN_DURATION_IN_FRAMES;
   if (game->played_frames == game->perk_end_frame) {
-    /* Current Perk (if any) must end. */
     game->perk = PERK_NONE;
   } else if (game->played_frames == next_perk_frame) {
     game->perk = get_random_perk();
-    game->perk_x = random_integer(0, get_columns() - 1) * game->tile_w;
-    game->perk_y = random_integer(0, get_lines() - 1) * game->tile_h;
+    game->perk_x = random_integer(0, get_window_width() - get_tile_width());
+    const int random_y = random_integer(get_bar_height(), get_window_height() - 2 * get_bar_height());
+    game->perk_y = random_y - random_y % get_tile_height();
     game->perk_end_frame = game->played_frames + PERK_SCREEN_DURATION_IN_FRAMES;
   }
 }
 
 /**
- * Moves the player according to the sign of its current speed if it can move
- * in that direction.
+ * Moves the player according to the sign of its current speed if it can move in that direction.
  */
 void update_player_horizontal_position(Game *game) {
   int pending_movement = get_pending_movement(game, game->player->speed_x);

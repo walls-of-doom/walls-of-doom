@@ -1,10 +1,10 @@
-COLUMNS = 100
-LINES = 50
+WIDTH = 1860
+HEIGHT = 900
 
-# You can provide your own window dimensions.
-# Uncomment the following lines to try it.
-# WIDTH = 640
-# HEIGHT = 360
+BAR_HEIGHT = 30
+
+TILE_WIDTH = 20
+TILE_HEIGHT = 20
 
 FONT_SIZE = 20
 

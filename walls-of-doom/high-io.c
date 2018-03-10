@@ -71,57 +71,6 @@ Code read_player_name(char *destination, const size_t maximum_size, Renderer *re
   return code;
 }
 
-static SDL_Rect make_top_bar_rectangle(void) {
-  SDL_Rect rectangle;
-  rectangle.x = 0;
-  rectangle.y = get_bar_height();
-  rectangle.w = get_window_width();
-  rectangle.h = get_border_height();
-  return rectangle;
-}
-
-static SDL_Rect make_left_bar_rectangle(void) {
-  SDL_Rect rectangle;
-  rectangle.x = 0;
-  rectangle.y = get_bar_height();
-  rectangle.w = get_border_width();
-  rectangle.h = get_window_height() - 2 * get_bar_height();
-  return rectangle;
-}
-
-static SDL_Rect make_right_bar_rectangle(void) {
-  SDL_Rect rectangle;
-  rectangle.x = get_window_width() - get_border_width();
-  rectangle.y = get_bar_height();
-  rectangle.w = get_border_width();
-  rectangle.h = get_window_height() - 2 * get_bar_height();
-  return rectangle;
-}
-
-static SDL_Rect make_bottom_bar_rectangle(void) {
-  SDL_Rect rectangle;
-  rectangle.x = 0;
-  rectangle.y = get_window_height() - get_bar_height() - get_border_height();
-  rectangle.w = get_window_width();
-  rectangle.h = get_border_height();
-  return rectangle;
-}
-
-static Code render_borders(Renderer *renderer) {
-  const SDL_Rect top_bar = make_top_bar_rectangle();
-  const SDL_Rect left_bar = make_left_bar_rectangle();
-  const SDL_Rect right_bar = make_right_bar_rectangle();
-  const SDL_Rect bottom_bar = make_bottom_bar_rectangle();
-  SDL_Color color = to_sdl_color(COLOR_DEFAULT_FOREGROUND);
-  swap_color(renderer, &color);
-  SDL_RenderFillRect(renderer, &top_bar);
-  SDL_RenderFillRect(renderer, &left_bar);
-  SDL_RenderFillRect(renderer, &right_bar);
-  SDL_RenderFillRect(renderer, &bottom_bar);
-  swap_color(renderer, &color);
-  return CODE_OK;
-}
-
 /**
  * Prints the provided string on the screen starting at (x, y).
  */
@@ -177,16 +126,14 @@ static void draw_shaded_absolute_rectangle(const int x, const int y, const int w
 static void draw_absolute_tile_rectangle(int x, int y, Color color, Renderer *renderer) {
   const int w = get_tile_width();
   const int h = get_tile_height();
-  x += get_border_width();
-  y += get_bar_height() + get_border_height();
+  y += get_bar_height();
   draw_absolute_rectangle(x, y, w, h, color, renderer);
 }
 
 static void draw_shaded_absolute_tile_rectangle(int x, int y, Color color, Renderer *renderer) {
   const int w = get_tile_width();
   const int h = get_tile_height();
-  x += get_border_width();
-  y += get_bar_height() + get_border_height();
+  y += get_bar_height();
   draw_shaded_absolute_rectangle(x, y, w, h, color, renderer);
 }
 
@@ -246,16 +193,10 @@ static void draw_bottom_bar(const char *message, Renderer *renderer) {
   write_bottom_bar_string(message, renderer);
 }
 
-/**
- * Draws the borders of the screen.
- */
-static void draw_borders(Renderer *renderer) { render_borders(renderer); }
-
 static void draw_platforms(const Platform *platforms, const size_t platform_count, const BoundingBox *box,
                            Renderer *renderer) {
   const Color color = COLOR_PAIR_PLATFORM.foreground;
-  const int x_padding = get_border_width();
-  const int y_padding = get_bar_height() + get_border_height();
+  const int y_padding = get_bar_height();
   Platform p;
   int x;
   int y;
@@ -264,9 +205,9 @@ static void draw_platforms(const Platform *platforms, const size_t platform_coun
   size_t i;
   for (i = 0; i < platform_count; i++) {
     p = platforms[i];
-    x = x_padding + max_int(box->min_x, p.x);
+    x = max_int(box->min_x, p.x);
     y = y_padding + p.y;
-    w = min_int(box->max_x, p.x + p.w - 1) - (x - x_padding) + 1;
+    w = min_int(box->max_x, p.x + p.w - 1) - x + 1;
     h = p.h;
     draw_absolute_rectangle(x, y, w, h, color, renderer);
   }
@@ -310,11 +251,10 @@ static void draw_resized_perk(int x, int y, int w, int h, double f, Renderer *re
 
 static void draw_active_perk(const Game *const game, Renderer *renderer) {
   const int interval = PERK_FADING_INTERVAL;
-  const int x_padding = get_border_width();
-  const int y_padding = get_bar_height() + get_border_height();
+  const int y_padding = get_bar_height();
   const int remaining = (int)(game->perk_end_frame - game->played_frames);
   const double fraction = min_int(interval, remaining) / (double)interval;
-  const int x = x_padding + game->perk_x;
+  const int x = game->perk_x;
   const int y = y_padding + game->perk_y;
   draw_resized_perk(x, y, game->tile_w, game->tile_h, fraction, renderer);
 }
@@ -362,10 +302,6 @@ Milliseconds draw_game(const Game *const game, Renderer *renderer) {
   profiler_begin("draw_game:draw_bottom_bar");
   draw_bottom_bar(game->message, renderer);
   profiler_end("draw_game:draw_bottom_bar");
-
-  profiler_begin("draw_game:draw_borders");
-  draw_borders(renderer);
-  profiler_end("draw_game:draw_borders");
 
   profiler_begin("draw_game:draw_platforms");
   draw_platforms(game->platforms, game->platform_count, game->box, renderer);

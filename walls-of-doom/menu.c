@@ -64,11 +64,9 @@ void write_menu(const Menu *const menu, SDL_Renderer *renderer) {
     }
   }
   print_menu(string_count, strings, renderer);
-  /* Free the strings. */
   for (i = 0; i < string_count; i++) {
-    resize_memory(strings[i], 0);
+    strings[i] = resize_memory(strings[i], 0);
   }
-  /* Free the pointer array. */
   resize_memory(strings, 0);
 }
 

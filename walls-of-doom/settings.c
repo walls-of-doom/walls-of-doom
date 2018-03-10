@@ -32,17 +32,20 @@ static int font_size = 20;
 static const long MINIMUM_PLATFORM_COUNT = 0;
 static long platform_count = 16;
 
-static const long MINIMUM_COLUMNS = 40;
-static long columns = 80;
-
-static const long MINIMUM_LINES = 20;
-static long lines = 30;
-
 /* SDL has a limit at 16384. */
 static const long MAXIMUM_DIMENSION = 16384;
 static const long MINIMUM_DIMENSION = 240;
+
 static int width = -1;
 static int height = -1;
+
+static const long MAXIMUM_TILE_DIMENSION = 16384;
+static const long MINIMUM_TILE_DIMENSION = 1;
+
+static int tile_width = -1;
+static int tile_height = -1;
+
+static int bar_height = -1;
 
 static int player_stops_platforms = 0;
 
@@ -199,6 +202,15 @@ static void log_unused_key(const char *key) {
   log_message(log_buffer);
 }
 
+static void validate_settings(void) {
+  if ((get_window_width() % get_tile_height()) != 0) {
+    exit(EXIT_FAILURE);
+  }
+  if (((get_window_height() - 2 * get_bar_height()) % get_tile_height()) != 0) {
+    exit(EXIT_FAILURE);
+  }
+}
+
 void initialize_settings(void) {
   char input[SETTINGS_BUFFER_SIZE];
   char key[SETTINGS_STRING_SIZE];
@@ -228,16 +240,6 @@ void initialize_settings(void) {
       limits.maximum = MAXIMUM_FONT_SIZE;
       limits.fallback = font_size;
       font_size = parse_value(value, limits);
-    } else if (string_equals(key, "COLUMNS")) {
-      limits.minimum = MINIMUM_COLUMNS;
-      limits.maximum = MAXIMUM_COLUMNS;
-      limits.fallback = columns;
-      columns = parse_value(value, limits);
-    } else if (string_equals(key, "LINES")) {
-      limits.minimum = MINIMUM_LINES;
-      limits.maximum = MAXIMUM_LINES;
-      limits.fallback = lines;
-      lines = parse_value(value, limits);
     } else if (string_equals(key, "WIDTH")) {
       limits.minimum = MINIMUM_DIMENSION;
       limits.maximum = MAXIMUM_DIMENSION;
@@ -248,6 +250,21 @@ void initialize_settings(void) {
       limits.maximum = MAXIMUM_DIMENSION;
       limits.fallback = height;
       height = parse_value(value, limits);
+    } else if (string_equals(key, "TILE_WIDTH")) {
+      limits.minimum = MINIMUM_TILE_DIMENSION;
+      limits.maximum = MAXIMUM_TILE_DIMENSION;
+      limits.fallback = tile_width;
+      tile_width = parse_value(value, limits);
+    } else if (string_equals(key, "TILE_HEIGHT")) {
+      limits.minimum = MINIMUM_TILE_DIMENSION;
+      limits.maximum = MAXIMUM_TILE_DIMENSION;
+      limits.fallback = tile_height;
+      tile_height = parse_value(value, limits);
+    } else if (string_equals(key, "BAR_HEIGHT")) {
+      limits.minimum = MINIMUM_TILE_DIMENSION;
+      limits.maximum = MAXIMUM_TILE_DIMENSION;
+      limits.fallback = bar_height;
+      bar_height = parse_value(value, limits);
     } else if (string_equals(key, "COLOR_PAIR_DEFAULT")) {
       COLOR_PAIR_DEFAULT = parse_color(value);
     } else if (string_equals(key, "COLOR_PAIR_PERK")) {
@@ -333,6 +350,7 @@ void initialize_settings(void) {
       log_unused_key(key);
     }
   }
+  validate_settings();
 }
 
 RepositionAlgorithm get_reposition_algorithm(void) { return reposition_algorithm; }
@@ -343,13 +361,15 @@ long get_platform_count(void) { return platform_count; }
 
 int get_font_size(void) { return font_size; }
 
-long get_columns(void) { return columns; }
+int get_tile_width(void) { return tile_width; }
 
-long get_lines(void) { return lines; }
+int get_tile_height(void) { return tile_height; }
 
-int get_requested_window_width(void) { return width; }
+int get_bar_height(void) { return bar_height; }
 
-int get_requested_window_height(void) { return height; }
+int get_window_width(void) { return width; }
+
+int get_window_height(void) { return height; }
 
 long get_padding(void) { return padding; }
 

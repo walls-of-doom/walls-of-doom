@@ -25,18 +25,15 @@
 #define CREATE_SURFACE_FAIL "Failed to create surface in %s!"
 #define CREATE_TEXTURE_FAIL "Failed to create texture in %s!"
 
-#define MINIMUM_BAR_HEIGHT 20
-
 #define PERK_FADING_INTERVAL FPS
 
 #define IMG_FLAGS IMG_INIT_PNG
 
-#define SDL_INIT_FLAGS SDL_INIT_VIDEO | SDL_INIT_JOYSTICK
+#define SDL_INIT_FLAGS (SDL_INIT_VIDEO | SDL_INIT_JOYSTICK)
 
 static Font *global_monospaced_font = NULL;
 
 /* Default integers to one to prevent divisions by zero. */
-static int bar_height = 1;
 static int window_width = 1;
 static int window_height = 1;
 static int global_monospaced_font_width = 1;
@@ -52,41 +49,11 @@ void clear(Renderer *renderer) { SDL_RenderClear(renderer); }
  */
 void present(Renderer *renderer) { SDL_RenderPresent(renderer); }
 
-/**
- * In the future we may support window resizing.
- *
- * These functions encapsulate how window metrics are actually obtained.
- */
-int get_window_width(void) { return window_width; }
-
-int get_window_height(void) { return window_height; }
-
-/**
- * Returns the height of the top and bottom bars.
- */
-int get_bar_height(void) { return bar_height; }
-
 Font *get_font(void) { return global_monospaced_font; }
 
 int get_font_width(void) { return global_monospaced_font_width; }
 
 int get_font_height(void) { return global_monospaced_font_height; }
-
-int get_tile_width(void) { return get_window_width() / (get_columns() + 2); }
-
-int get_tile_height(void) { return (get_window_height() - 2 * get_bar_height()) / (get_lines() + 2); }
-
-int get_border_width(void) {
-  const int center_width = get_window_width();
-  return (center_width - get_columns() * get_tile_width()) / 2;
-}
-
-int get_border_height(void) {
-  const int center_height = get_window_height() - 2 * get_bar_height();
-  return (center_height - get_lines() * get_tile_height()) / 2;
-}
-
-static int derive_font_size(void) { return (int)(get_bar_height() * 0.6); }
 
 /**
  * Swap the renderer color by the provided color.
@@ -110,7 +77,7 @@ static Code initialize_fonts(void) {
     return CODE_OK;
   }
   /* We try to open the font if we need to initialize. */
-  font = TTF_OpenFont(MONOSPACED_FONT_PATH, derive_font_size());
+  font = TTF_OpenFont(MONOSPACED_FONT_PATH, get_font_size());
   /* If it failed, we log an error. */
   if (font == NULL) {
     sprintf(log_buffer, "TTF font opening error: %s", SDL_GetError());
@@ -144,24 +111,21 @@ static Code initialize_font_metrics(void) {
  *
  * Updates the pointers with the window width, window height, and bar height.
  */
-static Window *create_window(int *width, int *height, int *bar_height) {
+static Window *create_window(int *width, int *height) {
   const char *title = GAME_NAME;
   const int x = SDL_WINDOWPOS_CENTERED;
   const int y = SDL_WINDOWPOS_CENTERED;
-  int w = get_requested_window_width();
-  int h = get_requested_window_height();
-  Uint32 flags = SDL_WINDOW_FULLSCREEN_DESKTOP;
-  int line_height;
+  int w = get_window_width();
+  int h = get_window_height();
+  Uint32 flags = SDL_WINDOW_INPUT_FOCUS;
   Window *window;
   if (w > 0 && h > 0) {
     log_message("Got requested width and height, setting fullscreen...");
     /* Do NOT use desktop resolution, use what we provided. */
-    flags = SDL_WINDOW_FULLSCREEN;
+    flags = SDL_WINDOW_INPUT_FOCUS;
   }
   window = SDL_CreateWindow(title, x, y, w, h, flags);
   SDL_GetWindowSize(window, width, height);
-  line_height = (*height - 2 * MINIMUM_BAR_HEIGHT) / get_lines();
-  *bar_height = (*height - get_lines() * line_height) / 2;
   return window;
 }
 
@@ -192,7 +156,6 @@ Code initialize(Window **window, Renderer **renderer) {
   initialize_logger();
   initialize_profiler();
   initialize_settings();
-  /* Initialize SDL. */
   if (SDL_Init(SDL_INIT_FLAGS)) {
     sprintf(log_buffer, "SDL initialization error: %s", SDL_GetError());
     log_message(log_buffer);
@@ -200,7 +163,6 @@ Code initialize(Window **window, Renderer **renderer) {
   }
   SDL_ShowCursor(SDL_DISABLE);
   initialize_joystick();
-  /* Initialize TTF. */
   if (!TTF_WasInit()) {
     if (TTF_Init()) {
       sprintf(log_buffer, "TTF initialization error: %s", SDL_GetError());
@@ -219,7 +181,7 @@ Code initialize(Window **window, Renderer **renderer) {
    * experimenting before creating the window.
    */
   /* Log the size of the window we are going to create. */
-  *window = create_window(&window_width, &window_height, &bar_height);
+  *window = create_window(&window_width, &window_height);
   sprintf(log_buffer, "Created a %dx%d window", window_width, window_height);
   log_message(log_buffer);
   if (*window == NULL) {

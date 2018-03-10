@@ -20,6 +20,8 @@ int bounding_box_equals(const BoundingBox *a, const BoundingBox *const b);
  */
 int bounding_box_overlaps(const BoundingBox *a, const BoundingBox *const b);
 
+int bounding_box_width(const BoundingBox *a);
+
 long bounding_box_area(const BoundingBox *box);
 
 #endif
