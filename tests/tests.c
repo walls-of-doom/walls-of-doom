@@ -396,9 +396,7 @@ void test_generate_platforms_avoids_multiple_platforms_on_the_same_line(void) {
   resize_memory(y_counter, 0);
 }
 
-void test_find_next_power_of_two_works_for_zero(void) {
-  TEST_ASSERT_EQUAL_INT32(find_next_power_of_two(0), 1);
-}
+void test_find_next_power_of_two_works_for_zero(void) { TEST_ASSERT_EQUAL_INT32(find_next_power_of_two(0), 1); }
 
 void test_find_next_power_of_two_works_for_positive_integers(void) {
   const unsigned long one = 1;

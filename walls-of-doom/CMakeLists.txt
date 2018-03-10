@@ -55,7 +55,7 @@ find_package (SDL2_image REQUIRED)
 include_directories (${SDL2_INCLUDE_DIR} ${SDL2_TTF_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
 target_link_libraries (walls-of-doom-base ${SDL2_LIBRARY} ${SDL2_TTF_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
 
-add_executable (walls-of-doom main.c ${walls-of-doom-sources})
+add_executable (walls-of-doom main.c ${walls-of-doom-sources} boolean.h)
 if (UNIX)
     target_link_libraries (walls-of-doom m)
 endif (UNIX)

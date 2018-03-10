@@ -1,13 +1,12 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
+#include "boolean.h"
 #include "clock.h"
 #include "code.h"
-#include <stdbool.h>
 
 /**
- * The Command enumerated type represents the different commands the user may
- * issue.
+ * The Command enumeration represents the different commands the user may issue.
  */
 typedef enum Command {
   COMMAND_NONE,
@@ -35,7 +34,7 @@ typedef struct CommandTable {
 
 void initialize_command_table(CommandTable *table);
 
-bool test_command_table(CommandTable *table, enum Command command, Milliseconds repetition_delay);
+Boolean test_command_table(CommandTable *table, enum Command command, Milliseconds repetition_delay);
 
 void read_commands(CommandTable *table);
 

@@ -1,10 +1,6 @@
 #include "command.h"
 
-#include "clock.h"
 #include "joystick.h"
-#include "player.h"
-
-#include <stdbool.h>
 
 /**
  * Returns the Command value corresponding to the provided key combination.
@@ -119,7 +115,7 @@ void read_commands(CommandTable *table) {
   }
 }
 
-bool test_command_table(CommandTable *table, Command command, Milliseconds repetition_delay) {
+Boolean test_command_table(CommandTable *table, Command command, Milliseconds repetition_delay) {
   if (table->status[command] == 0.0) {
     return false;
   }

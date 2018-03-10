@@ -13,8 +13,9 @@
 #include "settings.h"
 #include "text.h"
 #include "version.h"
+
 #include <SDL.h>
-#include <ecpglib.h>
+
 #include <stdlib.h>
 #include <string.h>
 
