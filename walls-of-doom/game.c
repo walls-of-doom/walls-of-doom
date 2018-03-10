@@ -223,7 +223,8 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
       read_commands(game->player->table);
       if (test_command_table(game->player->table, COMMAND_CLOSE, 200)) {
         code = CODE_CLOSE;
-      } else if (test_command_table(game->player->table, COMMAND_CLOSE, 200)) {
+      }
+      if (test_command_table(game->player->table, COMMAND_QUIT, 200)) {
         code = CODE_QUIT;
       }
       if (test_command_table(game->player->table, COMMAND_PAUSE, 200)) {
