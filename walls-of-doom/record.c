@@ -13,7 +13,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#define READ_TABLE_FAILURE_FORMAT "Failed to read a RecordTable from %s"
 #define READ_TABLE_BUFFER_SIZE 256
 #define RECORD_CSV_OUT "\"%s\",%ld\n"
 
@@ -22,7 +21,7 @@ typedef struct RecordTable {
   Record records[RECORD_ARRAY_SIZE];
 } RecordTable;
 
-Record make_record(const char *name, const int score) {
+Record make_record(const char *name, const Score score) {
   Record record;
   /* Safely copy the provided name into the array. */
   memset(record.name, '\0', MAXIMUM_PLAYER_NAME_SIZE);
