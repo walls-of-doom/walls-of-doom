@@ -83,9 +83,9 @@ static Code initialize_fonts(void) {
     sprintf(log_buffer, "TTF font opening error: %s.", SDL_GetError());
     log_message(log_buffer);
     return CODE_ERROR;
-  } else {
-    global_monospaced_font = font;
   }
+  global_monospaced_font = font;
+
   return CODE_OK;
 }
 

@@ -1,5 +1,6 @@
 #include "command.h"
 
+#include "clock.h"
 #include "joystick.h"
 
 /**
@@ -10,7 +11,8 @@ static Command command_from_key(const SDL_Keysym keysym) {
   const Uint16 mod = keysym.mod;
   if (sym == SDLK_KP_8 || sym == SDLK_UP) {
     return COMMAND_UP;
-  } else if (sym == SDLK_KP_4 || sym == SDLK_LEFT) {
+  }
+  if (sym == SDLK_KP_4 || sym == SDLK_LEFT) {
     return COMMAND_LEFT;
   } else if (sym == SDLK_KP_5) {
     return COMMAND_CENTER;
@@ -43,10 +45,10 @@ static void set_command_table(CommandTable *table, Command command, double value
 }
 
 static void digest_joystick_event(CommandTable *table, SDL_Event event) {
+  const Milliseconds time = get_milliseconds();
   if (table == NULL) {
     return;
   }
-  const Milliseconds time = get_milliseconds();
   if (event.type == SDL_JOYBUTTONDOWN) {
     set_command_table(table, command_from_joystick_event(event), 1.0, time);
   } else if (event.type == SDL_JOYBUTTONUP) {
@@ -84,10 +86,10 @@ static void digest_joystick_event(CommandTable *table, SDL_Event event) {
 }
 
 static void digest_event(CommandTable *table, const SDL_Event event) {
+  const Milliseconds time = get_milliseconds();
   if (table == NULL) {
     return;
   }
-  const Milliseconds time = get_milliseconds();
   if (event.type == SDL_QUIT) {
     set_command_table(table, COMMAND_QUIT, 1.0, time);
   } else if (event.type == SDL_KEYDOWN) {
@@ -142,7 +144,8 @@ Code wait_for_input(CommandTable *table) {
       if (event.type == SDL_KEYDOWN) {
         test_command_table(table, command_from_key(event.key.keysym), 0);
         return CODE_OK;
-      } else if (event.type == SDL_JOYBUTTONDOWN) {
+      }
+      if (event.type == SDL_JOYBUTTONDOWN) {
         test_command_table(table, command_from_joystick_event(event), 0);
         return CODE_OK;
       }

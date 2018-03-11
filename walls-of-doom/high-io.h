@@ -16,8 +16,7 @@
  *
  * The string will be echoed after the prompt, which starts at (x, y).
  */
-Code read_string(const int x, const int y, const char *prompt, char *destination, const size_t size,
-                 Renderer *renderer);
+Code read_string(int x, int y, const char *prompt, char *destination, size_t size, Renderer *renderer);
 
 /**
  * Attempts to read a player name.

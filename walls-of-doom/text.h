@@ -20,7 +20,7 @@ size_t copy_string(char *destination, const char *source, const size_t size);
  *
  * NUL terminates the destination string, unless size == 0.
  */
-size_t copy_string_up_to(char *destination, const char *source, const char *end, const size_t size);
+size_t copy_string_up_to(char *destination, const char *begin, const char *end, const size_t size);
 
 /**
  * Compares two strings to determine whether or not they are equal.

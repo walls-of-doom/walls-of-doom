@@ -14,8 +14,7 @@ Code info(SDL_Renderer *renderer, CommandTable *table) {
   if (code != CODE_OK) {
     log_message("Failed to read the text.");
     return code;
-  } else {
-    print_long_text(buffer, renderer);
-    return wait_for_input(table);
   }
+  print_long_text(buffer, renderer);
+  return wait_for_input(table);
 }

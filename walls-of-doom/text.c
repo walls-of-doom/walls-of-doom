@@ -63,9 +63,8 @@ size_t copy_string_up_to(char *destination, const char *begin, const char *end, 
 
   if (s == end) {
     return end - begin + 1;
-  } else {
-    return size;
   }
+  return size;
 }
 
 /**

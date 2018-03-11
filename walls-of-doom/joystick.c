@@ -61,47 +61,43 @@ void initialize_joystick() {
 static int get_invest_button() {
   if (get_joystick_profile() == JOYSTICK_PROFILE_XBOX) {
     return XBOX_Y;
-  } else {
-    return DUALSHOCK_TRIANGLE;
   }
+  return DUALSHOCK_TRIANGLE;
 }
 
 static int get_convert_button() {
   if (get_joystick_profile() == JOYSTICK_PROFILE_XBOX) {
     return XBOX_B;
-  } else {
-    return DUALSHOCK_CIRCLE;
   }
+  return DUALSHOCK_CIRCLE;
 }
 
 static int get_jump_button() {
   if (get_joystick_profile() == JOYSTICK_PROFILE_XBOX) {
     return XBOX_A;
-  } else {
-    return DUALSHOCK_CROSS;
   }
+  return DUALSHOCK_CROSS;
 }
 
 static int get_enter_button() {
   if (get_joystick_profile() == JOYSTICK_PROFILE_XBOX) {
     return XBOX_START;
-  } else {
-    return DUALSHOCK_START;
   }
+  return DUALSHOCK_START;
 }
 
 static int get_pause_button() {
   if (get_joystick_profile() == JOYSTICK_PROFILE_XBOX) {
     return XBOX_BACK;
-  } else {
-    return DUALSHOCK_SELECT;
   }
+  return DUALSHOCK_SELECT;
 }
 
 Command command_from_joystick_button(Uint8 button) {
   if (button == get_invest_button()) {
     return COMMAND_INVEST;
-  } else if (button == get_convert_button()) {
+  }
+  if (button == get_convert_button()) {
     return COMMAND_CONVERT;
   } else if (button == get_jump_button()) {
     return COMMAND_JUMP;
@@ -116,18 +112,21 @@ Command command_from_joystick_button(Uint8 button) {
 Command command_from_joystick_event(const SDL_Event event) {
   if (event.type == SDL_JOYBUTTONDOWN || event.type == SDL_JOYBUTTONUP) {
     return command_from_joystick_button(event.jbutton.button);
-  } else if (event.type == SDL_JOYAXISMOTION) {
+  }
+  if (event.type == SDL_JOYAXISMOTION) {
     if (abs(event.jaxis.value) > JOYSTICK_DEAD_ZONE) {
       if (event.jaxis.axis == 0) {
         if (event.jaxis.value > 0) {
           return COMMAND_RIGHT;
-        } else if (event.jaxis.value < 0) {
+        }
+        if (event.jaxis.value < 0) {
           return COMMAND_LEFT;
         }
       } else {
         if (event.jaxis.value > 0) {
           return COMMAND_DOWN;
-        } else if (event.jaxis.value < 0) {
+        }
+        if (event.jaxis.value < 0) {
           return COMMAND_UP;
         }
       }

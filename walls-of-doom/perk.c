@@ -20,7 +20,8 @@ int is_curse_perk(const Perk perk) {
 char *get_perk_name(Perk perk) {
   if (perk == PERK_POWER_INVINCIBILITY) {
     return "Invincibility";
-  } else if (perk == PERK_POWER_LEVITATION) {
+  }
+  if (perk == PERK_POWER_LEVITATION) {
     return "Levitation";
   } else if (perk == PERK_POWER_LOW_GRAVITY) {
     return "Low Gravity";

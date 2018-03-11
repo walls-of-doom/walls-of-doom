@@ -25,10 +25,9 @@ ParserResult parse_argument(const char *argument) {
   if (string_equals(argument, "--version")) {
     printf("%s\n", WALLS_OF_DOOM_VERSION);
     return PARSER_RESULT_QUIT;
-  } else {
-    log_unrecognized_argument(argument);
-    return PARSER_RESULT_QUIT;
   }
+  log_unrecognized_argument(argument);
+  return PARSER_RESULT_QUIT;
 }
 
 /* Must be declared with parameters because of SDL 2. */

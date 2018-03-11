@@ -76,7 +76,8 @@ static int is_valid_move(const Game *const game, const int x, const int y) {
     /* If it is invincible, it shouldn't move into walls. */
     if (x == game->box->min_x - 1) {
       return 0;
-    } else if (x + game->player->w - 1 == game->box->max_x + 1) {
+    }
+    if (x + game->player->w - 1 == game->box->max_x + 1) {
       return 0;
     } else if (y == game->box->min_y - 1) {
       return 0;
@@ -214,13 +215,15 @@ static int can_move_platform(Game *const game, Platform *p, int dx, int dy) {
   if (dx == 0) {
     if (dy < 0) {
       return is_free_on_matrix(game, p->x, p->y + dy, p->w, -dy);
-    } else if (dy > 0) {
+    }
+    if (dy > 0) {
       return is_free_on_matrix(game, p->x, p->y + p->h, p->w, dy);
     }
   } else if (dy == 0) {
     if (dx < 0) {
       return is_free_on_matrix(game, p->x + dx, p->y, -dx, p->h);
-    } else if (dx > 0) {
+    }
+    if (dx > 0) {
       return is_free_on_matrix(game, p->x + p->w, p->y, dx, p->h);
     }
   } else {
@@ -420,7 +423,8 @@ int is_out_of_bounding_box(Platform *const platform, const BoundingBox *const bo
   const int max_x = platform->x + platform->w;
   if (max_x < box->min_x || min_x > box->max_x) {
     return 1;
-  } else if (platform->y < box->min_y || platform->y > box->max_y) {
+  }
+  if (platform->y < box->min_y || platform->y > box->max_y) {
     return 2;
   } else {
     return 0;
@@ -609,13 +613,13 @@ static int get_investment_total(Player *player, InvestmentMode mode) {
   Score product;
   if (mode == INVESTMENT_MODE_FIXED) {
     return base_amount;
-  } else if (mode == INVESTMENT_MODE_PROPORTIONAL) {
+  }
+  if (mode == INVESTMENT_MODE_PROPORTIONAL) {
     product = player->score * proportion;
     if (product >= base_amount) {
       return product;
-    } else {
-      return base_amount;
     }
+    return base_amount;
   }
   /* Unknown investment type. */
   return 0;

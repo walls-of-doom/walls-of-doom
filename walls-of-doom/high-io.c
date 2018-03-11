@@ -58,7 +58,8 @@ Code read_player_name(char *destination, const size_t maximum_size, Renderer *re
     code = read_string(x, y, message, destination, maximum_size, renderer);
     if (code == CODE_QUIT) {
       return CODE_QUIT;
-    } else if (code == CODE_OK) {
+    }
+    if (code == CODE_OK) {
       sprintf(log_buffer, "Read %s from the user.", destination);
       log_message(log_buffer);
       /* Trim the name the user entered. */
@@ -69,15 +70,6 @@ Code read_player_name(char *destination, const size_t maximum_size, Renderer *re
     }
   }
   return code;
-}
-
-/**
- * Prints the provided string on the screen starting at (x, y).
- */
-Code print(const int x, const int y, const char *string, const ColorPair color_pair, Renderer *renderer) {
-  const int absolute_x = get_tile_width() * x;
-  const int absolute_y = get_bar_height() + get_tile_height() * (y - 1);
-  return print_absolute(absolute_x, absolute_y, string, color_pair, renderer);
 }
 
 /**
@@ -92,8 +84,7 @@ void print_menu(int line_count, char **lines, Renderer *renderer) {
 /**
  * Draws an absolute rectangle based on the provided coordinates.
  */
-static void draw_absolute_rectangle(const int x, const int y, const int w, const int h, Color color,
-                                    Renderer *renderer) {
+static void draw_absolute_rectangle(int x, int y, int w, int h, Color color, Renderer *renderer) {
   SDL_Color swap = to_sdl_color(color);
   SDL_Rect rectangle;
   rectangle.x = x;
@@ -108,9 +99,7 @@ static void draw_absolute_rectangle(const int x, const int y, const int w, const
 /**
  * Draws a shaded absolute rectangle based on the provided coordinates.
  */
-static void draw_shaded_absolute_rectangle(const int x, const int y, const int w, const int h, Color color,
-                                           Renderer *renderer) {
-
+static void draw_shaded_absolute_rectangle(int x, int y, int w, int h, Color color, Renderer *renderer) {
   SDL_Color swap = to_sdl_color(color);
   SDL_Rect rectangle;
   rectangle.x = x;
@@ -449,7 +438,8 @@ Code read_string(const int x, const int y, const char *prompt, char *destination
        */
       if (event.type == SDL_QUIT) {
         return CODE_QUIT;
-      } else if (event.type == SDL_KEYDOWN) {
+      }
+      if (event.type == SDL_KEYDOWN) {
         /* Handle backspace. */
         if (event.key.keysym.sym == SDLK_BACKSPACE && written > 0) {
           write--;

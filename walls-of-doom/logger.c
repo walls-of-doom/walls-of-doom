@@ -17,7 +17,7 @@
 
 #define SCORE_FILE_NAME "score.txt"
 
-#define LOG_MESSAGE_SIZE TIMESTAMP_BUFFER_SIZE + 256
+#define LOG_MESSAGE_SIZE (TIMESTAMP_BUFFER_SIZE + 256)
 
 /**
  * Initializes the logger. Should only be called once.

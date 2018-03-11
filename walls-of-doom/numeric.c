@@ -8,7 +8,8 @@
 int normalize(const int value) {
   if (value < 0) {
     return -1;
-  } else if (value == 0) {
+  }
+  if (value == 0) {
     return 0;
   } else {
     return 1;
@@ -35,9 +36,8 @@ int count_digits(long value) {
 int min_int(const int a, const int b) {
   if (b > a) {
     return a;
-  } else {
-    return b;
   }
+  return b;
 }
 
 /**
@@ -46,7 +46,6 @@ int min_int(const int a, const int b) {
 int max_int(const int a, const int b) {
   if (b < a) {
     return a;
-  } else {
-    return b;
   }
+  return b;
 }

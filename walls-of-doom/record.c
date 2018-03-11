@@ -33,7 +33,8 @@ Record make_record(const char *name, const Score score) {
 int compare_records(const Record *const a, const Record *const b) {
   if (a->score < b->score) {
     return -1;
-  } else if (a->score == b->score) {
+  }
+  if (a->score == b->score) {
     return 0;
   } else {
     return 1;

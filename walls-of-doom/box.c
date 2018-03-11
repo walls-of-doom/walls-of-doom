@@ -23,7 +23,8 @@ int bounding_box_overlaps(const BoundingBox *a, const BoundingBox *const b) {
   /* Two boxes overlap if, and only if, a corner is contained in another. */
   if (bounding_box_contains(a, b->min_x, b->min_y)) {
     return 1;
-  } else if (bounding_box_contains(a, b->min_x, b->max_y)) {
+  }
+  if (bounding_box_contains(a, b->min_x, b->max_y)) {
     return 1;
   } else if (bounding_box_contains(a, b->max_x, b->min_y)) {
     return 1;
