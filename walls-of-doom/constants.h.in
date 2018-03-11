@@ -22,10 +22,7 @@
 
 #define MAXIMUM_PLAYER_NAME_SIZE 64
 
-/**
- * The number of frames per second the engine renders.
- */
-#define FPS 60
+#define FPS 200
 
 #define PLAYER_RUNNING_SPEED 9
 
