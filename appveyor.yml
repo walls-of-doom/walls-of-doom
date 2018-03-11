@@ -1,13 +1,11 @@
 version: build-{build}
 
-# Build worker image (VM template)
 image: Visual Studio 2015
 
 init: git config --global core.autocrlf input
 
 clone_folder: C:\walls-of-doom\
 
-# Fetch repository as zip archive
 shallow_clone: true
 
 before_build:
@@ -36,17 +34,15 @@ before_build:
 
   - echo Running cmake...
   - cd C:\walls-of-doom\build
-  - cmake -G "Visual Studio 10 2010" ..  # Only make a 32-bit version
+  - cmake -G "Visual Studio 10 2010" ..
 
   - echo Building the project...
   - cmake --build . --config Release
 
 build:
-  # parallel: true                  # Enable MSBuild parallel builds
-  # project: walls-of-doom.sln      # Path to Visual Studio solution or project
+  # parallel: true
 
 after_build:
-  # Package the artifact
   - 7z a walls-of-doom\Release\walls-of-doom.zip .\walls-of-doom\Release\walls-of-doom.exe .\walls-of-doom\assets .\lib\*.dll
 
 artifacts:
@@ -61,4 +57,4 @@ deploy:
   draft: false
   prerelease: false
   on:
-    appveyor_repo_tag: true  # Deploy only on tags
+    appveyor_repo_tag: true
