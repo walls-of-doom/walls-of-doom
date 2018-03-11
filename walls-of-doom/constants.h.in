@@ -2,10 +2,6 @@
 #define CONSTANTS_H
 
 /**
- * This header file defines most of the constants used in the application.
- */
-
-/**
  * How many strings the top bar has.
  */
 #define TOP_BAR_STRING_COUNT 4
@@ -15,8 +11,7 @@
  *
  * This is the maximum size which the application strings should have.
  *
- * Several functions hold arrays of this size. Therefore, increasing it will
- * likely dramatically increase the usage of the stack.
+ * Several functions hold arrays of this size. Increasing it will likely dramatically increase stack usage.
  */
 #define MAXIMUM_STRING_SIZE 256
 
