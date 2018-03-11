@@ -20,6 +20,7 @@ set(walls-of-doom-sources
         command.h command.c
         constants.h
         data.h data.c
+        integers.h
         game.h game.c
         graphics.h graphics.c
         high-io.h high-io.c
