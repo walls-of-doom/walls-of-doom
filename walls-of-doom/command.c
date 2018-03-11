@@ -119,10 +119,10 @@ void read_commands(CommandTable *table) {
 }
 
 int test_command_table(CommandTable *table, Command command, Milliseconds repetition_delay) {
+  const Milliseconds time = get_milliseconds();
   if (table->status[command] == 0.0) {
     return 0;
   }
-  const Milliseconds time = get_milliseconds();
   if (time - table->last_issued[command] < repetition_delay) {
     return 0;
   }
