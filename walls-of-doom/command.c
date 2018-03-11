@@ -103,7 +103,8 @@ static void digest_event(CommandTable *table, const SDL_Event event) {
 
 void initialize_command_table(CommandTable *table) {
   const Milliseconds time = get_milliseconds();
-  for (int i = 0; i < COMMAND_COUNT; i++) {
+  int i;
+  for (i = 0; i < COMMAND_COUNT; i++) {
     table->status[i] = 0.0;
     table->last_issued[i] = time;
     table->last_modified[i] = time;

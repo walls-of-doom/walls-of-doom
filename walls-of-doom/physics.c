@@ -541,14 +541,17 @@ void process_curse(Game *const game, const Perk perk) {
 
 void update_perk(Game *const game) {
   unsigned long next_perk_frame = game->perk_end_frame;
+  int random_x;
+  int random_y;
   next_perk_frame += PERK_INTERVAL_IN_FRAMES;
   next_perk_frame -= PERK_SCREEN_DURATION_IN_FRAMES;
   if (game->played_frames == game->perk_end_frame) {
     game->perk = PERK_NONE;
   } else if (game->played_frames == next_perk_frame) {
     game->perk = get_random_perk();
-    game->perk_x = random_integer(0, get_window_width() - get_tile_width());
-    const int random_y = random_integer(get_bar_height(), get_window_height() - 2 * get_bar_height());
+    random_x = random_integer(0, get_window_width() - get_tile_width());
+    random_y = random_integer(get_bar_height(), get_window_height() - 2 * get_bar_height());
+    game->perk_x = random_x;
     game->perk_y = random_y - random_y % get_tile_height();
     game->perk_end_frame = game->played_frames + PERK_SCREEN_DURATION_IN_FRAMES;
   }

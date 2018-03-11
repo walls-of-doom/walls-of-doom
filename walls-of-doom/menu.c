@@ -90,6 +90,7 @@ int main_menu(SDL_Renderer *renderer) {
   int should_quit = 0;
   Code code = CODE_OK;
   Menu menu;
+  CommandTable command_table;
   char title[MAXIMUM_STRING_SIZE];
   char *options[] = {"Play", "Top Scores", "Info", "Quit"};
   sprintf(title, "%s %s", "Walls of Doom", WALLS_OF_DOOM_VERSION);
@@ -97,7 +98,6 @@ int main_menu(SDL_Renderer *renderer) {
   menu.options = options;
   menu.option_count = 4;
   menu.selected_option = 0;
-  CommandTable command_table;
   initialize_command_table(&command_table);
   while (!should_quit) {
     write_menu(&menu, renderer);
