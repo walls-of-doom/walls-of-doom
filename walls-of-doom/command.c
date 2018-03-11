@@ -141,7 +141,7 @@ Code wait_for_input(CommandTable *table) {
       if (event.type == SDL_QUIT) {
         return CODE_QUIT;
       }
-      // Mark this command as read. This prevents a key press from being carried to another screen.
+      /* Mark this command as read. This prevents a key press from being carried to another screen. */
       if (event.type == SDL_KEYDOWN) {
         test_command_table(table, command_from_key(event.key.keysym), 0);
         return CODE_OK;

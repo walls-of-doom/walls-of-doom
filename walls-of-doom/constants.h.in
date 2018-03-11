@@ -6,6 +6,8 @@
  */
 #define TOP_BAR_STRING_COUNT 4
 
+#define REPETITION_DELAY 100
+
 /**
  * All stack character buffers default to this size.
  *

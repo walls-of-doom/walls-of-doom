@@ -221,13 +221,13 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
         sleep_milliseconds(interval - drawing_delta);
       }
       read_commands(game->player->table);
-      if (test_command_table(game->player->table, COMMAND_CLOSE, 200)) {
+      if (test_command_table(game->player->table, COMMAND_CLOSE, REPETITION_DELAY)) {
         code = CODE_CLOSE;
       }
-      if (test_command_table(game->player->table, COMMAND_QUIT, 200)) {
+      if (test_command_table(game->player->table, COMMAND_QUIT, REPETITION_DELAY)) {
         code = CODE_QUIT;
       }
-      if (test_command_table(game->player->table, COMMAND_PAUSE, 200)) {
+      if (test_command_table(game->player->table, COMMAND_PAUSE, REPETITION_DELAY)) {
         game->paused = 0;
       }
       continue;
@@ -244,7 +244,7 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
     read_commands(game->player->table);
     update_player(game, game->player);
     game->frame++;
-    if (test_command_table(game->player->table, COMMAND_PAUSE, 200)) {
+    if (test_command_table(game->player->table, COMMAND_PAUSE, REPETITION_DELAY)) {
       game->paused = 1;
     }
   }

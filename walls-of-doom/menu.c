@@ -19,8 +19,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define DEFAULT_DELAY 200
-
 typedef struct Menu {
   char *title;
   char **options;
@@ -102,20 +100,20 @@ int main_menu(SDL_Renderer *renderer) {
   while (!should_quit) {
     write_menu(&menu, renderer);
     read_commands(&command_table);
-    if (test_command_table(&command_table, COMMAND_UP, DEFAULT_DELAY)) {
+    if (test_command_table(&command_table, COMMAND_UP, REPETITION_DELAY)) {
       if (menu.selected_option > 0) {
         menu.selected_option--;
       } else {
         menu.selected_option = menu.option_count - 1;
       }
-    } else if (test_command_table(&command_table, COMMAND_DOWN, DEFAULT_DELAY)) {
+    } else if (test_command_table(&command_table, COMMAND_DOWN, REPETITION_DELAY)) {
       if (menu.selected_option + 1 < menu.option_count) {
         menu.selected_option++;
       } else {
         menu.selected_option = 0;
       }
-    } else if (test_command_table(&command_table, COMMAND_ENTER, DEFAULT_DELAY) ||
-               test_command_table(&command_table, COMMAND_CENTER, DEFAULT_DELAY)) {
+    } else if (test_command_table(&command_table, COMMAND_ENTER, REPETITION_DELAY) ||
+               test_command_table(&command_table, COMMAND_CENTER, REPETITION_DELAY)) {
       if (menu.selected_option == 0) {
         code = game(renderer, &command_table);
       } else if (menu.selected_option == 1) {
@@ -131,7 +129,7 @@ int main_menu(SDL_Renderer *renderer) {
       }
     }
     /* Quit if the user selected the Quit option or closed the window. */
-    should_quit = should_quit || test_command_table(&command_table, COMMAND_QUIT, DEFAULT_DELAY);
+    should_quit = should_quit || test_command_table(&command_table, COMMAND_QUIT, REPETITION_DELAY);
   }
   return 0;
 }
