@@ -20,6 +20,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
+#include <string>
 
 #define GAME_NAME "Walls of Doom"
 
@@ -141,21 +142,23 @@ static void write_top_bar_strings(char *strings[], Renderer *renderer) {
  */
 static void draw_top_bar(const Game *game, Renderer *renderer) {
   const Player *player = game->player;
+  char time_buffer[MAXIMUM_STRING_SIZE];
+  char perk_buffer[MAXIMUM_STRING_SIZE];
   char lives_buffer[MAXIMUM_STRING_SIZE];
   char score_buffer[MAXIMUM_STRING_SIZE];
-  char time_buffer[MAXIMUM_STRING_SIZE];
   char *strings[TOP_BAR_STRING_COUNT];
-  char *perk_name = "No Power";
-  const unsigned long limit = game->limit_played_frames;
-  double time_left = (limit - game->played_frames) / (double)UPS;
-  sprintf(time_buffer, "%.2f s", time_left);
+  std::string perk_name = "No Power";
   if (player->perk != PERK_NONE) {
     perk_name = get_perk_name(player->perk);
   }
+  const unsigned long limit = game->limit_played_frames;
+  double time_left = (limit - game->played_frames) / (double)UPS;
+  sprintf(time_buffer, "%.2f s", time_left);
   sprintf(lives_buffer, "Lives: %d", player->lives);
   sprintf(score_buffer, "Score: %ld", player->score);
+  copy_string(perk_buffer, perk_name.c_str(), MAXIMUM_STRING_SIZE);
   strings[0] = time_buffer;
-  strings[1] = perk_name;
+  strings[1] = perk_buffer;
   strings[2] = lives_buffer;
   strings[3] = score_buffer;
   write_top_bar_strings(strings, renderer);
@@ -338,10 +341,10 @@ void print_records(const size_t count, const Record *records, Renderer *renderer
   const size_t printed = min_int(count, text_lines_limit);
   char **strings = NULL;
   size_t i;
-  strings = resize_memory(strings, sizeof(char *) * printed);
+  strings = reinterpret_cast<char **>(resize_memory(strings, sizeof(char *) * printed));
   for (i = 0; i < printed; i++) {
     strings[i] = NULL;
-    strings[i] = resize_memory(strings[i], string_width);
+    strings[i] = reinterpret_cast<char *>(resize_memory(strings[i], string_width));
     record_to_string(records + i, strings[i], string_width - 1);
   }
   clear(renderer);

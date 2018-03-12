@@ -1,6 +1,4 @@
 #include "sort.h"
-#include <stdlib.h>
-#include <string.h>
 
 /**
  * Sorts the first count elements of the array pointed to by start, each element

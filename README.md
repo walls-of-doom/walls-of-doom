@@ -1,6 +1,8 @@
 # Walls of Doom
 
-Walls of Doom is a minimalistic [platformer](https://en.wikipedia.org/wiki/Platform_game) written in [ANSI C](https://en.wikipedia.org/wiki/ANSI_C) using SDL 2.
+Walls of Doom is a minimalistic [platformer](https://en.wikipedia.org/wiki/Platform_game) written in C++ using SDL 2.
+
+The game was written in [ANSI C](https://en.wikipedia.org/wiki/ANSI_C), but I decided to move on to a safer and more modern language. However, several parts of the codebase are still just pure C code.
 
 The game should work under Windows, Linux, and everything that SDL 2 supports.
 

@@ -12,6 +12,8 @@
 #include "text.h"
 #include <stdio.h>
 #include <string.h>
+#include <string>
+#include <vector>
 
 #define READ_TABLE_BUFFER_SIZE 256
 #define RECORD_CSV_OUT "\"%s\",%ld\n"
@@ -45,7 +47,7 @@ int compare_void_records(const void *a, const void *b) { return compare_records(
 
 void populate_table_with_default_records(RecordTable *table) {
   Record empty_record;
-  static char *names[] = {"Adam", "Bree", "Cora", "Dave", "Elmo"};
+  std::vector<std::string> names = {"Adam", "Bree", "Cora", "Dave", "Elmo"};
   static int scores[] = {18, 14, 10, 8, 2};
   size_t i;
   size_t end = sizeof(scores) / sizeof(int);
@@ -54,7 +56,7 @@ void populate_table_with_default_records(RecordTable *table) {
   }
   table->record_count = 0;
   for (i = 0; i < end; i++) {
-    table->records[i] = make_record(names[i], scores[i]);
+    table->records[i] = make_record(names[i].c_str(), scores[i]);
     table->record_count++;
   }
   /* Safely fill the rest of the table with the empty record. */
@@ -99,7 +101,7 @@ void read_table(RecordTable *table) {
   FILE *file;
   size_t i;
   char *buffer = NULL;
-  buffer = resize_memory(buffer, READ_TABLE_BUFFER_SIZE);
+  buffer = reinterpret_cast<char *>(resize_memory(buffer, READ_TABLE_BUFFER_SIZE));
   get_full_path(path, RECORD_TABLE_FILE_NAME);
   if (file_exists(path)) {
     file = fopen(path, "r");

@@ -2,6 +2,7 @@
 #define INVESTMENT_H
 
 #include "score.h"
+#include <string>
 
 typedef struct Investment {
   struct Investment *next;
@@ -15,6 +16,6 @@ typedef enum InvestmentMode {
   INVESTMENT_MODE_COUNT
 } InvestmentMode;
 
-char *get_investment_mode_name(InvestmentMode mode);
+std::string get_investment_mode_name(InvestmentMode mode);
 
 #endif

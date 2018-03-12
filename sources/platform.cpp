@@ -22,7 +22,7 @@ void generate_platforms(Platform *platforms, const BoundingBox *const box, const
   int random_y;
   int speed;
   int i;
-  density = resize_memory(density, sizeof(unsigned char) * lines);
+  density = reinterpret_cast<unsigned char *>(resize_memory(density, sizeof(unsigned char) * lines));
   memset(density, 0, lines);
   for (i = 0; i < count; i++) {
     platform = platforms + i;

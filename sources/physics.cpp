@@ -327,7 +327,7 @@ int select_random_line_awarely(const unsigned char *lines, const int size) {
   if (size < 1) {
     return 0;
   }
-  distances = resize_memory(distances, sizeof(int) * size);
+  distances = reinterpret_cast<int *>(resize_memory(distances, sizeof(int) * size));
   /* First pass: calculate the distance to nearest occupied line above. */
   for (i = 0; i < size; i++) {
     if (lines[i]) {
@@ -382,7 +382,7 @@ static void reposition(Game *const game, Platform *const platform) {
   unsigned char *occupied = NULL;
   int line;
   size_t i;
-  occupied = resize_memory(occupied, occupied_size);
+  occupied = reinterpret_cast<unsigned char *>(resize_memory(occupied, occupied_size));
   memset(occupied, 0, occupied_size);
   /* Build a table of occupied rows. */
   for (i = 0; i < game->platform_count; i++) {
@@ -636,7 +636,7 @@ static void invest(Game *game, InvestmentMode mode) {
     return;
   }
   if (game->player->score >= amount) {
-    investment = resize_memory(investment, sizeof(Investment));
+    investment = reinterpret_cast<Investment *>(resize_memory(investment, sizeof(Investment)));
     player_score_sub(game->player, amount);
     investment->next = NULL;
     investment->amount = amount;
@@ -743,20 +743,20 @@ void update_double_jump(Game *game) {
 
 static void write_got_perk_message(Game *game, const Perk perk) {
   char message[MAXIMUM_STRING_SIZE];
-  sprintf(message, "Got %s!", get_perk_name(perk));
+  sprintf(message, "Got %s!", get_perk_name(perk).c_str());
   game_set_message(game, message, 1, 0);
 }
 
 static void write_perk_faded_message(Game *game, const Perk perk) {
   char message[MAXIMUM_STRING_SIZE];
-  sprintf(message, "%s has faded.", get_perk_name(perk));
+  sprintf(message, "%s has faded.", get_perk_name(perk).c_str());
   game_set_message(game, message, 1, 0);
 }
 
 static void write_perk_fading_message(Game *game, const Perk perk, const unsigned long remaining_frames) {
   const int seconds = remaining_frames / UPS;
   char message[MAXIMUM_STRING_SIZE];
-  const char *perk_name = get_perk_name(perk);
+  const char *perk_name = get_perk_name(perk).c_str();
   if (seconds < 1) {
     sprintf(message, "%s will fade at any moment.", perk_name);
   } else if (seconds == 1) {

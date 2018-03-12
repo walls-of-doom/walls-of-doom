@@ -1,7 +1,7 @@
 #ifndef SORT_H
 #define SORT_H
 
-#include <stdlib.h>
+#include <cstdlib>
 
 /**
  * Sorts the first count elements of the array pointed to by start, each element

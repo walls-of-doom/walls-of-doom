@@ -1,7 +1,9 @@
 #include "color.h"
+#include "memory.h"
+#include "text.h"
 #include <SDL.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 #define COLOR_STRING_SEPARATOR ','
 
@@ -34,9 +36,11 @@ Color color_from_string(const char *string) {
 
 ColorPair color_pair_from_string(const char *string) {
   ColorPair pair;
-  char *const end = strchr(string, COLOR_STRING_SEPARATOR);
+  char *copy = reinterpret_cast<char *>(resize_memory(nullptr, strlen(string) + 1));
+  copy_string(copy, string, strlen(string) + 1);
+  char *end = strchr(copy, COLOR_STRING_SEPARATOR);
   *end = '\0';
-  pair.foreground = color_from_string(string);
+  pair.foreground = color_from_string(copy);
   *end = COLOR_STRING_SEPARATOR;
   pair.background = color_from_string(end + 1);
   return pair;

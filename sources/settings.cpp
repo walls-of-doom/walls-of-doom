@@ -291,8 +291,8 @@ void initialize_settings(void) {
       }
     } else if (string_equals(key, "INVESTMENT_MODE")) {
       for (i = 0; i < INVESTMENT_MODE_COUNT; ++i) {
-        if (string_equals(value, get_investment_mode_name(i))) {
-          investment_mode = i;
+        if (string_equals(value, get_investment_mode_name(static_cast<InvestmentMode>(i)).c_str())) {
+          investment_mode = static_cast<InvestmentMode>(i);
         }
       }
     } else if (string_equals(key, "INVESTMENT_AMOUNT")) {

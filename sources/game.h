@@ -14,25 +14,24 @@
 #include "random.h"
 #include "settings.h"
 #include <SDL.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 typedef struct Game {
 
   Player *player;
 
   Platform *platforms;
+
   size_t platform_count;
 
-  u64 current_frame;
-  u64 desired_frame;
+  U64 current_frame;
+  U64 desired_frame;
 
-  /**
-   * Count of frames on which the player was active (not in the initial state).
-   */
-  unsigned long played_frames;
-  unsigned long limit_played_frames;
+  /* Count of frames on which the player was active (not in the initial state). */
+  U64 played_frames;
+  U64 limit_played_frames;
 
-  int paused;
+  bool paused;
 
   int tile_w;
   int tile_h;

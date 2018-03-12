@@ -45,7 +45,7 @@ ProfilerData *get_empty_data(const char *identifier) {
   empty_data.sum = 0;
   empty_data.stamp = 0;
   empty_data.frequency = 0;
-  reallocated_table = resize_memory(table, new_size);
+  reallocated_table = reinterpret_cast<ProfilerData *>(resize_memory(table, new_size));
   if (reallocated_table != NULL) {
     table = reallocated_table;
     table_size++;
@@ -97,7 +97,7 @@ void profiler_end(const char *identifier) {
 static double profiler_data_mean(const ProfilerData *const data) { return data->sum / (double)data->frequency; }
 
 static void profiler_data_copy_base_id(const ProfilerData *data, char *dest) {
-  char *colon = strchr(data->identifier, ':');
+  const char *colon = strchr(data->identifier, ':');
   copy_string(dest, data->identifier, MAXIMUM_DATA_IDENTIFIER_SIZE);
   if (colon != NULL) {
     /* Cut the string before the colon. */
@@ -160,7 +160,7 @@ void write_statistics(void) {
  */
 Code finalize_profiler(void) {
   write_statistics();
-  table = resize_memory(table, 0);
+  table = reinterpret_cast<ProfilerData *>(resize_memory(table, 0));
   table_size = 0;
   log_message("Freed the profiler table.");
   return CODE_OK;

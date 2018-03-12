@@ -1,6 +1,8 @@
 #ifndef PERK_H
 #define PERK_H
 
+#include <string>
+
 #define PERK_INTERVAL_IN_SECONDS 30
 #define PERK_INTERVAL_IN_FRAMES (PERK_INTERVAL_IN_SECONDS * UPS)
 
@@ -29,11 +31,6 @@ int is_bonus_perk(const Perk perk);
 
 int is_curse_perk(const Perk perk);
 
-/**
- * Returns the name of the provided Perk.
- *
- * The biggest string this function returns has 13 printable characters.
- */
-char *get_perk_name(Perk perk);
+std::string get_perk_name(Perk perk);
 
 #endif

@@ -6,7 +6,10 @@ if [ ! -f $COMPILATION_DATABASE ]; then
 fi
 
 echo Reformatting...
-clang-format -i walls-of-doom/*.[hc]
-clang-format -i tests/*.[hc]
+
+clang-format -i sources/*.cpp
+clang-format -i sources/*.h
+
+clang-format -i tests/*.cpp
 
 echo "Done after $SECONDS seconds."

@@ -81,7 +81,7 @@ Game create_game(Player *player) {
 
   game.player = player;
   game.platform_count = platform_count;
-  game.platforms = resize_memory(NULL, sizeof(Platform) * platform_count);
+  game.platforms = reinterpret_cast<Platform *>(resize_memory(NULL, sizeof(Platform) * platform_count));
 
   game.current_frame = 0;
   game.desired_frame = 0;
@@ -97,7 +97,7 @@ Game create_game(Player *player) {
   player->w = tile_w;
   player->h = tile_h;
 
-  game.box = resize_memory(NULL, sizeof(BoundingBox));
+  game.box = reinterpret_cast<BoundingBox *>(resize_memory(NULL, sizeof(BoundingBox)));
   initialize_bounding_box(&game);
 
   generate_platforms(game.platforms, game.box, platform_count, tile_w, tile_h);
@@ -114,7 +114,7 @@ Game create_game(Player *player) {
   game.rigid_matrix_n = game.box->max_x - game.box->min_x + 1;
   game.rigid_matrix_size = game.rigid_matrix_m * game.rigid_matrix_n;
   rigid_matrix_bytes = sizeof(unsigned char) * game.rigid_matrix_size;
-  game.rigid_matrix = resize_memory(NULL, rigid_matrix_bytes);
+  game.rigid_matrix = reinterpret_cast<unsigned char *>(resize_memory(NULL, rigid_matrix_bytes));
   initialize_rigid_matrix(&game);
 
   game.message[0] = '\0';
@@ -128,9 +128,9 @@ Game create_game(Player *player) {
 
 void destroy_game(Game *game) {
   destroy_player(game->player);
-  game->rigid_matrix = resize_memory(game->rigid_matrix, 0);
-  game->box = resize_memory(game->box, 0);
-  game->platforms = resize_memory(game->platforms, 0);
+  game->rigid_matrix = reinterpret_cast<unsigned char *>(resize_memory(game->rigid_matrix, 0));
+  game->box = reinterpret_cast<BoundingBox *>(resize_memory(game->box, 0));
+  game->platforms = reinterpret_cast<Platform *>(resize_memory(game->platforms, 0));
 }
 
 Milliseconds update_game(Game *const game) {
@@ -169,10 +169,11 @@ static void print_game_result(const Player *player, const int position, SDL_Rend
   const Score score = player->score;
   const ColorPair color = COLOR_PAIR_DEFAULT;
   char first_line[MAXIMUM_STRING_SIZE];
+  char empty_line[1] = "";
   char second_line[MAXIMUM_STRING_SIZE];
   char *lines[3];
   lines[0] = first_line;
-  lines[1] = "";
+  lines[1] = empty_line;
   lines[2] = second_line;
   sprintf(first_line, "%s died after making %ld points.", name, score);
   if (position > 0) {
@@ -217,6 +218,9 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
   initialize_command_table(&table);
   while (!game->player->table->status[COMMAND_QUIT] && *lives != 0 && game->played_frames < limit) {
     start_time = get_milliseconds();
+    if (time_passed >= 2 * interval) {
+      fprintf(stderr, "Skipped a frame!\n");
+    }
     while (time_passed > interval) {
       time_passed -= interval;
       game->desired_frame++;
@@ -238,9 +242,6 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
     if (game->played_frames == next_played_frames_score) {
       player_score_add(game->player, 1);
       next_played_frames_score += UPS;
-    }
-    if (game->current_frame + 1 < game->desired_frame) {
-      printf("Shit.\n");
     }
     while (game->current_frame < game->desired_frame) {
       update_game(game);

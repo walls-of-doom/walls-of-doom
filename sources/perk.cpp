@@ -2,7 +2,7 @@
 #include "logger.h"
 #include "random.h"
 
-Perk get_random_perk(void) { return random_integer(0, PERK_COUNT - 1); }
+Perk get_random_perk(void) { return static_cast<Perk>(random_integer(0, PERK_COUNT - 1)); }
 
 int is_bonus_perk(const Perk perk) { return perk == PERK_BONUS_EXTRA_POINTS || perk == PERK_BONUS_EXTRA_LIFE; }
 
@@ -12,12 +12,7 @@ int is_curse_perk(const Perk perk) {
   return is_accelerate_platforms || is_reverse_platforms;
 }
 
-/**
- * Returns the name of the provided Perk.
- *
- * The biggest string this function returns has 13 printable characters.
- */
-char *get_perk_name(Perk perk) {
+std::string get_perk_name(Perk perk) {
   if (perk == PERK_POWER_INVINCIBILITY) {
     return "Invincibility";
   }
