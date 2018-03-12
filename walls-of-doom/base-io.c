@@ -25,7 +25,7 @@
 #define CREATE_SURFACE_FAIL "Failed to create surface in %s!"
 #define CREATE_TEXTURE_FAIL "Failed to create texture in %s!"
 
-#define PERK_FADING_INTERVAL FPS
+#define PERK_FADING_INTERVAL UPS
 
 #define IMG_FLAGS IMG_INIT_PNG
 

@@ -5,6 +5,7 @@
 #include "clock.h"
 #include "code.h"
 #include "constants.h"
+#include "integers.h"
 #include "logger.h"
 #include "numeric.h"
 #include "perk.h"
@@ -22,10 +23,8 @@ typedef struct Game {
   Platform *platforms;
   size_t platform_count;
 
-  /**
-   * In which frame - starting at 0 - we are now.
-   */
-  unsigned long frame;
+  u64 current_frame;
+  u64 desired_frame;
 
   /**
    * Count of frames on which the player was active (not in the initial state).

@@ -19,7 +19,7 @@
 
 #define MAXIMUM_PLAYER_NAME_SIZE 64
 
-#define FPS 200
+#define UPS 50
 
 #define PLAYER_RUNNING_SPEED 9
 

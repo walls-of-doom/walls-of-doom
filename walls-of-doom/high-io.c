@@ -23,7 +23,7 @@
 
 #define GAME_NAME "Walls of Doom"
 
-#define PERK_FADING_INTERVAL FPS
+#define PERK_FADING_INTERVAL UPS
 
 /**
  * Evaluates whether or not a Player name is a valid name.
@@ -147,7 +147,7 @@ static void draw_top_bar(const Game *game, Renderer *renderer) {
   char *strings[TOP_BAR_STRING_COUNT];
   char *perk_name = "No Power";
   const unsigned long limit = game->limit_played_frames;
-  double time_left = (limit - game->played_frames) / (double)FPS;
+  double time_left = (limit - game->played_frames) / (double)UPS;
   sprintf(time_buffer, "%.2f s", time_left);
   if (player->perk != PERK_NONE) {
     perk_name = get_perk_name(player->perk);

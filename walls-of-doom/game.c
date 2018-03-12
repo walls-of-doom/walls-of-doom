@@ -19,7 +19,7 @@
 
 #define DEFAULT_LIMIT_PLAYED_MINUTES 2
 #define DEFAULT_LIMIT_PLAYED_SECONDS (DEFAULT_LIMIT_PLAYED_MINUTES * 60)
-#define DEFAULT_LIMIT_PLAYED_FRAMES DEFAULT_LIMIT_PLAYED_SECONDS *FPS
+#define DEFAULT_LIMIT_PLAYED_FRAMES DEFAULT_LIMIT_PLAYED_SECONDS *UPS
 
 void print_command_table(CommandTable *table);
 
@@ -83,7 +83,9 @@ Game create_game(Player *player) {
   game.platform_count = platform_count;
   game.platforms = resize_memory(NULL, sizeof(Platform) * platform_count);
 
-  game.frame = 0;
+  game.current_frame = 0;
+  game.desired_frame = 0;
+
   game.played_frames = 0;
   game.limit_played_frames = DEFAULT_LIMIT_PLAYED_FRAMES;
 
@@ -135,7 +137,7 @@ Milliseconds update_game(Game *const game) {
   Milliseconds game_update_start;
   profiler_begin("update_game");
   game_update_start = get_milliseconds();
-  if (game->message_end_frame < game->frame) {
+  if (game->message_end_frame < game->current_frame) {
     game->message[0] = '\0';
   }
   update_platforms(game);
@@ -153,10 +155,10 @@ Milliseconds update_game(Game *const game) {
  */
 void game_set_message(Game *const game, const char *message, const unsigned long duration,
                       const unsigned int priority) {
-  const int last_has_expired = game->message_end_frame <= game->frame;
+  const int last_has_expired = game->message_end_frame <= game->current_frame;
   const int last_has_lower_priority = game->message_priority <= priority;
   if (last_has_expired || last_has_lower_priority) {
-    game->message_end_frame = game->frame + duration * FPS;
+    game->message_end_frame = game->current_frame + duration * UPS;
     game->message_priority = priority;
     copy_string(game->message, message, MAXIMUM_STRING_SIZE);
   }
@@ -204,22 +206,23 @@ void register_score(const Game *const game, SDL_Renderer *renderer) {
  * Runs the main game loop for the Game object and registers the player score.
  */
 Code run_game(Game *const game, SDL_Renderer *renderer) {
-  unsigned long next_played_frames_score = FPS;
-  const Milliseconds interval = 1000 / FPS;
-  Milliseconds drawing_delta = 0;
-  Milliseconds updating_delta = 0;
+  unsigned long next_played_frames_score = UPS;
+  const Milliseconds interval = 1000 / UPS;
+  Milliseconds start_time = 0;
+  Milliseconds time_passed = 0;
   Code code = CODE_OK;
   int *lives = &game->player->lives;
-  unsigned long *played = &game->played_frames;
   unsigned long limit = game->limit_played_frames;
   CommandTable table;
   initialize_command_table(&table);
-  while (!game->player->table->status[COMMAND_QUIT] && *lives != 0 && *played < limit) {
+  while (!game->player->table->status[COMMAND_QUIT] && *lives != 0 && game->played_frames < limit) {
+    start_time = get_milliseconds();
+    while (time_passed > interval) {
+      time_passed -= interval;
+      game->desired_frame++;
+    }
     if (game->paused) {
-      drawing_delta = draw_game(game, renderer);
-      if (drawing_delta < interval) {
-        sleep_milliseconds(interval - drawing_delta);
-      }
+      draw_game(game, renderer);
       read_commands(game->player->table);
       if (test_command_table(game->player->table, COMMAND_CLOSE, REPETITION_DELAY)) {
         code = CODE_CLOSE;
@@ -234,19 +237,22 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
     }
     if (game->played_frames == next_played_frames_score) {
       player_score_add(game->player, 1);
-      next_played_frames_score += FPS;
+      next_played_frames_score += UPS;
     }
-    updating_delta = update_game(game);
-    drawing_delta = draw_game(game, renderer);
-    if (updating_delta + drawing_delta < interval) {
-      sleep_milliseconds(interval - updating_delta - drawing_delta);
+    if (game->current_frame + 1 < game->desired_frame) {
+      printf("Shit.\n");
     }
+    while (game->current_frame < game->desired_frame) {
+      update_game(game);
+      update_player(game, game->player);
+      game->current_frame++;
+    }
+    draw_game(game, renderer);
     read_commands(game->player->table);
-    update_player(game, game->player);
-    game->frame++;
     if (test_command_table(game->player->table, COMMAND_PAUSE, REPETITION_DELAY)) {
       game->paused = 1;
     }
+    time_passed += get_milliseconds() - start_time;
   }
   if (code != CODE_CLOSE) {
     register_score(game, renderer);

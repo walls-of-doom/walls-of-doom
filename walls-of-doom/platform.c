@@ -14,8 +14,8 @@ void generate_platforms(Platform *platforms, const BoundingBox *const box, const
                         const int height) {
   const int min_width = get_platform_min_width() * width;
   const int max_width = get_platform_max_width() * width;
-  const int min_speed = get_platform_min_speed() * width;
-  const int max_speed = get_platform_max_speed() * width;
+  const int min_speed = get_platform_min_speed();
+  const int max_speed = get_platform_max_speed();
   const int lines = (box->max_y - box->min_y + 1) / height;
   unsigned char *density = NULL;
   Platform *platform;

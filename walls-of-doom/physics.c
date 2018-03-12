@@ -15,7 +15,7 @@
 #include <string.h>
 
 /* Should be the maximum frame count value for 5 seconds remaining. */
-#define MINIMUM_REMAINING_FRAMES_FOR_MESSAGE (6 * FPS - 1)
+#define MINIMUM_REMAINING_FRAMES_FOR_MESSAGE (6 * UPS - 1)
 
 /* Extra level of indirection needed to expand macros before the conversion. */
 #define AS_STR(X) #X
@@ -128,15 +128,15 @@ static void shove_player(Game *game, int x, int y, int standing) {
 
 static int get_absolute_pending_movement(unsigned long frame, int speed) {
   /* Should move slice after every frame. */
-  const double slice = speed / (double)FPS;
+  const double slice = speed / (double)UPS;
   /* To reduce floating point error, normalize frame to [FPS, 2 FPS - 1]. */
-  frame = frame % FPS + FPS;
+  frame = frame % UPS + UPS;
   return floor(frame * slice) - floor((frame - 1) * slice);
 }
 
 static int get_pending_movement(const Game *const game, const int speed) {
   const int normalized = normalize(speed);
-  return normalized * get_absolute_pending_movement(game->frame, abs(speed));
+  return normalized * get_absolute_pending_movement(game->current_frame, abs(speed));
 }
 
 static void subtract_platform(Game *const game, Platform *const platform) {
@@ -254,9 +254,9 @@ static void move_platform(Game *const game, Platform *const platform, const int 
 }
 
 static void move_platform_horizontally(Game *const game, Platform *const platform) {
-  const int normalized_speed = normalize(platform->speed);
+  int normalized_speed = normalize(platform->speed);
   /* This could be made more efficient by handling each direction separately. */
-  int pending = abs(get_pending_movement(game, platform->speed));
+  int pending = abs(platform->speed);
   while (pending) {
     if (can_move_platform(game, platform, normalized_speed, 0)) {
       if (is_in_front_of_platform(game->player, platform)) {
@@ -640,7 +640,7 @@ static void invest(Game *game, InvestmentMode mode) {
     player_score_sub(game->player, amount);
     investment->next = NULL;
     investment->amount = amount;
-    investment->end = game->played_frames + FPS * get_investment_period();
+    investment->end = game->played_frames + UPS * get_investment_period();
     while (investments != NULL && investments->next != NULL) {
       investments = investments->next;
     }
@@ -754,7 +754,7 @@ static void write_perk_faded_message(Game *game, const Perk perk) {
 }
 
 static void write_perk_fading_message(Game *game, const Perk perk, const unsigned long remaining_frames) {
-  const int seconds = remaining_frames / FPS;
+  const int seconds = remaining_frames / UPS;
   char message[MAXIMUM_STRING_SIZE];
   const char *perk_name = get_perk_name(perk);
   if (seconds < 1) {
@@ -829,7 +829,6 @@ static void update_player_graphics(Game *game) {
 }
 
 void update_player(Game *game, Player *player) {
-  profiler_begin("update_player");
   if (player->physics) {
     log_player_score(game->played_frames, player->score);
   }
