@@ -30,42 +30,13 @@ public:
 /**
  * Writes the provided Menu for the user.
  */
-void write_menu(const Menu *const menu, SDL_Renderer *renderer) {
-  const size_t entries = menu->options.size() + 1;
-  const size_t string_count = 2 * entries - 1;
-  char **strings = NULL;
-  const char hint_format[] = "> %s <";
-  const size_t hint_size = strlen(hint_format) - 2;
-  size_t option_index;
-  size_t i;
-  strings = reinterpret_cast<char **>(resize_memory(strings, sizeof(char *) * string_count));
-  for (i = 0; i < string_count; i++) {
-    strings[i] = NULL;
-    strings[i] = reinterpret_cast<char *>(resize_memory(strings[i], MAXIMUM_STRING_SIZE));
-    if (i == 0) {
-      copy_string(strings[i], menu->title.c_str(), MAXIMUM_STRING_SIZE);
-    } else if (i % 2 == 0) {
-      /* Note that i == 0 is used for the title. */
-      option_index = (i - 2) / 2;
-      const char *source = menu->options[option_index].c_str();
-      if (menu->selected_option == option_index) {
-        if (strlen(source) + 2 * hint_size < MAXIMUM_STRING_SIZE) {
-          sprintf(strings[i], hint_format, source);
-        } else {
-          copy_string(strings[i], source, MAXIMUM_STRING_SIZE);
-        }
-      } else {
-        copy_string(strings[i], source, MAXIMUM_STRING_SIZE);
-      }
-    } else {
-      copy_string(strings[i], "", MAXIMUM_STRING_SIZE);
-    }
-  }
-  print_menu(string_count, strings, renderer);
-  for (i = 0; i < string_count; i++) {
-    strings[i] = reinterpret_cast<char *>(resize_memory(strings[i], 0));
-  }
-  resize_memory(strings, 0);
+void write_menu(const Menu &menu, SDL_Renderer *renderer) {
+  std::vector<std::string> string_vector;
+  string_vector.emplace_back(game_name);
+  string_vector.insert(std::end(string_vector), std::begin(menu.options), std::end(menu.options));
+  const auto selected_option_index = menu.selected_option + 1;
+  string_vector[selected_option_index] = "> " + string_vector[selected_option_index] + " <";
+  print_menu(string_vector, renderer);
 }
 
 Code game(SDL_Renderer *renderer, CommandTable *table) {
@@ -90,20 +61,20 @@ int main_menu(SDL_Renderer *renderer) {
   Menu menu;
   CommandTable command_table;
   std::vector<std::string> options = {"Play", "Top Scores", "Info", "Quit"};
-  const std::string game_name = "Walls of Doom";
-  std::string title = game_name + " " + WALLS_OF_DOOM_VERSION;
+  const std::string game_name_string(game_name);
+  std::string title = game_name_string + " " + WALLS_OF_DOOM_VERSION;
   menu.title = title;
   menu.options = options;
   menu.selected_option = 0;
   initialize_command_table(&command_table);
   while (!should_quit) {
-    write_menu(&menu, renderer);
+    write_menu(menu, renderer);
     read_commands(&command_table);
     if (test_command_table(&command_table, COMMAND_UP, REPETITION_DELAY)) {
       if (menu.selected_option > 0) {
         menu.selected_option--;
       } else {
-        menu.selected_option = menu.options.size();
+        menu.selected_option = menu.options.size() - 1;
       }
     } else if (test_command_table(&command_table, COMMAND_DOWN, REPETITION_DELAY)) {
       if (menu.selected_option + 1 < menu.options.size()) {

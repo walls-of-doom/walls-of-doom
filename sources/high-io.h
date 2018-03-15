@@ -10,6 +10,8 @@
 #include "perk.h"
 #include "physics.h"
 #include "record.h"
+#include <string>
+#include <vector>
 
 /**
  * Reads a string from the user of up to size characters (including NUL).
@@ -37,10 +39,7 @@ Milliseconds draw_game(const Game *const game, Renderer *renderer);
  */
 Code print(const int x, const int y, const char *string, const ColorPair color_pair, Renderer *renderer);
 
-/**
- * Writes the menu, centralized in the string.
- */
-void print_menu(int line_count, char **lines, Renderer *renderer);
+void print_menu(const std::vector<std::string> &strings, Renderer *renderer);
 
 /**
  * Prints the provided string after formatting it to increase readability.

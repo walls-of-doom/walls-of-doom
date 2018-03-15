@@ -171,18 +171,18 @@ static void print_game_result(const Player *player, const int position, SDL_Rend
   char first_line[MAXIMUM_STRING_SIZE];
   char empty_line[1] = "";
   char second_line[MAXIMUM_STRING_SIZE];
-  char *lines[3];
-  lines[0] = first_line;
-  lines[1] = empty_line;
-  lines[2] = second_line;
   sprintf(first_line, "%s died after making %ld points.", name, score);
   if (position > 0) {
     sprintf(second_line, "%s got to position %d!", name, position);
   } else {
     sprintf(second_line, "%s didn't make it to the top scores.", name);
   }
+  std::vector<std::string> lines;
+  lines.emplace_back(first_line);
+  lines.emplace_back(empty_line);
+  lines.emplace_back(second_line);
   clear(renderer);
-  print_centered_vertically(3, lines, color, renderer);
+  print_centered_vertically(lines, color, renderer);
   present(renderer);
 }
 

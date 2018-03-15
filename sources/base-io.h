@@ -10,6 +10,8 @@
 #include "physics.h"
 #include "record.h"
 #include <SDL_ttf.h>
+#include <string>
+#include <vector>
 
 typedef TTF_Font Font;
 typedef SDL_Window Window;
@@ -57,12 +59,9 @@ Code print_absolute(const int x, const int y, const char *string, const ColorPai
 /**
  * Prints the provided strings centered at the specified absolute line.
  */
-Code print_centered_horizontally(const int y, const int string_count, char **strings, const ColorPair color_pair,
+Code print_centered_horizontally(const int y, const std::vector<std::string> &strings, const ColorPair color_pair,
                                  Renderer *renderer);
 
-/**
- * Prints the provided strings centered in the middle of the screen.
- */
-Code print_centered_vertically(const int string_count, char **strings, const ColorPair color_pair, Renderer *renderer);
+Code print_centered_vertically(const std::vector<std::string> &strings, const ColorPair color_pair, Renderer *renderer);
 
 #endif

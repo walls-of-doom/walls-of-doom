@@ -22,8 +22,6 @@
 #include <string.h>
 #include <string>
 
-#define GAME_NAME "Walls of Doom"
-
 #define PERK_FADING_INTERVAL UPS
 
 /**
@@ -73,12 +71,9 @@ Code read_player_name(char *destination, const size_t maximum_size, Renderer *re
   return code;
 }
 
-/**
- * Replaces the first line break of any sequence of line breaks by a space.
- */
-void print_menu(int line_count, char **lines, Renderer *renderer) {
+void print_menu(const std::vector<std::string> &lines, Renderer *renderer) {
   clear(renderer);
-  print_centered_vertically(line_count, lines, COLOR_PAIR_DEFAULT, renderer);
+  print_centered_vertically(lines, COLOR_PAIR_DEFAULT, renderer);
   present(renderer);
 }
 
@@ -127,14 +122,13 @@ static void draw_shaded_absolute_tile_rectangle(int x, int y, Color color, Rende
   draw_shaded_absolute_rectangle(x, y, w, h, color, renderer);
 }
 
-static void write_top_bar_strings(char *strings[], Renderer *renderer) {
+static void write_top_bar_strings(const std::vector<std::string> &strings, Renderer *renderer) {
   const ColorPair color_pair = COLOR_PAIR_TOP_BAR;
-  const int string_count = TOP_BAR_STRING_COUNT;
   const int y = (get_bar_height() - get_font_height()) / 2;
   int h = get_bar_height();
   int w = get_window_width();
   draw_absolute_rectangle(0, 0, w, h, color_pair.background, renderer);
-  print_centered_horizontally(y, string_count, strings, color_pair, renderer);
+  print_centered_horizontally(y, strings, color_pair, renderer);
 }
 
 /**
@@ -142,25 +136,19 @@ static void write_top_bar_strings(char *strings[], Renderer *renderer) {
  */
 static void draw_top_bar(const Game *game, Renderer *renderer) {
   const Player *player = game->player;
-  char time_buffer[MAXIMUM_STRING_SIZE];
-  char perk_buffer[MAXIMUM_STRING_SIZE];
-  char lives_buffer[MAXIMUM_STRING_SIZE];
-  char score_buffer[MAXIMUM_STRING_SIZE];
-  char *strings[TOP_BAR_STRING_COUNT];
+  std::vector<std::string> strings;
   std::string perk_name = "No Power";
   if (player->perk != PERK_NONE) {
     perk_name = get_perk_name(player->perk);
   }
   const unsigned long limit = game->limit_played_frames;
   double time_left = (limit - game->played_frames) / (double)UPS;
+  char time_buffer[MAXIMUM_STRING_SIZE];
   sprintf(time_buffer, "%.2f s", time_left);
-  sprintf(lives_buffer, "Lives: %d", player->lives);
-  sprintf(score_buffer, "Score: %ld", player->score);
-  copy_string(perk_buffer, perk_name.c_str(), MAXIMUM_STRING_SIZE);
-  strings[0] = time_buffer;
-  strings[1] = perk_buffer;
-  strings[2] = lives_buffer;
-  strings[3] = score_buffer;
+  strings.emplace_back(time_buffer);
+  strings.push_back(perk_name);
+  strings.push_back("Lives: " + std::to_string(player->lives));
+  strings.push_back("Score: " + std::to_string(player->score));
   write_top_bar_strings(strings, renderer);
 }
 
@@ -315,19 +303,18 @@ Milliseconds draw_game(const Game *const game, Renderer *renderer) {
   return get_milliseconds() - draw_game_start;
 }
 
-/**
- * Converts a Record to a human-readable string.
- */
-static void record_to_string(const Record *const record, char *dest, const int width) {
+static std::string record_to_string(const Record &record, const int width) {
   const char format[] = "%s%*.*s%d";
-  const char *name = record->name;
-  const int score = record->score;
+  const char *name = record.name;
+  const int score = record.score;
   char pad_string[MAXIMUM_STRING_SIZE];
   int pad_length;
   memset(pad_string, '.', MAXIMUM_STRING_SIZE - 1);
   pad_string[MAXIMUM_STRING_SIZE - 1] = '\0';
   pad_length = width - strlen(name) - count_digits(score);
-  sprintf(dest, format, name, pad_length, pad_length, pad_string, score);
+  char destination[MAXIMUM_STRING_SIZE];
+  sprintf(destination, format, name, pad_length, pad_length, pad_string, score);
+  return std::string(destination);
 }
 
 void print_records(const size_t count, const Record *records, Renderer *renderer) {
@@ -339,21 +326,13 @@ void print_records(const size_t count, const Record *records, Renderer *renderer
   const int text_width_in_pixels = get_window_width() - x_padding;
   const size_t string_width = text_width_in_pixels / get_font_width();
   const size_t printed = min_int(count, text_lines_limit);
-  char **strings = NULL;
-  size_t i;
-  strings = reinterpret_cast<char **>(resize_memory(strings, sizeof(char *) * printed));
-  for (i = 0; i < printed; i++) {
-    strings[i] = NULL;
-    strings[i] = reinterpret_cast<char *>(resize_memory(strings[i], string_width));
-    record_to_string(records + i, strings[i], string_width - 1);
+  std::vector<std::string> strings;
+  for (size_t i = 0; i < printed; i++) {
+    strings.push_back(record_to_string(records[i], string_width));
   }
   clear(renderer);
-  print_centered_vertically(printed, strings, pair, renderer);
+  print_centered_vertically(strings, pair, renderer);
   present(renderer);
-  for (i = 0; i < printed; i++) {
-    resize_memory(strings[i], 0);
-  }
-  resize_memory(strings, 0);
 }
 
 /**

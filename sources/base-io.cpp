@@ -20,8 +20,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#define GAME_NAME "Walls of Doom"
-
 #define CREATE_SURFACE_FAIL "Failed to create surface in %s!"
 #define CREATE_TEXTURE_FAIL "Failed to create texture in %s!"
 
@@ -112,21 +110,20 @@ static Code initialize_font_metrics(void) {
  * Updates the pointers with the window width, window height, and bar height.
  */
 static Window *create_window(int *width, int *height) {
-  const char *title = GAME_NAME;
   const int x = SDL_WINDOWPOS_CENTERED;
   const int y = SDL_WINDOWPOS_CENTERED;
   const int w = get_window_width();
   const int h = get_window_height();
   const Uint32 flags = SDL_WINDOW_INPUT_FOCUS;
   Window *window;
-  window = SDL_CreateWindow(title, x, y, w, h, flags);
+  window = SDL_CreateWindow(game_name, x, y, w, h, flags);
   SDL_GetWindowSize(window, width, height);
   return window;
 }
 
 static Code set_window_title_and_icon(Window *window) {
   SDL_Surface *icon_surface = IMG_Load(ICON_PATH);
-  SDL_SetWindowTitle(window, GAME_NAME);
+  SDL_SetWindowTitle(window, game_name);
   if (icon_surface == NULL) {
     log_message("Failed to load the icon.");
     return CODE_ERROR;
@@ -342,28 +339,24 @@ void print_long_text(char *string, Renderer *renderer) {
 /**
  * Prints the provided strings centered at the specified absolute line.
  */
-Code print_centered_horizontally(const int y, const int string_count, char **strings, const ColorPair color_pair,
+Code print_centered_horizontally(const int y, const std::vector<std::string> &strings, const ColorPair color_pair,
                                  Renderer *renderer) {
   char log_buffer[MAXIMUM_STRING_SIZE];
   const SDL_Color foreground = to_sdl_color(color_pair.foreground);
   const SDL_Color background = to_sdl_color(color_pair.background);
-  const int slice_size = get_window_width() / string_count;
+  const int slice_size = get_window_width() / strings.size();
   Font *font = global_monospaced_font;
   SDL_Surface *surface;
   SDL_Texture *texture;
   SDL_Rect position;
-  int i;
   position.x = 0;
   position.y = y;
   /* Validate that x and y are nonnegative. */
   if (y < 0) {
     return CODE_ERROR;
   }
-  for (i = 0; i < string_count; i++) {
-    if (*strings[i] == '\0') {
-      continue;
-    }
-    surface = TTF_RenderText_Shaded(font, strings[i], foreground, background);
+  for (int i = 0; i < static_cast<int>(strings.size()); i++) {
+    surface = TTF_RenderText_Shaded(font, strings[i].c_str(), foreground, background);
     if (surface == NULL) {
       sprintf(log_buffer, CREATE_SURFACE_FAIL, "print_centered_horizontally()");
       log_message(log_buffer);
@@ -388,21 +381,25 @@ Code print_centered_horizontally(const int y, const int string_count, char **str
 /**
  * Prints the provided strings centered in the middle of the screen.
  */
-Code print_centered_vertically(const int string_count, char **strings, const ColorPair color_pair, Renderer *renderer) {
+Code print_centered_vertically(const std::vector<std::string> &strings, const ColorPair color_pair,
+                               Renderer *renderer) {
   const int text_line_height = global_monospaced_font_height;
   const int padding = 2 * get_padding() * global_monospaced_font_height;
   const int available_window_height = get_window_height() - padding;
   const int text_lines_limit = available_window_height / text_line_height;
-  int printed_count = string_count;
+  auto printed_count = static_cast<int>(strings.size());
   int y;
-  int i;
-  if (string_count > text_lines_limit) {
+  if (strings.size() > text_lines_limit) {
     printed_count = text_lines_limit;
   }
-  y = (get_window_height() - string_count * text_line_height) / 2;
-  for (i = 0; i < printed_count; i++) {
-    print_centered_horizontally(y, 1, strings + i, color_pair, renderer);
+  y = (get_window_height() - strings.size() * text_line_height) / 2;
+  for (int i = 0; i < printed_count; i++) {
+    const auto string = strings[i];
+    char *array = reinterpret_cast<char *>(malloc(string.size() + 1));
+    copy_string(array, string.c_str(), string.size() + 1);
+    print_centered_horizontally(y, {string}, color_pair, renderer);
     y += text_line_height;
+    free(array);
   }
   return CODE_OK;
 }

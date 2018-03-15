@@ -4,18 +4,18 @@
 #include "code.h"
 #include "constants.h"
 #include "player.h"
-
 #include <SDL.h>
-
 #include <stdlib.h>
+#include <string>
 
 /**
  * A Record is a structure that stores the outcome of a game.
  */
-typedef struct Record {
+class Record {
+public:
   char name[MAXIMUM_PLAYER_NAME_SIZE];
   long score;
-} Record;
+};
 
 /**
  * Creates a new Record from the provided data.
