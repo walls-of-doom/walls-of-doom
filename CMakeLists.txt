@@ -114,26 +114,22 @@ set(walls-of-doom-sources
         sources/version.hpp
         )
 
-add_library(walls-of-doom-base ${walls-of-doom-sources})
+add_library(walls-of-doom-object OBJECT ${walls-of-doom-sources})
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_ttf REQUIRED)
 find_package(SDL2_image REQUIRED)
 
+add_executable(walls-of-doom sources/main.cpp $<TARGET_OBJECTS:walls-of-doom-object>)
+
 include_directories("${CMAKE_SOURCE_DIR}}/sources")
 include_directories(${SDL2_INCLUDE_DIR} ${SDL2_TTF_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
-
-target_link_libraries(walls-of-doom-base ${SDL2_LIBRARY} ${SDL2_TTF_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
-
-add_executable(walls-of-doom sources/main.cpp ${walls-of-doom-sources})
-
 target_link_libraries(walls-of-doom ${SDL2_LIBRARY} ${SDL2_TTF_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
 
 add_custom_command(TARGET walls-of-doom POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets/ ${CMAKE_CURRENT_BINARY_DIR}/assets/)
 
 if (NOT "${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
-    add_executable(tests tests/tests.cpp catch/catch.hpp)
+    add_executable(tests tests/tests.cpp catch/catch.hpp $<TARGET_OBJECTS:walls-of-doom-object>)
     include_directories("${CMAKE_SOURCE_DIR}}/sources")
-    target_link_libraries(tests walls-of-doom-base)
     target_link_libraries(tests ${SDL2_LIBRARY} ${SDL2_TTF_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
 endif ()
