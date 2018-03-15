@@ -18,7 +18,7 @@ void initialize_settings();
 
 RepositionAlgorithm get_reposition_algorithm();
 
-long get_platform_count();
+U64 get_platform_count();
 
 int get_font_size();
 

@@ -19,7 +19,7 @@
 #include <SDL_ttf.h>
 #include <cctype>
 #include <cstdio>
-#include <string.h>
+#include <cstring>
 #include <string>
 
 #define PERK_FADING_INTERVAL UPS
@@ -388,7 +388,7 @@ Code read_string(const int x, const int y, const char *prompt, char *destination
   int should_rerender = 1;
   /* The x coordinate of the user input buffer. */
   size_t written = strlen(destination);
-  char character = '\0';
+  char character;
   char *write = destination + written;
   SDL_Event event{};
   /* Start listening for text input. */

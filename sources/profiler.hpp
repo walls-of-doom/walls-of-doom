@@ -9,7 +9,7 @@ Code initialize_profiler();
 /**
  * Updates the statistics about an identifier with a new millisecond count.
  */
-void update_profiler(const char *identifier, const Milliseconds delta);
+void update_profiler(const char *identifier, Milliseconds delta);
 
 /**
  * Begins the profiling of the execution of the provided identifier.

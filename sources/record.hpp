@@ -5,7 +5,7 @@
 #include "constants.hpp"
 #include "player.hpp"
 #include <SDL.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <string>
 
 /**

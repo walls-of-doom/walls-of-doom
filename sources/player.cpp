@@ -26,7 +26,7 @@ Player create_player(char name[64], CommandTable *table) {
   player.h = 0;
   player.speed_x = 0;
   player.speed_y = 0;
-  player.physics = 0;
+  player.physics = false;
   player.can_double_jump = 0;
   player.remaining_jump_height = 0;
   player.lives = 3;

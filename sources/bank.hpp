@@ -4,6 +4,6 @@
 #include "game.hpp"
 #include "investment.hpp"
 
-int collect_investment(Game const *const game, const Investment investment);
+int collect_investment(Game const *game, Investment investment);
 
 #endif

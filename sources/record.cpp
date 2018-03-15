@@ -11,7 +11,7 @@
 #include "sort.hpp"
 #include "text.hpp"
 #include <cstdio>
-#include <string.h>
+#include <cstring>
 #include <string>
 #include <vector>
 
@@ -152,7 +152,7 @@ void write_table(const RecordTable *const table) {
  * Writes the specified Record to to the system.
  */
 int save_record(Record *record) {
-  int (*comparator)(const void *a, const void *b) = &compare_void_records;
+  int (*comparator)(const void *, const void *) = &compare_void_records;
   int record_index;
   RecordTable table{};
   read_table(&table);

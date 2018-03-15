@@ -69,9 +69,9 @@ static void initialize_bounding_box(Game *game) {
  * Creates a new Game object with the provided objects.
  */
 Game create_game(Player *player) {
-  const int tile_w = get_tile_width();
-  const int tile_h = get_tile_height();
-  const int platform_count = get_platform_count();
+  const auto tile_w = get_tile_width();
+  const auto tile_h = get_tile_height();
+  const auto platform_count = get_platform_count();
   size_t rigid_matrix_bytes;
   Game game{};
 
@@ -85,7 +85,7 @@ Game create_game(Player *player) {
   game.played_frames = 0;
   game.limit_played_frames = DEFAULT_LIMIT_PLAYED_FRAMES;
 
-  game.paused = 0;
+  game.paused = false;
 
   game.tile_w = tile_w;
   game.tile_h = tile_h;
@@ -106,8 +106,8 @@ Game create_game(Player *player) {
   /* Don't start with a Perk on the screen. */
   game.perk_end_frame = PERK_SCREEN_DURATION_IN_FRAMES;
 
-  game.rigid_matrix_m = game.box->max_y - game.box->min_y + 1;
-  game.rigid_matrix_n = game.box->max_x - game.box->min_x + 1;
+  game.rigid_matrix_m = static_cast<size_t>(game.box->max_y - game.box->min_y + 1);
+  game.rigid_matrix_n = static_cast<size_t>(game.box->max_x - game.box->min_x + 1);
   game.rigid_matrix_size = game.rigid_matrix_m * game.rigid_matrix_n;
   rigid_matrix_bytes = sizeof(unsigned char) * game.rigid_matrix_size;
   game.rigid_matrix = reinterpret_cast<unsigned char *>(resize_memory(nullptr, rigid_matrix_bytes));

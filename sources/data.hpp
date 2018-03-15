@@ -2,7 +2,7 @@
 #define DATA_H
 
 #include "code.hpp"
-#include <stdio.h>
+#include <cstdio>
 
 /**
  * The maximum size a file path can have, including the NUL terminator.

@@ -16,7 +16,7 @@
 #include <SDL.h>
 #include <array>
 #include <cstdlib>
-#include <string.h>
+#include <cstring>
 #include <string>
 #include <vector>
 

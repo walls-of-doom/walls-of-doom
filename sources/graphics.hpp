@@ -2,7 +2,7 @@
 #define GRAPHICS_H
 
 #include "point.hpp"
-#include <stdlib.h>
+#include <cstdlib>
 
 typedef struct Graphics {
   Point *trail;

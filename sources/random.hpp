@@ -16,7 +16,7 @@ unsigned long find_next_power_of_two(unsigned long number);
 /**
  * Returns a random number in the range [minimum, maximum].
  */
-int random_integer(const int minimum, const int maximum);
+int random_integer(int minimum, int maximum);
 
 /**
  * Writes a pseudorandom name to the destination.

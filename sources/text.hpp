@@ -1,7 +1,7 @@
 #ifndef TEXT_H
 #define TEXT_H
 
-#include <stdlib.h>
+#include <cstdlib>
 
 /**
  * Copy from the source string to the destination string, using at most size

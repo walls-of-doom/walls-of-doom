@@ -44,7 +44,7 @@ static const int MINIMUM_FONT_SIZE = 12;
 static int font_size = 20;
 
 static const long MINIMUM_PLATFORM_COUNT = 0;
-static long platform_count = 16;
+static U64 platform_count = 16;
 
 /* SDL has a limit at 16384. */
 static const long MAXIMUM_DIMENSION = 16384;
@@ -359,7 +359,7 @@ RepositionAlgorithm get_reposition_algorithm() { return reposition_algorithm; }
 
 RendererType get_renderer_type() { return renderer_type; }
 
-long get_platform_count() { return platform_count; }
+U64 get_platform_count() { return platform_count; }
 
 int get_font_size() { return font_size; }
 
