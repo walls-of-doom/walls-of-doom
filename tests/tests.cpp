@@ -1,15 +1,14 @@
-#include "sources/data.h"
-#include "sources/high-io.h"
-#include "sources/logger.h"
-#include "sources/memory.h"
-#include "sources/numeric.h"
-#include "sources/random.h"
-#include "sources/sort.h"
-#include "sources/text.h"
-
 #define CATCH_CONFIG_MAIN
-#include "catch/catch.hpp"
 
+#include "catch/catch.hpp"
+#include "sources/data.hpp"
+#include "sources/high-io.hpp"
+#include "sources/logger.hpp"
+#include "sources/memory.hpp"
+#include "sources/numeric.hpp"
+#include "sources/random.hpp"
+#include "sources/sort.hpp"
+#include "sources/text.hpp"
 #include <climits>
 #include <stdlib.h>
 #include <string.h>

@@ -1,7 +1,7 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include "score.h"
+#include "score.hpp"
 
 /**
  * Initializes the logger. Should only be called once.

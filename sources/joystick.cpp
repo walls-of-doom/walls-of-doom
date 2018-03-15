@@ -1,8 +1,8 @@
-#include "joystick.h"
-#include "command.h"
-#include "constants.h"
-#include "logger.h"
-#include "settings.h"
+#include "joystick.hpp"
+#include "command.hpp"
+#include "constants.hpp"
+#include "logger.hpp"
+#include "settings.hpp"
 
 #include <SDL.h>
 

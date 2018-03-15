@@ -1,10 +1,10 @@
-#include "settings.h"
-#include "color.h"
-#include "constants.h"
-#include "data.h"
-#include "investment.h"
-#include "logger.h"
-#include "text.h"
+#include "settings.hpp"
+#include "color.hpp"
+#include "constants.hpp"
+#include "data.hpp"
+#include "investment.hpp"
+#include "logger.hpp"
+#include "text.hpp"
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>

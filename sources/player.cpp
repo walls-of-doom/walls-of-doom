@@ -1,7 +1,7 @@
-#include "player.h"
-#include "command.h"
-#include "graphics.h"
-#include "logger.h"
+#include "player.hpp"
+#include "command.hpp"
+#include "graphics.hpp"
+#include "logger.hpp"
 #include <limits.h>
 #include <stdlib.h>
 

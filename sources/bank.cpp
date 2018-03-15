@@ -1,10 +1,10 @@
-#include "bank.h"
-#include "game.h"
-#include "investment.h"
-#include "logger.h"
-#include "random.h"
-#include "score.h"
-#include "settings.h"
+#include "bank.hpp"
+#include "game.hpp"
+#include "investment.hpp"
+#include "logger.hpp"
+#include "random.hpp"
+#include "score.hpp"
+#include "settings.hpp"
 #include <stdlib.h>
 
 static double get_average_width(Game const *const game) {

@@ -1,10 +1,10 @@
-#include "high-io.h"
-#include "logger.h"
-#include "memory.h"
-#include "menu.h"
-#include "random.h"
-#include "text.h"
-#include "version.h"
+#include "high-io.hpp"
+#include "logger.hpp"
+#include "memory.hpp"
+#include "menu.hpp"
+#include "random.hpp"
+#include "text.hpp"
+#include "version.hpp"
 #include <SDL.h>
 #include <stdio.h>
 

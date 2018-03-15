@@ -1,15 +1,15 @@
-#include "physics.h"
-#include "bank.h"
-#include "base-io.h"
-#include "constants.h"
-#include "investment.h"
-#include "limits.h"
-#include "logger.h"
-#include "memory.h"
-#include "profiler.h"
-#include "random.h"
-#include "score.h"
-#include "settings.h"
+#include "physics.hpp"
+#include "bank.hpp"
+#include "base-io.hpp"
+#include "constants.hpp"
+#include "investment.hpp"
+#include "logger.hpp"
+#include "memory.hpp"
+#include "profiler.hpp"
+#include "random.hpp"
+#include "score.hpp"
+#include "settings.hpp"
+#include <limits>
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
@@ -318,7 +318,7 @@ int select_random_line_blindly(const unsigned char *lines, const int size) {
  */
 int select_random_line_awarely(const unsigned char *lines, const int size) {
   int *distances = NULL;
-  int maximum_distance = INT_MIN;
+  int maximum_distance = std::numeric_limits<int>::min();
   int count;
   int skip;
   int line;

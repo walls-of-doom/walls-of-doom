@@ -1,4 +1,4 @@
-#include "point.h"
+#include "point.hpp"
 
 Point make_point(int x, int y) {
   Point point;

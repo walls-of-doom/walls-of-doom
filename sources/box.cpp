@@ -1,4 +1,4 @@
-#include "box.h"
+#include "box.hpp"
 
 int bounding_box_contains(const BoundingBox *box, const int x, const int y) {
   if (x >= box->min_x && x <= box->max_x) {

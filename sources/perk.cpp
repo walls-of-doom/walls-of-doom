@@ -1,6 +1,6 @@
-#include "perk.h"
-#include "logger.h"
-#include "random.h"
+#include "perk.hpp"
+#include "logger.hpp"
+#include "random.hpp"
 
 Perk get_random_perk(void) { return static_cast<Perk>(random_integer(0, PERK_COUNT - 1)); }
 

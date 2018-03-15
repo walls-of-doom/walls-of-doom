@@ -1,5 +1,5 @@
-#include "memory.h"
-#include "logger.h"
+#include "memory.hpp"
+#include "logger.hpp"
 
 /**
  * This module simplifies memory management and, by doing so, reduces

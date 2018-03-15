@@ -1,8 +1,8 @@
 #ifndef PROFILER_H
 #define PROFILER_H
 
-#include "clock.h"
-#include "code.h"
+#include "clock.hpp"
+#include "code.hpp"
 
 Code initialize_profiler(void);
 

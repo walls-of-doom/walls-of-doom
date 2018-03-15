@@ -1,11 +1,11 @@
 #ifndef PHYSICS_H
 #define PHYSICS_H
 
-#include "box.h"
-#include "command.h"
-#include "game.h"
-#include "platform.h"
-#include "player.h"
+#include "box.hpp"
+#include "command.hpp"
+#include "game.hpp"
+#include "platform.hpp"
+#include "player.hpp"
 #include <stdlib.h>
 
 /**

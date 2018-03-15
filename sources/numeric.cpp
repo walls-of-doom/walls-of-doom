@@ -1,4 +1,4 @@
-#include "numeric.h"
+#include "numeric.hpp"
 #include <stdlib.h>
 
 /**

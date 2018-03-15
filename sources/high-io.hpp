@@ -1,15 +1,15 @@
 #ifndef HIGH_IO_H
 #define HIGH_IO_H
 
-#include "base-io.h"
-#include "clock.h"
-#include "code.h"
-#include "color.h"
-#include "command.h"
-#include "game.h"
-#include "perk.h"
-#include "physics.h"
-#include "record.h"
+#include "base-io.hpp"
+#include "clock.hpp"
+#include "code.hpp"
+#include "color.hpp"
+#include "command.hpp"
+#include "game.hpp"
+#include "perk.hpp"
+#include "physics.hpp"
+#include "record.hpp"
 #include <string>
 #include <vector>
 

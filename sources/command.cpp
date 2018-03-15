@@ -1,7 +1,7 @@
-#include "command.h"
+#include "command.hpp"
 
-#include "clock.h"
-#include "joystick.h"
+#include "clock.hpp"
+#include "joystick.hpp"
 
 /**
  * Returns the Command value corresponding to the provided key combination.

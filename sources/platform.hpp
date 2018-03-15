@@ -1,7 +1,7 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
-#include "box.h"
+#include "box.hpp"
 
 typedef struct Platform {
   int x;

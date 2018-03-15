@@ -1,10 +1,10 @@
-#include "logger.h"
-#include "clock.h"
-#include "constants.h"
-#include "data.h"
-#include "score.h"
-#include "settings.h"
-#include "version.h"
+#include "logger.hpp"
+#include "clock.hpp"
+#include "constants.hpp"
+#include "data.hpp"
+#include "score.hpp"
+#include "settings.hpp"
+#include "version.hpp"
 #include <stdio.h>
 #include <time.h>
 

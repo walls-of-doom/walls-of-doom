@@ -1,4 +1,4 @@
-#include "code.h"
+#include "code.hpp"
 
 /**
  * Returns whether or not the Code is a termination code.

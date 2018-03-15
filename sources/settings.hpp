@@ -1,7 +1,7 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
-#include "investment.h"
+#include "investment.hpp"
 
 /* These maximums are made public so that static allocation is possible. */
 

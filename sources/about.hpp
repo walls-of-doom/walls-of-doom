@@ -1,8 +1,8 @@
 #ifndef ABOUT_H
 #define ABOUT_H
 
-#include "code.h"
-#include "command.h"
+#include "code.hpp"
+#include "command.hpp"
 #include <SDL.h>
 
 /**

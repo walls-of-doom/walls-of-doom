@@ -45,72 +45,72 @@ if ("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /D _CRT_SECURE_NO_WARNINGS=1")
 endif ()
 
-configure_file(sources/version.h.in version.h)
-configure_file(sources/constants.h.in constants.h)
+configure_file(sources/version.hpp.in version.hpp)
+configure_file(sources/constants.hpp.in constants.hpp)
 
 set(walls-of-doom-sources
-        sources/about.h
+        sources/about.hpp
         sources/about.cpp
-        sources/bank.h
+        sources/bank.hpp
         sources/bank.cpp
-        sources/base-io.h
+        sources/base-io.hpp
         sources/base-io.cpp
-        sources/box.h
+        sources/box.hpp
         sources/box.cpp
-        sources/clock.h
+        sources/clock.hpp
         sources/clock.cpp
-        sources/code.h
+        sources/code.hpp
         sources/code.cpp
-        sources/color.h
+        sources/color.hpp
         sources/color.cpp
-        sources/command.h
+        sources/command.hpp
         sources/command.cpp
-        sources/constants.h
-        sources/data.h
+        sources/constants.hpp
+        sources/data.hpp
         sources/data.cpp
-        sources/integers.h
-        sources/game.h
+        sources/integers.hpp
+        sources/game.hpp
         sources/game.cpp
-        sources/graphics.h
+        sources/graphics.hpp
         sources/graphics.cpp
-        sources/high-io.h
+        sources/high-io.hpp
         sources/high-io.cpp
-        sources/investment.h
+        sources/investment.hpp
         sources/investment.cpp
-        sources/joystick.h
+        sources/joystick.hpp
         sources/joystick.cpp
-        sources/logger.h
+        sources/logger.hpp
         sources/logger.cpp
-        sources/memory.h
+        sources/memory.hpp
         sources/memory.cpp
-        sources/menu.h
+        sources/menu.hpp
         sources/menu.cpp
-        sources/numeric.h
+        sources/numeric.hpp
         sources/numeric.cpp
-        sources/perk.h
+        sources/perk.hpp
         sources/perk.cpp
-        sources/physics.h
+        sources/physics.hpp
         sources/physics.cpp
-        sources/platform.h
+        sources/platform.hpp
         sources/platform.cpp
-        sources/player.h
+        sources/player.hpp
         sources/player.cpp
-        sources/point.h
+        sources/point.hpp
         sources/point.cpp
-        sources/profiler.h
+        sources/profiler.hpp
         sources/profiler.cpp
-        sources/random.h
+        sources/random.hpp
         sources/random.cpp
-        sources/record.h
+        sources/record.hpp
         sources/record.cpp
-        sources/score.h
-        sources/settings.h
+        sources/score.hpp
+        sources/settings.hpp
         sources/settings.cpp
-        sources/sort.h
+        sources/sort.hpp
         sources/sort.cpp
-        sources/text.h
+        sources/text.hpp
         sources/text.cpp
-        sources/version.h
+        sources/version.hpp
         )
 
 add_library(walls-of-doom-base ${walls-of-doom-sources})

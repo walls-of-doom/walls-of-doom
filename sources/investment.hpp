@@ -1,7 +1,7 @@
 #ifndef INVESTMENT_H
 #define INVESTMENT_H
 
-#include "score.h"
+#include "score.hpp"
 #include <string>
 
 typedef struct Investment {

@@ -8,7 +8,7 @@ fi
 echo Reformatting...
 
 clang-format -i sources/*.cpp
-clang-format -i sources/*.h
+clang-format -i sources/*.hpp
 
 clang-format -i tests/*.cpp
 

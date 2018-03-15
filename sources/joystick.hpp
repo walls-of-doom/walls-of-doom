@@ -1,8 +1,8 @@
 #ifndef JOYSTICK_H
 #define JOYSTICK_H
 
-#include "command.h"
-#include "player.h"
+#include "command.hpp"
+#include "player.hpp"
 #include <SDL.h>
 
 #define JOYSTICK_DEAD_ZONE 4096

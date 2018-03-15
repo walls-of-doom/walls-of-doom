@@ -1,6 +1,6 @@
-#include "color.h"
-#include "memory.h"
-#include "text.h"
+#include "color.hpp"
+#include "memory.hpp"
+#include "text.hpp"
 #include <SDL.h>
 #include <cstdlib>
 #include <cstring>

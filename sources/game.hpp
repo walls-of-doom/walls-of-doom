@@ -1,18 +1,18 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "box.h"
-#include "clock.h"
-#include "code.h"
-#include "constants.h"
-#include "integers.h"
-#include "logger.h"
-#include "numeric.h"
-#include "perk.h"
-#include "platform.h"
-#include "player.h"
-#include "random.h"
-#include "settings.h"
+#include "box.hpp"
+#include "clock.hpp"
+#include "code.hpp"
+#include "constants.hpp"
+#include "integers.hpp"
+#include "logger.hpp"
+#include "numeric.hpp"
+#include "perk.hpp"
+#include "platform.hpp"
+#include "player.hpp"
+#include "random.hpp"
+#include "settings.hpp"
 #include <SDL.h>
 #include <cstdlib>
 

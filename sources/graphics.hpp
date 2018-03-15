@@ -1,7 +1,7 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
-#include "point.h"
+#include "point.hpp"
 #include <stdlib.h>
 
 typedef struct Graphics {

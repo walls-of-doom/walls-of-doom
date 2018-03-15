@@ -1,9 +1,9 @@
 #ifndef RECORD_H
 #define RECORD_H
 
-#include "code.h"
-#include "constants.h"
-#include "player.h"
+#include "code.hpp"
+#include "constants.hpp"
+#include "player.hpp"
 #include <SDL.h>
 #include <stdlib.h>
 #include <string>

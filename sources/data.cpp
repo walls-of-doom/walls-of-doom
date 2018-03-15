@@ -1,7 +1,7 @@
-#include "data.h"
-#include "code.h"
-#include "constants.h"
-#include "logger.h"
+#include "data.hpp"
+#include "code.hpp"
+#include "constants.hpp"
+#include "logger.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

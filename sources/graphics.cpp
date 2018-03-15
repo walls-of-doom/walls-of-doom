@@ -1,6 +1,6 @@
-#include "graphics.h"
-#include "memory.h"
-#include "point.h"
+#include "graphics.hpp"
+#include "memory.hpp"
+#include "point.hpp"
 
 /* Appends (x, y) to the trail. */
 void graphics_update_trail(Graphics *graphics, int x, int y) {

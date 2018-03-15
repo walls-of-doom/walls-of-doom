@@ -1,7 +1,7 @@
 #ifndef SCORE_H
 #define SCORE_H
 
-#include "integers.h"
+#include "integers.hpp"
 
 typedef S64 Score;
 

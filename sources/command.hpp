@@ -1,8 +1,8 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
-#include "clock.h"
-#include "code.h"
+#include "clock.hpp"
+#include "code.hpp"
 
 /**
  * The Command enumeration represents the different commands the user may issue.

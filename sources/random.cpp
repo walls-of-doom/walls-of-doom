@@ -1,7 +1,7 @@
-#include "random.h"
-#include "constants.h"
-#include "data.h"
-#include "text.h"
+#include "random.hpp"
+#include "constants.hpp"
+#include "data.hpp"
+#include "text.hpp"
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>

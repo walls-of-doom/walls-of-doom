@@ -1,7 +1,7 @@
 #ifndef DATA_H
 #define DATA_H
 
-#include "code.h"
+#include "code.hpp"
 #include <stdio.h>
 
 /**
