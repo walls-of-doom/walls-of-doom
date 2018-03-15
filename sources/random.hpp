@@ -6,7 +6,7 @@
  *
  * This function can safely be called multiple times.
  */
-void seed_random(void);
+void seed_random();
 
 /**
  * Returns the next power of two bigger than the provided number.

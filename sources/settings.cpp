@@ -61,7 +61,7 @@ static int tile_height = -1;
 
 static int bar_height = -1;
 
-static bool player_stops_platforms = 0;
+static bool player_stops_platforms = false;
 
 static int joystick_profile = JOYSTICK_PROFILE_DUALSHOCK;
 

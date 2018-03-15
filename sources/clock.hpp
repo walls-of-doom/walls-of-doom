@@ -8,7 +8,7 @@ typedef unsigned long Milliseconds;
  *
  * This function should be used to measure computation times.
  */
-Milliseconds get_milliseconds(void);
+Milliseconds get_milliseconds();
 
 /**
  * Sleeps for the specified number of milliseconds or more.

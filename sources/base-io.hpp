@@ -27,11 +27,11 @@ void clear(Renderer *renderer);
  */
 void present(Renderer *renderer);
 
-Font *get_font(void);
+Font *get_font();
 
-int get_font_width(void);
+int get_font_width();
 
-int get_font_height(void);
+int get_font_height();
 
 /**
  * Swap the renderer color by the provided color.

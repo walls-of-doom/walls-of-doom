@@ -4,7 +4,7 @@
 #include "clock.hpp"
 #include "code.hpp"
 
-Code initialize_profiler(void);
+Code initialize_profiler();
 
 /**
  * Updates the statistics about an identifier with a new millisecond count.
@@ -24,6 +24,6 @@ void profiler_end(const char *identifier);
 /**
  * Saves all profiler data to disk and frees the allocated memory.
  */
-Code finalize_profiler(void);
+Code finalize_profiler();
 
 #endif

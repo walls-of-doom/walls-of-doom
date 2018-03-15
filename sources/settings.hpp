@@ -14,52 +14,52 @@ typedef enum RepositionAlgorithm { REPOSITION_SELECT_BLINDLY, REPOSITION_SELECT_
 
 typedef enum RendererType { RENDERER_HARDWARE, RENDERER_SOFTWARE } RendererType;
 
-void initialize_settings(void);
+void initialize_settings();
 
-RepositionAlgorithm get_reposition_algorithm(void);
+RepositionAlgorithm get_reposition_algorithm();
 
-long get_platform_count(void);
+long get_platform_count();
 
-int get_font_size(void);
+int get_font_size();
 
-int get_window_width(void);
+int get_window_width();
 
-int get_window_height(void);
+int get_window_height();
 
-int get_tile_width(void);
+int get_tile_width();
 
-int get_tile_height(void);
+int get_tile_height();
 
-int get_bar_height(void);
+int get_bar_height();
 
-long get_padding(void);
+long get_padding();
 
-int get_player_stops_platforms(void);
+bool get_player_stops_platforms();
 
-int get_joystick_profile(void);
+int get_joystick_profile();
 
-InvestmentMode get_investment_mode(void);
+InvestmentMode get_investment_mode();
 
-int get_investment_amount(void);
+int get_investment_amount();
 
-double get_investment_proportion(void);
+double get_investment_proportion();
 
-int get_investment_period(void);
+int get_investment_period();
 
-double get_investment_maximum_factor(void);
+double get_investment_maximum_factor();
 
-double get_investment_minimum_factor(void);
+double get_investment_minimum_factor();
 
-RendererType get_renderer_type(void);
+RendererType get_renderer_type();
 
-int get_platform_max_width(void);
+int get_platform_max_width();
 
-int get_platform_min_width(void);
+int get_platform_min_width();
 
-int get_platform_max_speed(void);
+int get_platform_max_speed();
 
-int get_platform_min_speed(void);
+int get_platform_min_speed();
 
-int is_logging_player_score(void);
+int is_logging_player_score();
 
 #endif
