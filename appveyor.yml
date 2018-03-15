@@ -34,9 +34,7 @@ before_build:
 
   - echo Running cmake...
   - cd C:\walls-of-doom\build
-  - cmake -G "Visual Studio 10 2010" ..
-
-  - echo Building the project...
+  - cmake ..
   - cmake --build . --config Release
 
 build:
