@@ -14,6 +14,7 @@ endif ()
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_INCLUDE_CURRENT_DIR_IN_INTERFACE ON)
 
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 option(ENV32 "Generate code for a 32-bit environment.")

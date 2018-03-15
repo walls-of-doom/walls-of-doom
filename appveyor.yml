@@ -38,20 +38,20 @@ before_build:
   - cmake --build . --config Release
 
 build:
-  # parallel: true
+  parallel: true
 
 after_build:
-  - 7z a walls-of-doom\Release\walls-of-doom.zip .\walls-of-doom\Release\walls-of-doom.exe .\walls-of-doom\assets .\lib\*.dll
+  - 7z a Release\walls-of-doom.zip Release\walls-of-doom.exe assets .\lib\*.dll
 
 artifacts:
-  - path: build\walls-of-doom\Release\walls-of-doom.zip
-    name: walls-of-doom-windows.zip
+  - path: build\Release\walls-of-doom.zip
+    name: walls-of-doom-windows-{build}.zip
 
 deploy:
   provider: GitHub
   auth_token:
     secure: JaO/fskUcLorWunMYql+CKy6Hwc26EBCYY1Re4owoiBgQEADsVXY9pdr+iAAjvPb
-  artifact: walls-of-doom-windows.zip
+  artifact: walls-of-doom-windows-{build}.zip
   draft: false
   prerelease: false
   on:
