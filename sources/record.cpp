@@ -10,7 +10,7 @@
 #include "settings.hpp"
 #include "sort.hpp"
 #include "text.hpp"
-#include <stdio.h>
+#include <cstdio>
 #include <string.h>
 #include <string>
 #include <vector>
@@ -24,7 +24,7 @@ typedef struct RecordTable {
 } RecordTable;
 
 Record make_record(const char *name, const Score score) {
-  Record record;
+  Record record{};
   /* Safely copy the provided name into the array. */
   memset(record.name, '\0', MAXIMUM_PLAYER_NAME_SIZE);
   copy_string(record.name, name, MAXIMUM_PLAYER_NAME_SIZE);
@@ -38,15 +38,16 @@ int compare_records(const Record *const a, const Record *const b) {
   }
   if (a->score == b->score) {
     return 0;
-  } else {
-    return 1;
-  };
+  }
+  return 1;
 }
 
-int compare_void_records(const void *a, const void *b) { return compare_records((const Record *)a, (const Record *)b); }
+int compare_void_records(const void *a, const void *b) {
+  return compare_records(static_cast<const Record *>(a), static_cast<const Record *>(b));
+}
 
 void populate_table_with_default_records(RecordTable *table) {
-  Record empty_record;
+  Record empty_record{};
   std::vector<std::string> names = {"Adam", "Bree", "Cora", "Dave", "Elmo"};
   static int scores[] = {18, 14, 10, 8, 2};
   size_t i;
@@ -69,23 +70,23 @@ void populate_table_with_default_records(RecordTable *table) {
 }
 
 static void parse_record(const char *buffer, Record *const record) {
-  const char *begin = NULL;
-  const char *end = NULL;
+  const char *begin = nullptr;
+  const char *end = nullptr;
   /* Properly initialize the Record even if parsing fails. */
   record->score = 0;
   record->name[0] = '\0';
   if (*buffer == '"') {
     begin = buffer + 1;
     end = strchr(buffer + 1, '"');
-    if (end == NULL) {
+    if (end == nullptr) {
       return;
     }
     copy_string_up_to(record->name, begin, end, MAXIMUM_PLAYER_NAME_SIZE);
     begin = strchr(end, ',');
-    if (begin == NULL) {
+    if (begin == nullptr) {
       return;
     }
-    record->score = strtol(begin + 1, NULL, 10);
+    record->score = strtol(begin + 1, nullptr, 10);
   }
 }
 
@@ -100,16 +101,16 @@ void read_table(RecordTable *table) {
   Record *record;
   FILE *file;
   size_t i;
-  char *buffer = NULL;
+  char *buffer = nullptr;
   buffer = reinterpret_cast<char *>(resize_memory(buffer, READ_TABLE_BUFFER_SIZE));
   get_full_path(path, RECORD_TABLE_FILE_NAME);
-  if (file_exists(path)) {
+  if (file_exists(path) != 0) {
     file = fopen(path, "r");
-    if (file != NULL) {
+    if (file != nullptr) {
       table->record_count = 0;
       for (i = 0; i < RECORD_ARRAY_SIZE; i++) {
         record = table->records + i;
-        if (fgets(buffer, READ_TABLE_BUFFER_SIZE, file) != NULL) {
+        if (fgets(buffer, READ_TABLE_BUFFER_SIZE, file) != nullptr) {
           table->record_count++;
           parse_record(buffer, record);
         } else {
@@ -124,7 +125,7 @@ void read_table(RecordTable *table) {
     /* Set the error flag to trigger the creation of a new table. */
     read_error = 1;
   }
-  if (read_error) {
+  if (read_error != 0) {
     populate_table_with_default_records(table);
     log_message("Populated the table with the default records.");
   }
@@ -138,7 +139,7 @@ void write_table(const RecordTable *const table) {
   size_t i;
   get_full_path(path, RECORD_TABLE_FILE_NAME);
   file = fopen(path, "w");
-  if (file != NULL) {
+  if (file != nullptr) {
     for (i = 0; i < table->record_count; i++) {
       record = table->records + i;
       fprintf(file, RECORD_CSV_OUT, record->name, record->score);
@@ -153,7 +154,7 @@ void write_table(const RecordTable *const table) {
 int save_record(Record *record) {
   int (*comparator)(const void *a, const void *b) = &compare_void_records;
   int record_index;
-  RecordTable table;
+  RecordTable table{};
   read_table(&table);
   /* If the table is full, overwrite the last record if this is greater. */
   if (table.record_count == RECORD_ARRAY_SIZE) {
@@ -187,7 +188,7 @@ int save_record(Record *record) {
  * Returns how many Records were actually read.
  */
 size_t read_records(Record *destination, size_t destination_size) {
-  RecordTable table;
+  RecordTable table{};
   size_t i;
   size_t max_i;
   read_table(&table);

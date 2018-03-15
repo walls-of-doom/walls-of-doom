@@ -14,11 +14,14 @@ static Command command_from_key(const SDL_Keysym keysym) {
   }
   if (sym == SDLK_KP_4 || sym == SDLK_LEFT) {
     return COMMAND_LEFT;
-  } else if (sym == SDLK_KP_5) {
+  }
+  if (sym == SDLK_KP_5) {
     return COMMAND_CENTER;
-  } else if (sym == SDLK_KP_6 || sym == SDLK_RIGHT) {
+  }
+  if (sym == SDLK_KP_6 || sym == SDLK_RIGHT) {
     return COMMAND_RIGHT;
-  } else if (sym == SDLK_KP_2 || sym == SDLK_DOWN) {
+  }
+  if (sym == SDLK_KP_2 || sym == SDLK_DOWN) {
     return COMMAND_DOWN;
   } else if (sym == SDLK_SPACE) {
     return COMMAND_JUMP;
@@ -27,7 +30,7 @@ static Command command_from_key(const SDL_Keysym keysym) {
   } else if (sym == SDLK_c) {
     return COMMAND_CONVERT;
   } else if (sym == SDLK_i) {
-    if (mod & KMOD_SHIFT) {
+    if ((mod & KMOD_SHIFT) != 0) {
       return COMMAND_INVEST_ALL;
     }
     return COMMAND_INVEST;
@@ -46,7 +49,7 @@ static void set_command_table(CommandTable *table, Command command, double value
 
 static void digest_joystick_event(CommandTable *table, SDL_Event event) {
   const Milliseconds time = get_milliseconds();
-  if (table == NULL) {
+  if (table == nullptr) {
     return;
   }
   if (event.type == SDL_JOYBUTTONDOWN) {
@@ -55,7 +58,7 @@ static void digest_joystick_event(CommandTable *table, SDL_Event event) {
     set_command_table(table, command_from_joystick_event(event), 0.0, time);
   } else if (event.type == SDL_JOYAXISMOTION) {
     if (abs(event.jaxis.value) > JOYSTICK_DEAD_ZONE) {
-      double magnitude = event.jaxis.value / (double)MAXIMUM_JOYSTICK_AXIS_VALUE;
+      double magnitude = event.jaxis.value / static_cast<double>(MAXIMUM_JOYSTICK_AXIS_VALUE);
       if (event.jaxis.axis == 0) {
         set_command_table(table, COMMAND_RIGHT, 0.0, time);
         set_command_table(table, COMMAND_LEFT, 0.0, time);
@@ -87,7 +90,7 @@ static void digest_joystick_event(CommandTable *table, SDL_Event event) {
 
 static void digest_event(CommandTable *table, const SDL_Event event) {
   const Milliseconds time = get_milliseconds();
-  if (table == NULL) {
+  if (table == nullptr) {
     return;
   }
   if (event.type == SDL_QUIT) {
@@ -112,31 +115,31 @@ void initialize_command_table(CommandTable *table) {
 }
 
 void read_commands(CommandTable *table) {
-  SDL_Event event;
-  while (SDL_PollEvent(&event)) {
+  SDL_Event event{};
+  while (SDL_PollEvent(&event) != 0) {
     digest_event(table, event);
   }
 }
 
-int test_command_table(CommandTable *table, Command command, Milliseconds repetition_delay) {
+bool test_command_table(CommandTable *table, Command command, Milliseconds repetition_delay) {
   const Milliseconds time = get_milliseconds();
   if (table->status[command] == 0.0) {
-    return 0;
+    return false;
   }
   if (time - table->last_issued[command] < repetition_delay) {
-    return 0;
+    return false;
   }
   table->last_issued[command] = time;
-  return 1;
+  return true;
 }
 
 /**
  * Waits for any user input, blocking indefinitely.
  */
 Code wait_for_input(CommandTable *table) {
-  SDL_Event event;
-  while (1) {
-    if (SDL_WaitEvent(&event)) {
+  SDL_Event event{};
+  while (true) {
+    if (SDL_WaitEvent(&event) != 0) {
       digest_event(table, event);
       if (event.type == SDL_QUIT) {
         return CODE_QUIT;

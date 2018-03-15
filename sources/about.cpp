@@ -3,7 +3,7 @@
 #include "data.hpp"
 #include "high-io.hpp"
 #include "logger.hpp"
-#include <string.h>
+#include <cstring>
 
 /**
  * Presents information about the game to the player.

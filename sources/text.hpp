@@ -22,10 +22,7 @@ size_t copy_string(char *destination, const char *source, const size_t size);
  */
 size_t copy_string_up_to(char *destination, const char *begin, const char *end, const size_t size);
 
-/**
- * Compares two strings to determine whether or not they are equal.
- */
-int string_equals(const char *a, const char *b);
+bool string_equals(const char *a, const char *b);
 
 /**
  * Returns a pointer to the start of the text of the string.

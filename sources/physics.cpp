@@ -1,18 +1,8 @@
 #include "physics.hpp"
 #include "bank.hpp"
-#include "base-io.hpp"
-#include "constants.hpp"
-#include "investment.hpp"
-#include "logger.hpp"
 #include "memory.hpp"
 #include "profiler.hpp"
-#include "random.hpp"
-#include "score.hpp"
-#include "settings.hpp"
 #include <limits>
-#include <math.h>
-#include <stdio.h>
-#include <string.h>
 
 /* Should be the maximum frame count value for 5 seconds remaining. */
 #define MINIMUM_REMAINING_FRAMES_FOR_MESSAGE (6 * UPS - 1)
@@ -34,55 +24,53 @@ static BoundingBox derive_box(const Game *game, const int x, const int y) {
   return box;
 }
 
-static int has_rigid_support(const Game *game, int x, int y, int w, int h) {
-  int i;
-  for (i = 0; i < w; i++) {
-    if (get_from_rigid_matrix(game, x + i, y + h)) {
-      return 1;
+static bool has_rigid_support(const Game *game, int x, int y, int w, int h) {
+  for (int i = 0; i < w; i++) {
+    if (get_from_rigid_matrix(game, x + i, y + h) != 0u) {
+      return true;
     }
   }
-  return 0;
+  return false;
 }
 
-static int is_over_platform(const Player *player, const Platform *const platform) {
+static bool is_over_platform(const Player *player, const Platform *const platform) {
   if (player->y + player->h == platform->y) {
     if (player->x < platform->x + platform->w) {
       return player->x + player->w > platform->x;
     }
   }
-  return 0;
+  return false;
 }
 
 /* Width and height are the width and height of the matrix tile. */
-static int violates_rigid_matrix(const Game *game, int x, int y, int w, int h) {
-  int i;
-  int j;
-  for (i = 0; i < w; i++) {
-    for (j = 0; j < h; j++) {
-      if (get_from_rigid_matrix(game, x + i, y + j)) {
-        return 1;
+static bool violates_rigid_matrix(const Game *game, int x, int y, int w, int h) {
+  for (int i = 0; i < w; i++) {
+    for (int j = 0; j < h; j++) {
+      if (get_from_rigid_matrix(game, x + i, y + j) != 0) {
+        return true;
       }
     }
   }
-  return 0;
+  return false;
 }
 
 /**
- * Evaluates whether or not the given x and y pair is a valid position for the
- * player to occupy.
+ * Evaluates whether or not the given x and y pair is a valid position for the player to occupy.
  */
-static int is_valid_move(const Game *const game, const int x, const int y) {
+static bool is_valid_move(const Game *const game, const int x, const int y) {
   if (game->player->perk == PERK_POWER_INVINCIBILITY) {
     /* If it is invincible, it shouldn't move into walls. */
     if (x == game->box->min_x - 1) {
-      return 0;
+      return false;
     }
     if (x + game->player->w - 1 == game->box->max_x + 1) {
-      return 0;
-    } else if (y == game->box->min_y - 1) {
-      return 0;
-    } else if (y + game->player->h - 1 == game->box->max_y + 1) {
-      return 0;
+      return false;
+    }
+    if (y == game->box->min_y - 1) {
+      return false;
+    }
+    if (y + game->player->h - 1 == game->box->max_y + 1) {
+      return false;
     }
   }
   return !violates_rigid_matrix(game, x, y, game->player->w, game->player->h);
@@ -93,19 +81,19 @@ static int is_valid_move(const Game *const game, const int x, const int y) {
  *
  * This moves the player at most one position on each axis.
  */
-static void move_player(Game *game, int x, int y) {
+static void move_player(Game *game, int dx, int dy) {
   /* It is OK to reuse x and y to prevent multiple integers for the same axis.
    */
   /* Ignore magnitude, take just -1, 0, or 1. */
-  x = normalize(x);
-  y = normalize(y);
+  dx = normalize(dx);
+  dy = normalize(dy);
   /* Just in case a compiler cannot optimize this case away. */
-  if (x == 0 && y == 0) {
+  if (dx == 0 && dy == 0) {
     return;
   }
-  if (is_valid_move(game, game->player->x + x, game->player->y + y)) {
-    game->player->x += x;
-    game->player->y += y;
+  if (is_valid_move(game, game->player->x + dx, game->player->y + dy)) {
+    game->player->x += dx;
+    game->player->y += dy;
   }
 }
 
@@ -116,27 +104,26 @@ static void move_player(Game *game, int x, int y) {
  *
  * The standing flag indicates if the player is standing above the platform.
  */
-static void shove_player(Game *game, int x, int y, int standing) {
+static void shove_player(Game *game, int dx, int dy, int standing) {
   if (game->player->physics) {
     /* Don't shove the player if he is hovering over a platform. */
-    if (game->player->perk != PERK_POWER_LEVITATION || !standing) {
-      move_player(game, x, 0);
+    if (game->player->perk != PERK_POWER_LEVITATION || (standing == 0)) {
+      move_player(game, dx, 0);
     }
   }
-  move_player(game, 0, y);
+  move_player(game, 0, dy);
 }
 
 static int get_absolute_pending_movement(unsigned long frame, int speed) {
   /* Should move slice after every frame. */
-  const double slice = speed / (double)UPS;
+  const double slice = speed / static_cast<double>(UPS);
   /* To reduce floating point error, normalize frame to [FPS, 2 FPS - 1]. */
   frame = frame % UPS + UPS;
-  return floor(frame * slice) - floor((frame - 1) * slice);
+  return static_cast<int>(floor(frame * slice) - floor((frame - 1) * slice));
 }
 
 static int get_pending_movement(const Game *const game, const int speed) {
-  const int normalized = normalize(speed);
-  return normalized * get_absolute_pending_movement(game->current_frame, abs(speed));
+  return normalize(speed) * get_absolute_pending_movement(game->current_frame, abs(speed));
 }
 
 static void subtract_platform(Game *const game, Platform *const platform) {
@@ -147,34 +134,27 @@ static void add_platform(Game *const game, Platform *const platform) {
   modify_rigid_matrix_platform(game, platform, 1);
 }
 
-static int is_free_on_matrix(Game *const game, int x, int y, int w, int h) {
-  int i;
-  int j;
-  for (i = 0; i != w; i++) {
-    for (j = 0; j != h; j++) {
-      if (get_from_rigid_matrix(game, x + i, y + j)) {
-        return 0;
+static bool is_free_on_matrix(Game *const game, int x, int y, int w, int h) {
+  for (int i = 0; i != w; i++) {
+    for (int j = 0; j != h; j++) {
+      if (get_from_rigid_matrix(game, x + i, y + j) != 0u) {
+        return false;
       }
     }
   }
-  return 1;
+  return true;
 }
 
-/**
- * Returns whether or not the platform can be inserted in the game without
- * overlapping any existing platforms.
- */
-static int can_insert_platform(Game *const game, Platform *const p) {
+static bool can_insert_platform(Game *const game, Platform *const p) {
   return is_free_on_matrix(game, p->x, p->y, p->w, p->h);
 }
 
 /**
  * Evaluates whether or not the player is standing on a platform.
  *
- * This function takes into account the Invincibility perk, which makes the
- * bottom border to be treated as a platform.
+ * This function takes into account the Invincibility perk, which makes the bottom border to be treated as a platform.
  */
-static int is_standing_on_platform(const Game *const game) {
+static bool is_standing_on_platform(const Game *const game) {
   const int x = game->player->x;
   const int y = game->player->y;
   const int w = game->player->w;
@@ -185,32 +165,32 @@ static int is_standing_on_platform(const Game *const game) {
   return has_rigid_support(game, x, y, w, h);
 }
 
-static int is_in_front_of_platform(const Player *const player, const Platform *const platform) {
+static bool is_in_front_of_platform(const Player *const player, const Platform *const platform) {
   if (platform->speed < 0) {
     if (player->x + player->w != platform->x) {
-      return 0;
+      return false;
     }
   } else {
     if (platform->x + platform->w != player->x) {
-      return 0;
+      return false;
     }
   }
   if (player->y < platform->y + platform->h) {
     if (player->y + player->h > platform->y) {
-      return 1;
+      return true;
     }
   }
-  return 0;
+  return false;
 }
 
-static int can_move_platform(Game *const game, Platform *p, int dx, int dy) {
-  int can_move = 1;
+static bool can_move_platform(Game *const game, Platform *p, int dx, int dy) {
   if (get_player_stops_platforms() && is_over_platform(game->player, p)) {
-    return 0;
+    return false;
   }
   if (dx == 0 && dy == 0) {
-    return 1;
+    return true;
   }
+  auto can_move = true;
   /* There are two optimized paths for unidirectional movement. */
   if (dx == 0) {
     if (dy < 0) {
@@ -257,12 +237,12 @@ static void move_platform_horizontally(Game *const game, Platform *const platfor
   int normalized_speed = normalize(platform->speed);
   /* This could be made more efficient by handling each direction separately. */
   int pending = abs(platform->speed);
-  while (pending) {
+  while (pending != 0) {
     if (can_move_platform(game, platform, normalized_speed, 0)) {
       if (is_in_front_of_platform(game->player, platform)) {
         shove_player(game, normalized_speed, 0, 0);
       }
-      if (is_over_platform(game->player, platform)) {
+      if (is_over_platform(game->player, platform) != 0) {
         shove_player(game, normalized_speed, 0, 1);
       }
       move_platform(game, platform, normalized_speed, 0);
@@ -290,7 +270,7 @@ int select_random_line_blindly(const unsigned char *lines, const int size) {
   /* Count how many empty lines there are. */
   count = 0;
   for (i = 0; i < size; i++) {
-    if (!lines[i]) {
+    if (lines[i] == 0) {
       count++;
     }
   }
@@ -301,8 +281,8 @@ int select_random_line_blindly(const unsigned char *lines, const int size) {
   /* Get a random value based on the count. */
   skip = random_integer(0, count - 1);
   line = 0;
-  while (lines[line] || skip != 0) {
-    if (!lines[line]) {
+  while ((lines[line] != 0) || skip != 0) {
+    if (lines[line] == 0) {
       skip--;
     }
     line = (line + 1) % size;
@@ -317,7 +297,7 @@ int select_random_line_blindly(const unsigned char *lines, const int size) {
  * This algorithm is O(n) with respect to the number of lines.
  */
 int select_random_line_awarely(const unsigned char *lines, const int size) {
-  int *distances = NULL;
+  int *distances = nullptr;
   int maximum_distance = std::numeric_limits<int>::min();
   int count;
   int skip;
@@ -330,7 +310,7 @@ int select_random_line_awarely(const unsigned char *lines, const int size) {
   distances = reinterpret_cast<int *>(resize_memory(distances, sizeof(int) * size));
   /* First pass: calculate the distance to nearest occupied line above. */
   for (i = 0; i < size; i++) {
-    if (lines[i]) {
+    if (lines[i] != 0) {
       distances[i] = 0;
     } else {
       if (i > 0) {
@@ -342,7 +322,7 @@ int select_random_line_awarely(const unsigned char *lines, const int size) {
   }
   /* Second pass: calculate the distance to nearest occupied line below. */
   for (i = size - 1; i >= 0; i--) {
-    if (lines[i]) {
+    if (lines[i] != 0) {
       distances[i] = 0;
     } else {
       if (i < size - 1) {
@@ -377,16 +357,16 @@ int select_random_line_awarely(const unsigned char *lines, const int size) {
 static void reposition(Game *const game, Platform *const platform) {
   const BoundingBox *const box = game->box;
   /* The occupied size may be smaller than the array actually is. */
-  const int occupied_size = (get_window_height() - 2 * get_bar_height()) / get_tile_height();
+  const auto occupied_size = static_cast<U32>((get_window_height() - 2 * get_bar_height()) / get_tile_height());
   const int tile_h = game->tile_h;
-  unsigned char *occupied = NULL;
+  unsigned char *occupied = nullptr;
   int line;
   size_t i;
   occupied = reinterpret_cast<unsigned char *>(resize_memory(occupied, occupied_size));
   memset(occupied, 0, occupied_size);
   /* Build a table of occupied rows. */
   for (i = 0; i < game->platform_count; i++) {
-    if (!platform_equals(game->platforms[i], *platform)) {
+    if (platform_equals(game->platforms[i], *platform) == 0) {
       occupied[(game->platforms[i].y - box->min_y) / tile_h] = 1;
     }
   }
@@ -426,59 +406,42 @@ int is_out_of_bounding_box(Platform *const platform, const BoundingBox *const bo
   }
   if (platform->y < box->min_y || platform->y > box->max_y) {
     return 2;
-  } else {
-    return 0;
   }
+  return 0;
 }
 
 static void update_platform(Game *const game, Platform *const platform) {
   move_platform_horizontally(game, platform);
-  if (is_out_of_bounding_box(platform, game->box)) {
+  if (is_out_of_bounding_box(platform, game->box) != 0) {
     reposition(game, platform);
   }
 }
 
 void update_platforms(Game *const game) {
-  size_t i;
   if (game->player->perk != PERK_POWER_TIME_STOP) {
-    for (i = 0; i < game->platform_count; i++) {
+    for (size_t i = 0; i < game->platform_count; i++) {
       update_platform(game, game->platforms + i);
     }
   }
 }
 
-/**
- * Evaluates whether or not the Player is falling.
- */
-static int is_falling(const Game *const game) {
-  const Player *const player = game->player;
-  const int x = player->x;
-  const int y = player->y;
-  const int w = player->w;
-  const int h = player->h;
-  if (!player->physics || player->perk == PERK_POWER_LEVITATION) {
-    return 0;
+static bool is_falling(const Game *const game) {
+  if (!game->player->physics || game->player->perk == PERK_POWER_LEVITATION) {
+    return false;
   }
-  if (y == game->box->max_y) {
-    return 1;
+  if (game->player->y == game->box->max_y) {
+    return true;
   }
-  return !has_rigid_support(game, x, y, w, h);
+  return !has_rigid_support(game, game->player->x, game->player->y, game->player->w, game->player->h);
 }
 
-static int is_touching_a_wall(const Game *const game) {
-  /**
-   * As in the maximum values for the boxes, the maximum is the last used pixel.
-   */
-  const int b_min_x = game->box->min_x;
-  const int b_max_x = game->box->max_x;
-  const int b_min_y = game->box->min_y;
-  const int b_max_y = game->box->max_y;
-  const int p_min_x = game->player->x;
-  const int p_max_x = game->player->x + game->player->w - 1;
-  const int p_min_y = game->player->y;
-  const int p_max_y = game->player->y + game->player->h - 1;
-  const int in_x = p_min_x < b_min_x || p_max_x > b_max_x;
-  const int in_y = p_min_y < b_min_y || p_max_y > b_max_y;
+static bool is_touching_a_wall(const Game *const game) {
+  const auto b_min_x = game->box->min_x;
+  const auto b_max_x = game->box->max_x;
+  const auto b_min_y = game->box->min_y;
+  const auto b_max_y = game->box->max_y;
+  const auto in_x = game->player->x < b_min_x || game->player->x + game->player->w - 1 > b_max_x;
+  const auto in_y = game->player->y < b_min_y || game->player->y + game->player->h - 1 > b_max_y;
   return in_x || in_y;
 }
 
@@ -491,11 +454,8 @@ static int get_bounding_box_center_y(const BoundingBox *const box) {
 }
 
 void reposition_player(Game *const game) {
-  const BoundingBox *const box = game->box;
-  const int x = get_bounding_box_center_x(box);
-  const int y = get_bounding_box_center_y(box);
-  game->player->x = x;
-  game->player->y = y;
+  game->player->x = get_bounding_box_center_x(game->box);
+  game->player->y = get_bounding_box_center_y(game->box);
 }
 
 /**
@@ -517,9 +477,8 @@ static void accelerate_platform(Platform *const platform) { platform->speed = pl
 
 static void reverse_platform(Platform *const platform) { platform->speed = -platform->speed; }
 
-static void apply_to_platforms(Game *const game, void (*f)(Platform *const p)) {
-  size_t i;
-  for (i = 0; i != game->platform_count; ++i) {
+static void apply_to_platforms(Game *const game, void (*f)(Platform *const)) {
+  for (size_t i = 0; i != game->platform_count; ++i) {
     f(game->platforms + i);
   }
 }
@@ -540,18 +499,15 @@ void process_curse(Game *const game, const Perk perk) {
 }
 
 void update_perk(Game *const game) {
-  unsigned long next_perk_frame = game->perk_end_frame;
-  int random_x;
-  int random_y;
+  auto next_perk_frame = game->perk_end_frame;
   next_perk_frame += PERK_INTERVAL_IN_FRAMES;
   next_perk_frame -= PERK_SCREEN_DURATION_IN_FRAMES;
   if (game->played_frames == game->perk_end_frame) {
     game->perk = PERK_NONE;
   } else if (game->played_frames == next_perk_frame) {
     game->perk = get_random_perk();
-    random_x = random_integer(0, get_window_width() - get_tile_width());
-    random_y = random_integer(get_bar_height(), get_window_height() - 2 * get_bar_height());
-    game->perk_x = random_x;
+    game->perk_x = random_integer(0, get_window_width() - get_tile_width());
+    int random_y = random_integer(get_bar_height(), get_window_height() - 2 * get_bar_height());
     game->perk_y = random_y - random_y % get_tile_height();
     game->perk_end_frame = game->played_frames + PERK_SCREEN_DURATION_IN_FRAMES;
   }
@@ -572,7 +528,7 @@ void update_player_horizontal_position(Game *game) {
   }
 }
 
-static int is_jumping(const Player *const player) { return player->remaining_jump_height > 0; }
+static bool is_jumping(const Player *const player) { return player->remaining_jump_height > 0; }
 
 void process_jump(Game *const game) {
   const int jumping_height = game->tile_h * PLAYER_JUMPING_HEIGHT;
@@ -581,7 +537,7 @@ void process_jump(Game *const game) {
     if (game->player->perk == PERK_POWER_SUPER_JUMP) {
       game->player->remaining_jump_height *= 2;
     }
-  } else if (game->player->can_double_jump) {
+  } else if (game->player->can_double_jump != 0) {
     game->player->can_double_jump = 0;
     game->player->remaining_jump_height += jumping_height / 2;
     if (game->player->perk == PERK_POWER_SUPER_JUMP) {
@@ -601,7 +557,7 @@ static void buy_life(Game *game) {
 static void update_player_investments(Game *game) {
   Investment *swap;
   Investment *investments = game->player->investments;
-  while (investments != NULL && investments->end <= game->played_frames) {
+  while (investments != nullptr && investments->end <= game->played_frames) {
     player_score_add(game->player, collect_investment(game, *investments));
     swap = investments->next;
     resize_memory(investments, 0);
@@ -610,7 +566,7 @@ static void update_player_investments(Game *game) {
   game->player->investments = investments;
 }
 
-static int get_investment_total(Player *player, InvestmentMode mode) {
+static Score get_investment_total(Player *player, InvestmentMode mode) {
   const Score base_amount = get_investment_amount();
   const double proportion = get_investment_proportion();
   Score product;
@@ -618,7 +574,7 @@ static int get_investment_total(Player *player, InvestmentMode mode) {
     return base_amount;
   }
   if (mode == INVESTMENT_MODE_PROPORTIONAL) {
-    product = player->score * proportion;
+    product = static_cast<Score>(player->score * proportion);
     if (product >= base_amount) {
       return product;
     }
@@ -629,22 +585,22 @@ static int get_investment_total(Player *player, InvestmentMode mode) {
 }
 
 static void invest(Game *game, InvestmentMode mode) {
-  const int amount = get_investment_total(game->player, mode);
+  const Score amount = get_investment_total(game->player, mode);
   Investment *investments = game->player->investments;
-  Investment *investment = NULL;
+  Investment *investment = nullptr;
   if (amount == 0) {
     return;
   }
   if (game->player->score >= amount) {
     investment = reinterpret_cast<Investment *>(resize_memory(investment, sizeof(Investment)));
     player_score_sub(game->player, amount);
-    investment->next = NULL;
+    investment->next = nullptr;
     investment->amount = amount;
     investment->end = game->played_frames + UPS * get_investment_period();
-    while (investments != NULL && investments->next != NULL) {
+    while (investments != nullptr && investments->next != nullptr) {
       investments = investments->next;
     }
-    if (investments == NULL) {
+    if (investments == nullptr) {
       game->player->investments = investment;
     } else {
       investments->next = investment;
@@ -654,25 +610,25 @@ static void invest(Game *game, InvestmentMode mode) {
 
 void process_command(Game *game, Player *player) {
   double *table = player->table->status;
-  if (table[COMMAND_LEFT]) {
+  if (table[COMMAND_LEFT] != 0.0) {
     double speed = -table[COMMAND_LEFT] * PLAYER_RUNNING_SPEED * game->tile_w;
-    player->speed_x = (int)speed;
-    player->physics = 1;
-  } else if (table[COMMAND_RIGHT]) {
+    player->speed_x = static_cast<int>(speed);
+    player->physics = true;
+  } else if (table[COMMAND_RIGHT] != 0.0) {
     double speed = table[COMMAND_RIGHT] * PLAYER_RUNNING_SPEED * game->tile_w;
-    player->speed_x = (int)speed;
-    player->physics = 1;
+    player->speed_x = static_cast<int>(speed);
+    player->physics = true;
   } else {
-    player->speed_x = (int)0.0;
+    player->speed_x = 0;
   }
-  if (table[COMMAND_JUMP]) {
+  if (table[COMMAND_JUMP] != 0.0) {
     process_jump(game);
     table[COMMAND_JUMP] = 0.0;
-    player->physics = 1;
-  } else if (table[COMMAND_CONVERT]) {
+    player->physics = true;
+  } else if (table[COMMAND_CONVERT] != 0.0) {
     buy_life(game);
     table[COMMAND_CONVERT] = 0.0;
-  } else if (table[COMMAND_INVEST]) {
+  } else if (table[COMMAND_INVEST] != 0.0) {
     invest(game, get_investment_mode());
     table[COMMAND_INVEST] = 0.0;
   }
@@ -688,20 +644,20 @@ static void check_for_player_death(Game *game) {
     player->lives--;
     reposition_player(game);
     /* Unset physics collisions for the player. */
-    player->physics = 0;
+    player->physics = false;
     player->speed_x = 0;
     player->can_double_jump = 0;
     player->remaining_jump_height = 0;
   }
 }
 
-static int can_move_up(const Game *game) {
+static bool can_move_up(const Game *game) {
   const int x = game->player->x;
   const int y = game->player->y;
   if (y == game->box->min_y) {
-    return 1;
+    return true;
   }
-  return !get_from_rigid_matrix(game, x, y - 1);
+  return get_from_rigid_matrix(game, x, y - 1) == 0u;
 }
 
 /**
@@ -710,10 +666,9 @@ static int can_move_up(const Game *game) {
 void update_player_vertical_position(Game *game) {
   const int jumping_speed = PLAYER_JUMPING_SPEED * game->tile_h;
   const int falling_speed = PLAYER_FALLING_SPEED * game->tile_h;
-  int pending;
   if (is_jumping(game->player)) {
     if (can_move_up(game)) {
-      pending = get_pending_movement(game, jumping_speed);
+      int pending = get_pending_movement(game, jumping_speed);
       while (pending > 0) {
         move_player(game, 0, -1);
         game->player->remaining_jump_height--;
@@ -723,6 +678,7 @@ void update_player_vertical_position(Game *game) {
       game->player->remaining_jump_height = 0;
     }
   } else if (is_falling(game)) {
+    int pending = 0;
     if (game->player->perk == PERK_POWER_LOW_GRAVITY) {
       pending = get_pending_movement(game, falling_speed / 2);
     } else {
@@ -754,31 +710,30 @@ static void write_perk_faded_message(Game *game, const Perk perk) {
 }
 
 static void write_perk_fading_message(Game *game, const Perk perk, const unsigned long remaining_frames) {
-  const int seconds = remaining_frames / UPS;
+  const U64 seconds = remaining_frames / UPS;
   char message[MAXIMUM_STRING_SIZE];
   const char *perk_name = get_perk_name(perk).c_str();
   if (seconds < 1) {
     sprintf(message, "%s will fade at any moment.", perk_name);
   } else if (seconds == 1) {
-    sprintf(message, "%s will fade in %d second.", perk_name, seconds);
+    sprintf(message, "%s will fade in %lu second.", perk_name, seconds);
   } else {
-    sprintf(message, "%s will fade in %d seconds.", perk_name, seconds);
+    sprintf(message, "%s will fade in %lu seconds.", perk_name, seconds);
   }
   game_set_message(game, message, 1, 0);
 }
 
-static int is_touching_perk(const Game *const game) {
-  const Player *player = game->player;
-  const BoundingBox player_box = derive_box(game, player->x, player->y);
-  const BoundingBox perk_box = derive_box(game, game->perk_x, game->perk_y);
-  return bounding_box_overlaps(&player_box, &perk_box);
+static bool is_touching_perk(const Game *const game) {
+  const auto player_box = derive_box(game, game->player->x, game->player->y);
+  const auto perk_box = derive_box(game, game->perk_x, game->perk_y);
+  return player_box.overlaps(perk_box);
 }
 
 static void update_player_perk(Game *game) {
   unsigned long end_frame;
   unsigned long remaining_frames;
   Player *player = game->player;
-  Perk perk = PERK_NONE;
+  Perk perk;
   if (player->physics) {
     game->played_frames++;
     /* Check for expiration of the player's perk. */
@@ -801,7 +756,7 @@ static void update_player_perk(Game *game) {
         /* calculate when the next perk is going to be created */
         /* Attribute the Perk to the Player */
         player->perk = perk;
-        if (is_bonus_perk(perk) || is_curse_perk(perk)) {
+        if ((is_bonus_perk(perk)) || (is_curse_perk(perk))) {
           if (is_bonus_perk(perk)) {
             conceive_bonus(player, perk);
           } else {

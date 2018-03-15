@@ -17,8 +17,8 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
-#include <ctype.h>
-#include <stdio.h>
+#include <cctype>
+#include <cstdio>
 #include <string.h>
 #include <string>
 
@@ -34,7 +34,7 @@ static int is_valid_player_name(const char *player_name) {
   char buffer[MAXIMUM_PLAYER_NAME_SIZE];
   copy_string(buffer, player_name, MAXIMUM_PLAYER_NAME_SIZE);
   trim_string(buffer);
-  return strlen(buffer) >= 2;
+  return static_cast<int>(strlen(buffer) >= 2);
 }
 
 /**
@@ -51,7 +51,7 @@ Code read_player_name(char *destination, const size_t maximum_size, Renderer *re
   char log_buffer[MAXIMUM_STRING_SIZE];
   random_name(destination);
   /* While there is not a read error or a valid name. */
-  while (code != CODE_OK || !valid_name) {
+  while (code != CODE_OK || (valid_name == 0)) {
     x = get_padding() * get_font_width();
     y = (get_window_height() - get_font_height()) / 2;
     code = read_string(x, y, message, destination, maximum_size, renderer);
@@ -82,7 +82,7 @@ void print_menu(const std::vector<std::string> &lines, Renderer *renderer) {
  */
 static void draw_absolute_rectangle(int x, int y, int w, int h, Color color, Renderer *renderer) {
   SDL_Color swap = to_sdl_color(color);
-  SDL_Rect rectangle;
+  SDL_Rect rectangle{};
   rectangle.x = x;
   rectangle.y = y;
   rectangle.w = w;
@@ -97,7 +97,7 @@ static void draw_absolute_rectangle(int x, int y, int w, int h, Color color, Ren
  */
 static void draw_shaded_absolute_rectangle(int x, int y, int w, int h, Color color, Renderer *renderer) {
   SDL_Color swap = to_sdl_color(color);
-  SDL_Rect rectangle;
+  SDL_Rect rectangle{};
   rectangle.x = x;
   rectangle.y = y;
   rectangle.w = w;
@@ -142,7 +142,7 @@ static void draw_top_bar(const Game *game, Renderer *renderer) {
     perk_name = get_perk_name(player->perk);
   }
   const unsigned long limit = game->limit_played_frames;
-  double time_left = (limit - game->played_frames) / (double)UPS;
+  double time_left = (limit - game->played_frames) / static_cast<double>(UPS);
   char time_buffer[MAXIMUM_STRING_SIZE];
   sprintf(time_buffer, "%.2f s", time_left);
   strings.emplace_back(time_buffer);
@@ -177,7 +177,7 @@ static void draw_platforms(const Platform *platforms, const size_t platform_coun
                            Renderer *renderer) {
   const Color color = COLOR_PAIR_PLATFORM.foreground;
   const int y_padding = get_bar_height();
-  Platform p;
+  Platform p{};
   int x;
   int y;
   int w;
@@ -193,12 +193,12 @@ static void draw_platforms(const Platform *platforms, const size_t platform_coun
   }
 }
 
-static int has_active_perk(const Game *const game) { return game->perk != PERK_NONE; }
+static int has_active_perk(const Game *const game) { return static_cast<int>(game->perk != PERK_NONE); }
 
 static void draw_resized_perk(int x, int y, int w, int h, double f, Renderer *renderer) {
   /* The scaled values. */
-  const int s_w = (int)(f * w);
-  const int s_h = (int)(f * h);
+  const auto s_w = static_cast<int>(f * w);
+  const auto s_h = static_cast<int>(f * h);
   /* The foreground variables. */
   const Color f_color = COLOR_PAIR_PERK.background;
   int f_x;
@@ -232,15 +232,15 @@ static void draw_resized_perk(int x, int y, int w, int h, double f, Renderer *re
 static void draw_active_perk(const Game *const game, Renderer *renderer) {
   const int interval = PERK_FADING_INTERVAL;
   const int y_padding = get_bar_height();
-  const int remaining = (int)(game->perk_end_frame - game->played_frames);
-  const double fraction = min_int(interval, remaining) / (double)interval;
+  const auto remaining = static_cast<int>(game->perk_end_frame - game->played_frames);
+  const double fraction = min_int(interval, remaining) / static_cast<double>(interval);
   const int x = game->perk_x;
   const int y = y_padding + game->perk_y;
   draw_resized_perk(x, y, game->tile_w, game->tile_h, fraction, renderer);
 }
 
 static void draw_perk(const Game *const game, Renderer *renderer) {
-  if (has_active_perk(game)) {
+  if (has_active_perk(game) != 0) {
     draw_active_perk(game, renderer);
   }
 }
@@ -257,7 +257,7 @@ Code draw_player(const Player *const player, Renderer *renderer) {
   for (i = 0; i < size; i++) {
     x = player->graphics->trail[(head + i) % capacity].x;
     y = player->graphics->trail[(head + i) % capacity].y;
-    color.a = (unsigned char)((i + 1) * (255.0 / (capacity + 1)));
+    color.a = static_cast<unsigned char>((i + 1) * (255.0 / (capacity + 1)));
     draw_shaded_absolute_tile_rectangle(x, y, color, renderer);
   }
   return CODE_OK;
@@ -390,11 +390,11 @@ Code read_string(const int x, const int y, const char *prompt, char *destination
   size_t written = strlen(destination);
   char character = '\0';
   char *write = destination + written;
-  SDL_Event event;
+  SDL_Event event{};
   /* Start listening for text input. */
   SDL_StartTextInput();
-  while (!is_done) {
-    if (should_rerender) {
+  while (is_done == 0) {
+    if (should_rerender != 0) {
       clear(renderer);
       print_absolute(x, y, prompt, COLOR_PAIR_DEFAULT, renderer);
       if (written == 0) {
@@ -414,7 +414,7 @@ Code read_string(const int x, const int y, const char *prompt, char *destination
       should_rerender = 0;
     }
     /* Throughout the loop, the write pointer always points to a '\0'. */
-    if (SDL_WaitEvent(&event)) {
+    if (SDL_WaitEvent(&event) != 0) {
       /* Check for user quit and return 1. */
       /* This is OK because the destination string is always a valid C string.
        */
@@ -437,7 +437,7 @@ Code read_string(const int x, const int y, const char *prompt, char *destination
         }
       } else if (event.type == SDL_TEXTINPUT) {
         character = event.text.text[0];
-        if (is_valid_input_character(character) && written + 1 < size) {
+        if ((is_valid_input_character(character) != 0) && written + 1 < size) {
           *write = character;
           write++;
           written++;

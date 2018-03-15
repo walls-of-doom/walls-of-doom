@@ -2,11 +2,11 @@
 #include "constants.hpp"
 #include "data.hpp"
 #include "text.hpp"
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
+#include <cctype>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
 
 #define MAXIMUM_WORD_SIZE 32
 
@@ -16,7 +16,7 @@ static unsigned long y;
 static unsigned long z;
 static unsigned long w;
 
-static unsigned long xorshift128(void) {
+static unsigned long xorshift128() {
   unsigned long t = x;
   /* Left shif overflow is undefined behavior in C. */
   t ^= t << 11;
@@ -29,9 +29,9 @@ static unsigned long xorshift128(void) {
   return w;
 }
 
-void seed_random(void) {
+void seed_random() {
   /* If tloc is a null pointer, no value is stored. */
-  x = (long)time(NULL);
+  x = static_cast<long>(time(nullptr));
 }
 
 /**
@@ -39,7 +39,7 @@ void seed_random(void) {
  */
 unsigned long find_next_power_of_two(unsigned long number) {
   unsigned long result = 1;
-  while (number) {
+  while (number != 0u) {
     number >>= 1;
     result <<= 1;
   }
@@ -86,7 +86,7 @@ void random_word(char *destination, const char *filename) {
   if (line_count > 0) {
     chosen_line = random_integer(0, line_count - 1);
     file = fopen(filename, "r");
-    if (file) {
+    if (file != nullptr) {
       current_line = 0;
       while (current_line != chosen_line && read != EOF) {
         read = fgetc(file);
@@ -96,10 +96,10 @@ void random_word(char *destination, const char *filename) {
       }
       /* Got to the line we want to copy. */
       while ((read = fgetc(file)) != EOF) {
-        if (isspace((char)read)) {
+        if (isspace(static_cast<char>(read)) != 0) {
           break;
         }
-        *destination++ = (char)read;
+        *destination++ = static_cast<char>(read);
       }
       fclose(file);
     }

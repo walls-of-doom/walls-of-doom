@@ -5,24 +5,24 @@
 #include "random.hpp"
 #include "score.hpp"
 #include "settings.hpp"
-#include <stdlib.h>
+#include <cstdlib>
 
 static double get_average_width(Game const *const game) {
   double total = 0.0;
   size_t i;
-  for (i = game->platform_count - 1; i; --i) {
+  for (i = game->platform_count - 1; i != 0u; --i) {
     total += game->platforms[i].w;
   }
-  return total / (double)game->platform_count;
+  return total / static_cast<double>(game->platform_count);
 }
 
 static double get_average_speed(Game const *const game) {
   double total = 0.0;
   size_t i;
-  for (i = game->platform_count - 1; i; --i) {
+  for (i = game->platform_count - 1; i != 0u; --i) {
     total += abs(game->platforms[i].speed);
   }
-  return total / (double)game->platform_count;
+  return total / static_cast<double>(game->platform_count);
 }
 
 static void log_difficulty(const double difficulty) {
@@ -50,7 +50,7 @@ static double get_difficulty(Game const *const game) {
   const double difficulty = width_ratio * speed_ratio;
   /* Log the difficulty coefficient once. */
   static int logged_difficulty = 0;
-  if (!logged_difficulty) {
+  if (logged_difficulty == 0) {
     log_difficulty(difficulty);
     logged_difficulty = 1;
   }
@@ -66,8 +66,8 @@ int collect_investment(Game const *const game, const Investment investment) {
   const double difference = max_return - min_return;
   const double normalized_delta = get_difficulty(game) * difference;
   const double normalized_max_return = min_return + normalized_delta;
-  const int min_random = (int)(scaling_factor * min_return);
-  const int max_random = (int)(scaling_factor * normalized_max_return);
+  const auto min_random = static_cast<int>(scaling_factor * min_return);
+  const auto max_random = static_cast<int>(scaling_factor * normalized_max_return);
   const double random_factor = random_integer(min_random, max_random);
-  return (int)(random_factor * investment.amount / scaling_factor);
+  return static_cast<int>(random_factor * investment.amount / scaling_factor);
 }

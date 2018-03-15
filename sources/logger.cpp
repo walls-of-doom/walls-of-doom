@@ -5,8 +5,8 @@
 #include "score.hpp"
 #include "settings.hpp"
 #include "version.hpp"
-#include <stdio.h>
-#include <time.h>
+#include <cstdio>
+#include <ctime>
 
 #define LOGGER_VERSION_MESSAGE "Version is " WALLS_OF_DOOM_VERSION "."
 
@@ -22,7 +22,7 @@
 /**
  * Initializes the logger. Should only be called once.
  */
-void initialize_logger(void) {
+void initialize_logger() {
   /* Currently, the logger does not need initialization. */
   log_message("Initialized the logger.");
   log_message(LOGGER_VERSION_MESSAGE);
@@ -31,7 +31,7 @@ void initialize_logger(void) {
 /**
  * Terminates the logger. Should only be called once.
  */
-void finalize_logger(void) {
+void finalize_logger() {
   /* Currently, the logger does not need termination. */
   log_message("Finalized the logger.");
 }
@@ -54,7 +54,7 @@ static void write_timestamp(char *buffer, const size_t buffer_size) {
 static void append_to_file(const char *path, const char *string) {
   FILE *file;
   file = fopen(path, "a");
-  if (file) {
+  if (file != nullptr) {
     fprintf(file, "%s\n", string);
     fclose(file);
   }
@@ -83,7 +83,7 @@ void log_message(const char *message) {
 void log_player_score(const unsigned long frame, const Score score) {
   char path[MAXIMUM_PATH_SIZE];
   char string[LOG_MESSAGE_SIZE];
-  if (is_logging_player_score()) {
+  if (is_logging_player_score() != 0) {
     get_full_path(path, SCORE_FILE_NAME);
     sprintf(string, "%ld,%ld", frame, score);
     append_to_file(path, string);

@@ -25,11 +25,11 @@ typedef enum Perk {
   PERK_NONE
 } Perk;
 
-Perk get_random_perk(void);
+Perk get_random_perk();
 
-int is_bonus_perk(const Perk perk);
+bool is_bonus_perk(Perk perk);
 
-int is_curse_perk(const Perk perk);
+bool is_curse_perk(Perk perk);
 
 std::string get_perk_name(Perk perk);
 

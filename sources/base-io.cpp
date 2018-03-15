@@ -16,9 +16,9 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <string.h>
+#include <cctype>
+#include <cstdio>
+#include <cstring>
 
 #define CREATE_SURFACE_FAIL "Failed to create surface in %s!"
 #define CREATE_TEXTURE_FAIL "Failed to create texture in %s!"
@@ -29,7 +29,7 @@
 
 #define SDL_INIT_FLAGS (SDL_INIT_VIDEO | SDL_INIT_JOYSTICK)
 
-static Font *global_monospaced_font = NULL;
+static Font *global_monospaced_font = nullptr;
 
 /* Default integers to one to prevent divisions by zero. */
 static int window_width = 1;
@@ -47,11 +47,11 @@ void clear(Renderer *renderer) { SDL_RenderClear(renderer); }
  */
 void present(Renderer *renderer) { SDL_RenderPresent(renderer); }
 
-Font *get_font(void) { return global_monospaced_font; }
+Font *get_font() { return global_monospaced_font; }
 
-int get_font_width(void) { return global_monospaced_font_width; }
+int get_font_width() { return global_monospaced_font_width; }
 
-int get_font_height(void) { return global_monospaced_font_height; }
+int get_font_height() { return global_monospaced_font_height; }
 
 /**
  * Swap the renderer color by the provided color.
@@ -59,7 +59,7 @@ int get_font_height(void) { return global_monospaced_font_height; }
  * The color previously in the renderer will be copied to the pointer.
  */
 void swap_color(Renderer *renderer, SDL_Color *color) {
-  SDL_Color swap;
+  SDL_Color swap{};
   SDL_GetRenderDrawColor(renderer, &swap.r, &swap.g, &swap.b, &swap.a);
   SDL_SetRenderDrawColor(renderer, color->r, color->g, color->b, color->a);
   *color = swap;
@@ -68,16 +68,16 @@ void swap_color(Renderer *renderer, SDL_Color *color) {
 /**
  * Initializes the global fonts.
  */
-static Code initialize_fonts(void) {
+static Code initialize_fonts() {
   char log_buffer[MAXIMUM_STRING_SIZE];
-  Font *font = NULL;
-  if (global_monospaced_font != NULL) {
+  Font *font = nullptr;
+  if (global_monospaced_font != nullptr) {
     return CODE_OK;
   }
   /* We try to open the font if we need to initialize. */
   font = TTF_OpenFont(MONOSPACED_FONT_PATH, get_font_size());
   /* If it failed, we log an error. */
-  if (font == NULL) {
+  if (font == nullptr) {
     sprintf(log_buffer, "TTF font opening error: %s.", SDL_GetError());
     log_message(log_buffer);
     return CODE_ERROR;
@@ -90,11 +90,11 @@ static Code initialize_fonts(void) {
 /**
  * Initializes the required font metrics.
  */
-static Code initialize_font_metrics(void) {
+static Code initialize_font_metrics() {
   int width;
   int height;
   Font *font = global_monospaced_font;
-  if (TTF_GlyphMetrics(font, 'A', NULL, NULL, NULL, NULL, &width)) {
+  if (TTF_GlyphMetrics(font, 'A', nullptr, nullptr, nullptr, nullptr, &width) != 0) {
     log_message("Could not assess the width of a font.");
     return CODE_ERROR;
   }
@@ -124,7 +124,7 @@ static Window *create_window(int *width, int *height) {
 static Code set_window_title_and_icon(Window *window) {
   SDL_Surface *icon_surface = IMG_Load(ICON_PATH);
   SDL_SetWindowTitle(window, game_name);
-  if (icon_surface == NULL) {
+  if (icon_surface == nullptr) {
     log_message("Failed to load the icon.");
     return CODE_ERROR;
   }
@@ -148,15 +148,15 @@ Code initialize(Window **window, Renderer **renderer) {
   initialize_logger();
   initialize_profiler();
   initialize_settings();
-  if (SDL_Init(SDL_INIT_FLAGS)) {
+  if (SDL_Init(SDL_INIT_FLAGS) != 0) {
     sprintf(log_buffer, "SDL initialization error: %s.", SDL_GetError());
     log_message(log_buffer);
     return CODE_ERROR;
   }
   SDL_ShowCursor(SDL_DISABLE);
   initialize_joystick();
-  if (!TTF_WasInit()) {
-    if (TTF_Init()) {
+  if (TTF_WasInit() == 0) {
+    if (TTF_Init() != 0) {
       sprintf(log_buffer, "TTF initialization error: %s.", SDL_GetError());
       log_message(log_buffer);
       return CODE_ERROR;
@@ -176,17 +176,17 @@ Code initialize(Window **window, Renderer **renderer) {
   *window = create_window(&window_width, &window_height);
   sprintf(log_buffer, "Created a %dx%d window.", window_width, window_height);
   log_message(log_buffer);
-  if (*window == NULL) {
+  if (*window == nullptr) {
     sprintf(log_buffer, "SDL initialization error: %s.", SDL_GetError());
     log_message(log_buffer);
     return CODE_ERROR;
   }
-  if (initialize_fonts()) {
+  if (initialize_fonts() != 0u) {
     sprintf(log_buffer, "Failed to initialize fonts.");
     log_message(log_buffer);
     return CODE_ERROR;
   }
-  if (initialize_font_metrics()) {
+  if (initialize_font_metrics() != 0u) {
     sprintf(log_buffer, "Failed to initialize font metrics.");
     log_message(log_buffer);
     return CODE_ERROR;
@@ -208,10 +208,10 @@ Code initialize(Window **window, Renderer **renderer) {
 /**
  * Finalizes the global fonts.
  */
-static void finalize_fonts(void) {
-  if (global_monospaced_font != NULL) {
+static void finalize_fonts() {
+  if (global_monospaced_font != nullptr) {
     TTF_CloseFont(global_monospaced_font);
-    global_monospaced_font = NULL;
+    global_monospaced_font = nullptr;
   }
 }
 
@@ -225,8 +225,8 @@ Code finalize(Window **window, Renderer **renderer) {
   finalize_joystick();
   SDL_DestroyRenderer(*renderer);
   SDL_DestroyWindow(*window);
-  *window = NULL;
-  if (TTF_WasInit()) {
+  *window = nullptr;
+  if (TTF_WasInit() != 0) {
     TTF_Quit();
   }
   /* This could be called earlier, but we only do it here to organize things. */
@@ -244,10 +244,10 @@ Code print_absolute(const int x, const int y, const char *string, const ColorPai
   Font *font = global_monospaced_font;
   SDL_Surface *surface;
   SDL_Texture *texture;
-  SDL_Rect position;
+  SDL_Rect position{};
   position.x = x;
   position.y = y;
-  if (string == NULL || string[0] == '\0') {
+  if (string == nullptr || string[0] == '\0') {
     return CODE_OK;
   }
   /* Validate that x and y are nonnegative. */
@@ -255,20 +255,20 @@ Code print_absolute(const int x, const int y, const char *string, const ColorPai
     return CODE_ERROR;
   }
   surface = TTF_RenderText_Shaded(font, string, foreground, background);
-  if (surface == NULL) {
+  if (surface == nullptr) {
     sprintf(log_buffer, CREATE_SURFACE_FAIL, "print_absolute()");
     log_message(log_buffer);
     return CODE_ERROR;
   }
   texture = SDL_CreateTextureFromSurface(renderer, surface);
-  if (texture == NULL) {
+  if (texture == nullptr) {
     sprintf(log_buffer, CREATE_TEXTURE_FAIL, "print_absolute()");
     log_message(log_buffer);
     return CODE_ERROR;
   }
   /* Copy destination width and height from the texture. */
-  SDL_QueryTexture(texture, NULL, NULL, &position.w, &position.h);
-  SDL_RenderCopy(renderer, texture, NULL, &position);
+  SDL_QueryTexture(texture, nullptr, nullptr, &position.w, &position.h);
+  SDL_RenderCopy(renderer, texture, nullptr, &position);
   SDL_DestroyTexture(texture);
   SDL_FreeSurface(surface);
   return CODE_OK;
@@ -278,13 +278,13 @@ static void remove_first_breaks(char *string) {
   char c;
   size_t i;
   int preserve = 0;
-  if (string == NULL) {
+  if (string == nullptr) {
     return;
   }
   for (i = 0; string[i] != '\0'; i++) {
     c = string[i];
     if (c == '\n') {
-      if (!preserve) {
+      if (preserve == 0) {
         string[i] = ' ';
         /* Stop erasing newlines. */
         preserve = 1;
@@ -307,30 +307,30 @@ void print_long_text(char *string, Renderer *renderer) {
   SDL_Surface *surface;
   SDL_Texture *texture;
   SDL_Color color = to_sdl_color(COLOR_DEFAULT_FOREGROUND);
-  SDL_Rect position;
+  SDL_Rect position{};
   position.x = get_padding() * font_width;
   position.y = get_padding() * font_width;
   clear(renderer);
   /* Validate that the string is not empty and that x and y are nonnegative. */
-  if (string == NULL || string[0] == '\0') {
+  if (string == nullptr || string[0] == '\0') {
     return;
   }
   remove_first_breaks(string);
   surface = TTF_RenderText_Blended_Wrapped(font, string, color, width);
-  if (surface == NULL) {
+  if (surface == nullptr) {
     sprintf(log_buffer, CREATE_SURFACE_FAIL, "print_long_text()");
     log_message(log_buffer);
     return;
   }
   texture = SDL_CreateTextureFromSurface(renderer, surface);
-  if (texture == NULL) {
+  if (texture == nullptr) {
     sprintf(log_buffer, CREATE_TEXTURE_FAIL, "print_long_text()");
     log_message(log_buffer);
     return;
   }
   /* Copy destination width and height from the texture. */
-  SDL_QueryTexture(texture, NULL, NULL, &position.w, &position.h);
-  SDL_RenderCopy(renderer, texture, NULL, &position);
+  SDL_QueryTexture(texture, nullptr, nullptr, &position.w, &position.h);
+  SDL_RenderCopy(renderer, texture, nullptr, &position);
   SDL_DestroyTexture(texture);
   SDL_FreeSurface(surface);
   present(renderer);
@@ -348,7 +348,7 @@ Code print_centered_horizontally(const int y, const std::vector<std::string> &st
   Font *font = global_monospaced_font;
   SDL_Surface *surface;
   SDL_Texture *texture;
-  SDL_Rect position;
+  SDL_Rect position{};
   position.x = 0;
   position.y = y;
   /* Validate that x and y are nonnegative. */
@@ -357,21 +357,21 @@ Code print_centered_horizontally(const int y, const std::vector<std::string> &st
   }
   for (int i = 0; i < static_cast<int>(strings.size()); i++) {
     surface = TTF_RenderText_Shaded(font, strings[i].c_str(), foreground, background);
-    if (surface == NULL) {
+    if (surface == nullptr) {
       sprintf(log_buffer, CREATE_SURFACE_FAIL, "print_centered_horizontally()");
       log_message(log_buffer);
       return CODE_ERROR;
     }
     texture = SDL_CreateTextureFromSurface(renderer, surface);
-    if (texture == NULL) {
+    if (texture == nullptr) {
       sprintf(log_buffer, CREATE_TEXTURE_FAIL, "print_centered_horizontally()");
       log_message(log_buffer);
       return CODE_ERROR;
     }
     /* Copy destination width and height from the texture. */
-    SDL_QueryTexture(texture, NULL, NULL, &position.w, &position.h);
+    SDL_QueryTexture(texture, nullptr, nullptr, &position.w, &position.h);
     position.x = i * slice_size + (slice_size - position.w) / 2;
-    SDL_RenderCopy(renderer, texture, NULL, &position);
+    SDL_RenderCopy(renderer, texture, nullptr, &position);
     SDL_DestroyTexture(texture);
     SDL_FreeSurface(surface);
   }
@@ -395,7 +395,7 @@ Code print_centered_vertically(const std::vector<std::string> &strings, const Co
   y = (get_window_height() - strings.size() * text_line_height) / 2;
   for (int i = 0; i < printed_count; i++) {
     const auto string = strings[i];
-    char *array = reinterpret_cast<char *>(malloc(string.size() + 1));
+    auto *array = reinterpret_cast<char *>(malloc(string.size() + 1));
     copy_string(array, string.c_str(), string.size() + 1);
     print_centered_horizontally(y, {string}, color_pair, renderer);
     y += text_line_height;

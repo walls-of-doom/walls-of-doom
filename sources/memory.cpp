@@ -24,19 +24,19 @@
  * As it prevents double-freeing bugs.
  */
 void *resize_memory(void *pointer, size_t size) {
-  void *p = NULL;
+  void *p = nullptr;
   /* Handle the special case of freeing memory. */
   if (size == 0) {
     free(pointer);
     /* Return NULL, which prevents double-freeing bugs. */
-    return NULL;
+    return nullptr;
   }
   if (size > MAXIMUM_MEMORY_SIZE) {
     log_message("Attempted to allocate more than the maximum memory size.");
     exit(EXIT_FAILURE);
   }
   p = realloc(pointer, size);
-  if (p == NULL) {
+  if (p == nullptr) {
     log_message("Failed to to resize memory.");
     exit(EXIT_FAILURE);
   }

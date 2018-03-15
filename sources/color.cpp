@@ -22,11 +22,11 @@ static unsigned char parse_two_hexadecimal_characters(const char *string) {
   substring[0] = string[0];
   substring[1] = string[1];
   substring[2] = '\0';
-  return (unsigned char)strtoul(substring, NULL, 16);
+  return static_cast<unsigned char>(strtoul(substring, nullptr, 16));
 }
 
 Color color_from_string(const char *string) {
-  Color color;
+  Color color{};
   color.r = parse_two_hexadecimal_characters(string);
   color.g = parse_two_hexadecimal_characters(string + 2);
   color.b = parse_two_hexadecimal_characters(string + 4);
@@ -35,8 +35,8 @@ Color color_from_string(const char *string) {
 }
 
 ColorPair color_pair_from_string(const char *string) {
-  ColorPair pair;
-  char *copy = reinterpret_cast<char *>(resize_memory(nullptr, strlen(string) + 1));
+  ColorPair pair{};
+  auto *copy = reinterpret_cast<char *>(resize_memory(nullptr, strlen(string) + 1));
   copy_string(copy, string, strlen(string) + 1);
   char *end = strchr(copy, COLOR_STRING_SEPARATOR);
   *end = '\0';
@@ -46,16 +46,16 @@ ColorPair color_pair_from_string(const char *string) {
   return pair;
 }
 
-int color_equals(Color a, Color b) { return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a; }
+int color_equals(Color a, Color b) { return static_cast<int>(a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a); }
 
 int color_pair_equals(ColorPair a, ColorPair b) {
   const int fore_equals = color_equals(a.foreground, b.foreground);
   const int back_equals = color_equals(a.background, b.background);
-  return fore_equals && back_equals;
+  return static_cast<int>((fore_equals != 0) && (back_equals) != 0);
 }
 
 Color color_from_rgb(unsigned char r, unsigned char g, unsigned char b) {
-  Color color;
+  Color color{};
   color.r = r;
   color.g = g;
   color.b = b;
@@ -64,15 +64,15 @@ Color color_from_rgb(unsigned char r, unsigned char g, unsigned char b) {
 }
 
 Color mix_colors(Color a, Color b) {
-  a.r = ((int)a.r + (int)b.r) / 2;
-  a.g = ((int)a.g + (int)b.g) / 2;
-  a.b = ((int)a.b + (int)b.b) / 2;
-  a.a = ((int)a.a + (int)b.a) / 2;
+  a.r = (static_cast<int>(a.r) + static_cast<int>(b.r)) / 2;
+  a.g = (static_cast<int>(a.g) + static_cast<int>(b.g)) / 2;
+  a.b = (static_cast<int>(a.b) + static_cast<int>(b.b)) / 2;
+  a.a = (static_cast<int>(a.a) + static_cast<int>(b.a)) / 2;
   return a;
 }
 
 SDL_Color to_sdl_color(Color color) {
-  SDL_Color sdl_color;
+  SDL_Color sdl_color{};
   sdl_color.r = color.r;
   sdl_color.g = color.g;
   sdl_color.b = color.b;
@@ -81,7 +81,7 @@ SDL_Color to_sdl_color(Color color) {
 }
 
 ColorPair color_pair_from_colors(Color foreground, Color background) {
-  ColorPair pair;
+  ColorPair pair{};
   pair.foreground = foreground;
   pair.background = background;
   return pair;

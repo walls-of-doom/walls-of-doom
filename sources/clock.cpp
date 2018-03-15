@@ -7,7 +7,7 @@
  *
  * This function should be used to measure computation times.
  */
-Milliseconds get_milliseconds(void) { return SDL_GetTicks(); }
+Milliseconds get_milliseconds() { return SDL_GetTicks(); }
 
 /**
  * Sleeps for the specified number of milliseconds or more.
@@ -20,7 +20,7 @@ void sleep_milliseconds(Milliseconds amount) {
     return;
   }
   if (amount < maximum_sleep) {
-    ms = (Uint32)amount;
+    ms = static_cast<Uint32>(amount);
   } else {
     /* Note that this constant is unsigned. */
     ms = 0x7FFFFFFFUL;

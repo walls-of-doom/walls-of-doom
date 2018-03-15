@@ -39,7 +39,7 @@ Milliseconds draw_game(const Game *const game, Renderer *renderer);
  */
 Code print(const int x, const int y, const char *string, const ColorPair color_pair, Renderer *renderer);
 
-void print_menu(const std::vector<std::string> &strings, Renderer *renderer);
+void print_menu(const std::vector<std::string> &lines, Renderer *renderer);
 
 /**
  * Prints the provided string after formatting it to increase readability.

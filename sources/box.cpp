@@ -1,43 +1,25 @@
 #include "box.hpp"
 
-int bounding_box_contains(const BoundingBox *box, const int x, const int y) {
-  if (x >= box->min_x && x <= box->max_x) {
-    return y >= box->min_y && y <= box->max_y;
-  }
-  return 0;
+bool BoundingBox::operator==(const BoundingBox &rhs) const {
+  return min_x == rhs.min_x && min_y == rhs.min_y && max_x == rhs.max_x && max_y == rhs.max_y;
 }
 
-/**
- * Compares two BoundingBox objects for equality.
- */
-int bounding_box_equals(const BoundingBox *a, const BoundingBox *const b) {
-  const int min_equals = a->min_x == b->min_x && a->min_y == b->min_y;
-  const int max_equals = a->max_x == b->max_x && a->max_y == b->max_y;
-  return min_equals && max_equals;
-}
+bool BoundingBox::operator!=(const BoundingBox &rhs) const { return !(rhs == *this); }
 
-/**
- * Checks for overlap of two BoundingBox objects.
- */
-int bounding_box_overlaps(const BoundingBox *a, const BoundingBox *const b) {
+bool BoundingBox::contains(int x, int y) const { return (x >= min_x && x <= max_x) && (y >= min_y && y <= max_y); }
+
+bool BoundingBox::overlaps(const BoundingBox &rhs) const {
   /* Two boxes overlap if, and only if, a corner is contained in another. */
-  if (bounding_box_contains(a, b->min_x, b->min_y)) {
-    return 1;
+  if (contains(rhs.min_x, rhs.min_y)) {
+    return true;
   }
-  if (bounding_box_contains(a, b->min_x, b->max_y)) {
-    return 1;
-  } else if (bounding_box_contains(a, b->max_x, b->min_y)) {
-    return 1;
-  } else if (bounding_box_contains(a, b->max_x, b->max_y)) {
-    return 1;
+  if (contains(rhs.min_x, rhs.max_y)) {
+    return true;
   }
-  return 0;
+  if (contains(rhs.max_x, rhs.min_y)) {
+    return true;
+  }
+  return contains(rhs.max_x, rhs.max_y);
 }
 
 int bounding_box_width(const BoundingBox *a) { return a->max_x - a->min_x; }
-
-long bounding_box_area(const BoundingBox *box) {
-  const long w = box->max_x - box->min_x + 1;
-  const long h = box->max_y - box->min_y + 1;
-  return w * h;
-}

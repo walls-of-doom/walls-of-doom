@@ -21,7 +21,7 @@ typedef struct Player {
   int speed_y;
 
   /* Whether or not the player is being affected by physics. */
-  int physics;
+  bool physics;
 
   int can_double_jump;
   int remaining_jump_height;

@@ -1,5 +1,5 @@
 #include "numeric.hpp"
-#include <stdlib.h>
+#include <cstdlib>
 
 /**
  * Normalizes a scalar by returning either -1, 0 or 1 if this scalar is
@@ -11,9 +11,8 @@ int normalize(const int value) {
   }
   if (value == 0) {
     return 0;
-  } else {
-    return 1;
   }
+  return 1;
 }
 
 /**

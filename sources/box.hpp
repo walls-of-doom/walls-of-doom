@@ -1,27 +1,24 @@
 #ifndef BOX_H
 #define BOX_H
 
-typedef struct BoundingBox {
-  int min_x;
-  int min_y;
-  int max_x;
-  int max_y;
-} BoundingBox;
+class BoundingBox {
+public:
+  int min_x = 0;
+  int min_y = 0;
+  int max_x = 0;
+  int max_y = 0;
 
-int bounding_box_contains(const BoundingBox *box, const int x, const int y);
+  bool contains(int x, int y) const;
 
-/**
- * Compares two BoundingBox objects for equality.
- */
-int bounding_box_equals(const BoundingBox *a, const BoundingBox *const b);
+  /**
+   * Checks for overlap of two BoundingBox objects.
+   */
+  bool overlaps(const BoundingBox &rhs) const;
 
-/**
- * Checks for overlap of two BoundingBox objects.
- */
-int bounding_box_overlaps(const BoundingBox *a, const BoundingBox *const b);
+  bool operator==(const BoundingBox &rhs) const;
+  bool operator!=(const BoundingBox &rhs) const;
+};
 
 int bounding_box_width(const BoundingBox *a);
-
-long bounding_box_area(const BoundingBox *box);
 
 #endif

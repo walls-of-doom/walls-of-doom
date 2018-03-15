@@ -15,7 +15,7 @@
 #include "version.hpp"
 #include <SDL.h>
 #include <array>
-#include <stdlib.h>
+#include <cstdlib>
 #include <string.h>
 #include <string>
 #include <vector>
@@ -24,7 +24,7 @@ class Menu {
 public:
   std::string title;
   std::vector<std::string> options;
-  size_t selected_option;
+  size_t selected_option{};
 };
 
 /**
@@ -41,8 +41,8 @@ void write_menu(const Menu &menu, SDL_Renderer *renderer) {
 
 Code game(SDL_Renderer *renderer, CommandTable *table) {
   char name[MAXIMUM_PLAYER_NAME_SIZE];
-  Player player;
-  Game game;
+  Player player{};
+  Game game{};
   Code code;
   code = read_player_name(name, MAXIMUM_PLAYER_NAME_SIZE, renderer);
   if (code == CODE_QUIT || code == CODE_CLOSE) {
@@ -59,7 +59,7 @@ int main_menu(SDL_Renderer *renderer) {
   int should_quit = 0;
   Code code = CODE_OK;
   Menu menu;
-  CommandTable command_table;
+  CommandTable command_table{};
   std::vector<std::string> options = {"Play", "Top Scores", "Info", "Quit"};
   const std::string game_name_string(game_name);
   std::string title = game_name_string + " " + WALLS_OF_DOOM_VERSION;
@@ -67,23 +67,23 @@ int main_menu(SDL_Renderer *renderer) {
   menu.options = options;
   menu.selected_option = 0;
   initialize_command_table(&command_table);
-  while (!should_quit) {
+  while (should_quit == 0) {
     write_menu(menu, renderer);
     read_commands(&command_table);
-    if (test_command_table(&command_table, COMMAND_UP, REPETITION_DELAY)) {
+    if (static_cast<int>(test_command_table(&command_table, COMMAND_UP, REPETITION_DELAY)) != 0) {
       if (menu.selected_option > 0) {
         menu.selected_option--;
       } else {
         menu.selected_option = menu.options.size() - 1;
       }
-    } else if (test_command_table(&command_table, COMMAND_DOWN, REPETITION_DELAY)) {
+    } else if (static_cast<int>(test_command_table(&command_table, COMMAND_DOWN, REPETITION_DELAY)) != 0) {
       if (menu.selected_option + 1 < menu.options.size()) {
         menu.selected_option++;
       } else {
         menu.selected_option = 0;
       }
-    } else if (test_command_table(&command_table, COMMAND_ENTER, REPETITION_DELAY) ||
-               test_command_table(&command_table, COMMAND_CENTER, REPETITION_DELAY)) {
+    } else if ((static_cast<int>(test_command_table(&command_table, COMMAND_ENTER, REPETITION_DELAY)) != 0) ||
+               (static_cast<int>(test_command_table(&command_table, COMMAND_CENTER, REPETITION_DELAY)) != 0)) {
       if (menu.selected_option == 0) {
         code = game(renderer, &command_table);
       } else if (menu.selected_option == 1) {
@@ -99,7 +99,9 @@ int main_menu(SDL_Renderer *renderer) {
       }
     }
     /* Quit if the user selected the Quit option or closed the window. */
-    should_quit = should_quit || test_command_table(&command_table, COMMAND_QUIT, REPETITION_DELAY);
+    should_quit =
+        static_cast<int>((should_quit != 0) ||
+                         static_cast<int>(test_command_table(&command_table, COMMAND_QUIT, REPETITION_DELAY)) != 0);
   }
   return 0;
 }

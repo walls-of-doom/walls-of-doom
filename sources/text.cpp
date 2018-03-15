@@ -1,7 +1,7 @@
 #include "text.hpp"
-#include <ctype.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cctype>
+#include <cstdlib>
+#include <cstring>
 
 /**
  * Copy from the source string to the destination string, using at most size
@@ -32,7 +32,7 @@ size_t copy_string(char *destination, const char *source, const size_t size) {
       *d = '\0';
     }
   }
-  while (*s) {
+  while (*s != 0) {
     s++;
   }
   /* Here s points to the first occurrence of '\0' in source. */
@@ -67,10 +67,7 @@ size_t copy_string_up_to(char *destination, const char *begin, const char *end, 
   return size;
 }
 
-/**
- * Compares two strings to determine whether or not they are equal.
- */
-int string_equals(const char *a, const char *b) { return strcmp(a, b) == 0; }
+bool string_equals(const char *a, const char *b) { return strcmp(a, b) == 0; }
 
 /**
  * Returns a pointer to the start of the text of the string.
@@ -78,7 +75,7 @@ int string_equals(const char *a, const char *b) { return strcmp(a, b) == 0; }
  * This is either the first character which is not a space or '\0'.
  */
 char *find_start_of_text(char *string) {
-  while (*string != '\0' && isspace(*string)) {
+  while (*string != '\0' && (isspace(*string) != 0)) {
     string++;
   }
   return string;
@@ -92,7 +89,7 @@ char *find_start_of_text(char *string) {
 char *find_end_of_text(char *string) {
   char *end = string;
   while (*string != '\0') {
-    if (!isspace(*string)) {
+    if (isspace(*string) == 0) {
       end = string;
     }
     string++;
@@ -101,7 +98,7 @@ char *find_end_of_text(char *string) {
     return end;
   }
   /* If the string is only spaces, end points to the first space. */
-  if (isspace(*end)) {
+  if (isspace(*end) != 0) {
     return end;
   }
   return end + 1;
@@ -114,7 +111,7 @@ void trim_string(char *string) {
   char *write = string;
   char *read = string;
   /* Find the first not space. */
-  while (*read != '\0' && isspace(*read)) {
+  while (*read != '\0' && (isspace(*read) != 0)) {
     read++;
   }
   /* Copy everything from the first not space up to the end. */
@@ -127,7 +124,7 @@ void trim_string(char *string) {
   if (read != string) {
     /* Point to the last character. */
     read--;
-    while (isspace(*read) || read > write) {
+    while ((isspace(*read) != 0) || read > write) {
       *read = '\0';
       if (read == string) {
         /* Do not write before the start of the string. */
@@ -152,13 +149,13 @@ void wrap_at_right_margin(char *string, const size_t columns) {
   size_t end = 0;
   end = begin + columns;
   while (end < string_length) {
-    while (begin != end && !isspace(string[end])) {
+    while (begin != end && (isspace(string[end]) == 0)) {
       end--;
     }
     if (begin == end) {
       /* There are no spaces in this line, so we can't break it anywhere. */
       /* We work around this by finding the next space on the string. */
-      while (end < string_length && !isspace(string[end])) {
+      while (end < string_length && (isspace(string[end]) == 0)) {
         end++;
       }
     }

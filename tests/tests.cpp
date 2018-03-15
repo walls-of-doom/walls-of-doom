@@ -10,9 +10,9 @@
 #include "sources/sort.hpp"
 #include "sources/text.hpp"
 #include <climits>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
 
 #define SMALL_STRING_BUFFER_SIZE 64
 
@@ -33,7 +33,7 @@ int compare_unsigned_char(const void *pointer_a, const void *pointer_b) {
 }
 
 TEST_CASE("resize_memory()") {
-  unsigned char *chunk = NULL;
+  unsigned char *chunk = nullptr;
   REQUIRE(chunk == NULL);
   chunk = reinterpret_cast<unsigned char *>(resize_memory(chunk, RESIZE_MEMORY_SIZE));
   REQUIRE(chunk != NULL);
@@ -248,7 +248,7 @@ TEST_CASE("read_integers()") {
   int actual_count;
   FILE *file;
   file = fopen(filename, "w+");
-  if (file == NULL) {
+  if (file == nullptr) {
     FAIL("Failed to create helper test file.");
   }
   fprintf(file, "%d", expected_value);
@@ -293,9 +293,9 @@ TEST_CASE("bounding_box_equals()") {
       box_j.min_y = j >> 2 & 1;
       box_j.max_y = j >> 3 & 1;
       if (i == j) {
-        REQUIRE(bounding_box_equals(&box_i, &box_j));
+        REQUIRE(box_i == box_j);
       } else {
-        REQUIRE(!bounding_box_equals(&box_i, &box_j));
+        REQUIRE(box_i != box_j);
       }
     }
   }
@@ -303,8 +303,8 @@ TEST_CASE("bounding_box_equals()") {
 
 TEST_CASE("generate_platforms() avoids multiple platforms on the same line") {
   const size_t platform_count = 128;
-  Platform *platforms = NULL;
-  int *y_counter = NULL;
+  Platform *platforms = nullptr;
+  int *y_counter = nullptr;
   BoundingBox box;
   size_t i;
   int y;
@@ -322,8 +322,8 @@ TEST_CASE("generate_platforms() avoids multiple platforms on the same line") {
   for (i = 0; i < platform_count; i++) {
     y = platforms[i].y;
     /* Casting is safe because y is nonnegative at that point. */
-    if (y >= 0 && (size_t)y < platform_count) {
-      if (y_counter[y]) {
+    if (y >= 0 && static_cast<size_t>(y) < platform_count) {
+      if (y_counter[y] != 0) {
         FAIL("Two of more platforms on the same line.");
       } else {
         y_counter[y]++;

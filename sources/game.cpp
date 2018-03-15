@@ -14,16 +14,12 @@
 #include "text.hpp"
 #include "version.hpp"
 #include <SDL.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 #define DEFAULT_LIMIT_PLAYED_MINUTES 2
 #define DEFAULT_LIMIT_PLAYED_SECONDS (DEFAULT_LIMIT_PLAYED_MINUTES * 60)
 #define DEFAULT_LIMIT_PLAYED_FRAMES DEFAULT_LIMIT_PLAYED_SECONDS *UPS
-
-void print_command_table(CommandTable *table);
-
-char *command_to_string(Command command);
 
 static size_t get_rigid_matrix_index(const Game *const game, const int x, const int y) {
   const int base_x = x - game->box->min_x;
@@ -32,19 +28,19 @@ static size_t get_rigid_matrix_index(const Game *const game, const int x, const 
 }
 
 unsigned char get_from_rigid_matrix(const Game *const game, const int x, const int y) {
-  if (bounding_box_contains(game->box, x, y)) {
+  if (game->box->contains(x, y)) {
     return game->rigid_matrix[get_rigid_matrix_index(game, x, y)];
   }
   return 0;
 }
 
-void modify_rigid_matrix_point(const Game *const game, const int x, const int y, const unsigned char delta) {
-  if (bounding_box_contains(game->box, x, y)) {
+void modify_rigid_matrix_point(const Game *const game, const int x, const int y, S8 delta) {
+  if (game->box->contains(x, y)) {
     game->rigid_matrix[get_rigid_matrix_index(game, x, y)] += delta;
   }
 }
 
-void modify_rigid_matrix_platform(Game *game, Platform const *platform, const unsigned char delta) {
+void modify_rigid_matrix_platform(Game *game, Platform const *platform, S8 delta) {
   int x;
   int y;
   for (x = 0; x < platform->w; ++x) {
@@ -77,11 +73,11 @@ Game create_game(Player *player) {
   const int tile_h = get_tile_height();
   const int platform_count = get_platform_count();
   size_t rigid_matrix_bytes;
-  Game game;
+  Game game{};
 
   game.player = player;
   game.platform_count = platform_count;
-  game.platforms = reinterpret_cast<Platform *>(resize_memory(NULL, sizeof(Platform) * platform_count));
+  game.platforms = reinterpret_cast<Platform *>(resize_memory(nullptr, sizeof(Platform) * platform_count));
 
   game.current_frame = 0;
   game.desired_frame = 0;
@@ -97,7 +93,7 @@ Game create_game(Player *player) {
   player->w = tile_w;
   player->h = tile_h;
 
-  game.box = reinterpret_cast<BoundingBox *>(resize_memory(NULL, sizeof(BoundingBox)));
+  game.box = reinterpret_cast<BoundingBox *>(resize_memory(nullptr, sizeof(BoundingBox)));
   initialize_bounding_box(&game);
 
   generate_platforms(game.platforms, game.box, platform_count, tile_w, tile_h);
@@ -114,7 +110,7 @@ Game create_game(Player *player) {
   game.rigid_matrix_n = game.box->max_x - game.box->min_x + 1;
   game.rigid_matrix_size = game.rigid_matrix_m * game.rigid_matrix_n;
   rigid_matrix_bytes = sizeof(unsigned char) * game.rigid_matrix_size;
-  game.rigid_matrix = reinterpret_cast<unsigned char *>(resize_memory(NULL, rigid_matrix_bytes));
+  game.rigid_matrix = reinterpret_cast<unsigned char *>(resize_memory(nullptr, rigid_matrix_bytes));
   initialize_rigid_matrix(&game);
 
   game.message[0] = '\0';
@@ -155,9 +151,9 @@ Milliseconds update_game(Game *const game) {
  */
 void game_set_message(Game *const game, const char *message, const unsigned long duration,
                       const unsigned int priority) {
-  const int last_has_expired = game->message_end_frame <= game->current_frame;
-  const int last_has_lower_priority = game->message_priority <= priority;
-  if (last_has_expired || last_has_lower_priority) {
+  const auto last_has_expired = static_cast<const int>(game->message_end_frame <= game->current_frame);
+  const auto last_has_lower_priority = static_cast<const int>(game->message_priority <= priority);
+  if ((last_has_expired != 0) || (last_has_lower_priority != 0)) {
     game->message_end_frame = game->current_frame + duration * UPS;
     game->message_priority = priority;
     copy_string(game->message, message, MAXIMUM_STRING_SIZE);
@@ -190,7 +186,7 @@ void register_score(const Game *const game, SDL_Renderer *renderer) {
   const Player *const player = game->player;
   char buffer[MAXIMUM_STRING_SIZE];
   const char *format = "Started registering a score of %d points for %s.";
-  Record record;
+  Record record{};
   int scoreboard_index;
   int position;
   sprintf(buffer, format, player->score, player->name, renderer);
@@ -214,9 +210,9 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
   Code code = CODE_OK;
   int *lives = &game->player->lives;
   unsigned long limit = game->limit_played_frames;
-  CommandTable table;
+  CommandTable table{};
   initialize_command_table(&table);
-  while (!game->player->table->status[COMMAND_QUIT] && *lives != 0 && game->played_frames < limit) {
+  while ((game->player->table->status[COMMAND_QUIT] == 0.0) && *lives != 0 && game->played_frames < limit) {
     start_time = get_milliseconds();
     if (time_passed >= 2 * interval) {
       fprintf(stderr, "Skipped a frame!\n");
@@ -235,7 +231,7 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
         code = CODE_QUIT;
       }
       if (test_command_table(game->player->table, COMMAND_PAUSE, REPETITION_DELAY)) {
-        game->paused = 0;
+        game->paused = false;
       }
       continue;
     }
@@ -251,7 +247,7 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
     draw_game(game, renderer);
     read_commands(game->player->table);
     if (test_command_table(game->player->table, COMMAND_PAUSE, REPETITION_DELAY)) {
-      game->paused = 1;
+      game->paused = true;
     }
     time_passed += get_milliseconds() - start_time;
   }

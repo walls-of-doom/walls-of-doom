@@ -2,8 +2,8 @@
 #include "command.hpp"
 #include "graphics.hpp"
 #include "logger.hpp"
-#include <limits.h>
-#include <stdlib.h>
+#include <climits>
+#include <cstdlib>
 
 #define MAXIMUM_PLAYER_SCORE LONG_MAX
 #define MINIMUM_PLAYER_SCORE 0
@@ -16,7 +16,7 @@
  * An initialized Player object is an object which is ready to start a game.
  */
 Player create_player(char name[64], CommandTable *table) {
-  Player player;
+  Player player{};
   player.name = name;
   player.table = table;
   /* Initialize the player to the corner so that it is in a valid state. */
@@ -33,13 +33,13 @@ Player create_player(char name[64], CommandTable *table) {
   player.score = 0;
   player.perk = PERK_NONE;
   player.perk_end_frame = 0;
-  player.investments = NULL;
+  player.investments = nullptr;
   player.graphics = create_graphics(DEFAULT_TRAIL_SIZE);
   return player;
 }
 
 void destroy_player(Player *player) {
-  if (player != NULL) {
+  if (player != nullptr) {
     destroy_graphics(player->graphics);
   }
 }

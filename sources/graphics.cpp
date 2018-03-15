@@ -17,8 +17,8 @@ void graphics_update_trail(Graphics *graphics, int x, int y) {
 }
 
 Graphics *create_graphics(size_t trail_size) {
-  Graphics *graphics = reinterpret_cast<Graphics *>(resize_memory(NULL, sizeof(Graphics)));
-  graphics->trail = reinterpret_cast<Point *>(resize_memory(NULL, trail_size * sizeof(Point)));
+  auto *graphics = reinterpret_cast<Graphics *>(resize_memory(nullptr, sizeof(Graphics)));
+  graphics->trail = reinterpret_cast<Point *>(resize_memory(nullptr, trail_size * sizeof(Point)));
   graphics->trail_head = 0;
   graphics->trail_size = 0;
   graphics->trail_capacity = trail_size;

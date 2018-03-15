@@ -36,7 +36,7 @@
 #define DUALSHOCK_SELECT 8
 #define DUALSHOCK_START 9
 
-static SDL_Joystick *shared_joystick = NULL;
+static SDL_Joystick *shared_joystick = nullptr;
 
 static void log_joystick_count() {
   char log_buffer[MAXIMUM_STRING_SIZE];
@@ -50,9 +50,9 @@ static void set_joystick(SDL_Joystick *joystick) { shared_joystick = joystick; }
 
 void initialize_joystick() {
   log_joystick_count();
-  if (SDL_NumJoysticks()) {
+  if (SDL_NumJoysticks() != 0) {
     set_joystick(SDL_JoystickOpen(0));
-    if (get_joystick() == NULL) {
+    if (get_joystick() == nullptr) {
       log_message("Failed to open controller!");
     }
   }
@@ -99,11 +99,14 @@ Command command_from_joystick_button(Uint8 button) {
   }
   if (button == get_convert_button()) {
     return COMMAND_CONVERT;
-  } else if (button == get_jump_button()) {
+  }
+  if (button == get_jump_button()) {
     return COMMAND_JUMP;
-  } else if (button == get_enter_button()) {
+  }
+  if (button == get_enter_button()) {
     return COMMAND_ENTER;
-  } else if (button == get_pause_button()) {
+  }
+  if (button == get_pause_button()) {
     return COMMAND_PAUSE;
   }
   return COMMAND_NONE;
@@ -136,8 +139,8 @@ Command command_from_joystick_event(const SDL_Event event) {
 }
 
 void finalize_joystick() {
-  if (get_joystick() != NULL) {
+  if (get_joystick() != nullptr) {
     SDL_JoystickClose(get_joystick());
-    set_joystick(NULL);
+    set_joystick(nullptr);
   }
 }

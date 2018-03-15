@@ -11,7 +11,7 @@ void sort(void *start, const size_t count, const size_t size, int (*compare)(con
 static void swap(unsigned char *a, unsigned char *b, size_t size) {
   unsigned char a_byte;
   unsigned char b_byte;
-  while (size--) {
+  while ((size--) != 0u) {
     /*
      * Although we only need one swap byte, I think it reads better using two.
      *
@@ -29,7 +29,7 @@ static void swap(unsigned char *a, unsigned char *b, size_t size) {
  * start, each element size bytes long.
  */
 void reverse(void *start, const size_t count, const size_t size) {
-  unsigned char *pointer = (unsigned char *)start;
+  auto *pointer = static_cast<unsigned char *>(start);
   size_t i;
   for (i = 0; i < count / 2; i++) {
     swap(pointer + i * size, pointer + (count - i - 1) * size, size);

@@ -6,7 +6,7 @@
 #include "text.hpp"
 #include "version.hpp"
 #include <SDL.h>
-#include <stdio.h>
+#include <cstdio>
 
 typedef enum ParserResult { PARSER_RESULT_CONTINUE, PARSER_RESULT_QUIT } ParserResult;
 
@@ -14,7 +14,7 @@ void log_unrecognized_argument(const char *argument) {
   const size_t start_size = 128;
   const size_t input_size = strlen(argument);
   const size_t string_size = start_size + input_size + 1;
-  char *string = NULL;
+  char *string = nullptr;
   string = reinterpret_cast<char *>(resize_memory(string, string_size));
   sprintf(string, "Unrecognized argument: %s.", argument);
   log_message(string);
@@ -38,13 +38,13 @@ int main(int argc, char *argv[]) {
   SDL_Window *window;
   SDL_Renderer *renderer;
   if (argc > 1) {
-    for (i = 1; i < argc && !quit; i++) {
+    for (i = 1; i < argc && (quit == 0); i++) {
       if (parse_argument(argv[i]) == PARSER_RESULT_QUIT) {
         quit = 1;
       }
     }
   }
-  if (quit) {
+  if (quit != 0) {
     return result;
   }
   seed_random();

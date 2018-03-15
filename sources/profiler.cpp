@@ -6,9 +6,9 @@
 #include "memory.hpp"
 #include "sort.hpp"
 #include "text.hpp"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #define MAXIMUM_DATA_IDENTIFIER_SIZE 32
 
@@ -33,20 +33,20 @@ static size_t table_size = 0;
  *
  * Performance will degrade if too many different identifiers are used.
  */
-static ProfilerData *table = NULL;
+static ProfilerData *table = nullptr;
 
-Code initialize_profiler(void) { return CODE_OK; }
+Code initialize_profiler() { return CODE_OK; }
 
 ProfilerData *get_empty_data(const char *identifier) {
   const size_t new_size = (table_size + 1) * sizeof(ProfilerData);
   ProfilerData *reallocated_table;
-  ProfilerData empty_data;
+  ProfilerData empty_data{};
   copy_string(empty_data.identifier, identifier, MAXIMUM_DATA_IDENTIFIER_SIZE);
   empty_data.sum = 0;
   empty_data.stamp = 0;
   empty_data.frequency = 0;
   reallocated_table = reinterpret_cast<ProfilerData *>(resize_memory(table, new_size));
-  if (reallocated_table != NULL) {
+  if (reallocated_table != nullptr) {
     table = reallocated_table;
     table_size++;
     table[table_size - 1] = empty_data;
@@ -59,10 +59,10 @@ ProfilerData *get_empty_data(const char *identifier) {
 ProfilerData *get_data(const char *identifier) {
   int found = 0;
   size_t i;
-  for (i = 0; i < table_size && !found; i++) {
-    found = string_equals(identifier, table[i].identifier);
+  for (i = 0; i < table_size && (found == 0); i++) {
+    found = static_cast<int>(string_equals(identifier, table[i].identifier));
   }
-  if (!found) {
+  if (found == 0) {
     return get_empty_data(identifier);
   }
   /* Decrement because i is incremented before exiting the loop. */
@@ -94,12 +94,14 @@ void profiler_end(const char *identifier) {
   update_profiler(identifier, get_milliseconds() - data->stamp);
 }
 
-static double profiler_data_mean(const ProfilerData *const data) { return data->sum / (double)data->frequency; }
+static double profiler_data_mean(const ProfilerData *const data) {
+  return data->sum / static_cast<double>(data->frequency);
+}
 
 static void profiler_data_copy_base_id(const ProfilerData *data, char *dest) {
   const char *colon = strchr(data->identifier, ':');
   copy_string(dest, data->identifier, MAXIMUM_DATA_IDENTIFIER_SIZE);
-  if (colon != NULL) {
+  if (colon != nullptr) {
     /* Cut the string before the colon. */
     dest[colon - data->identifier] = '\0';
   }
@@ -128,21 +130,21 @@ static int profiler_data_greater_than(const void *a, const void *b) {
   return -1;
 }
 
-void sort_table(void) { sort(table, table_size, sizeof(ProfilerData), profiler_data_greater_than); }
+void sort_table() { sort(table, table_size, sizeof(ProfilerData), profiler_data_greater_than); }
 
-void write_statistics(void) {
+void write_statistics() {
   char path[MAXIMUM_PATH_SIZE];
   unsigned long frequency;
   double mean;
   size_t i;
   char *identifier;
   FILE *file;
-  if (table == NULL) {
+  if (table == nullptr) {
     return;
   }
   get_full_path(path, PROFILER_FILE_NAME);
   file = fopen(path, "a");
-  if (file) {
+  if (file != nullptr) {
     /* Sort the table if we can write output. */
     sort_table();
     for (i = 0; i < table_size; i++) {
@@ -158,7 +160,7 @@ void write_statistics(void) {
 /**
  * Saves all profiler data to disk and frees the allocated memory.
  */
-Code finalize_profiler(void) {
+Code finalize_profiler() {
   write_statistics();
   table = reinterpret_cast<ProfilerData *>(resize_memory(table, 0));
   table_size = 0;

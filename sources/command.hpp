@@ -33,7 +33,7 @@ typedef struct CommandTable {
 
 void initialize_command_table(CommandTable *table);
 
-int test_command_table(CommandTable *table, enum Command command, Milliseconds repetition_delay);
+bool test_command_table(CommandTable *table, enum Command command, Milliseconds repetition_delay);
 
 void read_commands(CommandTable *table);
 

@@ -64,8 +64,8 @@ void destroy_game(Game *game);
 Milliseconds update_game(Game *const game);
 
 unsigned char get_from_rigid_matrix(const Game *const game, const int x, const int y);
-void modify_rigid_matrix_point(const Game *const game, const int x, const int y, const unsigned char delta);
-void modify_rigid_matrix_platform(Game *game, Platform const *platform, const unsigned char delta);
+void modify_rigid_matrix_point(const Game *const game, const int x, const int y, S8 delta);
+void modify_rigid_matrix_platform(Game *game, Platform const *platform, S8 delta);
 
 /**
  * Changes the game message to the provided text, for the provided duration.
