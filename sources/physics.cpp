@@ -657,7 +657,12 @@ static bool can_move_up(const Game *game) {
   if (y == game->box->min_y) {
     return true;
   }
-  return get_from_rigid_matrix(game, x, y - 1) == 0u;
+  for (int i = 0; i < get_tile_width(); i++) {
+    if (get_from_rigid_matrix(game, x + i, y - 1) != 0u) {
+      return false;
+    }
+  }
+  return true;
 }
 
 /**
