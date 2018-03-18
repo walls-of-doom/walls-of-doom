@@ -56,7 +56,7 @@ Code game(SDL_Renderer *renderer, CommandTable *table) {
 }
 
 int main_menu(SDL_Renderer *renderer) {
-  int should_quit = 0;
+  auto should_quit = false;
   Code code = CODE_OK;
   Menu menu;
   CommandTable command_table{};
@@ -67,23 +67,26 @@ int main_menu(SDL_Renderer *renderer) {
   menu.options = options;
   menu.selected_option = 0;
   initialize_command_table(&command_table);
-  while (should_quit == 0) {
+  while (!should_quit) {
     write_menu(menu, renderer);
     read_commands(&command_table);
-    if (static_cast<int>(test_command_table(&command_table, COMMAND_UP, REPETITION_DELAY)) != 0) {
+    const auto got_up = test_command_table(&command_table, COMMAND_UP, REPETITION_DELAY);
+    const auto got_down = test_command_table(&command_table, COMMAND_DOWN, REPETITION_DELAY);
+    const auto got_enter = test_command_table(&command_table, COMMAND_ENTER, REPETITION_DELAY);
+    const auto got_center = test_command_table(&command_table, COMMAND_CENTER, REPETITION_DELAY);
+    if (got_up) {
       if (menu.selected_option > 0) {
         menu.selected_option--;
       } else {
         menu.selected_option = menu.options.size() - 1;
       }
-    } else if (static_cast<int>(test_command_table(&command_table, COMMAND_DOWN, REPETITION_DELAY)) != 0) {
+    } else if (got_down) {
       if (menu.selected_option + 1 < menu.options.size()) {
         menu.selected_option++;
       } else {
         menu.selected_option = 0;
       }
-    } else if ((static_cast<int>(test_command_table(&command_table, COMMAND_ENTER, REPETITION_DELAY)) != 0) ||
-               (static_cast<int>(test_command_table(&command_table, COMMAND_CENTER, REPETITION_DELAY)) != 0)) {
+    } else if (got_enter || got_center) {
       if (menu.selected_option == 0) {
         code = game(renderer, &command_table);
       } else if (menu.selected_option == 1) {
@@ -91,17 +94,14 @@ int main_menu(SDL_Renderer *renderer) {
       } else if (menu.selected_option == 2) {
         code = info(renderer, &command_table);
       } else if (menu.selected_option == 3) {
-        should_quit = 1;
+        should_quit = true;
       }
-      /* If it is not defined whether or not we should quit, check the code. */
-      if (should_quit == 0) {
+      if (!should_quit) {
         should_quit = is_termination_code(code);
       }
     }
     /* Quit if the user selected the Quit option or closed the window. */
-    should_quit =
-        static_cast<int>((should_quit != 0) ||
-                         static_cast<int>(test_command_table(&command_table, COMMAND_QUIT, REPETITION_DELAY)) != 0);
+    should_quit = should_quit || test_command_table(&command_table, COMMAND_QUIT, REPETITION_DELAY);
   }
   return 0;
 }
