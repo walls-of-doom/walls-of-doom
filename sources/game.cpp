@@ -21,6 +21,8 @@
 #define DEFAULT_LIMIT_PLAYED_SECONDS (DEFAULT_LIMIT_PLAYED_MINUTES * 60)
 #define DEFAULT_LIMIT_PLAYED_FRAMES DEFAULT_LIMIT_PLAYED_SECONDS *UPS
 
+static const Milliseconds register_score_release_delay = 200;
+
 static size_t get_rigid_matrix_index(const Game *const game, const int x, const int y) {
   const int base_x = x - game->box->min_x;
   const int base_y = y - game->box->min_y;
@@ -41,10 +43,8 @@ void modify_rigid_matrix_point(const Game *const game, const int x, const int y,
 }
 
 void modify_rigid_matrix_platform(Game *game, Platform const *platform, S8 delta) {
-  int x;
-  int y;
-  for (x = 0; x < platform->w; ++x) {
-    for (y = 0; y < platform->h; ++y) {
+  for (int x = 0; x < platform->w; ++x) {
+    for (int y = 0; y < platform->h; ++y) {
       modify_rigid_matrix_point(game, platform->x + x, platform->y + y, delta);
     }
   }
@@ -182,7 +182,7 @@ static void print_game_result(const Player *player, const int position, SDL_Rend
   present(renderer);
 }
 
-void register_score(const Game *const game, SDL_Renderer *renderer) {
+Code register_score(const Game *const game, SDL_Renderer *renderer) {
   const Player *const player = game->player;
   char buffer[MAXIMUM_STRING_SIZE];
   const char *format = "Started registering a score of %d points for %s.";
@@ -196,7 +196,14 @@ void register_score(const Game *const game, SDL_Renderer *renderer) {
   position = scoreboard_index + 1;
   log_message("Saved the record successfully.");
   print_game_result(player, position, renderer);
-  wait_for_input(game->player->table);
+  const Milliseconds release_time = get_milliseconds() + register_score_release_delay;
+  Code code = CODE_OK;
+  while ((code = wait_for_input(game->player->table)) == CODE_OK) {
+    if (get_milliseconds() > release_time) {
+      break;
+    }
+  }
+  return code;
 }
 
 /**
@@ -252,7 +259,7 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
     time_passed += get_milliseconds() - start_time;
   }
   if (code != CODE_CLOSE) {
-    register_score(game, renderer);
+    code = register_score(game, renderer);
   }
   if (code == CODE_QUIT) {
     /* When the player quits from the game, it should go back to the menu. */
