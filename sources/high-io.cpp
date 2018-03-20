@@ -43,8 +43,6 @@ static int is_valid_player_name(const char *player_name) {
  * Returns a Code, which may indicate that the player tried to quit.
  */
 Code read_player_name(char *destination, const size_t maximum_size, Renderer *renderer) {
-  int x;
-  int y;
   Code code = CODE_ERROR;
   int valid_name = 0;
   const char message[] = "Name your character: ";
@@ -52,8 +50,8 @@ Code read_player_name(char *destination, const size_t maximum_size, Renderer *re
   random_name(destination);
   /* While there is not a read error or a valid name. */
   while (code != CODE_OK || (valid_name == 0)) {
-    x = get_padding() * get_font_width();
-    y = (get_window_height() - get_font_height()) / 2;
+    auto x = get_padding() * get_font_width();
+    auto y = (get_window_height() - get_font_height()) / 2;
     code = read_string(x, y, message, destination, maximum_size, renderer);
     if (code == CODE_QUIT) {
       return CODE_QUIT;

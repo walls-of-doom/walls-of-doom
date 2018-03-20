@@ -387,12 +387,8 @@ Code print_centered_vertically(const std::vector<std::string> &strings, const Co
   const int padding = 2 * get_padding() * global_monospaced_font_height;
   const int available_window_height = get_window_height() - padding;
   const int text_lines_limit = available_window_height / text_line_height;
-  auto printed_count = static_cast<int>(strings.size());
-  int y;
-  if (strings.size() > text_lines_limit) {
-    printed_count = text_lines_limit;
-  }
-  y = (get_window_height() - strings.size() * text_line_height) / 2;
+  const auto printed_count = std::min(text_lines_limit, static_cast<int>(strings.size()));
+  auto y = (get_window_height() - strings.size() * text_line_height) / 2;
   for (int i = 0; i < printed_count; i++) {
     const auto string = strings[i];
     auto *array = reinterpret_cast<char *>(malloc(string.size() + 1));

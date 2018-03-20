@@ -169,8 +169,8 @@ int save_record(Record *record) {
   }
   log_message("Added the record to the record table.");
   /* Sort the table records. */
-  sort((void *)table.records, table.record_count, sizeof(Record), comparator);
-  reverse((void *)table.records, table.record_count, sizeof(Record));
+  sort(reinterpret_cast<void *>(table.records), table.record_count, sizeof(Record), comparator);
+  reverse(reinterpret_cast<void *>(table.records), table.record_count, sizeof(Record));
   log_message("Sorted the record table.");
   /* Write the table to disk. */
   write_table(&table);

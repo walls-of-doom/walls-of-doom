@@ -4,11 +4,8 @@
 /**
  * Codes passed between functions.
  */
-typedef enum Code { CODE_OK, CODE_QUIT, CODE_CLOSE, CODE_ERROR } Code;
+enum Code { CODE_OK, CODE_QUIT, CODE_CLOSE, CODE_ERROR };
 
-/**
- * Returns whether or not the Code is a termination code.
- */
-int is_termination_code(Code code);
+inline bool is_termination_code(Code code) { return code == CODE_QUIT || code == CODE_CLOSE; }
 
 #endif

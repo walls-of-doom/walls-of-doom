@@ -108,8 +108,8 @@ static void profiler_data_copy_base_id(const ProfilerData *data, char *dest) {
 }
 
 static int profiler_data_greater_than(const void *a, const void *b) {
-  const ProfilerData *a_data = (ProfilerData *)a;
-  const ProfilerData *b_data = (ProfilerData *)b;
+  const ProfilerData *a_data = reinterpret_cast<const ProfilerData *>(a);
+  const ProfilerData *b_data = reinterpret_cast<const ProfilerData *>(b);
   const double a_mean = profiler_data_mean(a_data);
   const double b_mean = profiler_data_mean(b_data);
   char a_base_id[MAXIMUM_DATA_IDENTIFIER_SIZE];
