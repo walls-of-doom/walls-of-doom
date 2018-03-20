@@ -61,7 +61,6 @@ set(walls-of-doom-sources
         sources/clock.hpp
         sources/clock.cpp
         sources/code.hpp
-        sources/code.cpp
         sources/color.hpp
         sources/color.cpp
         sources/command.hpp
@@ -116,6 +115,22 @@ set(walls-of-doom-sources
 
 add_library(walls-of-doom-object OBJECT ${walls-of-doom-sources})
 
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU|Clang|Intel")
+    add_definitions(-Wall)
+    add_definitions(-Wextra)
+    add_definitions(-Werror)
+    if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU|Clang")
+        add_definitions(-Wunused)
+        add_definitions(-Wcast-align)
+        add_definitions(-Wold-style-cast)
+        add_definitions(-Woverloaded-virtual)
+        add_definitions(-Wmissing-field-initializers)
+    endif ()
+    add_definitions(-pedantic)
+elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "MSVC")
+    add_definitions(/W4)
+endif ()
+
 find_package(SDL2 REQUIRED)
 find_package(SDL2_ttf REQUIRED)
 find_package(SDL2_image REQUIRED)
@@ -129,7 +144,8 @@ target_link_libraries(walls-of-doom ${SDL2_LIBRARY} ${SDL2_TTF_LIBRARIES} ${SDL2
 add_custom_command(TARGET walls-of-doom POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets/ ${CMAKE_CURRENT_BINARY_DIR}/assets/)
 
 if (NOT "${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
-    add_executable(tests tests/tests.cpp catch/catch.hpp $<TARGET_OBJECTS:walls-of-doom-object>)
+    add_executable(tests tests/tests.cpp $<TARGET_OBJECTS:walls-of-doom-object>)
+    include_directories(SYSTEM "${CMAKE_SOURCE_DIR}}/catch")
     include_directories("${CMAKE_SOURCE_DIR}}/sources")
     target_link_libraries(tests ${SDL2_LIBRARY} ${SDL2_TTF_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
 endif ()
