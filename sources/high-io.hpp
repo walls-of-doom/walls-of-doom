@@ -34,11 +34,6 @@ Code read_player_name(char *destination, size_t maximum_size, Renderer *renderer
  */
 Milliseconds draw_game(const Game *const game, Renderer *renderer);
 
-/**
- * Prints the provided string on the screen starting at (x, y).
- */
-Code print(const int x, const int y, const char *string, const ColorPair color_pair, Renderer *renderer);
-
 void print_menu(const std::vector<std::string> &lines, Renderer *renderer);
 
 /**

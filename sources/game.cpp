@@ -51,9 +51,8 @@ void modify_rigid_matrix_platform(Game *game, Platform const *platform, S8 delta
 }
 
 static void initialize_rigid_matrix(Game *game) {
-  size_t i;
   memset(game->rigid_matrix, 0, game->rigid_matrix_size);
-  for (i = 0; i < game->platform_count; i++) {
+  for (size_t i = 0; i < game->platform_count; i++) {
     modify_rigid_matrix_platform(game, game->platforms.data() + i, 1);
   }
 }
