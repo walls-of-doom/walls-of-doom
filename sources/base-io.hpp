@@ -17,6 +17,8 @@ typedef TTF_Font Font;
 typedef SDL_Window Window;
 typedef SDL_Renderer Renderer;
 
+extern const char *game_name;
+
 /**
  * Clears the screen.
  */

@@ -366,7 +366,7 @@ static void reposition(Game *const game, Platform *const platform) {
   memset(occupied, 0, occupied_size);
   /* Build a table of occupied rows. */
   for (i = 0; i < game->platform_count; i++) {
-    if (platform_equals(game->platforms[i], *platform) == 0) {
+    if (game->platforms[i] != *platform) {
       occupied[(game->platforms[i].y - box->min_y) / tile_h] = 1;
     }
   }
@@ -420,7 +420,7 @@ static void update_platform(Game *const game, Platform *const platform) {
 void update_platforms(Game *const game) {
   if (game->player->perk != PERK_POWER_TIME_STOP) {
     for (size_t i = 0; i < game->platform_count; i++) {
-      update_platform(game, game->platforms + i);
+      update_platform(game, game->platforms.data() + i);
     }
   }
 }
@@ -479,7 +479,7 @@ static void reverse_platform(Platform *const platform) { platform->speed = -plat
 
 static void apply_to_platforms(Game *const game, void (*f)(Platform *const)) {
   for (size_t i = 0; i != game->platform_count; ++i) {
-    f(game->platforms + i);
+    f(game->platforms.data() + i);
   }
 }
 

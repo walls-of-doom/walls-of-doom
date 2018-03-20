@@ -282,7 +282,7 @@ Milliseconds draw_game(const Game *const game, Renderer *renderer) {
   profiler_end("draw_game:draw_bottom_bar");
 
   profiler_begin("draw_game:draw_platforms");
-  draw_platforms(game->platforms, game->platform_count, game->box, renderer);
+  draw_platforms(game->platforms.data(), game->platform_count, game->box, renderer);
   profiler_end("draw_game:draw_platforms");
 
   profiler_begin("draw_game:draw_perk");

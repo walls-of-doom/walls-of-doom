@@ -15,12 +15,13 @@
 #include "settings.hpp"
 #include <SDL.h>
 #include <cstdlib>
+#include <vector>
 
-typedef struct Game {
-
+class Game {
+public:
   Player *player;
 
-  Platform *platforms;
+  std::vector<Platform> platforms;
 
   size_t platform_count;
 
@@ -52,14 +53,9 @@ typedef struct Game {
   unsigned long message_end_frame;
   unsigned int message_priority;
 
-} Game;
-
-/**
- * Creates a new Game object with the provided objects.
- */
-Game create_game(Player *player);
-
-void destroy_game(Game *game);
+  Game(Player *player);
+  virtual ~Game();
+};
 
 Milliseconds update_game(Game *const game);
 

@@ -2,21 +2,22 @@
 #define PLATFORM_H
 
 #include "box.hpp"
+#include "integers.hpp"
+#include <vector>
 
-typedef struct Platform {
-  int x;
-  int y;
-  int w;
-  int h;
-  int speed;
-} Platform;
+class Platform {
+public:
+  int x{};
+  int y{};
+  int w{};
+  int h{};
+  int speed{};
+  float rarity = 0.0f;
 
-void generate_platforms(Platform *platforms, const BoundingBox *const box, const int count, const int width,
-                        const int height);
+  bool operator==(const Platform &rhs) const;
+  bool operator!=(const Platform &rhs) const;
+};
 
-/**
- * Compares two Platforms and evaluates whether or not they are the same.
- */
-int platform_equals(const Platform a, const Platform b);
+std::vector<Platform> generate_platforms(BoundingBox box, U64 count, int width, int height);
 
 #endif

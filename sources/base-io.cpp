@@ -29,6 +29,8 @@
 
 #define SDL_INIT_FLAGS (SDL_INIT_VIDEO | SDL_INIT_JOYSTICK)
 
+const char *game_name = "Walls of Doom";
+
 static Font *global_monospaced_font = nullptr;
 
 /* Default integers to one to prevent divisions by zero. */

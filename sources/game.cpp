@@ -54,7 +54,7 @@ static void initialize_rigid_matrix(Game *game) {
   size_t i;
   memset(game->rigid_matrix, 0, game->rigid_matrix_size);
   for (i = 0; i < game->platform_count; i++) {
-    modify_rigid_matrix_platform(game, game->platforms + i, 1);
+    modify_rigid_matrix_platform(game, game->platforms.data() + i, 1);
   }
 }
 
@@ -65,68 +65,54 @@ static void initialize_bounding_box(Game *game) {
   game->box->max_y = get_window_height() - 2 * get_bar_height();
 }
 
-/**
- * Creates a new Game object with the provided objects.
- */
-Game create_game(Player *player) {
-  const auto tile_w = get_tile_width();
-  const auto tile_h = get_tile_height();
-  const auto platform_count = get_platform_count();
+Game::Game(Player *player) : player(player) {
+  tile_w = get_tile_width();
+  tile_h = get_tile_height();
+  platform_count = get_platform_count();
   size_t rigid_matrix_bytes;
-  Game game{};
 
-  game.player = player;
-  game.platform_count = platform_count;
-  game.platforms = reinterpret_cast<Platform *>(resize_memory(nullptr, sizeof(Platform) * platform_count));
+  box = new BoundingBox;
+  initialize_bounding_box(this);
 
-  game.current_frame = 0;
-  game.desired_frame = 0;
+  platforms = generate_platforms(*box, platform_count, tile_w, tile_h);
 
-  game.played_frames = 0;
-  game.limit_played_frames = DEFAULT_LIMIT_PLAYED_FRAMES;
+  current_frame = 0;
+  desired_frame = 0;
 
-  game.paused = false;
+  played_frames = 0;
+  limit_played_frames = DEFAULT_LIMIT_PLAYED_FRAMES;
 
-  game.tile_w = tile_w;
-  game.tile_h = tile_h;
+  paused = false;
 
   player->w = tile_w;
   player->h = tile_h;
 
-  game.box = reinterpret_cast<BoundingBox *>(resize_memory(nullptr, sizeof(BoundingBox)));
-  initialize_bounding_box(&game);
+  reposition_player(this);
 
-  generate_platforms(game.platforms, game.box, platform_count, tile_w, tile_h);
-
-  reposition_player(&game);
-
-  game.perk = PERK_NONE;
-  game.perk_x = 0;
-  game.perk_y = 0;
+  perk = PERK_NONE;
+  perk_x = 0;
+  perk_y = 0;
   /* Don't start with a Perk on the screen. */
-  game.perk_end_frame = PERK_SCREEN_DURATION_IN_FRAMES;
+  perk_end_frame = PERK_SCREEN_DURATION_IN_FRAMES;
 
-  game.rigid_matrix_m = static_cast<size_t>(game.box->max_y - game.box->min_y + 1);
-  game.rigid_matrix_n = static_cast<size_t>(game.box->max_x - game.box->min_x + 1);
-  game.rigid_matrix_size = game.rigid_matrix_m * game.rigid_matrix_n;
-  rigid_matrix_bytes = sizeof(unsigned char) * game.rigid_matrix_size;
-  game.rigid_matrix = reinterpret_cast<unsigned char *>(resize_memory(nullptr, rigid_matrix_bytes));
-  initialize_rigid_matrix(&game);
+  rigid_matrix_m = static_cast<size_t>(box->max_y - box->min_y + 1);
+  rigid_matrix_n = static_cast<size_t>(box->max_x - box->min_x + 1);
+  rigid_matrix_size = rigid_matrix_m * rigid_matrix_n;
+  rigid_matrix_bytes = sizeof(unsigned char) * rigid_matrix_size;
+  rigid_matrix = reinterpret_cast<unsigned char *>(resize_memory(nullptr, rigid_matrix_bytes));
+  initialize_rigid_matrix(this);
 
-  game.message[0] = '\0';
-  game.message_end_frame = 0;
-  game.message_priority = 0;
+  message[0] = '\0';
+  message_end_frame = 0;
+  message_priority = 0;
 
   log_message("Finished creating the game.");
-
-  return game;
 }
 
-void destroy_game(Game *game) {
-  destroy_player(game->player);
-  game->rigid_matrix = reinterpret_cast<unsigned char *>(resize_memory(game->rigid_matrix, 0));
-  game->box = reinterpret_cast<BoundingBox *>(resize_memory(game->box, 0));
-  game->platforms = reinterpret_cast<Platform *>(resize_memory(game->platforms, 0));
+Game::~Game() {
+  destroy_player(player);
+  rigid_matrix = reinterpret_cast<unsigned char *>(resize_memory(rigid_matrix, 0));
+  box = reinterpret_cast<BoundingBox *>(resize_memory(box, 0));
 }
 
 Milliseconds update_game(Game *const game) {

@@ -41,18 +41,13 @@ void write_menu(const Menu &menu, SDL_Renderer *renderer) {
 
 Code game(SDL_Renderer *renderer, CommandTable *table) {
   char name[MAXIMUM_PLAYER_NAME_SIZE];
-  Player player{};
-  Game game{};
-  Code code;
-  code = read_player_name(name, MAXIMUM_PLAYER_NAME_SIZE, renderer);
+  Code code = read_player_name(name, MAXIMUM_PLAYER_NAME_SIZE, renderer);
   if (code == CODE_QUIT || code == CODE_CLOSE) {
     return code;
   }
-  player = create_player(name, table);
-  game = create_game(&player);
-  code = run_game(&game, renderer);
-  destroy_game(&game);
-  return code;
+  Player player = create_player(name, table);
+  Game game(&player);
+  return run_game(&game, renderer);
 }
 
 int main_menu(SDL_Renderer *renderer) {
