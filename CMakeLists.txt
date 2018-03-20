@@ -54,8 +54,6 @@ set(walls-of-doom-sources
         sources/about.cpp
         sources/bank.hpp
         sources/bank.cpp
-        sources/base-io.hpp
-        sources/base-io.cpp
         sources/box.hpp
         sources/box.cpp
         sources/clock.hpp
@@ -73,8 +71,8 @@ set(walls-of-doom-sources
         sources/game.cpp
         sources/graphics.hpp
         sources/graphics.cpp
-        sources/high-io.hpp
-        sources/high-io.cpp
+        sources/io.hpp
+        sources/io.cpp
         sources/investment.hpp
         sources/investment.cpp
         sources/joystick.hpp
