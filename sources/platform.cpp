@@ -36,6 +36,7 @@ std::vector<Platform> generate_platforms(BoundingBox box, U64 count, int width, 
     } else {
       platform.speed = -speed;
     }
+    platform.rarity = random_integer(0, 4) / 4.0f;
   }
   resize_memory(density, 0);
   return platforms;

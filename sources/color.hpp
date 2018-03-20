@@ -1,14 +1,25 @@
 #ifndef COLOR_H
 #define COLOR_H
 
+#include "integers.hpp"
 #include <SDL.h>
 
-typedef struct Color {
-  unsigned char r;
-  unsigned char g;
-  unsigned char b;
-  unsigned char a;
-} Color;
+class Color {
+public:
+  U8 r = 0;
+  U8 g = 0;
+  U8 b = 0;
+  U8 a = 0;
+
+  Color mix(Color rhs, float rhsAmount) {
+    const auto lhsAmount = 1.0f - rhsAmount;
+    const auto endR = static_cast<U8>(r * lhsAmount + rhs.r * rhsAmount);
+    const auto endG = static_cast<U8>(g * lhsAmount + rhs.g * rhsAmount);
+    const auto endB = static_cast<U8>(b * lhsAmount + rhs.b * rhsAmount);
+    const auto endA = static_cast<U8>(a * lhsAmount + rhs.a * rhsAmount);
+    return {endR, endG, endB, endA};
+  }
+};
 
 typedef struct ColorPair {
   Color foreground;
@@ -21,9 +32,12 @@ extern Color COLOR_DEFAULT_BACKGROUND;
 extern ColorPair COLOR_PAIR_DEFAULT;
 extern ColorPair COLOR_PAIR_PERK;
 extern ColorPair COLOR_PAIR_PLAYER;
+
 extern ColorPair COLOR_PAIR_TOP_BAR;
-extern ColorPair COLOR_PAIR_PLATFORM;
 extern ColorPair COLOR_PAIR_BOTTOM_BAR;
+
+extern ColorPair COLOR_PAIR_PLATFORM;
+extern ColorPair COLOR_PAIR_PLATFORM_RARE;
 
 ColorPair color_pair_from_string(const char *string);
 

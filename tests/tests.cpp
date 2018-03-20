@@ -280,12 +280,10 @@ TEST_CASE("bounding_box_equals()") {
 
 TEST_CASE("generate_platforms() avoids multiple platforms on the same line") {
   const size_t platform_count = 128;
-  Platform *platforms = nullptr;
   int *y_counter = nullptr;
   BoundingBox box;
   size_t i;
   int y;
-  platforms = reinterpret_cast<Platform *>(resize_memory(platforms, sizeof(Platform) * platform_count));
   y_counter = reinterpret_cast<int *>(resize_memory(y_counter, sizeof(int) * platform_count));
   for (i = 0; i < platform_count; i++) {
     y_counter[i] = 0;
@@ -294,7 +292,7 @@ TEST_CASE("generate_platforms() avoids multiple platforms on the same line") {
   box.min_y = 0;
   box.max_x = platform_count - 1;
   box.max_y = platform_count - 1;
-  generate_platforms(platforms, &box, platform_count, 1, 1);
+  auto platforms = generate_platforms(box, platform_count, 1, 1);
   /* Each platform in platforms should have a different y coordinate. */
   for (i = 0; i < platform_count; i++) {
     y = platforms[i].y;
@@ -309,7 +307,6 @@ TEST_CASE("generate_platforms() avoids multiple platforms on the same line") {
       FAIL("Platform has invalid y coordinate.");
     }
   }
-  resize_memory(platforms, 0);
   resize_memory(y_counter, 0);
 }
 

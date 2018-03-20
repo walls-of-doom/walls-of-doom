@@ -171,23 +171,20 @@ static void draw_bottom_bar(const char *message, Renderer *renderer) {
   write_bottom_bar_string(message, renderer);
 }
 
+static Color get_platform_color(Platform platform) {
+  return COLOR_PAIR_PLATFORM.foreground.mix(COLOR_PAIR_PLATFORM_RARE.foreground, platform.rarity);
+}
+
 static void draw_platforms(const Platform *platforms, const size_t platform_count, const BoundingBox *box,
                            Renderer *renderer) {
-  const Color color = COLOR_PAIR_PLATFORM.foreground;
   const int y_padding = get_bar_height();
-  Platform p{};
-  int x;
-  int y;
-  int w;
-  int h;
-  size_t i;
-  for (i = 0; i < platform_count; i++) {
-    p = platforms[i];
-    x = max_int(box->min_x, p.x);
-    y = y_padding + p.y;
-    w = min_int(box->max_x, p.x + p.w - 1) - x + 1;
-    h = p.h;
-    draw_absolute_rectangle(x, y, w, h, color, renderer);
+  for (size_t i = 0; i < platform_count; i++) {
+    auto p = platforms[i];
+    auto x = max_int(box->min_x, p.x);
+    auto y = y_padding + p.y;
+    auto w = min_int(box->max_x, p.x + p.w - 1) - x + 1;
+    auto h = p.h;
+    draw_absolute_rectangle(x, y, w, h, get_platform_color(platforms[i]), renderer);
   }
 }
 

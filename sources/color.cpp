@@ -10,12 +10,16 @@
 /* These colors work as fallback if settings fails. */
 Color COLOR_DEFAULT_FOREGROUND = {192, 192, 192, 255};
 Color COLOR_DEFAULT_BACKGROUND = {32, 32, 32, 255};
+
 ColorPair COLOR_PAIR_DEFAULT = {{192, 192, 192, 255}, {32, 32, 32, 255}};
 ColorPair COLOR_PAIR_PERK = {{192, 192, 192, 255}, {32, 32, 32, 255}};
 ColorPair COLOR_PAIR_PLAYER = {{192, 192, 192, 255}, {32, 32, 32, 255}};
+
 ColorPair COLOR_PAIR_TOP_BAR = {{192, 192, 192, 255}, {32, 32, 32, 255}};
-ColorPair COLOR_PAIR_PLATFORM = {{192, 192, 192, 255}, {32, 32, 32, 255}};
 ColorPair COLOR_PAIR_BOTTOM_BAR = {{192, 192, 192, 255}, {32, 32, 32, 255}};
+
+ColorPair COLOR_PAIR_PLATFORM = {{192, 192, 192, 255}, {32, 32, 32, 255}};
+ColorPair COLOR_PAIR_PLATFORM_RARE = {{192, 192, 192, 255}, {32, 32, 32, 255}};
 
 static unsigned char parse_two_hexadecimal_characters(const char *string) {
   char substring[3];
