@@ -10,7 +10,7 @@ install:
   - bash scripts/setup.sh
 
 script:
-  - bash scripts/test.sh
+  - cd build && cmake .. && make && ./tests
 
 notifications:
   email:
