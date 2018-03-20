@@ -26,12 +26,6 @@
 #define WRAP_TEST_WIDTH_40 "assets/tests/wrap-test-width-40.txt"
 #define WRAP_TEST_WIDTH_80 "assets/tests/wrap-test-width-80.txt"
 
-int compare_unsigned_char(const void *pointer_a, const void *pointer_b) {
-  unsigned char a = *(unsigned char *)(pointer_a);
-  unsigned char b = *(unsigned char *)(pointer_b);
-  return a < b ? -1 : a == b ? 0 : 1;
-}
-
 TEST_CASE("resize_memory()") {
   unsigned char *chunk = nullptr;
   REQUIRE(chunk == NULL);
@@ -257,23 +251,6 @@ TEST_CASE("read_integers()") {
   REQUIRE(expected_count == actual_count);
   REQUIRE(expected_value == actual_values[0]);
   remove(filename);
-}
-
-TEST_CASE("compare_unsigned_char()") {
-  const unsigned char a = 0;
-  const unsigned char b = 1;
-  const unsigned char c = 2;
-  REQUIRE(-1 == compare_unsigned_char((void *)(&a), (void *)(&b)));
-  REQUIRE(-1 == compare_unsigned_char((void *)(&a), (void *)(&c)));
-  REQUIRE(-1 == compare_unsigned_char((void *)(&b), (void *)(&c)));
-
-  REQUIRE(0 == compare_unsigned_char((void *)(&a), (void *)(&a)));
-  REQUIRE(0 == compare_unsigned_char((void *)(&b), (void *)(&b)));
-  REQUIRE(0 == compare_unsigned_char((void *)(&c), (void *)(&c)));
-
-  REQUIRE(1 == compare_unsigned_char((void *)(&b), (void *)(&a)));
-  REQUIRE(1 == compare_unsigned_char((void *)(&c), (void *)(&a)));
-  REQUIRE(1 == compare_unsigned_char((void *)(&c), (void *)(&b)));
 }
 
 TEST_CASE("bounding_box_equals()") {
