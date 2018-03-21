@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <functional>
 #include <iomanip>
+#include <sstream>
 
 struct Record {
   std::string base;
