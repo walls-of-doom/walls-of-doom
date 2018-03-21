@@ -11,13 +11,16 @@ public:
   U8 b = 0;
   U8 a = 0;
 
-  Color mix(Color rhs, float rhsAmount) {
+  Color() = default;
+  Color(U8 r, U8 g, U8 b, U8 a) : r(r), g(g), b(b), a(a) {}
+
+  inline Color mix(Color rhs, float rhsAmount) {
     const auto lhsAmount = 1.0f - rhsAmount;
     const auto endR = static_cast<U8>(r * lhsAmount + rhs.r * rhsAmount);
     const auto endG = static_cast<U8>(g * lhsAmount + rhs.g * rhsAmount);
     const auto endB = static_cast<U8>(b * lhsAmount + rhs.b * rhsAmount);
     const auto endA = static_cast<U8>(a * lhsAmount + rhs.a * rhsAmount);
-    return Color{endR, endG, endB, endA};
+    return Color(endR, endG, endB, endA);
   }
 };
 
