@@ -17,7 +17,7 @@ public:
     const auto endG = static_cast<U8>(g * lhsAmount + rhs.g * rhsAmount);
     const auto endB = static_cast<U8>(b * lhsAmount + rhs.b * rhsAmount);
     const auto endA = static_cast<U8>(a * lhsAmount + rhs.a * rhsAmount);
-    return {endR, endG, endB, endA};
+    return Color{endR, endG, endB, endA};
   }
 };
 

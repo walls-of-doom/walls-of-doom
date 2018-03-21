@@ -21,7 +21,7 @@ struct Record {
     }
   }
 
-  bool operator<(const Record &other) { return base < other.base || (base == other.base && time > other.time); }
+  bool operator<(const Record &other) const { return base < other.base || (base == other.base && time > other.time); }
 };
 
 static double seconds_between(const TimePoint now, const TimePoint then) {
