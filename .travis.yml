@@ -8,7 +8,9 @@ compiler:
   - gcc
 
 install:
-  - bash scripts/setup.sh
+  - sudo apt-get update
+  - sudo apt-get upgrade
+  - sudo apt-get install -y libegl1-mesa-dev libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev
 
 script:
   - mkdir build && cd build && cmake .. && make && ./tests
