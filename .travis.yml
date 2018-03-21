@@ -11,7 +11,7 @@ install:
   - bash scripts/setup.sh
 
 script:
-  - cd build && cmake .. && make && ./tests
+  - mkdir build && cd build && cmake .. && make && ./tests
 
 notifications:
   email:
