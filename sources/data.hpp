@@ -3,6 +3,7 @@
 
 #include "code.hpp"
 #include <cstdio>
+#include <string>
 
 /**
  * The maximum size a file path can have, including the NUL terminator.
@@ -19,7 +20,7 @@
 /**
  * Assesses whether or not a file with the provided filename exists.
  */
-int file_exists(const char *filename);
+bool file_exists(const char *filename);
 
 /**
  * Returns the number of lines in a file.
@@ -27,6 +28,8 @@ int file_exists(const char *filename);
  * This is the count of occurrences of '\n'.
  */
 int file_line_count(const char *filename);
+
+std::string get_full_path(std::string filename);
 
 /**
  * Writes to buffer the full path for a file created by Walls of Doom.
@@ -44,6 +47,8 @@ Code get_full_path(char *buffer, const char *filename);
  * Writes bytes to the indicated file from the provided source.
  */
 Code write_bytes(const char *filename, const void *source, const size_t size, const size_t count);
+
+Code write_string(const char *filename, const std::string &string);
 
 /**
  * Reads bytes from the indicated file to the provided destination.

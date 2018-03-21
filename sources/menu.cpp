@@ -20,6 +20,8 @@
 #include <string>
 #include <vector>
 
+static const char *profiler_filename = "performance.csv";
+
 class Menu {
 public:
   std::string title;
@@ -39,14 +41,14 @@ void write_menu(const Menu &menu, SDL_Renderer *renderer) {
   print_menu(string_vector, renderer);
 }
 
-Code game(SDL_Renderer *renderer, CommandTable *table) {
+Code game(Profiler *profiler, SDL_Renderer *renderer, CommandTable *table) {
   char name[MAXIMUM_PLAYER_NAME_SIZE];
   Code code = read_player_name(name, MAXIMUM_PLAYER_NAME_SIZE, renderer);
   if (code == CODE_QUIT || code == CODE_CLOSE) {
     return code;
   }
   Player player = create_player(name, table);
-  Game game(&player);
+  Game game(&player, profiler);
   return run_game(&game, renderer);
 }
 
@@ -62,6 +64,7 @@ int main_menu(SDL_Renderer *renderer) {
   menu.options = options;
   menu.selected_option = 0;
   initialize_command_table(&command_table);
+  Profiler profiler(true);
   while (!should_quit) {
     write_menu(menu, renderer);
     read_commands(&command_table);
@@ -83,9 +86,9 @@ int main_menu(SDL_Renderer *renderer) {
       }
     } else if (got_enter || got_center) {
       if (menu.selected_option == 0) {
-        code = game(renderer, &command_table);
+        code = game(&profiler, renderer, &command_table);
       } else if (menu.selected_option == 1) {
-        code = top_scores(renderer, &command_table);
+        code = top_scores(profiler, renderer, &command_table);
       } else if (menu.selected_option == 2) {
         code = info(renderer, &command_table);
       } else if (menu.selected_option == 3) {
@@ -98,5 +101,7 @@ int main_menu(SDL_Renderer *renderer) {
     /* Quit if the user selected the Quit option or closed the window. */
     should_quit = should_quit || test_command_table(&command_table, COMMAND_QUIT, REPETITION_DELAY);
   }
+  auto full_path = get_full_path(profiler_filename);
+  write_string(full_path.c_str(), profiler.dump());
   return 0;
 }

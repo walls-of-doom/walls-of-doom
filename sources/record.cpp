@@ -104,7 +104,7 @@ void read_table(RecordTable *table) {
   char *buffer = nullptr;
   buffer = reinterpret_cast<char *>(resize_memory(buffer, READ_TABLE_BUFFER_SIZE));
   get_full_path(path, RECORD_TABLE_FILE_NAME);
-  if (file_exists(path) != 0) {
+  if (file_exists(path)) {
     file = fopen(path, "r");
     if (file != nullptr) {
       table->record_count = 0;
@@ -203,11 +203,11 @@ size_t read_records(Record *destination, size_t destination_size) {
   return i;
 }
 
-Code top_scores(SDL_Renderer *renderer, CommandTable *table) {
-  Milliseconds start = get_milliseconds();
+Code top_scores(Profiler &profiler, SDL_Renderer *renderer, CommandTable *table) {
+  profiler.start("top_scores");
   Record records[MAXIMUM_DISPLAYED_RECORDS];
   const size_t count = read_records(records, MAXIMUM_DISPLAYED_RECORDS);
   print_records(count, records, renderer);
-  update_profiler("top_scores", get_milliseconds() - start);
+  profiler.stop();
   return wait_for_input(table);
 }

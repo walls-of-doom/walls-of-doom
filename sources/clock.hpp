@@ -1,7 +1,12 @@
 #ifndef CLOCK_H
 #define CLOCK_H
 
-typedef unsigned long Milliseconds;
+#include "integers.hpp"
+#include <chrono>
+
+using Milliseconds = U64;
+
+using TimePoint = std::chrono::steady_clock::time_point;
 
 /**
  * Returns a number of milliseconds.

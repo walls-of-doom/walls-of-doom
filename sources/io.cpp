@@ -148,7 +148,6 @@ Code initialize(Window **window, Renderer **renderer) {
   char log_buffer[MAXIMUM_STRING_SIZE];
   Uint32 renderer_flags = 0;
   initialize_logger();
-  initialize_profiler();
   initialize_settings();
   if (SDL_Init(SDL_INIT_FLAGS) != 0) {
     sprintf(log_buffer, "SDL initialization error: %s.", SDL_GetError());
@@ -234,7 +233,6 @@ Code finalize(Window **window, Renderer **renderer) {
   /* This could be called earlier, but we only do it here to organize things. */
   IMG_Quit();
   SDL_Quit();
-  finalize_profiler();
   finalize_logger();
   return CODE_OK;
 }
@@ -643,35 +641,37 @@ Code draw_player(const Player *const player, Renderer *renderer) {
 Milliseconds draw_game(Game *const game, Renderer *renderer) {
   Milliseconds draw_game_start = get_milliseconds();
 
-  profiler_begin("draw_game:clear");
+  game->profiler->start("draw_game");
+
+  game->profiler->start("clear");
   clear(renderer);
-  profiler_end("draw_game:clear");
+  game->profiler->stop();
 
-  profiler_begin("draw_game:draw_top_bar");
+  game->profiler->start("draw_top_bar");
   draw_top_bar(game, renderer);
-  profiler_end("draw_game:draw_top_bar");
+  game->profiler->stop();
 
-  profiler_begin("draw_game:draw_bottom_bar");
+  game->profiler->start("draw_bottom_bar");
   draw_bottom_bar(game->message, renderer);
-  profiler_end("draw_game:draw_bottom_bar");
+  game->profiler->stop();
 
-  profiler_begin("draw_game:draw_platforms");
+  game->profiler->start("draw_platforms");
   draw_platforms(game->platforms.data(), game->platform_count, game->box, renderer);
-  profiler_end("draw_game:draw_platforms");
+  game->profiler->stop();
 
-  profiler_begin("draw_game:draw_perk");
+  game->profiler->start("draw_perk");
   draw_perk(game, renderer);
-  profiler_end("draw_game:draw_perk");
+  game->profiler->stop();
 
-  profiler_begin("draw_game:draw_player");
+  game->profiler->start("draw_player");
   draw_player(game->player, renderer);
-  profiler_end("draw_game:draw_player");
+  game->profiler->stop();
 
-  profiler_begin("draw_game:present");
+  game->profiler->start("present");
   present(renderer);
-  profiler_end("draw_game:present");
+  game->profiler->stop();
 
-  update_profiler("draw_game", get_milliseconds() - draw_game_start);
+  game->profiler->stop();
   return get_milliseconds() - draw_game_start;
 }
 

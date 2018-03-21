@@ -64,7 +64,7 @@ static void initialize_bounding_box(Game *game) {
   game->box->max_y = get_window_height() - 2 * get_bar_height();
 }
 
-Game::Game(Player *player) : player(player) {
+Game::Game(Player *player, Profiler *profiler) : player(player), profiler(profiler) {
   tile_w = get_tile_width();
   tile_h = get_tile_height();
   platform_count = get_platform_count();
@@ -116,14 +116,14 @@ Game::~Game() {
 
 Milliseconds update_game(Game *const game) {
   Milliseconds game_update_start;
-  profiler_begin("update_game");
+  game->profiler->start("update_game");
   game_update_start = get_milliseconds();
   if (game->message_end_frame < game->current_frame) {
     game->message[0] = '\0';
   }
   update_platforms(game);
   update_perk(game);
-  profiler_end("update_game");
+  game->profiler->stop();
   return get_milliseconds() - game_update_start;
 }
 

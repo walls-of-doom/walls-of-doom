@@ -5,8 +5,10 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <stdexcept>
 #include <sys/stat.h>
 #include <sys/types.h>
+
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -27,9 +29,9 @@
 /**
  * Assesses whether or not a file with the provided filename exists.
  */
-int file_exists(const char *filename) {
+bool file_exists(const char *filename) {
   struct stat buffer {};
-  return static_cast<int>(stat(filename, &buffer) == 0);
+  return stat(filename, &buffer) == 0;
 }
 
 typedef enum Operation { READ, WRITE } Operation;
@@ -40,7 +42,7 @@ typedef enum Operation { READ, WRITE } Operation;
  * If one needs to access the log.txt file, one should use
  *
  *   char path[MAXIMUM_PATH_SIZE];
- *   get_full_path(path, "log.txt");
+ *   get_full_path(path, filename);
  *
  * This is the correct way to access mutable files in any platform.
  *
@@ -69,6 +71,14 @@ Code get_full_path(char *buffer, const char *filename) {
   /* Should not write from one buffer to the same buffer. */
   sprintf(buffer, "%s/%s", DATA_DIRECTORY, filename);
   return CODE_OK;
+}
+
+std::string get_full_path(std::string filename) {
+  char path[MAXIMUM_PATH_SIZE];
+  if (get_full_path(path, filename.c_str()) != CODE_OK) {
+    throw std::runtime_error("Failed to get full path.");
+  }
+  return std::string(path);
 }
 
 /**
@@ -125,6 +135,10 @@ Code write_bytes(const char *filename, const void *source, const size_t size, co
   return CODE_OK;
 }
 
+Code write_string(const char *filename, const std::string &string) {
+  return write_bytes(filename, string.c_str(), 1, string.size());
+}
+
 /**
  * Reads bytes from the indicated file to the provided destination.
  */
@@ -135,7 +149,7 @@ Code read_bytes(const char *filename, void *destination, const size_t size, cons
   size_t read;
   FILE *file;
   log_access(READ, size * count, filename);
-  if (file_exists(filename) == 0) {
+  if (!file_exists(filename)) {
     return CODE_ERROR;
   }
   file = fopen(filename, "rb");
@@ -162,7 +176,7 @@ Code read_characters(const char *const filename, char *destination, const size_t
   size_t copied = 0;
   int c; /* Must be an integer because it may be EOF */
   log_access(READ, destination_size, filename);
-  if (file_exists(filename) != 0) {
+  if (file_exists(filename)) {
     file = fopen(filename, "r");
     if (file != nullptr) {
       /* Check copied + 1 against destination size because we need a null

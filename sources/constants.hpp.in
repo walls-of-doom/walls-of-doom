@@ -1,11 +1,6 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-/**
- * How many strings the top bar has.
- */
-#define TOP_BAR_STRING_COUNT 4
-
 #define REPETITION_DELAY 100
 
 /**
@@ -53,7 +48,5 @@
 
 #define RECORD_TABLE_FILE_NAME "records.txt"
 #define RECORD_ARRAY_SIZE 512
-
-#define PROFILER_FILE_NAME "performance.txt"
 
 #endif

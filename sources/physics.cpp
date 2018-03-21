@@ -789,6 +789,7 @@ static void update_player_graphics(Game *game) {
 }
 
 void update_player(Game *game, Player *player) {
+  game->profiler->start("update_player");
   if (player->physics) {
     log_player_score(game->played_frames, player->score);
   }
@@ -804,5 +805,5 @@ void update_player(Game *game, Player *player) {
   /* Enable double jump if the player is standing over a platform. */
   update_double_jump(game);
   check_for_player_death(game);
-  profiler_end("update_player");
+  game->profiler->stop();
 }

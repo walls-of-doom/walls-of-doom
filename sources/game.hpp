@@ -11,6 +11,7 @@
 #include "perk.hpp"
 #include "platform.hpp"
 #include "player.hpp"
+#include "profiler.hpp"
 #include "random.hpp"
 #include "settings.hpp"
 #include <SDL.h>
@@ -20,6 +21,8 @@
 class Game {
 public:
   Player *player;
+
+  Profiler *profiler;
 
   std::vector<Platform> platforms;
 
@@ -53,7 +56,7 @@ public:
   unsigned long message_end_frame;
   unsigned int message_priority;
 
-  Game(Player *player);
+  Game(Player *player, Profiler *profiler);
   virtual ~Game();
 };
 

@@ -65,8 +65,9 @@ static void append_to_file(const char *path, const char *string) {
  */
 void log_message(const char *message) {
   /*
-   * Note that this function CANNOT use resize_memory because resize_memory
-   * calls this function. Using resize_memory here may cause a deadlock.
+   * Note that this function CANNOT use resize_memory because resize_memory calls this function.
+   *
+   * Using resize_memory here may cause a deadlock.
    */
   char path[MAXIMUM_PATH_SIZE];
   char stamp[TIMESTAMP_BUFFER_SIZE];
