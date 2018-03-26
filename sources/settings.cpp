@@ -220,7 +220,6 @@ void initialize_settings() {
   const char *read = input;
   Limits limits{};
   DoubleLimits double_limits{};
-  int i;
   read_characters(SETTINGS_FILE, input, SETTINGS_BUFFER_SIZE);
   while (static_cast<int>(parse_line(&read, key, value)) != 0) {
     if (string_equals(key, "REPOSITION_ALGORITHM")) {
@@ -294,7 +293,7 @@ void initialize_settings() {
         joystick_profile = JOYSTICK_PROFILE_DUALSHOCK;
       }
     } else if (string_equals(key, "INVESTMENT_MODE")) {
-      for (i = 0; i < INVESTMENT_MODE_COUNT; ++i) {
+      for (int i = 0; i < INVESTMENT_MODE_COUNT; ++i) {
         if (string_equals(value, get_investment_mode_name(static_cast<InvestmentMode>(i)).c_str())) {
           investment_mode = static_cast<InvestmentMode>(i);
         }

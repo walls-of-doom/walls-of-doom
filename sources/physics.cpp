@@ -259,17 +259,13 @@ static void move_platform_horizontally(Game *const game, Platform *const platfor
  * This algorithm is O(n) with respect to the number of lines.
  */
 int select_random_line_blindly(const unsigned char *lines, const int size) {
-  int count;
-  int skip;
-  int line;
-  int i;
   /* Be careful not to call random_integer with invalid parameters. */
   if (size < 1) {
     return 0;
   }
   /* Count how many empty lines there are. */
-  count = 0;
-  for (i = 0; i < size; i++) {
+  int count = 0;
+  for (int i = 0; i < size; i++) {
     if (lines[i] == 0) {
       count++;
     }
@@ -279,8 +275,8 @@ int select_random_line_blindly(const unsigned char *lines, const int size) {
     return random_integer(0, size - 1);
   }
   /* Get a random value based on the count. */
-  skip = random_integer(0, count - 1);
-  line = 0;
+  int skip = random_integer(0, count - 1);
+  int line = 0;
   while ((lines[line] != 0) || skip != 0) {
     if (lines[line] == 0) {
       skip--;
@@ -297,19 +293,15 @@ int select_random_line_blindly(const unsigned char *lines, const int size) {
  * This algorithm is O(n) with respect to the number of lines.
  */
 int select_random_line_awarely(const unsigned char *lines, const int size) {
+  auto maximum_distance = std::numeric_limits<int>::min();
   int *distances = nullptr;
-  int maximum_distance = std::numeric_limits<int>::min();
-  int count;
-  int skip;
-  int line;
-  int i;
   /* Be careful not to call random_integer with invalid parameters. */
   if (size < 1) {
     return 0;
   }
   distances = reinterpret_cast<int *>(resize_memory(distances, sizeof(int) * size));
   /* First pass: calculate the distance to nearest occupied line above. */
-  for (i = 0; i < size; i++) {
+  for (int i = 0; i < size; i++) {
     if (lines[i] != 0) {
       distances[i] = 0;
     } else {
@@ -321,7 +313,7 @@ int select_random_line_awarely(const unsigned char *lines, const int size) {
     }
   }
   /* Second pass: calculate the distance to nearest occupied line below. */
-  for (i = size - 1; i >= 0; i--) {
+  for (int i = size - 1; i >= 0; i--) {
     if (lines[i] != 0) {
       distances[i] = 0;
     } else {
@@ -335,15 +327,15 @@ int select_random_line_awarely(const unsigned char *lines, const int size) {
     maximum_distance = max_int(maximum_distance, distances[i]);
   }
   /* Count how many occurrences of the maximum distance there are. */
-  count = 0;
-  for (i = 0; i < size; i++) {
+  int count = 0;
+  for (int i = 0; i < size; i++) {
     if (distances[i] == maximum_distance) {
       count++;
     }
   }
   /* Get a random value based on the count. */
-  skip = random_integer(0, count - 1);
-  line = 0;
+  int skip = random_integer(0, count - 1);
+  int line = 0;
   while (distances[line] != maximum_distance || skip != 0) {
     if (distances[line] == maximum_distance) {
       skip--;

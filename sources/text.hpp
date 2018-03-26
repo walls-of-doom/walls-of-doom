@@ -2,6 +2,9 @@
 #define TEXT_H
 
 #include <cstdlib>
+#include <string>
+
+std::string double_to_string(double value, int places);
 
 /**
  * Copy from the source string to the destination string, using at most size

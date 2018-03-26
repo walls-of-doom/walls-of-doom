@@ -2,6 +2,7 @@
 #include "code.hpp"
 #include "constants.hpp"
 #include "logger.hpp"
+#include "text.hpp"
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -14,9 +15,6 @@
 #else
 #include <unistd.h>
 #endif
-
-#define LOG_ACCESS_WRITE_FORMAT "Writing %lu bytes (%.2lf KiB) to %s."
-#define LOG_ACCESS_READ_FORMAT "Reading %lu bytes (%.2lf KiB) from %s."
 
 #define WRITE_BYTES_COUNT_FORMAT "Expected to write %lu but actually wrote %lu!"
 #define READ_BYTES_COUNT_FORMAT "Expected to read %lu but actually read %lu!"
@@ -102,10 +100,15 @@ int file_line_count(const char *filename) {
 }
 
 void log_access(Operation operation, const size_t bytes, const char *filename) {
-  char message[MAXIMUM_STRING_SIZE];
-  double kibibytes = bytes / 1024.0;
-  const char *format = operation == READ ? LOG_ACCESS_READ_FORMAT : LOG_ACCESS_WRITE_FORMAT;
-  sprintf(message, format, bytes, kibibytes, filename);
+  const auto kibibytes = bytes / 1024.0;
+  const auto bytes_string = std::to_string(bytes);
+  const auto kibibytes_string = double_to_string(kibibytes, 2);
+  std::string message;
+  if (operation == READ) {
+    message = "Reading " + bytes_string + " bytes (" + kibibytes_string + " KiB) from " + filename + ".";
+  } else {
+    message = "Writing " + bytes_string + " bytes (" + kibibytes_string + " KiB) to " + filename + ".";
+  }
   log_message(message);
 }
 

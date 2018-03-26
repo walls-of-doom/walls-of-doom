@@ -63,7 +63,7 @@ static void append_to_file(const char *path, const char *string) {
 /**
  * Logs the provided message to the current log file.
  */
-void log_message(const char *message) {
+void log_message(const std::string &message) {
   /*
    * Note that this function CANNOT use resize_memory because resize_memory calls this function.
    *
@@ -76,7 +76,7 @@ void log_message(const char *message) {
   get_full_path(path, LOG_FILE_NAME);
   /* write_timestamp does not use dynamic memory allocation. */
   write_timestamp(stamp, TIMESTAMP_BUFFER_SIZE);
-  sprintf(string, "[%s] %s", stamp, message);
+  sprintf(string, "[%s] %s", stamp, message.c_str());
   /* append_to_file does not use dynamic memory allocation. */
   append_to_file(path, string);
 }

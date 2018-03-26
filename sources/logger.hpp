@@ -2,6 +2,7 @@
 #define LOGGER_H
 
 #include "score.hpp"
+#include <string>
 
 /**
  * Initializes the logger. Should only be called once.
@@ -16,7 +17,7 @@ void finalize_logger();
 /**
  * Logs the provided message to the current log file.
  */
-void log_message(const char *message);
+void log_message(const std::string &message);
 
 void log_player_score(const unsigned long frame, const Score score);
 

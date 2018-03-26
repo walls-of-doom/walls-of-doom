@@ -2,6 +2,14 @@
 #include <cctype>
 #include <cstdlib>
 #include <cstring>
+#include <iomanip>
+#include <sstream>
+
+std::string double_to_string(double value, int places) {
+  std::stringstream stream;
+  stream << std::fixed << std::setprecision(places) << value;
+  return stream.str();
+}
 
 /**
  * Copy from the source string to the destination string, using at most size

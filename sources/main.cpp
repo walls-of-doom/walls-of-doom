@@ -26,13 +26,12 @@ ParserResult parse_argument(const char *argument) {
 
 /* Must be declared with parameters because of SDL 2. */
 int main(int argc, char *argv[]) {
-  int i;
   int quit = 0;
   int result = 0;
   SDL_Window *window;
   SDL_Renderer *renderer;
   if (argc > 1) {
-    for (i = 1; i < argc && (quit == 0); i++) {
+    for (int i = 1; i < argc && (quit == 0); i++) {
       if (parse_argument(argv[i]) == PARSER_RESULT_QUIT) {
         quit = 1;
       }

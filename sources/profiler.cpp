@@ -1,5 +1,6 @@
 #include "profiler.hpp"
 #include "integers.hpp"
+#include "text.hpp"
 #include <algorithm>
 #include <functional>
 #include <iomanip>
@@ -64,12 +65,6 @@ void Profiler::stop() {
   minima[component_name] = std::min(minima[component_name], duration);
   timings[component_name] += duration;
   hierarchy.pop_back();
-}
-
-static std::string double_to_string(double value, int places) {
-  std::stringstream stream;
-  stream << std::fixed << std::setprecision(places) << value;
-  return stream.str();
 }
 
 static std::string seconds_to_milliseconds_string(double value) { return double_to_string(1000.0 * value, 2) + " ms"; }
