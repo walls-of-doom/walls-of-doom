@@ -194,46 +194,6 @@ TEST_CASE("wrap_at_right_margin() with maximum width") {
   REQUIRE(string_equals(expected, actual));
 }
 
-TEST_CASE("find_start_of_text() with an empty string") {
-  char string[] = "";
-  REQUIRE(string == find_start_of_text(string));
-}
-
-TEST_CASE("find_start_of_text() with only spaces") {
-  char string[] = " \t\r\n";
-  REQUIRE(string + strlen(string) == find_start_of_text(string));
-}
-
-TEST_CASE("find_start_of_text() with a single word") {
-  char string[] = "string";
-  REQUIRE(string == find_start_of_text(string));
-}
-
-TEST_CASE("find_start_of_text() with leading spaces") {
-  char string[] = " \t\r\n string";
-  REQUIRE(string + 5 == find_start_of_text(string));
-}
-
-TEST_CASE("find_end_of_text() with an empty string") {
-  char string[] = "";
-  REQUIRE(string == find_end_of_text(string));
-}
-
-TEST_CASE("find_end_of_text() with only spaces") {
-  char string[] = " \t\r\n";
-  REQUIRE(string == find_end_of_text(string));
-}
-
-TEST_CASE("find_end_of_text() with a single word") {
-  char string[] = "string";
-  REQUIRE(string + 6 == find_end_of_text(string));
-}
-
-TEST_CASE("find_end_of_text() with trailing spaces") {
-  char string[] = "string \t\r\n ";
-  REQUIRE(string + 6 == find_end_of_text(string));
-}
-
 TEST_CASE("read_integers()") {
   char filename[] = "test_read_integers_file.txt";
   const int expected_count = 1;

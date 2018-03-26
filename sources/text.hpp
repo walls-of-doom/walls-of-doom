@@ -25,20 +25,6 @@ size_t copy_string_up_to(char *destination, const char *begin, const char *end, 
 bool string_equals(const char *a, const char *b);
 
 /**
- * Returns a pointer to the start of the text of the string.
- *
- * This is either the first character which is not a space or '\0'.
- */
-char *find_start_of_text(char *string);
-
-/**
- * Returns a pointer to the end of the text of the string.
- *
- * This is either the first trailing space or '\0'.
- */
-char *find_end_of_text(char *string);
-
-/**
  * Trims a string by removing whitespace from its start and from its end.
  */
 void trim_string(char *string);

@@ -70,41 +70,6 @@ size_t copy_string_up_to(char *destination, const char *begin, const char *end, 
 bool string_equals(const char *a, const char *b) { return strcmp(a, b) == 0; }
 
 /**
- * Returns a pointer to the start of the text of the string.
- *
- * This is either the first character which is not a space or '\0'.
- */
-char *find_start_of_text(char *string) {
-  while (*string != '\0' && (isspace(*string) != 0)) {
-    string++;
-  }
-  return string;
-}
-
-/**
- * Returns a pointer to the end of the text of the string.
- *
- * This is either the first trailing space or '\0'.
- */
-char *find_end_of_text(char *string) {
-  char *end = string;
-  while (*string != '\0') {
-    if (isspace(*string) == 0) {
-      end = string;
-    }
-    string++;
-  }
-  if (*end == '\0') {
-    return end;
-  }
-  /* If the string is only spaces, end points to the first space. */
-  if (isspace(*end) != 0) {
-    return end;
-  }
-  return end + 1;
-}
-
-/**
  * Trims a string by removing all leading and trailing spaces.
  */
 void trim_string(char *string) {
