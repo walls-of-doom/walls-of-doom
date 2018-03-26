@@ -1,20 +1,7 @@
 #include "game.hpp"
-#include "about.hpp"
-#include "box.hpp"
-#include "constants.hpp"
-#include "data.hpp"
 #include "io.hpp"
-#include "logger.hpp"
 #include "memory.hpp"
-#include "menu.hpp"
-#include "physics.hpp"
-#include "profiler.hpp"
-#include "random.hpp"
-#include "record.hpp"
 #include "text.hpp"
-#include "version.hpp"
-#include <SDL.h>
-#include <cstdlib>
 #include <cstring>
 
 #define DEFAULT_LIMIT_PLAYED_MINUTES 2
@@ -22,6 +9,8 @@
 #define DEFAULT_LIMIT_PLAYED_FRAMES DEFAULT_LIMIT_PLAYED_SECONDS *UPS
 
 static const Milliseconds register_score_release_delay = 200;
+static const Milliseconds milliseconds_in_a_second = 1000;
+static const int maximum_fps = 250;
 
 static size_t get_rigid_matrix_index(const Game *const game, const int x, const int y) {
   const int base_x = x - game->box->min_x;
@@ -196,9 +185,10 @@ Code register_score(const Game *const game, SDL_Renderer *renderer) {
  */
 Code run_game(Game *const game, SDL_Renderer *renderer) {
   unsigned long next_played_frames_score = UPS;
-  const Milliseconds interval = 1000 / UPS;
+  const Milliseconds frame_interval = milliseconds_in_a_second / maximum_fps;
+  const Milliseconds logic_interval = milliseconds_in_a_second / UPS;
   Milliseconds start_time = 0;
-  Milliseconds time_passed = 0;
+  Milliseconds time_since_last_logic_update = 0;
   Code code = CODE_OK;
   int *lives = &game->player->lives;
   unsigned long limit = game->limit_played_frames;
@@ -206,11 +196,11 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
   initialize_command_table(&table);
   while ((game->player->table->status[COMMAND_QUIT] == 0.0) && *lives != 0 && game->played_frames < limit) {
     start_time = get_milliseconds();
-    if (time_passed >= 2 * interval) {
+    if (time_since_last_logic_update >= 2 * logic_interval) {
       fprintf(stderr, "Skipped a frame!\n");
     }
-    while (time_passed > interval) {
-      time_passed -= interval;
+    while (time_since_last_logic_update > logic_interval) {
+      time_since_last_logic_update -= logic_interval;
       game->desired_frame++;
     }
     if (game->paused) {
@@ -241,7 +231,11 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
     if (test_command_table(game->player->table, COMMAND_PAUSE, REPETITION_DELAY)) {
       game->paused = true;
     }
-    time_passed += get_milliseconds() - start_time;
+    const auto time_since_last_frame_update = get_milliseconds() - start_time;
+    if (time_since_last_frame_update < frame_interval) {
+      sleep_milliseconds(frame_interval - time_since_last_frame_update);
+    }
+    time_since_last_logic_update += get_milliseconds() - start_time;
   }
   if (code != CODE_CLOSE) {
     code = register_score(game, renderer);
