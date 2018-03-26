@@ -505,11 +505,9 @@ static void draw_top_bar(const Game *game, Renderer *renderer) {
   if (player->perk != PERK_NONE) {
     perk_name = get_perk_name(player->perk);
   }
-  const unsigned long limit = game->limit_played_frames;
-  double time_left = (limit - game->played_frames) / static_cast<double>(UPS);
-  char time_buffer[MAXIMUM_STRING_SIZE];
-  sprintf(time_buffer, "%.2f s", time_left);
-  strings.emplace_back(time_buffer);
+  const auto limit = game->limit_played_frames;
+  const auto time_left = (limit - game->played_frames) / static_cast<double>(UPS);
+  strings.push_back(double_to_string(time_left, 2));
   strings.push_back(perk_name);
   strings.push_back("Lives: " + std::to_string(player->lives));
   strings.push_back("Score: " + std::to_string(player->score));
@@ -541,16 +539,15 @@ static Color get_platform_color(Platform platform) {
   return COLOR_PAIR_PLATFORM.foreground.mix(COLOR_PAIR_PLATFORM_RARE.foreground, platform.rarity);
 }
 
-static void draw_platforms(const Platform *platforms, const size_t platform_count, const BoundingBox *box,
-                           Renderer *renderer) {
-  const int y_padding = get_bar_height();
-  for (size_t i = 0; i < platform_count; i++) {
-    auto p = platforms[i];
+static void draw_platforms(const std::vector<Platform> &platforms, const BoundingBox *box, Renderer *renderer) {
+  const auto y_padding = get_bar_height();
+  for (const auto &platform : platforms) {
+    auto p = platform;
     auto x = max_int(box->min_x, p.x);
     auto y = y_padding + p.y;
     auto w = min_int(box->max_x, p.x + p.w - 1) - x + 1;
     auto h = p.h;
-    draw_absolute_rectangle(x, y, w, h, get_platform_color(platforms[i]), renderer);
+    draw_absolute_rectangle(x, y, w, h, get_platform_color(platform), renderer);
   }
 }
 
@@ -647,7 +644,7 @@ Milliseconds draw_game(Game *const game, Renderer *renderer) {
   game->profiler->stop();
 
   game->profiler->start("draw_platforms");
-  draw_platforms(game->platforms.data(), game->platform_count, game->box, renderer);
+  draw_platforms(game->platforms, game->box, renderer);
   game->profiler->stop();
 
   game->profiler->start("draw_perk");
