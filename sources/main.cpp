@@ -8,17 +8,11 @@
 #include <SDL.h>
 #include <cstdio>
 
-typedef enum ParserResult { PARSER_RESULT_CONTINUE, PARSER_RESULT_QUIT } ParserResult;
+enum ParserResult { PARSER_RESULT_CONTINUE, PARSER_RESULT_QUIT };
 
-void log_unrecognized_argument(const char *argument) {
-  const size_t start_size = 128;
-  const size_t input_size = strlen(argument);
-  const size_t string_size = start_size + input_size + 1;
-  char *string = nullptr;
-  string = reinterpret_cast<char *>(resize_memory(string, string_size));
-  sprintf(string, "Unrecognized argument: %s.", argument);
-  log_message(string);
-  resize_memory(string, 0);
+void log_unrecognized_argument(const std::string &argument) {
+  const auto string = "Unrecognized argument: " + argument + ".";
+  log_message(string.c_str());
 }
 
 ParserResult parse_argument(const char *argument) {
