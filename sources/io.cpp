@@ -355,6 +355,9 @@ Code print_centered_horizontally(const int y, const std::vector<std::string> &st
     return CODE_ERROR;
   }
   for (int i = 0; i < static_cast<int>(strings.size()); i++) {
+    if (strings[i].empty()) {
+      continue;
+    }
     surface = TTF_RenderText_Shaded(font, strings[i].c_str(), foreground, background);
     if (surface == nullptr) {
       sprintf(log_buffer, CREATE_SURFACE_FAIL, "print_centered_horizontally()");
