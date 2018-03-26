@@ -9,16 +9,9 @@ void sort(void *start, const size_t count, const size_t size, int (*compare)(con
 }
 
 static void swap(unsigned char *a, unsigned char *b, size_t size) {
-  unsigned char a_byte;
-  unsigned char b_byte;
   while ((size--) != 0u) {
-    /*
-     * Although we only need one swap byte, I think it reads better using two.
-     *
-     * The compiler probably optimizes this away anyway.
-     */
-    a_byte = *a;
-    b_byte = *b;
+    const auto a_byte = *a;
+    const auto b_byte = *b;
     *a++ = b_byte;
     *b++ = a_byte;
   }
