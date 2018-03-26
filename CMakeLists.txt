@@ -102,7 +102,6 @@ set(walls-of-doom-sources
         sources/player.hpp
         sources/player.cpp
         sources/point.hpp
-        sources/point.cpp
         sources/profiler.hpp
         sources/profiler.cpp
         sources/random.hpp
