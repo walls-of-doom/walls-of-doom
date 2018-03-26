@@ -36,13 +36,6 @@ int get_font_width();
 int get_font_height();
 
 /**
- * Swap the renderer color by the provided color.
- *
- * The color previously in the renderer will be copied to the pointer.
- */
-void swap_color(Renderer *renderer, SDL_Color *color);
-
-/**
  * Initializes the required resources.
  *
  * Should only be called once, right after starting.

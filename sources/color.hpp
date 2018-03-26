@@ -14,7 +14,7 @@ public:
   Color() = default;
   Color(U8 r, U8 g, U8 b, U8 a) : r(r), g(g), b(b), a(a) {}
 
-  inline Color mix(Color rhs, float rhsAmount) {
+  inline Color mix(Color rhs, float rhsAmount) const {
     const auto lhsAmount = 1.0f - rhsAmount;
     const auto endR = static_cast<U8>(r * lhsAmount + rhs.r * rhsAmount);
     const auto endG = static_cast<U8>(g * lhsAmount + rhs.g * rhsAmount);
@@ -22,12 +22,22 @@ public:
     const auto endA = static_cast<U8>(a * lhsAmount + rhs.a * rhsAmount);
     return Color(endR, endG, endB, endA);
   }
+
+  inline SDL_Color to_SDL_color() const {
+    SDL_Color color;
+    color.r = r;
+    color.g = g;
+    color.b = b;
+    color.a = a;
+    return color;
+  }
 };
 
-typedef struct ColorPair {
+class ColorPair {
+public:
   Color foreground;
   Color background;
-} ColorPair;
+};
 
 /* These colors work as fallback if settings fails. */
 extern Color COLOR_DEFAULT_FOREGROUND;

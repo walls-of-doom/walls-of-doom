@@ -60,7 +60,7 @@ int get_font_height() { return global_monospaced_font_height; }
  *
  * The color previously in the renderer will be copied to the pointer.
  */
-void swap_color(Renderer *renderer, SDL_Color *color) {
+static void swap_color(Renderer *renderer, SDL_Color *color) {
   SDL_Color swap{};
   SDL_GetRenderDrawColor(renderer, &swap.r, &swap.g, &swap.b, &swap.a);
   SDL_SetRenderDrawColor(renderer, color->r, color->g, color->b, color->a);
@@ -239,8 +239,6 @@ Code finalize(Window **window, Renderer **renderer) {
 
 Code print_absolute(const int x, const int y, const char *string, const ColorPair color_pair, Renderer *renderer) {
   char log_buffer[MAXIMUM_STRING_SIZE];
-  const SDL_Color foreground = to_sdl_color(color_pair.foreground);
-  const SDL_Color background = to_sdl_color(color_pair.background);
   Font *font = global_monospaced_font;
   SDL_Surface *surface;
   SDL_Texture *texture;
@@ -254,7 +252,9 @@ Code print_absolute(const int x, const int y, const char *string, const ColorPai
   if (x < 0 || y < 0) {
     return CODE_ERROR;
   }
-  surface = TTF_RenderText_Shaded(font, string, foreground, background);
+  auto foreground_color = color_pair.foreground.to_SDL_color();
+  auto background_color = color_pair.background.to_SDL_color();
+  surface = TTF_RenderText_Shaded(font, string, foreground_color, background_color);
   if (surface == nullptr) {
     sprintf(log_buffer, CREATE_SURFACE_FAIL, "print_absolute()");
     log_message(log_buffer);
@@ -306,7 +306,6 @@ void print_long_text(char *string, Renderer *renderer) {
   TTF_Font *font = get_font();
   SDL_Surface *surface;
   SDL_Texture *texture;
-  SDL_Color color = to_sdl_color(COLOR_DEFAULT_FOREGROUND);
   SDL_Rect position{};
   position.x = get_padding() * font_width;
   position.y = get_padding() * font_width;
@@ -316,7 +315,7 @@ void print_long_text(char *string, Renderer *renderer) {
     return;
   }
   remove_first_breaks(string);
-  surface = TTF_RenderText_Blended_Wrapped(font, string, color, width);
+  surface = TTF_RenderText_Blended_Wrapped(font, string, COLOR_DEFAULT_FOREGROUND.to_SDL_color(), width);
   if (surface == nullptr) {
     sprintf(log_buffer, CREATE_SURFACE_FAIL, "print_long_text()");
     log_message(log_buffer);
@@ -342,8 +341,8 @@ void print_long_text(char *string, Renderer *renderer) {
 Code print_centered_horizontally(const int y, const std::vector<std::string> &strings, const ColorPair pair,
                                  Renderer *renderer) {
   char log_buffer[MAXIMUM_STRING_SIZE];
-  const SDL_Color foreground = to_sdl_color(pair.foreground);
-  const SDL_Color background = to_sdl_color(pair.background);
+  const SDL_Color foreground = pair.foreground.to_SDL_color();
+  const SDL_Color background = pair.background.to_SDL_color();
   const int slice_size = get_window_width() / strings.size();
   Font *font = global_monospaced_font;
   SDL_Surface *surface;
@@ -454,7 +453,7 @@ void print_menu(const std::vector<std::string> &lines, Renderer *renderer) {
  * Draws an absolute rectangle based on the provided coordinates.
  */
 static void draw_absolute_rectangle(int x, int y, int w, int h, Color color, Renderer *renderer) {
-  SDL_Color swap = to_sdl_color(color);
+  SDL_Color swap = color.to_SDL_color();
   SDL_Rect rectangle{};
   rectangle.x = x;
   rectangle.y = y;
@@ -469,7 +468,7 @@ static void draw_absolute_rectangle(int x, int y, int w, int h, Color color, Ren
  * Draws a shaded absolute rectangle based on the provided coordinates.
  */
 static void draw_shaded_absolute_rectangle(int x, int y, int w, int h, Color color, Renderer *renderer) {
-  SDL_Color swap = to_sdl_color(color);
+  SDL_Color swap = color.to_SDL_color();
   SDL_Rect rectangle{};
   rectangle.x = x;
   rectangle.y = y;
@@ -576,7 +575,7 @@ static void draw_resized_perk(int x, int y, int w, int h, double f, Renderer *re
   int f_w = s_w;
   int f_h = s_h;
   /* The background variables. */
-  const Color b_color = mix_colors(COLOR_PAIR_DEFAULT.background, f_color);
+  const Color b_color = COLOR_PAIR_DEFAULT.background.mix(f_color, 0.5f);
   int b_x;
   int b_y;
   int b_w = s_w;
