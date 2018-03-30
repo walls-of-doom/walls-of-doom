@@ -44,7 +44,7 @@ endif ()
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     # Run-time buffer overflow detection.
-    if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
+    if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
         add_definitions(-D_FORTIFY_SOURCE=2)
     endif ()
     # Run-time bounds checking for C++ strings and containers.
