@@ -2,13 +2,13 @@
 
 Walls of Doom is a minimalistic [platformer](https://en.wikipedia.org/wiki/Platform_game) written in C++ using SDL 2.
 
-The game was written in [ANSI C](https://en.wikipedia.org/wiki/ANSI_C), but I decided to move on to a safer and more modern language. However, several parts of the codebase are still just pure C code.
+The game was originally written in [ANSI C](https://en.wikipedia.org/wiki/ANSI_C), but I decided to rewrite it using C++, a safer and more productive language. However, this is an ongoing effort and several parts of the codebase are still just C code.
 
-The game should work under Windows, Linux, and everything that SDL 2 supports.
+The game should work under Windows, Linux, and everything else that SDL 2 supports.
 
 See [the GitHub issue tracker](https://github.com/walls-of-doom/walls-of-doom/issues) and have a look at [the releases page](https://github.com/walls-of-doom/walls-of-doom/releases).
 
-Because of old decisions, the game is resolution-dependent. You can tweak the settings file to change the window size.
+The physics simulation is resolution-bound, therefore on a very high resolution you will get more pixels per tile and - consequently - a more fine-grained simulation.
 
 ## Screenshot
 
@@ -91,15 +91,6 @@ OS X and macOS support is unknown. [See the relevant issue](https://github.com/w
 ### CMake
 
 You need an installation of CMake in order to build the project.
-
-### An ANSI C compiler
-
-The following C compilers are known to work perfectly with the project:
-
-+ GCC 4.8.4 (or newer)
-+ Clang 3.7 (or newer)
-
-Older versions of the abovementioned compilers are **very** likely to work too.
 
 ## SDL 2
 
