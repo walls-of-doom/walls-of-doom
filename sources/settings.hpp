@@ -26,6 +26,10 @@ int get_window_width();
 
 int get_window_height();
 
+U16 get_tiles_on_x();
+
+U16 get_tiles_on_y();
+
 int get_tile_width();
 
 int get_tile_height();

@@ -10,6 +10,7 @@
 #include <climits>
 #include <cstdlib>
 #include <cstring>
+#include <limits>
 
 static const int SETTINGS_STRING_SIZE = 128;
 static const int SETTINGS_BUFFER_SIZE = 4 * 1024;
@@ -50,11 +51,11 @@ static U64 platform_count = 16;
 static const long MAXIMUM_DIMENSION = 16384;
 static const long MINIMUM_DIMENSION = 240;
 
-static int width = -1;
-static int height = -1;
-
 static const long MAXIMUM_TILE_DIMENSION = 16384;
 static const long MINIMUM_TILE_DIMENSION = 1;
+
+static U16 tiles_on_x = 0;
+static U16 tiles_on_y = 0;
 
 static int tile_width = -1;
 static int tile_height = -1;
@@ -241,22 +242,22 @@ void initialize_settings() {
       limits.maximum = MAXIMUM_FONT_SIZE;
       limits.fallback = font_size;
       font_size = parse_integer(value, limits);
-    } else if (string_equals(key, "WIDTH")) {
-      limits.minimum = MINIMUM_DIMENSION;
-      limits.maximum = MAXIMUM_DIMENSION;
-      limits.fallback = width;
-      width = parse_integer(value, limits);
-    } else if (string_equals(key, "HEIGHT")) {
-      limits.minimum = MINIMUM_DIMENSION;
-      limits.maximum = MAXIMUM_DIMENSION;
-      limits.fallback = height;
-      height = parse_integer(value, limits);
-    } else if (string_equals(key, "TILE_WIDTH")) {
+    } else if (string_equals(key, "TILES_ON_X")) {
+      limits.minimum = 0;
+      limits.maximum = std::numeric_limits<U16>::max();
+      limits.fallback = 0;
+      tiles_on_x = parse_integer(value, limits);
+    } else if (string_equals(key, "TILES_ON_Y")) {
+      limits.minimum = 0;
+      limits.maximum = std::numeric_limits<U16>::max();
+      limits.fallback = 0;
+      tiles_on_y = parse_integer(value, limits);
+    } else if (string_equals(key, "TILE_X_SIZE")) {
       limits.minimum = MINIMUM_TILE_DIMENSION;
       limits.maximum = MAXIMUM_TILE_DIMENSION;
       limits.fallback = tile_width;
       tile_width = parse_integer(value, limits);
-    } else if (string_equals(key, "TILE_HEIGHT")) {
+    } else if (string_equals(key, "TILE_Y_SIZE")) {
       limits.minimum = MINIMUM_TILE_DIMENSION;
       limits.maximum = MAXIMUM_TILE_DIMENSION;
       limits.fallback = tile_height;
@@ -364,15 +365,19 @@ U64 get_platform_count() { return platform_count; }
 
 int get_font_size() { return font_size; }
 
+U16 get_tiles_on_x() { return tiles_on_x; }
+
+U16 get_tiles_on_y() { return tiles_on_y; }
+
 int get_tile_width() { return tile_width; }
 
 int get_tile_height() { return tile_height; }
 
 int get_bar_height() { return bar_height; }
 
-int get_window_width() { return width; }
+int get_window_width() { return get_tile_width() * get_tiles_on_x(); }
 
-int get_window_height() { return height; }
+int get_window_height() { return get_tile_height() * get_tiles_on_y() + get_bar_height() * 2; }
 
 long get_padding() { return padding; }
 
