@@ -2,13 +2,14 @@
 #define PLAYER_H
 
 #include "command.hpp"
+#include "constants.hpp"
 #include "graphics.hpp"
 #include "investment.hpp"
 #include "perk.hpp"
 #include "score.hpp"
 
-typedef struct Player {
-
+class Player {
+public:
   char *name;
 
   CommandTable *table;
@@ -37,7 +38,8 @@ typedef struct Player {
 
   Graphics *graphics;
 
-} Player;
+  inline void add_score(float rarity) { score += 100.0f / UPS * (1.0f + rarity); }
+};
 
 /**
  * Returns an initialized Player object with the provided name.

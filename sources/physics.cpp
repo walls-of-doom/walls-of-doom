@@ -789,13 +789,24 @@ void update_player(Game *game, Player *player) {
   update_player_perk(game);
   update_player_investments(game);
   process_command(game, player);
-  /* This ordering makes the player run horizontally before falling.
-   * This seems to be the expected order from an user point-of-view. */
+  // This ordering makes the player run horizontally before falling.
+  // This seems to be the expected order from an user point-of-view.
   update_player_horizontal_position(game);
   /* After moving, if it even happened, simulate jumping and falling. */
   update_player_vertical_position(game);
   /* Enable double jump if the player is standing over a platform. */
   update_double_jump(game);
   check_for_player_death(game);
+  if (is_standing_on_platform(game)) {
+    for (const auto &platform : game->platforms) {
+      if (platform.y == player->y + player->h) {
+        if (player->x < platform.x + platform.w) {
+          if (player->x + player->w > platform.x) {
+            player->add_score(platform.rarity);
+          }
+        }
+      }
+    }
+  }
   game->profiler->stop();
 }

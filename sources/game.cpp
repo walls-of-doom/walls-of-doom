@@ -184,7 +184,6 @@ Code register_score(const Game *const game, SDL_Renderer *renderer) {
  * Runs the main game loop for the Game object and registers the player score.
  */
 Code run_game(Game *const game, SDL_Renderer *renderer) {
-  unsigned long next_played_frames_score = UPS;
   const Milliseconds frame_interval = milliseconds_in_a_second / maximum_fps;
   const Milliseconds logic_interval = milliseconds_in_a_second / UPS;
   Milliseconds start_time = 0;
@@ -197,7 +196,7 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
   while ((game->player->table->status[COMMAND_QUIT] == 0.0) && *lives != 0 && game->played_frames < limit) {
     start_time = get_milliseconds();
     if (time_since_last_logic_update >= 2 * logic_interval) {
-      fprintf(stderr, "Skipped a frame!\n");
+      std::cerr << "Skipped a frame!" << '\n';
     }
     while (time_since_last_logic_update > logic_interval) {
       time_since_last_logic_update -= logic_interval;
@@ -216,10 +215,6 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
         game->paused = false;
       }
       continue;
-    }
-    if (game->played_frames == next_played_frames_score) {
-      player_score_add(game->player, 1);
-      next_played_frames_score += UPS;
     }
     while (game->current_frame < game->desired_frame) {
       update_game(game);
