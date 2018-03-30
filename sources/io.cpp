@@ -148,13 +148,13 @@ Code initialize(Window **window, Renderer **renderer) {
   char log_buffer[MAXIMUM_STRING_SIZE];
   Uint32 renderer_flags = 0;
   initialize_logger();
-  initialize_settings();
   if (SDL_Init(SDL_INIT_FLAGS) != 0) {
     sprintf(log_buffer, "SDL initialization error: %s.", SDL_GetError());
     log_message(log_buffer);
     return CODE_ERROR;
   }
   SDL_ShowCursor(SDL_DISABLE);
+  initialize_settings();
   initialize_joystick();
   if (TTF_WasInit() == 0) {
     if (TTF_Init() != 0) {

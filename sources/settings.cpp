@@ -57,8 +57,12 @@ static const long MINIMUM_TILE_DIMENSION = 1;
 static U16 tiles_on_x = 0;
 static U16 tiles_on_y = 0;
 
-static int tile_width = -1;
-static int tile_height = -1;
+static bool computed_window_size = false;
+
+static const float window_size_occupancy = 0.8f;
+
+static int tile_w = -1;
+static int tile_h = -1;
 
 static int bar_height = -1;
 
@@ -206,7 +210,7 @@ static void log_unused_key(const char *key) {
 }
 
 static void validate_settings() {
-  if ((get_window_width() % get_tile_height()) != 0) {
+  if ((get_window_width() % get_tile_width()) != 0) {
     exit(EXIT_FAILURE);
   }
   if (((get_window_height() - 2 * get_bar_height()) % get_tile_height()) != 0) {
@@ -252,16 +256,6 @@ void initialize_settings() {
       limits.maximum = std::numeric_limits<U16>::max();
       limits.fallback = 0;
       tiles_on_y = parse_integer(value, limits);
-    } else if (string_equals(key, "TILE_X_SIZE")) {
-      limits.minimum = MINIMUM_TILE_DIMENSION;
-      limits.maximum = MAXIMUM_TILE_DIMENSION;
-      limits.fallback = tile_width;
-      tile_width = parse_integer(value, limits);
-    } else if (string_equals(key, "TILE_Y_SIZE")) {
-      limits.minimum = MINIMUM_TILE_DIMENSION;
-      limits.maximum = MAXIMUM_TILE_DIMENSION;
-      limits.fallback = tile_height;
-      tile_height = parse_integer(value, limits);
     } else if (string_equals(key, "BAR_HEIGHT")) {
       limits.minimum = MINIMUM_TILE_DIMENSION;
       limits.maximum = MAXIMUM_TILE_DIMENSION;
@@ -357,6 +351,23 @@ void initialize_settings() {
   validate_settings();
 }
 
+void compute_window_size() {
+  SDL_DisplayMode display_mode;
+  SDL_GetCurrentDisplayMode(0, &display_mode);
+  const auto w = display_mode.w;
+  const auto h = display_mode.h;
+  tile_w = 0;
+  while (tiles_on_x * (tile_w + 1) < window_size_occupancy * w) {
+    tile_w++;
+  }
+  tile_h = 0;
+  while (tiles_on_y * (tile_h + 1) + get_bar_height() * 2 < window_size_occupancy * h) {
+    tile_h++;
+  }
+  log_message("Using " + std::to_string(tile_w) + "x" + std::to_string(tile_h) + " for tile size.");
+  computed_window_size = true;
+}
+
 RepositionAlgorithm get_reposition_algorithm() { return reposition_algorithm; }
 
 RendererType get_renderer_type() { return renderer_type; }
@@ -369,9 +380,19 @@ U16 get_tiles_on_x() { return tiles_on_x; }
 
 U16 get_tiles_on_y() { return tiles_on_y; }
 
-int get_tile_width() { return tile_width; }
+int get_tile_width() {
+  if (!computed_window_size) {
+    compute_window_size();
+  }
+  return tile_w;
+}
 
-int get_tile_height() { return tile_height; }
+int get_tile_height() {
+  if (!computed_window_size) {
+    compute_window_size();
+  }
+  return tile_h;
+}
 
 int get_bar_height() { return bar_height; }
 
