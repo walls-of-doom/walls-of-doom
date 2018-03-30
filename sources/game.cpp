@@ -98,7 +98,6 @@ Game::Game(Player *player, Profiler *profiler) : player(player), profiler(profil
 }
 
 Game::~Game() {
-  destroy_player(player);
   rigid_matrix = reinterpret_cast<unsigned char *>(resize_memory(rigid_matrix, 0));
   box = reinterpret_cast<BoundingBox *>(resize_memory(box, 0));
 }
@@ -135,17 +134,17 @@ void game_set_message(Game *const game, const char *message, const unsigned long
 }
 
 static void print_game_result(const Player *player, const int position, SDL_Renderer *renderer) {
-  const char *name = player->name;
+  const auto name = player->name;
   const Score score = player->score;
   const ColorPair color = COLOR_PAIR_DEFAULT;
   char first_line[MAXIMUM_STRING_SIZE];
   char empty_line[1] = "";
   char second_line[MAXIMUM_STRING_SIZE];
-  sprintf(first_line, "%s died after making %ld points.", name, score);
+  sprintf(first_line, "%s died after making %ld points.", name.c_str(), score);
   if (position > 0) {
-    sprintf(second_line, "%s got to position %d!", name, position);
+    sprintf(second_line, "%s got to position %d!", name.c_str(), position);
   } else {
-    sprintf(second_line, "%s didn't make it to the top scores.", name);
+    sprintf(second_line, "%s didn't make it to the top scores.", name.c_str());
   }
   std::vector<std::string> lines;
   lines.emplace_back(first_line);
@@ -163,9 +162,9 @@ Code register_score(const Game *const game, SDL_Renderer *renderer) {
   Record record{};
   int scoreboard_index;
   int position;
-  sprintf(buffer, format, player->score, player->name, renderer);
+  sprintf(buffer, format, player->score, player->name.c_str(), renderer);
   log_message(buffer);
-  record = make_record(player->name, player->score);
+  record = make_record(player->name.c_str(), player->score);
   scoreboard_index = save_record(&record);
   position = scoreboard_index + 1;
   log_message("Saved the record successfully.");

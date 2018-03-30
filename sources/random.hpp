@@ -1,6 +1,8 @@
 #ifndef RANDOM_H
 #define RANDOM_H
 
+#include <string>
+
 /**
  * Seeds the PRNG with the current time.
  *
@@ -18,11 +20,6 @@ unsigned long find_next_power_of_two(unsigned long number);
  */
 int random_integer(int minimum, int maximum);
 
-/**
- * Writes a pseudorandom name to the destination.
- *
- * The destination should have at least 2 * MAXIMUM_WORD_SIZE bytes.
- */
-void random_name(char *destination);
+std::string get_user_name();
 
 #endif

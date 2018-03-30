@@ -42,12 +42,12 @@ void write_menu(const Menu &menu, SDL_Renderer *renderer) {
 }
 
 Code game(Profiler *profiler, SDL_Renderer *renderer, CommandTable *table) {
-  char name[MAXIMUM_PLAYER_NAME_SIZE];
-  Code code = read_player_name(name, MAXIMUM_PLAYER_NAME_SIZE, renderer);
+  std::string name;
+  Code code = read_player_name(name, renderer);
   if (code == CODE_QUIT || code == CODE_CLOSE) {
     return code;
   }
-  Player player = create_player(name, table);
+  Player player(name, table);
   Game game(&player, profiler);
   return run_game(&game, renderer);
 }

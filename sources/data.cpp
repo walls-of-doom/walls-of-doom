@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <fstream>
 #include <stdexcept>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -197,6 +198,18 @@ Code read_characters(const char *const filename, char *destination, const size_t
     }
   }
   return CODE_ERROR;
+}
+
+Code read_characters(const char *const filename, std::string &destination) {
+  std::ifstream stream(filename);
+  if (!stream) {
+    return CODE_ERROR;
+  }
+  char read;
+  while (stream >> read) {
+    destination += read;
+  }
+  return CODE_OK;
 }
 
 /**

@@ -10,7 +10,7 @@
 
 class Player {
 public:
-  char *name;
+  std::string name;
 
   CommandTable *table;
 
@@ -39,15 +39,11 @@ public:
   Graphics *graphics;
 
   inline void add_score(float rarity) { score += 100.0f / UPS * (1.0f + rarity); }
-};
 
-/**
- * Returns an initialized Player object with the provided name.
- *
- * An initialized Player object is an object which is ready to start a game.
- */
-Player create_player(char name[64], CommandTable *table);
-void destroy_player(Player *player);
+  Player(std::string name, CommandTable *table);
+
+  virtual ~Player();
+};
 
 void player_score_add(Player *player, const Score score);
 

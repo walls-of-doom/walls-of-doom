@@ -70,7 +70,7 @@ Code read_string(int x, int y, const char *prompt, char *destination, size_t siz
  *
  * Returns a Code, which may indicate that the player tried to quit.
  */
-Code read_player_name(char *destination, size_t maximum_size, Renderer *renderer);
+Code read_player_name(std::string &destination, Renderer *renderer);
 
 /**
  * Draws a full game to the screen.

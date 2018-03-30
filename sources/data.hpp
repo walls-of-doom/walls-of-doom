@@ -60,6 +60,8 @@ Code read_bytes(const char *filename, void *destination, const size_t size, cons
  */
 Code read_characters(const char *const filename, char *destination, const size_t destination_size);
 
+Code read_characters(const char *const filename, std::string &destination);
+
 /**
  * Reads integers from the indicated file into the provided array.
  *

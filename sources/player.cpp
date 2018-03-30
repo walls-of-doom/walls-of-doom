@@ -10,39 +10,25 @@
 
 #define DEFAULT_TRAIL_SIZE 4
 
-/**
- * Returns an initialized Player object with the provided name.
- *
- * An initialized Player object is an object which is ready to start a game.
- */
-Player create_player(char name[64], CommandTable *table) {
-  Player player{};
-  player.name = name;
-  player.table = table;
-  /* Initialize the player to the corner so that it is in a valid state. */
-  player.x = 0;
-  player.y = 0;
-  player.w = 0;
-  player.h = 0;
-  player.speed_x = 0;
-  player.speed_y = 0;
-  player.physics = false;
-  player.can_double_jump = 0;
-  player.remaining_jump_height = 0;
-  player.lives = 3;
-  player.score = 0;
-  player.perk = PERK_NONE;
-  player.perk_end_frame = 0;
-  player.investments = nullptr;
-  player.graphics = create_graphics(DEFAULT_TRAIL_SIZE);
-  return player;
+Player::Player(std::string name, CommandTable *table) : name(std::move(name)), table(table) {
+  x = 0;
+  y = 0;
+  w = 0;
+  h = 0;
+  speed_x = 0;
+  speed_y = 0;
+  physics = false;
+  can_double_jump = 0;
+  remaining_jump_height = 0;
+  lives = 3;
+  score = 0;
+  perk = PERK_NONE;
+  perk_end_frame = 0;
+  investments = nullptr;
+  graphics = create_graphics(DEFAULT_TRAIL_SIZE);
 }
 
-void destroy_player(Player *player) {
-  if (player != nullptr) {
-    destroy_graphics(player->graphics);
-  }
-}
+Player::~Player() { destroy_graphics(graphics); }
 
 void player_score_add(Player *player, const Score score) {
   const Score maximum_add = MAXIMUM_PLAYER_SCORE - player->score;

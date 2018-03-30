@@ -401,48 +401,37 @@ Code print_centered_vertically(const std::vector<std::string> &strings, const Co
   return CODE_OK;
 }
 
-/**
- * Evaluates whether or not a Player name is a valid name.
- *
- * A name is considered to be valid if it has at least two characters after
- * being trimmed.
- */
-static int is_valid_player_name(const char *player_name) {
-  char buffer[MAXIMUM_PLAYER_NAME_SIZE];
-  copy_string(buffer, player_name, MAXIMUM_PLAYER_NAME_SIZE);
-  trim_string(buffer);
-  return static_cast<int>(strlen(buffer) >= 2);
-}
+static bool is_valid_player_name(const std::string &player_name) { return player_name.size() >= 2; }
 
 /**
  * Attempts to read a player name.
  *
  * Returns a Code, which may indicate that the player tried to quit.
  */
-Code read_player_name(char *destination, const size_t maximum_size, Renderer *renderer) {
+Code read_player_name(std::string &destination, Renderer *renderer) {
   Code code = CODE_ERROR;
   int valid_name = 0;
   const char message[] = "Name your character: ";
-  char log_buffer[MAXIMUM_STRING_SIZE];
-  random_name(destination);
+  destination = get_user_name();
   /* While there is not a read error or a valid name. */
+  char name[MAXIMUM_PLAYER_NAME_SIZE] = {'\0'};
+  copy_string(name, destination.c_str(), MAXIMUM_PLAYER_NAME_SIZE);
   while (code != CODE_OK || (valid_name == 0)) {
     auto x = get_padding() * get_font_width();
     auto y = (get_window_height() - get_font_height()) / 2;
-    code = read_string(x, y, message, destination, maximum_size, renderer);
+    code = read_string(x, y, message, name, MAXIMUM_PLAYER_NAME_SIZE, renderer);
     if (code == CODE_QUIT) {
       return CODE_QUIT;
     }
     if (code == CODE_OK) {
-      sprintf(log_buffer, "Read %s from the user.", destination);
-      log_message(log_buffer);
+      log_message("Read " + std::string(name) + " from the user.");
       /* Trim the name the user entered. */
-      trim_string(destination);
-      sprintf(log_buffer, "Trimmed the input to %s.", destination);
-      log_message(log_buffer);
-      valid_name = is_valid_player_name(destination);
+      trim_string(name);
+      log_message("Trimmed the input to " + std::string(name) + ".");
+      valid_name = is_valid_player_name(std::string(name));
     }
   }
+  destination = std::string(name);
   return code;
 }
 
@@ -761,9 +750,9 @@ Code read_string(const int x, const int y, const char *prompt, char *destination
   int is_done = 0;
   int should_rerender = 1;
   /* The x coordinate of the user input buffer. */
-  size_t written = strlen(destination);
+  auto written = strlen(destination);
   char character;
-  char *write = destination + written;
+  auto write = destination + written;
   SDL_Event event{};
   /* Start listening for text input. */
   SDL_StartTextInput();
@@ -775,13 +764,8 @@ Code read_string(const int x, const int y, const char *prompt, char *destination
         /* We must write a single space, or SDL will not render anything. */
         print_absolute(buffer_x, y, " ", COLOR_PAIR_DEFAULT, renderer);
       } else {
-        /*
-         * Must care about how much we write, padding should be respected.
-         *
-         * Simply enough, we print the tail of the string and omit the
-         * beginning with an ellipsis.
-         *
-         */
+        // Must care about how much we write, padding should be respected.
+        // we print the tail of the string and omit the beginning with an ellipsis.
         print_limited(buffer_x, y, destination, buffer_view_limit, renderer);
       }
       present(renderer);
@@ -789,9 +773,8 @@ Code read_string(const int x, const int y, const char *prompt, char *destination
     }
     /* Throughout the loop, the write pointer always points to a '\0'. */
     if (SDL_WaitEvent(&event) != 0) {
-      /* Check for user quit and return 1. */
-      /* This is OK because the destination string is always a valid C string.
-       */
+      // Check for user quit and return 1.
+      // This is OK because the destination string is always a valid C string.
       if (event.type == SDL_QUIT) {
         return CODE_QUIT;
       }

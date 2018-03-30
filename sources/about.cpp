@@ -5,6 +5,10 @@
 #include "logger.hpp"
 #include <cstring>
 
+#define ABOUT_PAGE_PATH "assets/about/about.txt"
+
+#define ABOUT_PAGE_BUFFER_SIZE 1024
+
 /**
  * Presents information about the game to the player.
  */

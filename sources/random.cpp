@@ -7,8 +7,11 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <stdexcept>
 
 #define MAXIMUM_WORD_SIZE 32
+
+static const char *const NAME_FILE_PATH = "data/name.txt";
 
 /* These state variables must be initialized so that they are not all zero. */
 static unsigned long x;
@@ -75,17 +78,18 @@ int random_integer(const int minimum, const int maximum) {
 }
 
 /**
- * Copies the first word of a random line of the file to the destination.
+ * Returns the first word of a random line of the file.
  */
-void random_word(char *destination, const char *filename) {
+static std::string random_word(const std::string &filename) {
   int read = '\0';
   int chosen_line;
   int current_line;
-  const int line_count = file_line_count(filename);
+  const int line_count = file_line_count(filename.c_str());
   FILE *file;
+  std::string destination;
   if (line_count > 0) {
     chosen_line = random_integer(0, line_count - 1);
-    file = fopen(filename, "r");
+    file = fopen(filename.c_str(), "r");
     if (file != nullptr) {
       current_line = 0;
       while (current_line != chosen_line && read != EOF) {
@@ -99,27 +103,43 @@ void random_word(char *destination, const char *filename) {
         if (isspace(static_cast<char>(read)) != 0) {
           break;
         }
-        *destination++ = static_cast<char>(read);
+        destination += static_cast<char>(read);
       }
       fclose(file);
     }
   }
-  *destination = '\0';
+  return destination;
 }
 
-/**
- * Writes a pseudorandom name to the destination.
- *
- * The destination should have at least 2 * MAXIMUM_WORD_SIZE bytes.
- */
-void random_name(char *destination) {
-  char buffer[MAXIMUM_WORD_SIZE];
-  size_t first_word_size;
-  random_word(buffer, ADJECTIVES_FILE_PATH);
-  first_word_size = strlen(buffer);
-  buffer[0] = toupper(buffer[0]);
-  copy_string(destination, buffer, MAXIMUM_WORD_SIZE);
-  random_word(buffer, NOUNS_FILE_PATH);
-  buffer[0] = toupper(buffer[0]);
-  copy_string(destination + first_word_size, buffer, MAXIMUM_WORD_SIZE);
+static std::string get_stored_name() {
+  std::string destination;
+  Code code = read_characters(NAME_FILE_PATH, destination);
+  if (code != CODE_OK) {
+    throw std::runtime_error("Failed to read file.");
+  }
+  return destination;
+}
+
+static bool has_stored_name() {
+  try {
+    get_stored_name();
+    return true;
+  } catch (std::exception &exception) {
+    return false;
+  }
+}
+
+static std::string get_random_name() {
+  auto a = random_word(ADJECTIVES_FILE_PATH);
+  auto b = random_word(NOUNS_FILE_PATH);
+  a[0] = toupper(a[0]);
+  b[0] = toupper(b[0]);
+  return a + b;
+}
+
+std::string get_user_name() {
+  if (has_stored_name()) {
+    return get_stored_name();
+  }
+  return get_random_name();
 }
