@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <limits>
+#include <stdexcept>
 
 static const int SETTINGS_STRING_SIZE = 128;
 static const int SETTINGS_BUFFER_SIZE = 4 * 1024;
@@ -49,7 +50,6 @@ static U64 platform_count = 16;
 
 /* SDL has a limit at 16384. */
 static const long MAXIMUM_DIMENSION = 16384;
-static const long MINIMUM_DIMENSION = 240;
 
 static const long MAXIMUM_TILE_DIMENSION = 16384;
 static const long MINIMUM_TILE_DIMENSION = 1;
@@ -210,11 +210,17 @@ static void log_unused_key(const char *key) {
 }
 
 static void validate_settings() {
+  if (get_window_width() > MAXIMUM_DIMENSION) {
+    throw std::runtime_error("Window is too wide.");
+  }
+  if (get_window_height() > MAXIMUM_DIMENSION) {
+    throw std::runtime_error("Window is too tall.");
+  }
   if ((get_window_width() % get_tile_width()) != 0) {
-    exit(EXIT_FAILURE);
+    throw std::runtime_error("Window width is not divisible by tile width.");
   }
   if (((get_window_height() - 2 * get_bar_height()) % get_tile_height()) != 0) {
-    exit(EXIT_FAILURE);
+    throw std::runtime_error("Window height is not divisible by tile height.");
   }
 }
 
