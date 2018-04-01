@@ -114,7 +114,7 @@ static void shove_player(Game *game, int dx, int dy, int standing) {
   move_player(game, 0, dy);
 }
 
-static int get_absolute_pending_movement(unsigned long frame, int speed) {
+static int get_absolute_pending_movement(U64 frame, int speed) {
   /* Should move slice after every frame. */
   const double slice = speed / static_cast<double>(UPS);
   /* To reduce floating point error, normalize frame to [FPS, 2 FPS - 1]. */
@@ -706,7 +706,7 @@ static void write_perk_faded_message(Game *game, const Perk perk) {
   game_set_message(game, message, 1, 0);
 }
 
-static void write_perk_fading_message(Game *game, const Perk perk, const unsigned long remaining_frames) {
+static void write_perk_fading_message(Game *game, const Perk perk, const U64 remaining_frames) {
   const U64 seconds = remaining_frames / UPS;
   char message[MAXIMUM_STRING_SIZE];
   const char *perk_name = get_perk_name(perk).c_str();
@@ -727,8 +727,8 @@ static bool is_touching_perk(const Game *const game) {
 }
 
 static void update_player_perk(Game *game) {
-  unsigned long end_frame;
-  unsigned long remaining_frames;
+  U64 end_frame;
+  U64 remaining_frames;
   Player *player = game->player;
   Perk perk;
   if (player->physics) {

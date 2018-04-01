@@ -1,6 +1,7 @@
 #ifndef RANDOM_H
 #define RANDOM_H
 
+#include "integers.hpp"
 #include <string>
 
 /**
@@ -13,7 +14,7 @@ void seed_random();
 /**
  * Returns the next power of two bigger than the provided number.
  */
-unsigned long find_next_power_of_two(unsigned long number);
+U64 find_next_power_of_two(U64 number);
 
 /**
  * Returns a random number in the range [minimum, maximum].

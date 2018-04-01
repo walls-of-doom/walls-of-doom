@@ -19,6 +19,6 @@ void finalize_logger();
  */
 void log_message(const std::string &message);
 
-void log_player_score(const unsigned long frame, const Score score);
+void log_player_score(const U64 frame, const Score score);
 
 #endif

@@ -6,7 +6,7 @@
 
 typedef struct Investment {
   struct Investment *next;
-  unsigned long end;
+  U64 end;
   Score amount;
 } Investment;
 

@@ -43,7 +43,7 @@ public:
   Perk perk;
   int perk_x;
   int perk_y;
-  unsigned long perk_end_frame;
+  U64 perk_end_frame;
 
   BoundingBox *box;
 
@@ -53,7 +53,7 @@ public:
   unsigned char *rigid_matrix;
 
   char message[MAXIMUM_STRING_SIZE]{};
-  unsigned long message_end_frame;
+  U64 message_end_frame;
   unsigned int message_priority;
 
   Game(Player *player, Profiler *profiler);
@@ -73,7 +73,7 @@ void modify_rigid_matrix_platform(Game *game, Platform const *platform, S8 delta
  *
  * This function prevents buffer overflow by truncating the message.
  */
-void game_set_message(Game *const game, const char *message, const unsigned long duration, const unsigned int priority);
+void game_set_message(Game *const game, const char *message, const U64 duration, const unsigned int priority);
 
 /**
  * Runs the main game loop for the Game object and registers the player score.

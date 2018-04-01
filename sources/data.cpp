@@ -118,8 +118,8 @@ void log_access(Operation operation, const size_t bytes, const char *filename) {
  */
 Code write_bytes(const char *filename, const void *source, const size_t size, const size_t count) {
   char log_buffer[MAXIMUM_STRING_SIZE];
-  unsigned long long_count;
-  unsigned long long_written;
+  U64 long_count;
+  U64 long_written;
   size_t written;
   FILE *file;
   log_access(WRITE, size * count, filename);
@@ -130,8 +130,8 @@ Code write_bytes(const char *filename, const void *source, const size_t size, co
   written = fwrite(source, size, count, file);
   fclose(file);
   if (written != count) {
-    long_count = static_cast<unsigned long>(count);
-    long_written = static_cast<unsigned long>(written);
+    long_count = static_cast<U64>(count);
+    long_written = static_cast<U64>(written);
     sprintf(log_buffer, WRITE_BYTES_COUNT_FORMAT, long_count, long_written);
     log_message(log_buffer);
     return CODE_ERROR;
@@ -148,8 +148,8 @@ Code write_string(const char *filename, const std::string &string) {
  */
 Code read_bytes(const char *filename, void *destination, const size_t size, const size_t count) {
   char log_buffer[MAXIMUM_STRING_SIZE];
-  unsigned long long_count;
-  unsigned long long_read;
+  U64 long_count;
+  U64 long_read;
   size_t read;
   FILE *file;
   log_access(READ, size * count, filename);
@@ -163,8 +163,8 @@ Code read_bytes(const char *filename, void *destination, const size_t size, cons
   read = fread(destination, size, count, file);
   fclose(file);
   if (read != count) {
-    long_count = static_cast<unsigned long>(count);
-    long_read = static_cast<unsigned long>(read);
+    long_count = static_cast<U64>(count);
+    long_read = static_cast<U64>(read);
     sprintf(log_buffer, READ_BYTES_COUNT_FORMAT, long_count, long_read);
     log_message(log_buffer);
     return CODE_ERROR;

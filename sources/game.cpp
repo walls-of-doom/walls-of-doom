@@ -122,8 +122,7 @@ Milliseconds update_game(Game *const game) {
  *
  * This function prevents buffer overflow by truncating the message.
  */
-void game_set_message(Game *const game, const char *message, const unsigned long duration,
-                      const unsigned int priority) {
+void game_set_message(Game *const game, const char *message, const U64 duration, const unsigned int priority) {
   const auto last_has_expired = static_cast<const int>(game->message_end_frame <= game->current_frame);
   const auto last_has_lower_priority = static_cast<const int>(game->message_priority <= priority);
   if ((last_has_expired != 0) || (last_has_lower_priority != 0)) {
@@ -189,7 +188,7 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
   Milliseconds time_since_last_logic_update = 0;
   Code code = CODE_OK;
   int *lives = &game->player->lives;
-  unsigned long limit = game->limit_played_frames;
+  U64 limit = game->limit_played_frames;
   CommandTable table{};
   initialize_command_table(&table);
   while ((game->player->table->status[COMMAND_QUIT] == 0.0) && *lives != 0 && game->played_frames < limit) {

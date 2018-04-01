@@ -14,13 +14,13 @@
 static const char *const NAME_FILE_PATH = "data/name.txt";
 
 /* These state variables must be initialized so that they are not all zero. */
-static unsigned long x;
-static unsigned long y;
-static unsigned long z;
-static unsigned long w;
+static U64 x;
+static U64 y;
+static U64 z;
+static U64 w;
 
-static unsigned long xorshift128() {
-  unsigned long t = x;
+static U64 xorshift128() {
+  U64 t = x;
   /* Left shif overflow is undefined behavior in C. */
   t ^= t << 11;
   t ^= t >> 8;
@@ -40,8 +40,8 @@ void seed_random() {
 /**
  * Returns the next power of two bigger than the provided number.
  */
-unsigned long find_next_power_of_two(unsigned long number) {
-  unsigned long result = 1;
+U64 find_next_power_of_two(U64 number) {
+  U64 result = 1;
   while (number != 0u) {
     number >>= 1;
     result <<= 1;
@@ -56,9 +56,9 @@ unsigned long find_next_power_of_two(unsigned long number) {
  */
 int random_integer(const int minimum, const int maximum) {
   /* Range should be a bigger type because the difference may overflow int. */
-  unsigned long range;
-  unsigned long next_power_of_two;
-  unsigned long value;
+  U64 range;
+  U64 next_power_of_two;
+  U64 value;
   if (maximum < minimum) {
     return 0;
   }

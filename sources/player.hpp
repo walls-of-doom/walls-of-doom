@@ -32,7 +32,7 @@ public:
   Score score;
 
   Perk perk;
-  unsigned long perk_end_frame;
+  U64 perk_end_frame;
 
   Investment *investments;
 
