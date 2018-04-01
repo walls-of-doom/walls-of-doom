@@ -72,7 +72,7 @@ Code get_full_path(char *buffer, const char *filename) {
   return CODE_OK;
 }
 
-std::string get_full_path(std::string filename) {
+std::string get_full_path(const std::string &filename) {
   char path[MAXIMUM_PATH_SIZE];
   if (get_full_path(path, filename.c_str()) != CODE_OK) {
     throw std::runtime_error("Failed to get full path.");

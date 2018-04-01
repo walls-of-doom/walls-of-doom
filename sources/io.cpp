@@ -410,13 +410,13 @@ static bool is_valid_player_name(const std::string &player_name) { return player
  */
 Code read_player_name(std::string &destination, Renderer *renderer) {
   Code code = CODE_ERROR;
-  int valid_name = 0;
+  bool valid_name = false;
   const char message[] = "Name your character: ";
   destination = get_user_name();
   /* While there is not a read error or a valid name. */
   char name[MAXIMUM_PLAYER_NAME_SIZE] = {'\0'};
   copy_string(name, destination.c_str(), MAXIMUM_PLAYER_NAME_SIZE);
-  while (code != CODE_OK || (valid_name == 0)) {
+  while (code != CODE_OK || !valid_name) {
     auto x = get_padding() * get_font_width();
     auto y = (get_window_height() - get_font_height()) / 2;
     code = read_string(x, y, message, name, MAXIMUM_PLAYER_NAME_SIZE, renderer);

@@ -27,7 +27,8 @@ std::string get_perk_name(Perk perk) {
   }
   if (perk == PERK_POWER_TIME_STOP) {
     return "Time Stop";
-  } else if (perk == PERK_CURSE_ACCELERATE_PLATFORMS) {
+  }
+  if (perk == PERK_CURSE_ACCELERATE_PLATFORMS) {
     return "Accelerate Platforms";
   } else if (perk == PERK_CURSE_REVERSE_PLATFORMS) {
     return "Reverse Platforms";

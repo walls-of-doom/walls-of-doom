@@ -23,7 +23,8 @@ static Command command_from_key(const SDL_Keysym keysym) {
   }
   if (sym == SDLK_KP_2 || sym == SDLK_DOWN) {
     return COMMAND_DOWN;
-  } else if (sym == SDLK_SPACE) {
+  }
+  if (sym == SDLK_SPACE) {
     return COMMAND_JUMP;
   } else if (sym == SDLK_RETURN || sym == SDLK_KP_ENTER) {
     return COMMAND_ENTER;

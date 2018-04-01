@@ -12,7 +12,7 @@ enum ParserResult { PARSER_RESULT_CONTINUE, PARSER_RESULT_QUIT };
 
 void log_unrecognized_argument(const std::string &argument) {
   const auto string = "Unrecognized argument: " + argument + ".";
-  log_message(string.c_str());
+  log_message(string);
 }
 
 ParserResult parse_argument(const char *argument) {

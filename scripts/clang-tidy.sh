@@ -6,7 +6,7 @@ if [ ! -f $COMPILATION_DATABASE ]; then
 fi
 
 echo Analyzing...
-clang-tidy --quiet --fix walls-of-doom/*.[c]
-clang-tidy --quiet --fix tests/*.[c]
+clang-tidy --quiet --fix sources/*.cpp
+clang-tidy --quiet --fix tests/*.cpp
 
 echo "Done after $SECONDS seconds."

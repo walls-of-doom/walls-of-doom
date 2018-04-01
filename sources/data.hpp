@@ -29,7 +29,7 @@ bool file_exists(const char *filename);
  */
 int file_line_count(const char *filename);
 
-std::string get_full_path(std::string filename);
+std::string get_full_path(const std::string &filename);
 
 /**
  * Writes to buffer the full path for a file created by Walls of Doom.

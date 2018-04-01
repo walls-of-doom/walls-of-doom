@@ -52,7 +52,7 @@ public:
   size_t rigid_matrix_size;
   unsigned char *rigid_matrix;
 
-  char message[MAXIMUM_STRING_SIZE];
+  char message[MAXIMUM_STRING_SIZE]{};
   unsigned long message_end_frame;
   unsigned int message_priority;
 

@@ -242,7 +242,7 @@ static void move_platform_horizontally(Game *const game, Platform *const platfor
       if (is_in_front_of_platform(game->player, platform)) {
         shove_player(game, normalized_speed, 0, 0);
       }
-      if (is_over_platform(game->player, platform) != 0) {
+      if (is_over_platform(game->player, platform)) {
         shove_player(game, normalized_speed, 0, 1);
       }
       move_platform(game, platform, normalized_speed, 0);

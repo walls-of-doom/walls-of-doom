@@ -12,7 +12,7 @@ struct Record {
   std::string full;
   double time;
 
-  Record(std::string full_name, double time) : full(full_name), time(time) {
+  Record(const std::string &full_name, double time) : full(full_name), time(time) {
     auto separator = full_name.find_last_of('.');
     if (separator != std::string::npos) {
       base = full_name.substr(0, separator);

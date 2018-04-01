@@ -282,8 +282,8 @@ void initialize_settings() {
     } else if (string_equals(key, "COLOR_PAIR_PLATFORM_RARE")) {
       COLOR_PAIR_PLATFORM_RARE = parse_color(value);
     } else if (string_equals(key, "PLAYER_STOPS_PLATFORMS")) {
-      limits.fallback = player_stops_platforms;
-      player_stops_platforms = parse_boolean(value, limits.fallback);
+      limits.fallback = static_cast<long>(player_stops_platforms);
+      player_stops_platforms = (parse_boolean(value, limits.fallback) != 0);
     } else if (string_equals(key, "LOGGING_PLAYER_SCORE")) {
       limits.fallback = logging_player_score;
       logging_player_score = parse_boolean(value, limits.fallback);
@@ -358,7 +358,7 @@ void initialize_settings() {
 }
 
 void compute_window_size() {
-  SDL_DisplayMode display_mode;
+  SDL_DisplayMode display_mode{};
   SDL_GetCurrentDisplayMode(0, &display_mode);
   const auto w = display_mode.w;
   const auto h = display_mode.h;
