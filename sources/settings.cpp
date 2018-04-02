@@ -216,10 +216,10 @@ static void validate_settings() {
   if (get_window_height() > MAXIMUM_DIMENSION) {
     throw std::runtime_error("Window is too tall.");
   }
-  if ((get_window_width() % get_tile_width()) != 0) {
+  if ((get_window_width() % get_tile_w()) != 0) {
     throw std::runtime_error("Window width is not divisible by tile width.");
   }
-  if (((get_window_height() - 2 * get_bar_height()) % get_tile_height()) != 0) {
+  if (((get_window_height() - 2 * get_bar_height()) % get_tile_h()) != 0) {
     throw std::runtime_error("Window height is not divisible by tile height.");
   }
 }
@@ -386,14 +386,14 @@ U16 get_tiles_on_x() { return tiles_on_x; }
 
 U16 get_tiles_on_y() { return tiles_on_y; }
 
-int get_tile_width() {
+int get_tile_w() {
   if (!computed_window_size) {
     compute_window_size();
   }
   return tile_w;
 }
 
-int get_tile_height() {
+int get_tile_h() {
   if (!computed_window_size) {
     compute_window_size();
   }
@@ -402,9 +402,9 @@ int get_tile_height() {
 
 int get_bar_height() { return bar_height; }
 
-int get_window_width() { return get_tile_width() * get_tiles_on_x(); }
+int get_window_width() { return get_tile_w() * get_tiles_on_x(); }
 
-int get_window_height() { return get_tile_height() * get_tiles_on_y() + get_bar_height() * 2; }
+int get_window_height() { return get_tile_h() * get_tiles_on_y() + get_bar_height() * 2; }
 
 long get_padding() { return padding; }
 

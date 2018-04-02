@@ -1,9 +1,6 @@
 #include "physics.hpp"
 #include "bank.hpp"
 #include "memory.hpp"
-#include "profiler.hpp"
-#include <cmath>
-#include <limits>
 
 /* Should be the maximum frame count value for 5 seconds remaining. */
 #define MINIMUM_REMAINING_FRAMES_FOR_MESSAGE (6 * UPS - 1)
@@ -15,6 +12,8 @@
 #define BUY_LIFE_PRICE 100
 #define BUY_LIFE_FORMAT(PRICE) "Bought an extra life for " STR(PRICE) " points."
 #define BUY_LIFE_MESSAGE BUY_LIFE_FORMAT(BUY_LIFE_PRICE)
+
+enum class ShoveResult { ShoveFailure, ShoveSuccess };
 
 static BoundingBox derive_box(const Game *game, const int x, const int y) {
   BoundingBox box;
@@ -98,6 +97,19 @@ static void move_player(Game *game, int dx, int dy) {
   }
 }
 
+static bool can_move_player_without_intersecting(Game *game, int dx, int dy) {
+  const auto tile_w = get_tile_w();
+  const auto tile_h = get_tile_h();
+  for (auto x = game->player->x + dx; x < game->player->x + dx + tile_w; x++) {
+    for (auto y = game->player->y + dy; y < game->player->y + dy + tile_h; y++) {
+      if (get_from_rigid_matrix(game, x, y) != 0u) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 /**
  * Attempts to force the Player to move according to the provided displacement.
  *
@@ -105,14 +117,19 @@ static void move_player(Game *game, int dx, int dy) {
  *
  * The standing flag indicates if the player is standing above the platform.
  */
-static void shove_player(Game *game, int dx, int dy, int standing) {
+static ShoveResult shove_player(Game *game, int dx, int dy, bool standing) {
   if (game->player->physics) {
-    /* Don't shove the player if he is hovering over a platform. */
-    if (game->player->perk != PERK_POWER_LEVITATION || (standing == 0)) {
+    // Don't shove the player if he is hovering over a platform.
+    if (game->player->perk != PERK_POWER_LEVITATION || !standing) {
       move_player(game, dx, 0);
+    }
+    // Don't shove if the player would get into a solid object.
+    if (!can_move_player_without_intersecting(game, dx, dy)) {
+      return ShoveResult::ShoveFailure;
     }
   }
   move_player(game, 0, dy);
+  return ShoveResult::ShoveSuccess;
 }
 
 static int get_absolute_pending_movement(U64 frame, int speed) {
@@ -241,10 +258,13 @@ static void move_platform_horizontally(Game *const game, Platform *const platfor
   while (pending != 0) {
     if (can_move_platform(game, platform, normalized_speed, 0)) {
       if (is_in_front_of_platform(game->player, platform)) {
-        shove_player(game, normalized_speed, 0, 0);
+        const auto shove_result = shove_player(game, normalized_speed, 0, false);
+        if (shove_result == ShoveResult::ShoveFailure) {
+          break;
+        }
       }
       if (is_over_platform(game->player, platform)) {
-        shove_player(game, normalized_speed, 0, 1);
+        shove_player(game, normalized_speed, 0, true);
       }
       move_platform(game, platform, normalized_speed, 0);
     }
@@ -350,7 +370,7 @@ int select_random_line_awarely(const unsigned char *lines, const int size) {
 static void reposition(Game *const game, Platform *const platform) {
   const BoundingBox *const box = game->box;
   /* The occupied size may be smaller than the array actually is. */
-  const auto occupied_size = static_cast<U32>((get_window_height() - 2 * get_bar_height()) / get_tile_height());
+  const auto occupied_size = static_cast<U32>((get_window_height() - 2 * get_bar_height()) / get_tile_h());
   const int tile_h = game->tile_h;
   unsigned char *occupied = nullptr;
   int line;
@@ -499,9 +519,9 @@ void update_perk(Game *const game) {
     game->perk = PERK_NONE;
   } else if (game->played_frames == next_perk_frame) {
     game->perk = get_random_perk();
-    game->perk_x = random_integer(0, get_window_width() - get_tile_width());
+    game->perk_x = random_integer(0, get_window_width() - get_tile_w());
     int random_y = random_integer(get_bar_height(), get_window_height() - 2 * get_bar_height());
-    game->perk_y = random_y - random_y % get_tile_height();
+    game->perk_y = random_y - random_y % get_tile_h();
     game->perk_end_frame = game->played_frames + PERK_SCREEN_DURATION_IN_FRAMES;
   }
 }
@@ -650,7 +670,7 @@ static bool can_move_up(const Game *game) {
   if (y == game->box->min_y) {
     return true;
   }
-  for (int i = 0; i < get_tile_width(); i++) {
+  for (int i = 0; i < get_tile_w(); i++) {
     if (get_from_rigid_matrix(game, x + i, y - 1) != 0u) {
       return false;
     }

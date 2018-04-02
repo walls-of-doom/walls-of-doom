@@ -30,9 +30,9 @@ U16 get_tiles_on_x();
 
 U16 get_tiles_on_y();
 
-int get_tile_width();
+int get_tile_w();
 
-int get_tile_height();
+int get_tile_h();
 
 int get_bar_height();
 

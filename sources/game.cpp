@@ -54,8 +54,8 @@ static void initialize_bounding_box(Game *game) {
 }
 
 Game::Game(Player *player, Profiler *profiler) : player(player), profiler(profiler) {
-  tile_w = get_tile_width();
-  tile_h = get_tile_height();
+  tile_w = get_tile_w();
+  tile_h = get_tile_h();
   platform_count = get_platform_count();
   size_t rigid_matrix_bytes;
 

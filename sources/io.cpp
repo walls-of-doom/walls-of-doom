@@ -473,15 +473,15 @@ static void draw_shaded_absolute_rectangle(int x, int y, int w, int h, Color col
 }
 
 static void draw_absolute_tile_rectangle(int x, int y, Color color, Renderer *renderer) {
-  const int w = get_tile_width();
-  const int h = get_tile_height();
+  const int w = get_tile_w();
+  const int h = get_tile_h();
   y += get_bar_height();
   draw_absolute_rectangle(x, y, w, h, color, renderer);
 }
 
 static void draw_shaded_absolute_tile_rectangle(int x, int y, Color color, Renderer *renderer) {
-  const int w = get_tile_width();
-  const int h = get_tile_height();
+  const int w = get_tile_w();
+  const int h = get_tile_h();
   y += get_bar_height();
   draw_shaded_absolute_rectangle(x, y, w, h, color, renderer);
 }
