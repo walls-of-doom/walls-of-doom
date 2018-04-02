@@ -2,6 +2,7 @@
 #include "bank.hpp"
 #include "memory.hpp"
 #include "profiler.hpp"
+#include <cmath>
 #include <limits>
 
 /* Should be the maximum frame count value for 5 seconds remaining. */
@@ -119,7 +120,7 @@ static int get_absolute_pending_movement(U64 frame, int speed) {
   const double slice = speed / static_cast<double>(UPS);
   /* To reduce floating point error, normalize frame to [FPS, 2 FPS - 1]. */
   frame = frame % UPS + UPS;
-  return static_cast<int>(floor(frame * slice) - floor((frame - 1) * slice));
+  return static_cast<int>(std::floor(frame * slice) - std::floor((frame - 1) * slice));
 }
 
 static int get_pending_movement(const Game *const game, const int speed) {

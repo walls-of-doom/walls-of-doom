@@ -18,7 +18,7 @@ addons:
 
 matrix:
   include:
-    - env: COMPILER=clang-5.0
+    - env: COMPILER=clang++-5.0
     - env: COMPILER=g++-7
 
 script:
