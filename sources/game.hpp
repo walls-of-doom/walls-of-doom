@@ -62,9 +62,32 @@ public:
 
 Milliseconds update_game(Game *const game);
 
-unsigned char get_from_rigid_matrix(const Game *const game, const int x, const int y);
-void modify_rigid_matrix_point(const Game *const game, const int x, const int y, S8 delta);
-void modify_rigid_matrix_platform(Game *game, Platform const *platform, S8 delta);
+inline size_t get_rigid_matrix_index(const Game *const game, const int x, const int y) {
+  const int base_x = x - game->box->min_x;
+  const int base_y = y - game->box->min_y;
+  return base_x + base_y * game->rigid_matrix_n;
+}
+
+inline unsigned char get_from_rigid_matrix(const Game *const game, const int x, const int y) {
+  if (game->box->contains(x, y)) {
+    return game->rigid_matrix[get_rigid_matrix_index(game, x, y)];
+  }
+  return 0;
+}
+
+inline void modify_rigid_matrix_point(const Game *const game, const int x, const int y, S8 delta) {
+  if (game->box->contains(x, y)) {
+    game->rigid_matrix[get_rigid_matrix_index(game, x, y)] += delta;
+  }
+}
+
+inline void modify_rigid_matrix_platform(Game *game, Platform const *platform, S8 delta) {
+  for (int x = 0; x < platform->w; ++x) {
+    for (int y = 0; y < platform->h; ++y) {
+      modify_rigid_matrix_point(game, platform->x + x, platform->y + y, delta);
+    }
+  }
+}
 
 /**
  * Changes the game message to the provided text, for the provided duration.

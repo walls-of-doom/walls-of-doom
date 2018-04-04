@@ -12,33 +12,6 @@ static const Milliseconds register_score_release_delay = 200;
 static const Milliseconds milliseconds_in_a_second = 1000;
 static const int maximum_fps = 250;
 
-static size_t get_rigid_matrix_index(const Game *const game, const int x, const int y) {
-  const int base_x = x - game->box->min_x;
-  const int base_y = y - game->box->min_y;
-  return base_x + base_y * game->rigid_matrix_n;
-}
-
-unsigned char get_from_rigid_matrix(const Game *const game, const int x, const int y) {
-  if (game->box->contains(x, y)) {
-    return game->rigid_matrix[get_rigid_matrix_index(game, x, y)];
-  }
-  return 0;
-}
-
-void modify_rigid_matrix_point(const Game *const game, const int x, const int y, S8 delta) {
-  if (game->box->contains(x, y)) {
-    game->rigid_matrix[get_rigid_matrix_index(game, x, y)] += delta;
-  }
-}
-
-void modify_rigid_matrix_platform(Game *game, Platform const *platform, S8 delta) {
-  for (int x = 0; x < platform->w; ++x) {
-    for (int y = 0; y < platform->h; ++y) {
-      modify_rigid_matrix_point(game, platform->x + x, platform->y + y, delta);
-    }
-  }
-}
-
 static void initialize_rigid_matrix(Game *game) {
   memset(game->rigid_matrix, 0, game->rigid_matrix_size);
   for (size_t i = 0; i < game->platform_count; i++) {
