@@ -1,12 +1,13 @@
 About
 
 
-Walls of Doom is a minimalistic platformer written in ANSI C by Bernardo
-Sulzbach and others.
+Walls of Doom is a minimalistic platformer by Bernardo Sulzbach.
 
 
-The game is released under the BSD 3-Clause license for anyone to be able to
-play and modify it.
+It was originally written in ANSI C, then migrated to modern C++.
+
+
+The code is released under the BSD 3-Clause license, so anyone can modify it.
 
 
 The player gets points for surviving in a space enclosed by deadly walls with
