@@ -146,7 +146,7 @@ add_custom_command(TARGET walls-of-doom POST_BUILD COMMAND ${CMAKE_COMMAND} -E c
 
 if (NOT "${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
     add_executable(tests tests/tests.cpp $<TARGET_OBJECTS:walls-of-doom-object>)
-    include_directories(SYSTEM "${CMAKE_SOURCE_DIR}}/catch")
-    include_directories("${CMAKE_SOURCE_DIR}}/sources")
+    include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/catch")
+    include_directories("${CMAKE_SOURCE_DIR}/sources")
     target_link_libraries(tests ${SDL2_LIBRARY} ${SDL2_TTF_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
 endif ()
