@@ -7,7 +7,7 @@
 /**
  * The Command enumeration represents the different commands the user may issue.
  */
-typedef enum Command {
+enum Command {
   COMMAND_NONE,
   COMMAND_UP,
   COMMAND_LEFT,
@@ -20,16 +20,18 @@ typedef enum Command {
   COMMAND_INVEST,
   COMMAND_INVEST_ALL,
   COMMAND_PAUSE,
+  COMMAND_DEBUG,
   COMMAND_QUIT,
   COMMAND_CLOSE,
   COMMAND_COUNT
-} Command;
+};
 
-typedef struct CommandTable {
+class CommandTable {
+public:
   double status[COMMAND_COUNT];
   Milliseconds last_issued[COMMAND_COUNT];
   Milliseconds last_modified[COMMAND_COUNT];
-} CommandTable;
+};
 
 void initialize_command_table(CommandTable *table);
 

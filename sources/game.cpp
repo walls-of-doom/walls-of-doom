@@ -43,8 +43,6 @@ Game::Game(Player *player, Profiler *profiler) : player(player), profiler(profil
   played_frames = 0;
   limit_played_frames = DEFAULT_LIMIT_PLAYED_FRAMES;
 
-  paused = false;
-
   player->w = tile_w;
   player->h = tile_h;
 
@@ -196,6 +194,9 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
     read_commands(game->player->table);
     if (test_command_table(game->player->table, COMMAND_PAUSE, REPETITION_DELAY)) {
       game->paused = true;
+    }
+    if (test_command_table(game->player->table, COMMAND_DEBUG, REPETITION_DELAY)) {
+      game->debugging = !game->debugging;
     }
     const auto time_since_last_frame_update = get_milliseconds() - start_time;
     if (time_since_last_frame_update < frame_interval) {

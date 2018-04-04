@@ -82,12 +82,11 @@ static bool is_valid_move(const Game *const game, const int x, const int y) {
  * This moves the player at most one position on each axis.
  */
 static void move_player(Game *game, int dx, int dy) {
-  /* It is OK to reuse x and y to prevent multiple integers for the same axis.
-   */
-  /* Ignore magnitude, take just -1, 0, or 1. */
+  // It is OK to reuse x and y to prevent multiple integers for the same axis.
+  // Ignore magnitude, take just -1, 0, or 1.
   dx = normalize(dx);
   dy = normalize(dy);
-  /* Just in case a compiler cannot optimize this case away. */
+  // Just in case a compiler cannot optimize this case away.
   if (dx == 0 && dy == 0) {
     return;
   }
@@ -133,9 +132,9 @@ static ShoveResult shove_player(Game *game, int dx, int dy, bool standing) {
 }
 
 static int get_absolute_pending_movement(U64 frame, int speed) {
-  /* Should move slice after every frame. */
-  const double slice = speed / static_cast<double>(UPS);
-  /* To reduce floating point error, normalize frame to [FPS, 2 FPS - 1]. */
+  // Should move slice after every frame.
+  const auto slice = speed / static_cast<double>(UPS);
+  // To reduce floating point error, normalize frame to [FPS, 2 FPS - 1].
   frame = frame % UPS + UPS;
   return static_cast<int>(std::floor(frame * slice) - std::floor((frame - 1) * slice));
 }
@@ -209,7 +208,7 @@ static bool can_move_platform(Game *const game, Platform *p, int dx, int dy) {
     return true;
   }
   auto can_move = true;
-  /* There are two optimized paths for unidirectional movement. */
+  // There are two optimized paths for unidirectional movement.
   if (dx == 0) {
     if (dy < 0) {
       return is_free_on_matrix(game, p->x, p->y + dy, p->w, -dy);
@@ -225,7 +224,7 @@ static bool can_move_platform(Game *const game, Platform *p, int dx, int dy) {
       return is_free_on_matrix(game, p->x + p->w, p->y, dx, p->h);
     }
   } else {
-    /* If the platform would intersect with another platform, do not move it. */
+    // If the platform would intersect with another platform, do not move it.
     subtract_platform(game, p);
     p->x += dx;
     p->y += dy;
@@ -237,6 +236,33 @@ static bool can_move_platform(Game *const game, Platform *p, int dx, int dy) {
   return can_move;
 }
 
+static void slide_platform_on_x(Game *const game, Platform *const p, const int dx) {
+  if (dx == 0) {
+    throw std::logic_error("Bad call.");
+  }
+  const auto size = std::min(p->w, std::abs(dx));
+  int subB = 0;
+  int addB = 0;
+  if (dx > 0) {
+    subB = p->x;
+    addB = p->x + std::max(p->w, dx);
+  } else {
+    subB = std::max(p->x, p->x + p->w - size);
+    addB = p->x + dx;
+  }
+  for (int x = subB; x < subB + size; x++) {
+    for (int y = p->y; y < p->y + p->h; y++) {
+      modify_rigid_matrix_point(game, x, y, -1);
+    }
+  }
+  for (int x = addB; x < addB + size; x++) {
+    for (int y = p->y; y < p->y + p->h; y++) {
+      modify_rigid_matrix_point(game, x, y, +1);
+    }
+  }
+  p->x += dx;
+}
+
 /**
  * This function is the ONLY right way to move a platform.
  *
@@ -244,10 +270,10 @@ static bool can_move_platform(Game *const game, Platform *p, int dx, int dy) {
  */
 static void move_platform(Game *const game, Platform *const platform, const int dx, const int dy) {
   if (can_move_platform(game, platform, dx, dy)) {
-    subtract_platform(game, platform);
-    platform->x += dx;
-    platform->y += dy;
-    add_platform(game, platform);
+    slide_platform_on_x(game, platform, dx);
+    if (dy != 0) {
+      throw std::logic_error("Not implemented.");
+    }
   }
 }
 

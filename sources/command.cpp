@@ -37,6 +37,8 @@ static Command command_from_key(const SDL_Keysym keysym) {
     return COMMAND_INVEST;
   } else if (sym == SDLK_p) {
     return COMMAND_PAUSE;
+  } else if (sym == SDLK_F12) {
+    return COMMAND_DEBUG;
   } else if (sym == SDLK_q) {
     return COMMAND_QUIT;
   }

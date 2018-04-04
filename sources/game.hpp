@@ -35,7 +35,8 @@ public:
   U64 played_frames;
   U64 limit_played_frames;
 
-  bool paused;
+  bool paused = false;
+  bool debugging = false;
 
   int tile_w;
   int tile_h;

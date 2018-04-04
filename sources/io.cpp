@@ -621,6 +621,18 @@ Code draw_player(const Player *const player, Renderer *renderer) {
   return CODE_OK;
 }
 
+static void draw_debugging(Game *const game, Renderer *renderer) {
+  const auto height = get_bar_height();
+  const Color color(255, 255, 255, 127);
+  for (int x = game->box->min_x; x <= game->box->max_x; x++) {
+    for (int y = game->box->min_y; y <= game->box->max_y; y++) {
+      if (get_from_rigid_matrix(game, x, y) != 0u) {
+        draw_absolute_rectangle(x, height + y, 1, 1, color, renderer);
+      }
+    }
+  }
+}
+
 /**
  * Draws a full game to the screen.
  *
@@ -654,6 +666,10 @@ Milliseconds draw_game(Game *const game, Renderer *renderer) {
   game->profiler->start("draw_player");
   draw_player(game->player, renderer);
   game->profiler->stop();
+
+  if (game->debugging) {
+    draw_debugging(game, renderer);
+  }
 
   game->profiler->start("present");
   present(renderer);
