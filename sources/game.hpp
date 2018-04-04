@@ -31,7 +31,7 @@ public:
   U64 current_frame;
   U64 desired_frame;
 
-  /* Count of frames on which the player was active (not in the initial state). */
+  // Count of frames on which the player was active (not in the initial state).
   U64 played_frames;
   U64 limit_played_frames;
 
@@ -46,39 +46,38 @@ public:
   int perk_y;
   U64 perk_end_frame;
 
-  BoundingBox *box;
+  BoundingBox box;
 
   size_t rigid_matrix_n;
   size_t rigid_matrix_m;
   size_t rigid_matrix_size;
-  unsigned char *rigid_matrix;
+  std::vector<U8> rigid_matrix;
 
   char message[MAXIMUM_STRING_SIZE]{};
   U64 message_end_frame;
   unsigned int message_priority;
 
   Game(Player *player, Profiler *profiler);
-  virtual ~Game();
 };
 
 Milliseconds update_game(Game *const game);
 
 inline size_t get_rigid_matrix_index(const Game *const game, const int x, const int y) {
-  const int base_x = x - game->box->min_x;
-  const int base_y = y - game->box->min_y;
+  const int base_x = x - game->box.min_x;
+  const int base_y = y - game->box.min_y;
   return base_x + base_y * game->rigid_matrix_n;
 }
 
 inline unsigned char get_from_rigid_matrix(const Game *const game, const int x, const int y) {
-  if (game->box->contains(x, y)) {
+  if (game->box.contains(x, y)) {
     return game->rigid_matrix[get_rigid_matrix_index(game, x, y)];
   }
   return 0;
 }
 
-inline void modify_rigid_matrix_point(const Game *const game, const int x, const int y, S8 delta) {
-  if (game->box->contains(x, y)) {
-    game->rigid_matrix[get_rigid_matrix_index(game, x, y)] += delta;
+inline void modify_rigid_matrix_point(Game *const game, const int x, const int y, S8 delta) {
+  if (game->box.contains(x, y)) {
+    safe_add(game->rigid_matrix[get_rigid_matrix_index(game, x, y)], delta);
   }
 }
 

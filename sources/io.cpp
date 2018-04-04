@@ -539,13 +539,13 @@ static Color get_platform_color(Platform platform) {
   return COLOR_PAIR_PLATFORM.foreground.mix(COLOR_PAIR_PLATFORM_RARE.foreground, platform.rarity);
 }
 
-static void draw_platforms(const std::vector<Platform> &platforms, const BoundingBox *box, Renderer *renderer) {
+static void draw_platforms(const std::vector<Platform> &platforms, BoundingBox box, Renderer *renderer) {
   const auto y_padding = get_bar_height();
   for (const auto &platform : platforms) {
     auto p = platform;
-    auto x = max_int(box->min_x, p.x);
+    auto x = std::max(box.min_x, p.x);
     auto y = y_padding + p.y;
-    auto w = min_int(box->max_x, p.x + p.w - 1) - x + 1;
+    auto w = std::min(box.max_x, p.x + p.w - 1) - x + 1;
     auto h = p.h;
     draw_absolute_rectangle(x, y, w, h, get_platform_color(platform), renderer);
   }
@@ -591,7 +591,7 @@ static void draw_active_perk(const Game *const game, Renderer *renderer) {
   const int interval = PERK_FADING_INTERVAL;
   const int y_padding = get_bar_height();
   const auto remaining = static_cast<int>(game->perk_end_frame - game->played_frames);
-  const double fraction = min_int(interval, remaining) / static_cast<double>(interval);
+  const double fraction = std::min(interval, remaining) / static_cast<double>(interval);
   const int x = game->perk_x;
   const int y = y_padding + game->perk_y;
   draw_resized_perk(x, y, game->tile_w, game->tile_h, fraction, renderer);
@@ -624,8 +624,8 @@ Code draw_player(const Player *const player, Renderer *renderer) {
 static void draw_debugging(Game *const game, Renderer *renderer) {
   const auto height = get_bar_height();
   const Color color(255, 255, 255, 127);
-  for (int x = game->box->min_x; x <= game->box->max_x; x++) {
-    for (int y = game->box->min_y; y <= game->box->max_y; y++) {
+  for (int x = game->box.min_x; x <= game->box.max_x; x++) {
+    for (int y = game->box.min_y; y <= game->box.max_y; y++) {
       if (get_from_rigid_matrix(game, x, y) != 0u) {
         draw_absolute_rectangle(x, height + y, 1, 1, color, renderer);
       }
@@ -698,10 +698,10 @@ void print_records(const size_t count, const Record *records, Renderer *renderer
   const int x_padding = 2 * get_padding() * get_font_width();
   const int y_padding = 2 * get_padding() * get_font_height();
   const int available_window_height = get_window_height() - y_padding;
-  const int text_lines_limit = available_window_height / get_font_height();
+  const size_t text_lines_limit = available_window_height / get_font_height();
   const int text_width_in_pixels = get_window_width() - x_padding;
   const size_t string_width = text_width_in_pixels / get_font_width();
-  const size_t printed = min_int(count, text_lines_limit);
+  const size_t printed = std::min(count, text_lines_limit);
   std::vector<std::string> strings;
   for (size_t i = 0; i < printed; i++) {
     strings.push_back(record_to_string(records[i], string_width));

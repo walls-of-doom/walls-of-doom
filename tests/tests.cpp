@@ -68,9 +68,9 @@ TEST_CASE("get_random_perk() is well distributed") {
   /* Assess the distribution of the values. */
   for (i = 0; i < PERK_COUNT; i++) {
     count = counters[i];
-    minimum = min_int(minimum, count);
-    maximum = max_int(maximum, count);
-    maximum_deviation = max_int(maximum_deviation, abs(count - average));
+    minimum = std::min(minimum, count);
+    maximum = std::max(maximum, count);
+    maximum_deviation = std::max(maximum_deviation, abs(count - average));
     total += count;
   }
   if (maximum_deviation > maximum_allowed_deviation) {

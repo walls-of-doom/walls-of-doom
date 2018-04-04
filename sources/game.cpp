@@ -13,29 +13,22 @@ static const Milliseconds milliseconds_in_a_second = 1000;
 static const int maximum_fps = 250;
 
 static void initialize_rigid_matrix(Game *game) {
-  memset(game->rigid_matrix, 0, game->rigid_matrix_size);
   for (size_t i = 0; i < game->platform_count; i++) {
     modify_rigid_matrix_platform(game, game->platforms.data() + i, 1);
   }
-}
-
-static void initialize_bounding_box(Game *game) {
-  game->box->min_x = 0;
-  game->box->min_y = 0;
-  game->box->max_x = get_window_width();
-  game->box->max_y = get_window_height() - 2 * get_bar_height();
 }
 
 Game::Game(Player *player, Profiler *profiler) : player(player), profiler(profiler) {
   tile_w = get_tile_w();
   tile_h = get_tile_h();
   platform_count = get_platform_count();
-  size_t rigid_matrix_bytes;
 
-  box = new BoundingBox;
-  initialize_bounding_box(this);
+  box.min_x = 0;
+  box.min_y = 0;
+  box.max_x = get_window_width();
+  box.max_y = get_window_height() - 2 * get_bar_height();
 
-  platforms = generate_platforms(*box, platform_count, tile_w, tile_h);
+  platforms = generate_platforms(box, platform_count, tile_w, tile_h);
 
   current_frame = 0;
   desired_frame = 0;
@@ -54,11 +47,9 @@ Game::Game(Player *player, Profiler *profiler) : player(player), profiler(profil
   /* Don't start with a Perk on the screen. */
   perk_end_frame = PERK_SCREEN_DURATION_IN_FRAMES;
 
-  rigid_matrix_m = static_cast<size_t>(box->max_y - box->min_y + 1);
-  rigid_matrix_n = static_cast<size_t>(box->max_x - box->min_x + 1);
-  rigid_matrix_size = rigid_matrix_m * rigid_matrix_n;
-  rigid_matrix_bytes = sizeof(unsigned char) * rigid_matrix_size;
-  rigid_matrix = reinterpret_cast<unsigned char *>(resize_memory(nullptr, rigid_matrix_bytes));
+  rigid_matrix_m = static_cast<size_t>(box.max_y - box.min_y + 1);
+  rigid_matrix_n = static_cast<size_t>(box.max_x - box.min_x + 1);
+  rigid_matrix.resize(rigid_matrix_m * rigid_matrix_n);
   initialize_rigid_matrix(this);
 
   message[0] = '\0';
@@ -66,11 +57,6 @@ Game::Game(Player *player, Profiler *profiler) : player(player), profiler(profil
   message_priority = 0;
 
   log_message("Finished creating the game.");
-}
-
-Game::~Game() {
-  rigid_matrix = reinterpret_cast<unsigned char *>(resize_memory(rigid_matrix, 0));
-  box = reinterpret_cast<BoundingBox *>(resize_memory(box, 0));
 }
 
 Milliseconds update_game(Game *const game) {

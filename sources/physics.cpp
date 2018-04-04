@@ -60,16 +60,16 @@ static bool violates_rigid_matrix(const Game *game, int x, int y, int w, int h) 
 static bool is_valid_move(const Game *const game, const int x, const int y) {
   if (game->player->perk == PERK_POWER_INVINCIBILITY) {
     /* If it is invincible, it shouldn't move into walls. */
-    if (x == game->box->min_x - 1) {
+    if (x == game->box.min_x - 1) {
       return false;
     }
-    if (x + game->player->w - 1 == game->box->max_x + 1) {
+    if (x + game->player->w - 1 == game->box.max_x + 1) {
       return false;
     }
-    if (y == game->box->min_y - 1) {
+    if (y == game->box.min_y - 1) {
       return false;
     }
-    if (y + game->player->h - 1 == game->box->max_y + 1) {
+    if (y + game->player->h - 1 == game->box.max_y + 1) {
       return false;
     }
   }
@@ -176,7 +176,7 @@ static bool is_standing_on_platform(const Game *const game) {
   const int y = game->player->y;
   const int w = game->player->w;
   const int h = game->player->h;
-  if (y + h - 1 == game->box->max_y) {
+  if (y + h - 1 == game->box.max_y) {
     return game->player->perk == PERK_POWER_INVINCIBILITY;
   }
   return has_rigid_support(game, x, y, w, h);
@@ -366,12 +366,12 @@ int select_random_line_awarely(const unsigned char *lines, const int size) {
     } else {
       if (i < size - 1) {
         /* Use the minimum distance to first occupied line above or below. */
-        distances[i] = min_int(distances[i], distances[i + 1] + 1);
+        distances[i] = std::min(distances[i], distances[i + 1] + 1);
       } else {
         distances[i] = 1;
       }
     }
-    maximum_distance = max_int(maximum_distance, distances[i]);
+    maximum_distance = std::max(maximum_distance, distances[i]);
   }
   /* Count how many occurrences of the maximum distance there are. */
   int count = 0;
@@ -394,8 +394,8 @@ int select_random_line_awarely(const unsigned char *lines, const int size) {
 }
 
 static void reposition(Game *const game, Platform *const platform) {
-  const BoundingBox *const box = game->box;
-  /* The occupied size may be smaller than the array actually is. */
+  const auto box = game->box;
+  // The occupied size may be smaller than the array actually is.
   const auto occupied_size = static_cast<U32>((get_window_height() - 2 * get_bar_height()) / get_tile_h());
   const int tile_h = game->tile_h;
   unsigned char *occupied = nullptr;
@@ -406,7 +406,7 @@ static void reposition(Game *const game, Platform *const platform) {
   /* Build a table of occupied rows. */
   for (i = 0; i < game->platform_count; i++) {
     if (game->platforms[i] != *platform) {
-      occupied[(game->platforms[i].y - box->min_y) / tile_h] = 1;
+      occupied[(game->platforms[i].y - box.min_y) / tile_h] = 1;
     }
   }
   if (get_reposition_algorithm() == REPOSITION_SELECT_BLINDLY) {
@@ -415,17 +415,17 @@ static void reposition(Game *const game, Platform *const platform) {
     line = select_random_line_awarely(occupied, occupied_size);
   }
   resize_memory(occupied, 0);
-  if (platform->x > box->max_x) {
+  if (platform->x > box.max_x) {
     subtract_platform(game, platform);
     /* The platform should be one tick inside the box. */
-    platform->x = box->min_x - platform->w + 1;
-    platform->y = box->min_y + tile_h * line;
+    platform->x = box.min_x - platform->w + 1;
+    platform->y = box.min_y + tile_h * line;
     add_platform(game, platform);
-  } else if (platform->x + platform->w < box->min_x) {
+  } else if (platform->x + platform->w < box.min_x) {
     subtract_platform(game, platform);
     /* The platform should be one tick inside the box. */
-    platform->x = box->max_x;
-    platform->y = box->min_y + tile_h * line;
+    platform->x = box.max_x;
+    platform->y = box.min_y + tile_h * line;
     add_platform(game, platform);
   }
 }
@@ -451,7 +451,7 @@ int is_out_of_bounding_box(Platform *const platform, const BoundingBox *const bo
 
 static void update_platform(Game *const game, Platform *const platform) {
   move_platform_horizontally(game, platform);
-  if (is_out_of_bounding_box(platform, game->box) != 0) {
+  if (is_out_of_bounding_box(platform, &game->box) != 0) {
     reposition(game, platform);
   }
 }
@@ -468,17 +468,17 @@ static bool is_falling(const Game *const game) {
   if (!game->player->physics || game->player->perk == PERK_POWER_LEVITATION) {
     return false;
   }
-  if (game->player->y == game->box->max_y) {
+  if (game->player->y == game->box.max_y) {
     return true;
   }
   return !has_rigid_support(game, game->player->x, game->player->y, game->player->w, game->player->h);
 }
 
 static bool is_touching_a_wall(const Game *const game) {
-  const auto b_min_x = game->box->min_x;
-  const auto b_max_x = game->box->max_x;
-  const auto b_min_y = game->box->min_y;
-  const auto b_max_y = game->box->max_y;
+  const auto b_min_x = game->box.min_x;
+  const auto b_max_x = game->box.max_x;
+  const auto b_min_y = game->box.min_y;
+  const auto b_max_y = game->box.max_y;
   const auto in_x = game->player->x < b_min_x || game->player->x + game->player->w - 1 > b_max_x;
   const auto in_y = game->player->y < b_min_y || game->player->y + game->player->h - 1 > b_max_y;
   return in_x || in_y;
@@ -493,8 +493,8 @@ static int get_bounding_box_center_y(const BoundingBox *const box) {
 }
 
 void reposition_player(Game *const game) {
-  game->player->x = get_bounding_box_center_x(game->box);
-  game->player->y = get_bounding_box_center_y(game->box);
+  game->player->x = get_bounding_box_center_x(&game->box);
+  game->player->y = get_bounding_box_center_y(&game->box);
 }
 
 /**
@@ -693,7 +693,7 @@ static void check_for_player_death(Game *game) {
 static bool can_move_up(const Game *game) {
   const int x = game->player->x;
   const int y = game->player->y;
-  if (y == game->box->min_y) {
+  if (y == game->box.min_y) {
     return true;
   }
   for (int i = 0; i < get_tile_w(); i++) {
