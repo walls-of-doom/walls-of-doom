@@ -139,7 +139,6 @@ find_package(SDL2_image REQUIRED)
 
 add_executable(walls-of-doom sources/main.cpp $<TARGET_OBJECTS:walls-of-doom-object>)
 
-include_directories("${CMAKE_SOURCE_DIR}}/sources")
 include_directories(${SDL2_INCLUDE_DIR} ${SDL2_TTF_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
 target_link_libraries(walls-of-doom ${SDL2_LIBRARY} ${SDL2_TTF_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
 
