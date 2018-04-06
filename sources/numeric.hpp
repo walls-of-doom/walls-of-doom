@@ -13,7 +13,7 @@ template <typename T, typename K> void safe_add(T &accumulator, K value) {
     return;
   }
   if (value < 0) {
-    if (std::abs(value) > std::abs(accumulator)) {
+    if (std::abs(value) > accumulator) {
       throw std::logic_error("Underflow.");
     }
   }
