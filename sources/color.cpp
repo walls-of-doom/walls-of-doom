@@ -20,8 +20,6 @@ ColorPair COLOR_PAIR_BOTTOM_BAR = {{192, 192, 192, 255}, {32, 32, 32, 255}};
 ColorPair COLOR_PAIR_PLATFORM_A = {{192, 192, 192, 255}, {32, 32, 32, 255}};
 ColorPair COLOR_PAIR_PLATFORM_B = {{192, 192, 192, 255}, {32, 32, 32, 255}};
 
-static const char COLOR_STRING_SEPARATOR = ',';
-
 static void assert_equals(size_t actual, size_t expected) {
   if (expected != actual) {
     const auto expected_string = std::to_string(expected);
