@@ -1,14 +1,9 @@
 #include "player.hpp"
-#include "command.hpp"
-#include "graphics.hpp"
 #include "logger.hpp"
-#include <climits>
-#include <cstdlib>
 
-#define MAXIMUM_PLAYER_SCORE LONG_MAX
-#define MINIMUM_PLAYER_SCORE 0
-
-#define DEFAULT_TRAIL_SIZE 4
+static const Score MAXIMUM_PLAYER_SCORE = std::numeric_limits<Score>::max();
+static const Score MINIMUM_PLAYER_SCORE = 0;
+static const int DEFAULT_TRAIL_SIZE = 4;
 
 Player::Player(std::string name, CommandTable *table) : name(std::move(name)), table(table) {
   x = 0;
@@ -30,22 +25,24 @@ Player::Player(std::string name, CommandTable *table) : name(std::move(name)), t
 
 Player::~Player() { destroy_graphics(graphics); }
 
-void player_score_add(Player *player, const Score score) {
-  const Score maximum_add = MAXIMUM_PLAYER_SCORE - player->score;
-  if (maximum_add >= score) {
-    player->score += score;
+void Player::decrement_score(const Score amount) {
+  const Score maximum_sub = score - MINIMUM_PLAYER_SCORE;
+  if (maximum_sub >= amount) {
+    score -= amount;
   } else {
-    log_message("Prevented Player score overflow!");
-    player->score = MAXIMUM_PLAYER_SCORE;
+    log_message("Prevented Player score underflow!");
+    score = MINIMUM_PLAYER_SCORE;
   }
 }
 
-void player_score_sub(Player *player, const Score score) {
-  const Score maximum_sub = player->score - MINIMUM_PLAYER_SCORE;
-  if (maximum_sub >= score) {
-    player->score -= score;
+void Player::increment_score(const Score amount) {
+  const Score maximum_add = MAXIMUM_PLAYER_SCORE - score;
+  if (maximum_add >= amount) {
+    score += amount;
   } else {
-    log_message("Prevented Player score underflow!");
-    player->score = MINIMUM_PLAYER_SCORE;
+    log_message("Prevented Player score overflow!");
+    score = MAXIMUM_PLAYER_SCORE;
   }
 }
+
+void Player::increment_score_from_event(const float rarity) { score += 100.0f / UPS * (1.0f + rarity); }

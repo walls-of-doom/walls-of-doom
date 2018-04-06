@@ -8,6 +8,8 @@
 #include "player.hpp"
 #include <stdlib.h>
 
+static const int EXTRA_POINTS_AMOUNT = 1000;
+
 /**
  * From an array of lines occupancy states, selects at random an empty line.
  *

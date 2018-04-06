@@ -38,15 +38,13 @@ public:
 
   Graphics *graphics;
 
-  inline void add_score(float rarity) { score += 100.0f / UPS * (1.0f + rarity); }
-
   Player(std::string name, CommandTable *table);
 
   virtual ~Player();
+
+  void increment_score(Score amount);
+  void decrement_score(Score amount);
+  void increment_score_from_event(float rarity);
 };
-
-void player_score_add(Player *player, const Score score);
-
-void player_score_sub(Player *player, const Score score);
 
 #endif

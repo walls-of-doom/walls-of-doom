@@ -503,7 +503,7 @@ void reposition_player(Game *const game) {
 void conceive_bonus(Player *const player, const Perk perk) {
   if (is_bonus_perk(perk)) {
     if (perk == PERK_BONUS_EXTRA_POINTS) {
-      player_score_add(player, 60);
+      player->increment_score(EXTRA_POINTS_AMOUNT);
     } else if (perk == PERK_BONUS_EXTRA_LIFE) {
       player->lives += 1;
     }
@@ -587,7 +587,7 @@ void process_jump(Game *const game) {
 
 static void buy_life(Game *game) {
   if (game->player->score >= BUY_LIFE_PRICE) {
-    player_score_sub(game->player, BUY_LIFE_PRICE);
+    game->player->decrement_score(BUY_LIFE_PRICE);
     game->player->lives++;
     game_set_message(game, BUY_LIFE_MESSAGE, 1, 1);
   }
@@ -597,7 +597,7 @@ static void update_player_investments(Game *game) {
   Investment *swap;
   Investment *investments = game->player->investments;
   while (investments != nullptr && investments->end <= game->played_frames) {
-    player_score_add(game->player, collect_investment(game, *investments));
+    game->player->increment_score_from_event(collect_investment(game, *investments));
     swap = investments->next;
     resize_memory(investments, 0);
     investments = swap;
@@ -632,7 +632,7 @@ static void invest(Game *game, InvestmentMode mode) {
   }
   if (game->player->score >= amount) {
     investment = reinterpret_cast<Investment *>(resize_memory(investment, sizeof(Investment)));
-    player_score_sub(game->player, amount);
+    game->player->decrement_score(amount);
     investment->next = nullptr;
     investment->amount = amount;
     investment->end = game->played_frames + UPS * get_investment_period();
@@ -849,7 +849,7 @@ void update_player(Game *game, Player *player) {
       if (platform.y == player->y + player->h) {
         if (player->x < platform.x + platform.w) {
           if (player->x + player->w > platform.x) {
-            player->add_score(platform.rarity);
+            player->increment_score_from_event(platform.rarity);
           }
         }
       }

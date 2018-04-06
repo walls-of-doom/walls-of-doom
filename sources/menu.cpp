@@ -57,13 +57,13 @@ int main_menu(SDL_Renderer *renderer) {
   Code code = CODE_OK;
   Menu menu;
   CommandTable command_table{};
+  initialize_command_table(&command_table);
   std::vector<std::string> options = {"Play", "Top Scores", "Info", "Quit"};
   const std::string game_name_string(game_name);
   std::string title = game_name_string + " " + WALLS_OF_DOOM_VERSION;
   menu.title = title;
   menu.options = options;
   menu.selected_option = 0;
-  initialize_command_table(&command_table);
   Profiler profiler(true);
   while (!should_quit) {
     write_menu(menu, renderer);
