@@ -30,7 +30,8 @@ std::string get_perk_name(Perk perk) {
   }
   if (perk == PERK_CURSE_ACCELERATE_PLATFORMS) {
     return "Accelerate Platforms";
-  } else if (perk == PERK_CURSE_REVERSE_PLATFORMS) {
+  }
+  if (perk == PERK_CURSE_REVERSE_PLATFORMS) {
     return "Reverse Platforms";
   } else if (perk == PERK_BONUS_EXTRA_POINTS) {
     return "Extra Points";

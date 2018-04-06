@@ -452,3 +452,26 @@ TEST_CASE("select_random_line_awarely() with occupied middle line") {
   REQUIRE(counters[0] > seven_sixteenths);
   REQUIRE(counters[2] > seven_sixteenths);
 }
+
+TEST_CASE("parse_base16_digit_pair() works") {
+  for (U32 i = 0; i < 256; i++) {
+    std::stringstream stream;
+    stream << std::hex;
+    stream << std::setw(2);
+    stream << std::setfill('0');
+    stream << i;
+    REQUIRE(i == parse_base16_digit_pair(stream.str()));
+  }
+}
+
+TEST_CASE("color_pair_from_string() works") {
+  ColorPair pair = color_pair_from_string("12345678,90ABCDEF");
+  REQUIRE(pair.foreground.r == parse_base16_digit_pair("12"));
+  REQUIRE(pair.foreground.g == parse_base16_digit_pair("34"));
+  REQUIRE(pair.foreground.b == parse_base16_digit_pair("56"));
+  REQUIRE(pair.foreground.a == parse_base16_digit_pair("78"));
+  REQUIRE(pair.background.r == parse_base16_digit_pair("90"));
+  REQUIRE(pair.background.g == parse_base16_digit_pair("AB"));
+  REQUIRE(pair.background.b == parse_base16_digit_pair("CD"));
+  REQUIRE(pair.background.a == parse_base16_digit_pair("EF"));
+}

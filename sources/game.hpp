@@ -50,7 +50,7 @@ public:
 
   size_t rigid_matrix_n;
   size_t rigid_matrix_m;
-  size_t rigid_matrix_size;
+  size_t rigid_matrix_size{};
   std::vector<U8> rigid_matrix;
 
   char message[MAXIMUM_STRING_SIZE]{};

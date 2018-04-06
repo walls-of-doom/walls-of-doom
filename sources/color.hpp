@@ -3,6 +3,7 @@
 
 #include "integers.hpp"
 #include <SDL.h>
+#include <string>
 
 class Color {
 public:
@@ -12,6 +13,7 @@ public:
   U8 a = 0;
 
   Color() = default;
+  Color(U8 r, U8 g, U8 b) : r(r), g(g), b(b) {}
   Color(U8 r, U8 g, U8 b, U8 a) : r(r), g(g), b(b), a(a) {}
 
   inline Color mix(Color rhs, float rhsAmount) const {
@@ -39,28 +41,23 @@ public:
   Color background;
 };
 
+U8 parse_base16_digit_pair(std::string string);
+
+ColorPair color_pair_from_string(const std::string &);
+
 /* These colors work as fallback if settings fails. */
 extern Color COLOR_DEFAULT_FOREGROUND;
 extern Color COLOR_DEFAULT_BACKGROUND;
+
 extern ColorPair COLOR_PAIR_DEFAULT;
+
 extern ColorPair COLOR_PAIR_PERK;
 extern ColorPair COLOR_PAIR_PLAYER;
 
 extern ColorPair COLOR_PAIR_TOP_BAR;
 extern ColorPair COLOR_PAIR_BOTTOM_BAR;
 
-extern ColorPair COLOR_PAIR_PLATFORM;
-extern ColorPair COLOR_PAIR_PLATFORM_RARE;
-
-ColorPair color_pair_from_string(const char *string);
-
-int color_equals(Color a, Color b);
-
-int color_pair_equals(ColorPair a, ColorPair b);
-
-SDL_Color to_sdl_color(Color color);
-Color color_from_rgb(unsigned char r, unsigned char g, unsigned char b);
-Color mix_colors(Color a, Color b);
-ColorPair color_pair_from_colors(Color foreground, Color background);
+extern ColorPair COLOR_PAIR_PLATFORM_A;
+extern ColorPair COLOR_PAIR_PLATFORM_B;
 
 #endif

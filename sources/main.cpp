@@ -7,6 +7,8 @@
 #include "version.hpp"
 #include <SDL.h>
 #include <cstdio>
+#include <iostream>
+#include <stdexcept>
 
 enum ParserResult { PARSER_RESULT_CONTINUE, PARSER_RESULT_QUIT };
 
@@ -40,9 +42,13 @@ int main(int argc, char *argv[]) {
   if (quit != 0) {
     return result;
   }
-  seed_random();
-  initialize(&window, &renderer);
-  result = main_menu(renderer);
-  finalize(&window, &renderer);
+  try {
+    seed_random();
+    initialize(&window, &renderer);
+    result = main_menu(renderer);
+    finalize(&window, &renderer);
+  } catch (std::exception &exception) {
+    std::cout << "Exception!" << ' ' << exception.what() << '\n';
+  }
   return result;
 }

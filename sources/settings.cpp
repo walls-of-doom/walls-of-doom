@@ -277,10 +277,10 @@ void initialize_settings() {
       COLOR_PAIR_TOP_BAR = parse_color(value);
     } else if (string_equals(key, "COLOR_PAIR_BOTTOM_BAR")) {
       COLOR_PAIR_BOTTOM_BAR = parse_color(value);
-    } else if (string_equals(key, "COLOR_PAIR_PLATFORM")) {
-      COLOR_PAIR_PLATFORM = parse_color(value);
-    } else if (string_equals(key, "COLOR_PAIR_PLATFORM_RARE")) {
-      COLOR_PAIR_PLATFORM_RARE = parse_color(value);
+    } else if (string_equals(key, "COLOR_PAIR_PLATFORM_A")) {
+      COLOR_PAIR_PLATFORM_A = parse_color(value);
+    } else if (string_equals(key, "COLOR_PAIR_PLATFORM_B")) {
+      COLOR_PAIR_PLATFORM_B = parse_color(value);
     } else if (string_equals(key, "PLAYER_STOPS_PLATFORMS")) {
       limits.fallback = static_cast<long>(player_stops_platforms);
       player_stops_platforms = (parse_boolean(value, limits.fallback) != 0);

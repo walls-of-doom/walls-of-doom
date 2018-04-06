@@ -536,7 +536,7 @@ static void draw_bottom_bar(const char *message, Renderer *renderer) {
 }
 
 static Color get_platform_color(Platform platform) {
-  return COLOR_PAIR_PLATFORM.foreground.mix(COLOR_PAIR_PLATFORM_RARE.foreground, platform.rarity);
+  return COLOR_PAIR_PLATFORM_A.foreground.mix(COLOR_PAIR_PLATFORM_B.foreground, platform.rarity);
 }
 
 static void draw_platforms(const std::vector<Platform> &platforms, BoundingBox box, Renderer *renderer) {
