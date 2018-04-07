@@ -52,6 +52,12 @@ int get_platform_max_speed();
 
 int get_platform_min_speed();
 
+S32 get_perk_interval();
+
+S32 get_perk_screen_duration();
+
+S32 get_perk_player_duration();
+
 int is_logging_player_score();
 
 bool should_hide_cursor();

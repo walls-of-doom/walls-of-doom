@@ -54,6 +54,10 @@ static U64 platform_count = 16;
 /* SDL has a limit at 16384. */
 static const long MAXIMUM_DIMENSION = 16384;
 
+static const S32 perk_interval = 20;
+static const S32 perk_screen_duration = 10;
+static const S32 perk_player_duration = 5;
+
 static const long MAXIMUM_TILE_DIMENSION = 16384;
 static const long MINIMUM_TILE_DIMENSION = 1;
 
@@ -373,6 +377,12 @@ int get_platform_max_speed() { return platform_max_speed; }
 int get_platform_min_speed() { return platform_min_speed; }
 
 int is_logging_player_score() { return logging_player_score; }
+
+S32 get_perk_interval() { return perk_interval; }
+
+S32 get_perk_screen_duration() { return perk_screen_duration; }
+
+S32 get_perk_player_duration() { return perk_player_duration; }
 
 bool should_hide_cursor() { return hide_cursor; }
 

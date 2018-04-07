@@ -517,8 +517,8 @@ void process_curse(Game *const game, const Perk perk) {
 
 void update_perk(Game *const game) {
   auto next_perk_frame = game->perk_end_frame;
-  next_perk_frame += PERK_INTERVAL_IN_FRAMES;
-  next_perk_frame -= PERK_SCREEN_DURATION_IN_FRAMES;
+  next_perk_frame += get_perk_interval() * UPS;
+  next_perk_frame -= get_perk_screen_duration() * UPS;
   if (game->played_frames == game->perk_end_frame) {
     game->perk = PERK_NONE;
   } else if (game->played_frames == next_perk_frame) {
@@ -526,7 +526,7 @@ void update_perk(Game *const game) {
     game->perk_x = random_integer(0, get_window_width() - get_tile_w());
     int random_y = random_integer(get_bar_height(), get_window_height() - 2 * get_bar_height());
     game->perk_y = random_y - random_y % get_tile_h();
-    game->perk_end_frame = game->played_frames + PERK_SCREEN_DURATION_IN_FRAMES;
+    game->perk_end_frame = game->played_frames + get_perk_screen_duration() * UPS;
   }
 }
 
@@ -733,7 +733,7 @@ static void update_player_perk(Game *game) {
           /* this part would removed it, but this seems more correct. */
           player->perk = PERK_NONE;
         } else {
-          end_frame = game->played_frames + PERK_PLAYER_DURATION_IN_FRAMES;
+          end_frame = game->played_frames + get_perk_screen_duration() * UPS;
           player->perk_end_frame = end_frame;
         }
         write_got_perk_message(game, perk);

@@ -47,7 +47,7 @@ Game::Game(Player *player, Profiler *profiler) : player(player), profiler(profil
   perk_x = 0;
   perk_y = 0;
   /* Don't start with a Perk on the screen. */
-  perk_end_frame = PERK_SCREEN_DURATION_IN_FRAMES;
+  perk_end_frame = static_cast<U64>(get_perk_screen_duration() * UPS);
 
   rigid_matrix_m = static_cast<size_t>(box.max_y - box.min_y + 1);
   rigid_matrix_n = static_cast<size_t>(box.max_x - box.min_x + 1);
