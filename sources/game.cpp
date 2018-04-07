@@ -22,6 +22,7 @@ static void initialize_rigid_matrix(Game *game) {
 Game::Game(Player *player, Profiler *profiler) : player(player), profiler(profiler) {
   tile_w = get_tile_w();
   tile_h = get_tile_h();
+
   platform_count = get_platform_count();
 
   box.min_x = 0;
@@ -29,18 +30,18 @@ Game::Game(Player *player, Profiler *profiler) : player(player), profiler(profil
   box.max_x = get_window_width();
   box.max_y = get_window_height() - 2 * get_bar_height();
 
-  platforms = generate_platforms(box, platform_count, tile_w, tile_h);
+  player->w = tile_w;
+  player->h = tile_h;
+  reposition_player(this);
+
+  const BoundingBox avoidance{player->x, player->y, player->x + player->w, player->y + player->h};
+  platforms = generate_platforms(box, avoidance, platform_count, tile_w, tile_h);
 
   current_frame = 0;
   desired_frame = 0;
 
   played_frames = 0;
   limit_played_frames = DEFAULT_LIMIT_PLAYED_FRAMES;
-
-  player->w = tile_w;
-  player->h = tile_h;
-
-  reposition_player(this);
 
   perk = PERK_NONE;
   perk_x = 0;

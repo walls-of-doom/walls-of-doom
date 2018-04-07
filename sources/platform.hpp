@@ -18,6 +18,6 @@ public:
   bool operator!=(const Platform &rhs) const;
 };
 
-std::vector<Platform> generate_platforms(BoundingBox box, U64 count, int width, int height);
+std::vector<Platform> generate_platforms(BoundingBox box, BoundingBox avoidance, U64 count, int width, int height);
 
 #endif

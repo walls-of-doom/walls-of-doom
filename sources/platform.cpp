@@ -5,13 +5,16 @@
 #include "physics.hpp"
 #include <cstring>
 
-std::vector<Platform> generate_platforms(BoundingBox box, U64 count, S32 width, S32 height) {
+std::vector<Platform> generate_platforms(BoundingBox box, BoundingBox avoidance, U64 count, S32 width, S32 height) {
   const S32 min_width = get_platform_min_width() * width;
   const S32 max_width = get_platform_max_width() * width;
   const S32 min_speed = get_platform_min_speed();
   const S32 max_speed = get_platform_max_speed();
   const auto lines = static_cast<U32>((box.max_y - box.min_y + 1) / height);
   std::vector<U8> density(lines);
+  for (S32 y = avoidance.min_y; y < avoidance.max_y; y++) {
+    density[y / height] = 1;
+  }
   std::vector<Platform> platforms;
   for (U64 i = 0; i < count; i++) {
     platforms.emplace_back();
