@@ -331,10 +331,9 @@ TEST_CASE("random_integer() is evenly distributed") {
 
 TEST_CASE("select_random_line_blindly() with one empty line") {
   const int tests = 1 << 8;
-  const unsigned char array[1] = {0};
-  int i;
-  for (i = 0; i < tests; i++) {
-    REQUIRE(0 == select_random_line_blindly(array, 1));
+  const std::vector<U8> array{0};
+  for (int i = 0; i < tests; i++) {
+    REQUIRE(0 == select_random_line_blindly(array));
   }
 }
 
@@ -342,11 +341,10 @@ TEST_CASE("select_random_line_blindly() with two empty lines") {
   /* Should not overflow after a multiplication by 3. */
   const int tests = 1 << 10;
   const int seven_sixteenths = 7 * tests / 16;
-  const unsigned char array[2] = {0, 0};
+  const std::vector<U8> array{0, 0};
   int counters[2] = {0, 0};
-  int i;
-  for (i = 0; i < tests; i++) {
-    counters[select_random_line_blindly(array, 2)] += 1;
+  for (int i = 0; i < tests; i++) {
+    counters[select_random_line_blindly(array)] += 1;
   }
   /* Counters should be roughly the same. */
   REQUIRE(counters[0] > seven_sixteenths);
@@ -356,11 +354,10 @@ TEST_CASE("select_random_line_blindly() with two empty lines") {
 TEST_CASE("select_random_line_blindly() with three empty lines") {
   const int tests = 1 << 12;
   const int five_sixteenths = 5 * tests / 16;
-  const unsigned char array[3] = {0, 0, 0};
+  const std::vector<U8> array{0, 0, 0};
   int counters[3] = {0, 0, 0};
-  int i;
-  for (i = 0; i < tests; i++) {
-    counters[select_random_line_blindly(array, 3)] += 1;
+  for (int i = 0; i < tests; i++) {
+    counters[select_random_line_blindly(array)] += 1;
   }
   /* Counters should be roughly the same. */
   REQUIRE(counters[0] > five_sixteenths);
@@ -370,22 +367,20 @@ TEST_CASE("select_random_line_blindly() with three empty lines") {
 
 TEST_CASE("select_random_line_blindly() with one occupied line") {
   const int tests = 1 << 8;
-  const unsigned char array[1] = {1};
-  int i;
-  for (i = 0; i < tests; i++) {
+  const std::vector<U8> array{1};
+  for (int i = 0; i < tests; i++) {
     /* There is only one line to select, must select this one. */
-    REQUIRE(0 == select_random_line_blindly(array, 1));
+    REQUIRE(0 == select_random_line_blindly(array));
   }
 }
 
 TEST_CASE("select_random_line_blindly() with occupied middle line") {
   const int tests = 1 << 10;
   const int seven_sixteenths = 7 * tests / 16;
-  const unsigned char array[3] = {0, 1, 0};
+  const std::vector<U8> array{0, 1, 0};
   int counters[3] = {0, 0, 0};
-  int i;
-  for (i = 0; i < tests; i++) {
-    counters[select_random_line_blindly(array, 3)] += 1;
+  for (int i = 0; i < tests; i++) {
+    counters[select_random_line_blindly(array)] += 1;
   }
   REQUIRE(0 == counters[1]);
   REQUIRE(counters[0] > seven_sixteenths);
@@ -394,11 +389,10 @@ TEST_CASE("select_random_line_blindly() with occupied middle line") {
 
 TEST_CASE("select_random_line_awarely() with one empty line") {
   const int tests = 1 << 8;
-  const unsigned char array[1] = {0};
-  int i;
-  for (i = 0; i < tests; i++) {
+  const std::vector<U8> array{0};
+  for (int i = 0; i < tests; i++) {
     /* There is only one line to select, must select this one. */
-    REQUIRE(0 == select_random_line_awarely(array, 1));
+    REQUIRE(0 == select_random_line_awarely(array));
   }
 }
 
@@ -406,11 +400,10 @@ TEST_CASE("select_random_line_awarely() with two empty lines") {
   /* Should not overflow after a multiplication by 3. */
   const int tests = 1 << 10;
   const int seven_sixteenths = 7 * tests / 16;
-  const unsigned char array[2] = {0, 0};
+  const std::vector<U8> array{0, 0};
   int counters[2] = {0, 0};
-  int i;
-  for (i = 0; i < tests; i++) {
-    counters[select_random_line_awarely(array, 2)] += 1;
+  for (int i = 0; i < tests; i++) {
+    counters[select_random_line_awarely(array)] += 1;
   }
   /* Counters should be roughly the same. */
   REQUIRE(counters[0] > seven_sixteenths);
@@ -419,11 +412,10 @@ TEST_CASE("select_random_line_awarely() with two empty lines") {
 
 TEST_CASE("select_random_line_awarely() with three empty lines") {
   const int tests = 1 << 10;
-  const unsigned char array[3] = {0, 0, 0};
+  const std::vector<U8> array{0, 0, 0};
   int counters[3] = {0, 0, 0};
-  int i;
-  for (i = 0; i < tests; i++) {
-    counters[select_random_line_awarely(array, 3)] += 1;
+  for (int i = 0; i < tests; i++) {
+    counters[select_random_line_awarely(array)] += 1;
   }
   /* The middle line is the most distant one. */
   REQUIRE(counters[1] == tests);
@@ -431,22 +423,20 @@ TEST_CASE("select_random_line_awarely() with three empty lines") {
 
 TEST_CASE("select_random_line_awarely() with one occupied line") {
   const int tests = 1 << 8;
-  const unsigned char array[1] = {1};
-  int i;
-  for (i = 0; i < tests; i++) {
+  const std::vector<U8> array{1};
+  for (int i = 0; i < tests; i++) {
     /* There is only one line to select, must select this one. */
-    REQUIRE(0 == select_random_line_awarely(array, 1));
+    REQUIRE(0 == select_random_line_awarely(array));
   }
 }
 
 TEST_CASE("select_random_line_awarely() with occupied middle line") {
   const int tests = 1 << 10;
   const int seven_sixteenths = 7 * tests / 16;
-  const unsigned char array[3] = {0, 1, 0};
+  const std::vector<U8> array{0, 1, 0};
   int counters[3] = {0, 0, 0};
-  int i;
-  for (i = 0; i < tests; i++) {
-    counters[select_random_line_awarely(array, 3)] += 1;
+  for (int i = 0; i < tests; i++) {
+    counters[select_random_line_awarely(array)] += 1;
   }
   REQUIRE(0 == counters[1]);
   REQUIRE(counters[0] > seven_sixteenths);

@@ -10,10 +10,9 @@ std::vector<Platform> generate_platforms(BoundingBox box, U64 count, S32 width, 
   const S32 max_width = get_platform_max_width() * width;
   const S32 min_speed = get_platform_min_speed();
   const S32 max_speed = get_platform_max_speed();
-  const S32 lines = (box.max_y - box.min_y + 1) / height;
+  const auto lines = static_cast<U32>((box.max_y - box.min_y + 1) / height);
+  std::vector<U8> density(lines);
   std::vector<Platform> platforms;
-  auto *density = reinterpret_cast<unsigned char *>(resize_memory(nullptr, sizeof(unsigned char) * lines));
-  memset(density, 0, lines);
   for (U64 i = 0; i < count; i++) {
     platforms.emplace_back();
     Platform &platform = platforms.back();
@@ -22,7 +21,7 @@ std::vector<Platform> generate_platforms(BoundingBox box, U64 count, S32 width, 
     /* Subtract two to remove the borders. */
     /* Subtract one after this to prevent platform being after the screen. */
     platform.x = random_integer(0, bounding_box_width(&box)) + box.min_x;
-    const auto random_y = select_random_line_awarely(density, lines);
+    const auto random_y = select_random_line_awarely(density);
     density[random_y]++;
     platform.y = random_y * height + box.min_y;
     platform.speed = 0;
@@ -36,7 +35,6 @@ std::vector<Platform> generate_platforms(BoundingBox box, U64 count, S32 width, 
     }
     platform.rarity = random_integer(0, 4) / 4.0f;
   }
-  resize_memory(density, 0);
   return platforms;
 }
 

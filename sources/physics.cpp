@@ -297,28 +297,20 @@ static void move_platform_horizontally(Game *const game, Platform *const platfor
   }
 }
 
-/**
- * From an array of lines occupancy states, selects at random an empty line.
- *
- * If no such line exists, returns a random line.
- *
- * This algorithm is O(n) with respect to the number of lines.
- */
-int select_random_line_blindly(const unsigned char *lines, const int size) {
-  /* Be careful not to call random_integer with invalid parameters. */
-  if (size < 1) {
-    return 0;
+int select_random_line_blindly(const std::vector<unsigned char> &lines) {
+  if (lines.empty()) {
+    throw std::logic_error("Empty line vector.");
   }
   /* Count how many empty lines there are. */
   int count = 0;
-  for (int i = 0; i < size; i++) {
-    if (lines[i] == 0) {
+  for (const auto line : lines) {
+    if (line == 0) {
       count++;
     }
   }
   /* No empty lines, return any line. */
   if (count == 0) {
-    return random_integer(0, size - 1);
+    return random_integer(0, static_cast<int>(lines.size() - 1));
   }
   /* Get a random value based on the count. */
   int skip = random_integer(0, count - 1);
@@ -327,25 +319,19 @@ int select_random_line_blindly(const unsigned char *lines, const int size) {
     if (lines[line] == 0) {
       skip--;
     }
-    line = (line + 1) % size;
+    line = (line + 1) % static_cast<int>(lines.size());
   }
   return line;
 }
 
-/**
- * From an array of lines occupancy states, selects at random one of the lines
- * which are the furthest away from any other occupied line.
- *
- * This algorithm is O(n) with respect to the number of lines.
- */
-int select_random_line_awarely(const unsigned char *lines, const int size) {
-  if (size < 1) {
-    throw std::logic_error("Size is not positive.");
+int select_random_line_awarely(const std::vector<unsigned char> &lines) {
+  if (lines.empty()) {
+    throw std::logic_error("Empty line vector.");
   }
   auto maximum_distance = std::numeric_limits<int>::min();
-  std::vector<int> distances(static_cast<size_t>(size));
+  std::vector<int> distances(static_cast<size_t>(lines.size()));
   /* First pass: calculate the distance to nearest occupied line above. */
-  for (int i = 0; i < size; i++) {
+  for (size_t i = 0; i < lines.size(); i++) {
     if (lines[i] != 0) {
       distances[i] = 0;
     } else {
@@ -357,11 +343,11 @@ int select_random_line_awarely(const unsigned char *lines, const int size) {
     }
   }
   /* Second pass: calculate the distance to nearest occupied line below. */
-  for (int i = size - 1; i >= 0; i--) {
+  for (int i = static_cast<int>(lines.size()) - 1; i >= 0; i--) {
     if (lines[i] != 0) {
       distances[i] = 0;
     } else {
-      if (i < size - 1) {
+      if (i < static_cast<int>(lines.size()) - 1) {
         /* Use the minimum distance to first occupied line above or below. */
         distances[i] = std::min(distances[i], distances[i + 1] + 1);
       } else {
@@ -372,7 +358,7 @@ int select_random_line_awarely(const unsigned char *lines, const int size) {
   }
   /* Count how many occurrences of the maximum distance there are. */
   int count = 0;
-  for (int i = 0; i < size; i++) {
+  for (size_t i = 0; i < lines.size(); i++) {
     if (distances[i] == maximum_distance) {
       count++;
     }
@@ -384,7 +370,7 @@ int select_random_line_awarely(const unsigned char *lines, const int size) {
     if (distances[line] == maximum_distance) {
       skip--;
     }
-    line = (line + 1) % size;
+    line = (line + 1) % static_cast<int>(lines.size());
   }
   return line;
 }
@@ -394,23 +380,19 @@ static void reposition(Game *const game, Platform *const platform) {
   // The occupied size may be smaller than the array actually is.
   const auto occupied_size = static_cast<U32>((get_window_height() - 2 * get_bar_height()) / get_tile_h());
   const int tile_h = game->tile_h;
-  unsigned char *occupied = nullptr;
-  int line;
-  size_t i;
-  occupied = reinterpret_cast<unsigned char *>(resize_memory(occupied, occupied_size));
-  memset(occupied, 0, occupied_size);
+  std::vector<U8> occupied(occupied_size);
   /* Build a table of occupied rows. */
-  for (i = 0; i < game->platform_count; i++) {
+  for (size_t i = 0; i < game->platform_count; i++) {
     if (game->platforms[i] != *platform) {
       occupied[(game->platforms[i].y - box.min_y) / tile_h] = 1;
     }
   }
+  int line;
   if (get_reposition_algorithm() == REPOSITION_SELECT_BLINDLY) {
-    line = select_random_line_blindly(occupied, occupied_size);
+    line = select_random_line_blindly(occupied);
   } else {
-    line = select_random_line_awarely(occupied, occupied_size);
+    line = select_random_line_awarely(occupied);
   }
-  resize_memory(occupied, 0);
   if (platform->x > box.max_x) {
     subtract_platform(game, platform);
     /* The platform should be one tick inside the box. */
