@@ -4,7 +4,6 @@
 #include "command.hpp"
 #include "constants.hpp"
 #include "graphics.hpp"
-#include "investment.hpp"
 #include "perk.hpp"
 #include "score.hpp"
 
@@ -33,8 +32,6 @@ public:
 
   Perk perk;
   U64 perk_end_frame;
-
-  Investment *investments;
 
   Graphics graphics{4};
 

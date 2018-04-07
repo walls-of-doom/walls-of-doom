@@ -19,7 +19,6 @@ Player::Player(std::string name, CommandTable *table) : name(std::move(name)), t
   score = 0;
   perk = PERK_NONE;
   perk_end_frame = 0;
-  investments = nullptr;
 }
 
 void Player::decrement_score(const Score amount) {

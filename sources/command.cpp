@@ -8,7 +8,6 @@
  */
 static Command command_from_key(const SDL_Keysym keysym) {
   const SDL_Keycode sym = keysym.sym;
-  const Uint16 mod = keysym.mod;
   if (sym == SDLK_KP_8 || sym == SDLK_UP) {
     return COMMAND_UP;
   }
@@ -29,18 +28,17 @@ static Command command_from_key(const SDL_Keysym keysym) {
   }
   if (sym == SDLK_RETURN || sym == SDLK_KP_ENTER) {
     return COMMAND_ENTER;
-  } else if (sym == SDLK_c) {
+  }
+  if (sym == SDLK_c) {
     return COMMAND_CONVERT;
-  } else if (sym == SDLK_i) {
-    if ((mod & KMOD_SHIFT) != 0) {
-      return COMMAND_INVEST_ALL;
-    }
-    return COMMAND_INVEST;
-  } else if (sym == SDLK_p) {
+  }
+  if (sym == SDLK_p) {
     return COMMAND_PAUSE;
-  } else if (sym == SDLK_F12) {
+  }
+  if (sym == SDLK_F12) {
     return COMMAND_DEBUG;
-  } else if (sym == SDLK_q) {
+  }
+  if (sym == SDLK_q) {
     return COMMAND_QUIT;
   }
   return COMMAND_NONE;

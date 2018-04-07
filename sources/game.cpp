@@ -1,4 +1,5 @@
 #include "game.hpp"
+#include "analyst.hpp"
 #include "io.hpp"
 #include "memory.hpp"
 #include "text.hpp"
@@ -139,6 +140,7 @@ Code register_score(const Game *const game, SDL_Renderer *renderer) {
  * Runs the main game loop for the Game object and registers the player score.
  */
 Code run_game(Game *const game, SDL_Renderer *renderer) {
+  log_message("Started running a game of difficulty " + double_to_string(get_difficulty(*game), 4) + ".");
   const Milliseconds frame_interval = milliseconds_in_a_second / maximum_fps;
   const Milliseconds logic_interval = milliseconds_in_a_second / UPS;
   Milliseconds start_time = 0;

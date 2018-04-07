@@ -2,7 +2,6 @@
 #include "color.hpp"
 #include "constants.hpp"
 #include "data.hpp"
-#include "investment.hpp"
 #include "logger.hpp"
 #include "text.hpp"
 #include <cctype>
@@ -71,29 +70,6 @@ static int bar_height = -1;
 static bool player_stops_platforms = false;
 
 static int joystick_profile = JOYSTICK_PROFILE_DUALSHOCK;
-
-static InvestmentMode investment_mode = INVESTMENT_MODE_PROPORTIONAL;
-
-/* The period of the investment, in seconds .*/
-static const long MAXIMUM_INVESTMENT_PERIOD = 300;
-static const long MINIMUM_INVESTMENT_PERIOD = 1;
-static long investment_period = 15;
-
-static const long MAXIMUM_INVESTMENT_AMOUNT = 12000;
-static const long MINIMUM_INVESTMENT_AMOUNT = 1;
-static long investment_amount = 60;
-
-static const double MAXIMUM_INVESTMENT_PROPORTION = 1.0;
-static const double MINIMUM_INVESTMENT_PROPORTION = 0.1;
-static double investment_proportion = 60;
-
-static const double MAXIMUM_INVESTMENT_MAXIMUM_FACTOR = 5.0;
-static const double MINIMUM_INVESTMENT_MAXIMUM_FACTOR = 1.0;
-static double investment_maximum_factor = 1.50;
-
-static const double MAXIMUM_INVESTMENT_MINIMUM_FACTOR = 0.0;
-static const double MINIMUM_INVESTMENT_MINIMUM_FACTOR = 1.0;
-static double investment_minimum_factor = 0.75;
 
 static RendererType renderer_type = RENDERER_HARDWARE;
 
@@ -293,37 +269,6 @@ void initialize_settings() {
       } else if (string_equals(value, "DUALSHOCK")) {
         joystick_profile = JOYSTICK_PROFILE_DUALSHOCK;
       }
-    } else if (string_equals(key, "INVESTMENT_MODE")) {
-      for (int i = 0; i < INVESTMENT_MODE_COUNT; ++i) {
-        if (string_equals(value, get_investment_mode_name(static_cast<InvestmentMode>(i)).c_str())) {
-          investment_mode = static_cast<InvestmentMode>(i);
-        }
-      }
-    } else if (string_equals(key, "INVESTMENT_AMOUNT")) {
-      limits.minimum = MINIMUM_INVESTMENT_AMOUNT;
-      limits.maximum = MAXIMUM_INVESTMENT_AMOUNT;
-      limits.fallback = investment_amount;
-      investment_amount = parse_integer(value, limits);
-    } else if (string_equals(key, "INVESTMENT_PROPORTION")) {
-      double_limits.minimum = MINIMUM_INVESTMENT_PROPORTION;
-      double_limits.maximum = MAXIMUM_INVESTMENT_PROPORTION;
-      double_limits.fallback = investment_proportion;
-      investment_proportion = parse_double(value, double_limits);
-    } else if (string_equals(key, "INVESTMENT_PERIOD")) {
-      limits.minimum = MINIMUM_INVESTMENT_PERIOD;
-      limits.maximum = MAXIMUM_INVESTMENT_PERIOD;
-      limits.fallback = investment_period;
-      investment_period = parse_integer(value, limits);
-    } else if (string_equals(key, "INVESTMENT_MAXIMUM_FACTOR")) {
-      double_limits.minimum = MINIMUM_INVESTMENT_MAXIMUM_FACTOR;
-      double_limits.maximum = MAXIMUM_INVESTMENT_MAXIMUM_FACTOR;
-      double_limits.fallback = investment_maximum_factor;
-      investment_maximum_factor = parse_double(value, double_limits);
-    } else if (string_equals(key, "INVESTMENT_MINIMUM_FACTOR")) {
-      double_limits.minimum = MINIMUM_INVESTMENT_MINIMUM_FACTOR;
-      double_limits.maximum = MAXIMUM_INVESTMENT_MINIMUM_FACTOR;
-      double_limits.fallback = investment_minimum_factor;
-      investment_minimum_factor = parse_double(value, double_limits);
     } else if (string_equals(key, "PLATFORM_MAXIMUM_WIDTH")) {
       limits.minimum = 1;
       limits.maximum = 65535;
@@ -418,18 +363,6 @@ long get_padding() { return padding; }
 bool get_player_stops_platforms() { return player_stops_platforms; }
 
 int get_joystick_profile() { return joystick_profile; }
-
-InvestmentMode get_investment_mode() { return investment_mode; }
-
-int get_investment_amount() { return investment_amount; }
-
-double get_investment_proportion() { return investment_proportion; }
-
-int get_investment_period() { return investment_period; }
-
-double get_investment_maximum_factor() { return investment_maximum_factor; }
-
-double get_investment_minimum_factor() { return investment_minimum_factor; }
 
 int get_platform_max_width() { return platform_max_width; }
 

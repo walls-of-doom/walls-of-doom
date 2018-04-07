@@ -5,15 +5,13 @@
 #include "physics.hpp"
 #include <cstring>
 
-std::vector<Platform> generate_platforms(BoundingBox box, U64 count, int width, int height) {
-  const int min_width = get_platform_min_width() * width;
-  const int max_width = get_platform_max_width() * width;
-  const int min_speed = get_platform_min_speed();
-  const int max_speed = get_platform_max_speed();
-  const int lines = (box.max_y - box.min_y + 1) / height;
+std::vector<Platform> generate_platforms(BoundingBox box, U64 count, S32 width, S32 height) {
+  const S32 min_width = get_platform_min_width() * width;
+  const S32 max_width = get_platform_max_width() * width;
+  const S32 min_speed = get_platform_min_speed();
+  const S32 max_speed = get_platform_max_speed();
+  const S32 lines = (box.max_y - box.min_y + 1) / height;
   std::vector<Platform> platforms;
-  int random_y;
-  int speed;
   auto *density = reinterpret_cast<unsigned char *>(resize_memory(nullptr, sizeof(unsigned char) * lines));
   memset(density, 0, lines);
   for (U64 i = 0; i < count; i++) {
@@ -24,11 +22,11 @@ std::vector<Platform> generate_platforms(BoundingBox box, U64 count, int width, 
     /* Subtract two to remove the borders. */
     /* Subtract one after this to prevent platform being after the screen. */
     platform.x = random_integer(0, bounding_box_width(&box)) + box.min_x;
-    random_y = select_random_line_awarely(density, lines);
+    const auto random_y = select_random_line_awarely(density, lines);
     density[random_y]++;
     platform.y = random_y * height + box.min_y;
     platform.speed = 0;
-    speed = random_integer(min_speed, max_speed);
+    const auto speed = random_integer(min_speed, max_speed);
     /* Make about half the platforms go left and about half go right. */
     /* Make sure that the position is OK to trigger repositioning. */
     if (random_integer(0, 1) != 0) {

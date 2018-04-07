@@ -57,8 +57,8 @@ configure_file(sources/constants.hpp.in constants.hpp)
 set(walls-of-doom-sources
         sources/about.hpp
         sources/about.cpp
-        sources/bank.hpp
-        sources/bank.cpp
+        sources/analyst.hpp
+        sources/analyst.cpp
         sources/box.hpp
         sources/box.cpp
         sources/clock.hpp
@@ -77,8 +77,6 @@ set(walls-of-doom-sources
         sources/graphics.hpp
         sources/io.hpp
         sources/io.cpp
-        sources/investment.hpp
-        sources/investment.cpp
         sources/joystick.hpp
         sources/joystick.cpp
         sources/logger.hpp

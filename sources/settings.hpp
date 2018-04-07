@@ -1,7 +1,7 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
-#include "investment.hpp"
+#include "integers.hpp"
 
 /* These maximums are made public so that static allocation is possible. */
 
@@ -41,18 +41,6 @@ long get_padding();
 bool get_player_stops_platforms();
 
 int get_joystick_profile();
-
-InvestmentMode get_investment_mode();
-
-int get_investment_amount();
-
-double get_investment_proportion();
-
-int get_investment_period();
-
-double get_investment_maximum_factor();
-
-double get_investment_minimum_factor();
 
 RendererType get_renderer_type();
 

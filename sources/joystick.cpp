@@ -58,13 +58,6 @@ void initialize_joystick() {
   }
 }
 
-static int get_invest_button() {
-  if (get_joystick_profile() == JOYSTICK_PROFILE_XBOX) {
-    return XBOX_Y;
-  }
-  return DUALSHOCK_TRIANGLE;
-}
-
 static int get_convert_button() {
   if (get_joystick_profile() == JOYSTICK_PROFILE_XBOX) {
     return XBOX_B;
@@ -94,9 +87,6 @@ static int get_pause_button() {
 }
 
 Command command_from_joystick_button(Uint8 button) {
-  if (button == get_invest_button()) {
-    return COMMAND_INVEST;
-  }
   if (button == get_convert_button()) {
     return COMMAND_CONVERT;
   }

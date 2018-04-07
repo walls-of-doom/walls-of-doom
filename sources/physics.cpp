@@ -1,5 +1,4 @@
 #include "physics.hpp"
-#include "bank.hpp"
 #include "memory.hpp"
 
 /* Should be the maximum frame count value for 5 seconds remaining. */
@@ -340,13 +339,11 @@ int select_random_line_blindly(const unsigned char *lines, const int size) {
  * This algorithm is O(n) with respect to the number of lines.
  */
 int select_random_line_awarely(const unsigned char *lines, const int size) {
-  auto maximum_distance = std::numeric_limits<int>::min();
-  int *distances = nullptr;
-  /* Be careful not to call random_integer with invalid parameters. */
   if (size < 1) {
-    return 0;
+    throw std::logic_error("Size is not positive.");
   }
-  distances = reinterpret_cast<int *>(resize_memory(distances, sizeof(int) * size));
+  auto maximum_distance = std::numeric_limits<int>::min();
+  std::vector<int> distances(static_cast<size_t>(size));
   /* First pass: calculate the distance to nearest occupied line above. */
   for (int i = 0; i < size; i++) {
     if (lines[i] != 0) {
@@ -389,7 +386,6 @@ int select_random_line_awarely(const unsigned char *lines, const int size) {
     }
     line = (line + 1) % size;
   }
-  resize_memory(distances, 0);
   return line;
 }
 
@@ -593,60 +589,6 @@ static void buy_life(Game *game) {
   }
 }
 
-static void update_player_investments(Game *game) {
-  Investment *swap;
-  Investment *investments = game->player->investments;
-  while (investments != nullptr && investments->end <= game->played_frames) {
-    game->player->increment_score_from_event(collect_investment(game, *investments));
-    swap = investments->next;
-    resize_memory(investments, 0);
-    investments = swap;
-  }
-  game->player->investments = investments;
-}
-
-static Score get_investment_total(Player *player, InvestmentMode mode) {
-  const Score base_amount = get_investment_amount();
-  const double proportion = get_investment_proportion();
-  Score product;
-  if (mode == INVESTMENT_MODE_FIXED) {
-    return base_amount;
-  }
-  if (mode == INVESTMENT_MODE_PROPORTIONAL) {
-    product = static_cast<Score>(player->score * proportion);
-    if (product >= base_amount) {
-      return product;
-    }
-    return base_amount;
-  }
-  /* Unknown investment type. */
-  return 0;
-}
-
-static void invest(Game *game, InvestmentMode mode) {
-  const Score amount = get_investment_total(game->player, mode);
-  Investment *investments = game->player->investments;
-  Investment *investment = nullptr;
-  if (amount == 0) {
-    return;
-  }
-  if (game->player->score >= amount) {
-    investment = reinterpret_cast<Investment *>(resize_memory(investment, sizeof(Investment)));
-    game->player->decrement_score(amount);
-    investment->next = nullptr;
-    investment->amount = amount;
-    investment->end = game->played_frames + UPS * get_investment_period();
-    while (investments != nullptr && investments->next != nullptr) {
-      investments = investments->next;
-    }
-    if (investments == nullptr) {
-      game->player->investments = investment;
-    } else {
-      investments->next = investment;
-    }
-  }
-}
-
 void process_command(Game *game, Player *player) {
   double *table = player->table->status;
   if (table[COMMAND_LEFT] != 0.0) {
@@ -667,9 +609,6 @@ void process_command(Game *game, Player *player) {
   } else if (table[COMMAND_CONVERT] != 0.0) {
     buy_life(game);
     table[COMMAND_CONVERT] = 0.0;
-  } else if (table[COMMAND_INVEST] != 0.0) {
-    invest(game, get_investment_mode());
-    table[COMMAND_INVEST] = 0.0;
   }
 }
 
@@ -832,7 +771,6 @@ void update_player(Game *game, Player *player) {
   }
   update_player_graphics(game);
   update_player_perk(game);
-  update_player_investments(game);
   process_command(game, player);
   // This ordering makes the player run horizontally before falling.
   // This seems to be the expected order from an user point-of-view.
