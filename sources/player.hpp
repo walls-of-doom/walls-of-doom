@@ -13,6 +13,8 @@ public:
 
   CommandTable *table;
 
+  Graphics graphics;
+
   int x;
   int y;
   int w;
@@ -32,8 +34,6 @@ public:
 
   Perk perk;
   U64 perk_end_frame;
-
-  Graphics graphics{4};
 
   Player(std::string name, CommandTable *table);
 

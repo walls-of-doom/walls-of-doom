@@ -3,9 +3,10 @@
 
 static const Score MAXIMUM_PLAYER_SCORE = std::numeric_limits<Score>::max();
 static const Score MINIMUM_PLAYER_SCORE = 0;
-static const int DEFAULT_TRAIL_SIZE = 4;
 
-Player::Player(std::string name, CommandTable *table) : name(std::move(name)), table(table) {
+static const size_t TRAIL_SIZE = 4;
+
+Player::Player(std::string name, CommandTable *table) : name(std::move(name)), table(table), graphics(TRAIL_SIZE) {
   x = 0;
   y = 0;
   w = 0;

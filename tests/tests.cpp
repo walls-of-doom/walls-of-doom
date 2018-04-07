@@ -241,6 +241,7 @@ TEST_CASE("bounding_box_equals()") {
 TEST_CASE("generate_platforms() avoids multiple platforms on the same line") {
   const size_t platform_count = 128;
   int *y_counter = nullptr;
+  const BoundingBox empty{0, 0, 0, 0};
   BoundingBox box;
   size_t i;
   int y;
@@ -252,7 +253,7 @@ TEST_CASE("generate_platforms() avoids multiple platforms on the same line") {
   box.min_y = 0;
   box.max_x = platform_count - 1;
   box.max_y = platform_count - 1;
-  auto platforms = generate_platforms(box, platform_count, 1, 1);
+  auto platforms = generate_platforms(box, empty, platform_count, 1, 1);
   /* Each platform in platforms should have a different y coordinate. */
   for (i = 0; i < platform_count; i++) {
     y = platforms[i].y;
