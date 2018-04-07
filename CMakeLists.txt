@@ -75,7 +75,6 @@ set(walls-of-doom-sources
         sources/game.hpp
         sources/game.cpp
         sources/graphics.hpp
-        sources/graphics.cpp
         sources/io.hpp
         sources/io.cpp
         sources/investment.hpp

@@ -36,6 +36,10 @@ public:
 
 /* The use of variables is preferred over symbolic constants, when possible. */
 
+static bool hide_cursor = true;
+
+static F64 screen_occupancy = 0.75;
+
 /* How many spaces should be left from the margins when printing text. */
 static const int padding = 2;
 
@@ -58,8 +62,6 @@ static U16 tiles_on_x = 0;
 static U16 tiles_on_y = 0;
 
 static bool computed_window_size = false;
-
-static const float window_size_occupancy = 0.8f;
 
 static int tile_w = -1;
 static int tile_h = -1;
@@ -192,13 +194,13 @@ static long parse_integer(const char *value, Limits limits) {
   return integer;
 }
 
-static int parse_boolean(const char *value, const int fallback) {
-  /* 0, 1, and fallback are all safe to cast to int. */
-  Limits boolean_limits{};
-  boolean_limits.minimum = 0;
-  boolean_limits.maximum = 1;
-  boolean_limits.fallback = fallback;
-  return static_cast<int>(parse_integer(value, boolean_limits));
+static bool parse_boolean(std::string value) {
+  if (value == "true") {
+    return true;
+  } else if (value == "false") {
+    return false;
+  }
+  throw std::domain_error("Invalid string.");
 }
 
 static ColorPair parse_color(const char *string) { return color_pair_from_string(string); }
@@ -282,11 +284,9 @@ void initialize_settings() {
     } else if (string_equals(key, "COLOR_PAIR_PLATFORM_B")) {
       COLOR_PAIR_PLATFORM_B = parse_color(value);
     } else if (string_equals(key, "PLAYER_STOPS_PLATFORMS")) {
-      limits.fallback = static_cast<long>(player_stops_platforms);
-      player_stops_platforms = (parse_boolean(value, limits.fallback) != 0);
+      player_stops_platforms = parse_boolean(value);
     } else if (string_equals(key, "LOGGING_PLAYER_SCORE")) {
-      limits.fallback = logging_player_score;
-      logging_player_score = parse_boolean(value, limits.fallback);
+      logging_player_score = parse_boolean(value);
     } else if (string_equals(key, "JOYSTICK_PROFILE")) {
       if (string_equals(value, "XBOX")) {
         joystick_profile = JOYSTICK_PROFILE_XBOX;
@@ -344,6 +344,13 @@ void initialize_settings() {
       limits.maximum = 65535;
       limits.fallback = platform_min_speed;
       platform_min_speed = parse_integer(value, limits);
+    } else if (string_equals(key, "SCREEN_OCCUPANCY")) {
+      double_limits.minimum = 0.1;
+      double_limits.maximum = 1.0;
+      double_limits.fallback = screen_occupancy;
+      screen_occupancy = parse_double(value, double_limits);
+    } else if (string_equals(key, "HIDE_CURSOR")) {
+      hide_cursor = parse_boolean(value);
     } else if (string_equals(key, "RENDERER_TYPE")) {
       if (string_equals(value, "HARDWARE")) {
         renderer_type = RENDERER_HARDWARE;
@@ -363,11 +370,11 @@ void compute_window_size() {
   const auto w = display_mode.w;
   const auto h = display_mode.h;
   tile_w = 0;
-  while (tiles_on_x * (tile_w + 1) < window_size_occupancy * w) {
+  while (tiles_on_x * (tile_w + 1) < get_screen_occupancy() * w) {
     tile_w++;
   }
   tile_h = 0;
-  while (tiles_on_y * (tile_h + 1) + get_bar_height() * 2 < window_size_occupancy * h) {
+  while (tiles_on_y * (tile_h + 1) + get_bar_height() * 2 < get_screen_occupancy() * h) {
     tile_h++;
   }
   log_message("Using " + std::to_string(tile_w) + "x" + std::to_string(tile_h) + " for tile size.");
@@ -433,3 +440,7 @@ int get_platform_max_speed() { return platform_max_speed; }
 int get_platform_min_speed() { return platform_min_speed; }
 
 int is_logging_player_score() { return logging_player_score; }
+
+bool should_hide_cursor() { return hide_cursor; }
+
+F64 get_screen_occupancy() { return screen_occupancy; }

@@ -66,4 +66,8 @@ int get_platform_min_speed();
 
 int is_logging_player_score();
 
+bool should_hide_cursor();
+
+F64 get_screen_occupancy();
+
 #endif

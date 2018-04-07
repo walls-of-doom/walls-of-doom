@@ -1,20 +1,27 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
+#include <list>
+
 #include "point.hpp"
-#include <cstdlib>
 
-typedef struct Graphics {
-  Point *trail;
-  size_t trail_head;
-  size_t trail_size;
-  size_t trail_capacity;
-} Graphics;
+class Graphics {
+public:
+  inline explicit Graphics(size_t maximum_size) : maximum_size(maximum_size) {}
 
-/* Appends (x, y) to the trail. */
-void graphics_update_trail(Graphics *graphics, int x, int y);
+  inline void update_trail(S32 x, S32 y) {
+    trail.emplace_back(x, y);
+    if (trail.size() > maximum_size) {
+      trail.pop_front();
+    }
+  }
 
-Graphics *create_graphics(size_t trail_size);
-Graphics *destroy_graphics(Graphics *graphics);
+  inline size_t get_maximum_size() const { return maximum_size; }
+
+  std::list<Point> trail;
+
+private:
+  size_t maximum_size;
+};
 
 #endif

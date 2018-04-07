@@ -117,8 +117,7 @@ static Window *create_window(int *width, int *height) {
   const int w = get_window_width();
   const int h = get_window_height();
   const Uint32 flags = SDL_WINDOW_INPUT_FOCUS;
-  Window *window;
-  window = SDL_CreateWindow(game_name, x, y, w, h, flags);
+  Window *window = SDL_CreateWindow(game_name, x, y, w, h, flags);
   SDL_GetWindowSize(window, width, height);
   return window;
 }
@@ -604,19 +603,14 @@ static void draw_perk(const Game *const game, Renderer *renderer) {
 }
 
 Code draw_player(const Player *const player, Renderer *renderer) {
-  int x = player->x;
-  int y = player->y;
-  size_t i;
-  const size_t head = player->graphics->trail_head;
-  const size_t size = player->graphics->trail_size;
-  const size_t capacity = player->graphics->trail_capacity;
-  Color color = COLOR_PAIR_PLAYER.foreground;
-  draw_absolute_tile_rectangle(x, y, color, renderer);
-  for (i = 0; i < size; i++) {
-    x = player->graphics->trail[(head + i) % capacity].x;
-    y = player->graphics->trail[(head + i) % capacity].y;
-    color.a = static_cast<unsigned char>((i + 1) * (255.0 / (capacity + 1)));
-    draw_shaded_absolute_tile_rectangle(x, y, color, renderer);
+  draw_absolute_tile_rectangle(player->x, player->y, COLOR_PAIR_PLAYER.foreground, renderer);
+  const auto points = static_cast<double>(player->graphics.get_maximum_size());
+  size_t i = 0;
+  for (const auto point : player->graphics.trail) {
+    auto color = COLOR_PAIR_PLAYER.foreground;
+    color.a = static_cast<U8>((i + 1) * (std::numeric_limits<U8>::max() / points));
+    draw_shaded_absolute_tile_rectangle(point.x, point.y, color, renderer);
+    i++;
   }
   return CODE_OK;
 }

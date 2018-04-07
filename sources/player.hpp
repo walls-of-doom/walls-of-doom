@@ -36,11 +36,9 @@ public:
 
   Investment *investments;
 
-  Graphics *graphics;
+  Graphics graphics{4};
 
   Player(std::string name, CommandTable *table);
-
-  virtual ~Player();
 
   void increment_score(Score amount);
   void decrement_score(Score amount);

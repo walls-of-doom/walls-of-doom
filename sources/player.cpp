@@ -20,10 +20,7 @@ Player::Player(std::string name, CommandTable *table) : name(std::move(name)), t
   perk = PERK_NONE;
   perk_end_frame = 0;
   investments = nullptr;
-  graphics = create_graphics(DEFAULT_TRAIL_SIZE);
 }
-
-Player::~Player() { destroy_graphics(graphics); }
 
 void Player::decrement_score(const Score amount) {
   const Score maximum_sub = score - MINIMUM_PLAYER_SCORE;
