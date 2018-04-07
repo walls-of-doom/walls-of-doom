@@ -33,11 +33,9 @@ public:
   double fallback = 0;
 };
 
-/* The use of variables is preferred over symbolic constants, when possible. */
-
 static bool hide_cursor = true;
 
-static F64 screen_occupancy = 0.75;
+static F64 screen_occupancy = 0.8;
 
 /* How many spaces should be left from the margins when printing text. */
 static const int padding = 2;
