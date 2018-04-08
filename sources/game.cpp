@@ -2,6 +2,7 @@
 #include "analyst.hpp"
 #include "io.hpp"
 #include "memory.hpp"
+#include "record_table.hpp"
 #include "text.hpp"
 #include <cstring>
 
@@ -91,7 +92,7 @@ void game_set_message(Game *const game, const char *message, const U64 duration,
   }
 }
 
-static void print_game_result(const Settings &settings, const Player *player, const int position, SDL_Renderer *renderer) {
+static void print_game_result(const Settings &settings, const Player *player, const U32 position, SDL_Renderer *renderer) {
   const auto name = player->name;
   const Score score = player->score;
   const ColorPair color = COLOR_PAIR_DEFAULT;
@@ -117,14 +118,12 @@ Code register_score(const Game *const game, SDL_Renderer *renderer) {
   const Player *const player = game->player;
   char buffer[MAXIMUM_STRING_SIZE];
   const char *format = "Started registering a score of %d points for %s.";
-  Record record{};
-  int scoreboard_index;
-  int position;
+  RecordTable table(default_record_table_size);
+  table.load(default_record_table_filename);
+  const auto position = table.add_record(Record(player->name.c_str(), player->score));
+  table.dump(default_record_table_filename);
   sprintf(buffer, format, player->score, player->name.c_str(), renderer);
   log_message(buffer);
-  record = make_record(player->name.c_str(), player->score);
-  scoreboard_index = save_record(&record);
-  position = scoreboard_index + 1;
   log_message("Saved the record successfully.");
   print_game_result(*game->settings, player, position, renderer);
   const Milliseconds release_time = get_milliseconds() + register_score_release_delay;

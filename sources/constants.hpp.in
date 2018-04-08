@@ -12,8 +12,6 @@
  */
 #define MAXIMUM_STRING_SIZE 256
 
-#define MAXIMUM_PLAYER_NAME_SIZE 64
-
 #define UPS 50
 
 #define PLAYER_RUNNING_SPEED 9
@@ -39,9 +37,6 @@
  *
  * May be more than the maximum available.
  */
-#define MAXIMUM_DISPLAYED_RECORDS 64
-
-#define RECORD_TABLE_FILE_NAME "records.txt"
-#define RECORD_ARRAY_SIZE 512
+#define MAXIMUM_DISPLAYED_RECORDS 50
 
 #endif

@@ -6,13 +6,13 @@
 #include <iomanip>
 #include <sstream>
 
-struct Record {
+struct ProfilerRecord {
   std::string base;
   std::string name;
   std::string full;
   double time;
 
-  Record(const std::string &full_name, double time) : full(full_name), time(time) {
+  ProfilerRecord(const std::string &full_name, double time) : full(full_name), time(time) {
     auto separator = full_name.find_last_of('.');
     if (separator != std::string::npos) {
       base = full_name.substr(0, separator);
@@ -22,7 +22,7 @@ struct Record {
     }
   }
 
-  bool operator<(const Record &other) const {
+  bool operator<(const ProfilerRecord &other) const {
     return base < other.base || (base == other.base && time > other.time);
   }
 };
@@ -79,10 +79,10 @@ std::string Profiler::dump() {
   if (!active) {
     return "";
   }
-  std::vector<Record> records;
+  std::vector<ProfilerRecord> records;
   std::unordered_map<std::string, double> base_total;
   for (auto timing : timings) {
-    const Record &record = Record(timing.first, timing.second);
+    const ProfilerRecord &record = ProfilerRecord(timing.first, timing.second);
     base_total[record.base] += record.time;
     records.push_back(record);
   }
@@ -96,7 +96,7 @@ std::string Profiler::dump() {
     stream << labels[i];
   }
   stream << '\n';
-  auto dump_record = [this, &base_total, &stream](const Record &record) {
+  auto dump_record = [this, &base_total, &stream](const ProfilerRecord &record) {
     stream << record.full << ',';
     stream << seconds_to_milliseconds_string(minima[record.full]) << ',';
     stream << seconds_to_milliseconds_string(maxima[record.full]) << ',';

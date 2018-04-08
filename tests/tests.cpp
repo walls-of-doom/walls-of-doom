@@ -13,6 +13,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <sources/record_table.hpp>
 
 #define SMALL_STRING_BUFFER_SIZE 64
 
@@ -468,4 +469,30 @@ TEST_CASE("color_pair_from_string() works") {
   REQUIRE(pair.background.g == parse_base16_digit_pair("AB"));
   REQUIRE(pair.background.b == parse_base16_digit_pair("CD"));
   REQUIRE(pair.background.a == parse_base16_digit_pair("EF"));
+}
+
+TEST_CASE("RecordTable maximum size is respected") {
+  RecordTable table(2);
+  const Record record_a("A", 2);
+  const Record record_b("B", 1);
+  const Record record_c("C", 1);
+  const Record record_d("D", 2);
+  const Record record_e("E", 3);
+  REQUIRE(table.size() == 0);
+  REQUIRE(std::vector<Record>(table.begin(), table.end()).empty());
+  table.add_record(record_a);
+  REQUIRE(table.size() == 1);
+  REQUIRE(std::vector<Record>(table.begin(), table.end()) == std::vector<Record>{record_a});
+  table.add_record(record_b);
+  REQUIRE(table.size() == 2);
+  REQUIRE(std::vector<Record>(table.begin(), table.end()) == std::vector<Record>{record_a, record_b});
+  table.add_record(record_c);
+  REQUIRE(table.size() == 2);
+  REQUIRE(std::vector<Record>(table.begin(), table.end()) == std::vector<Record>{record_a, record_b});
+  table.add_record(record_d);
+  REQUIRE(table.size() == 2);
+  REQUIRE(std::vector<Record>(table.begin(), table.end()) == std::vector<Record>{record_a, record_d});
+  table.add_record(record_e);
+  REQUIRE(table.size() == 2);
+  REQUIRE(std::vector<Record>(table.begin(), table.end()) == std::vector<Record>{record_e, record_a});
 }

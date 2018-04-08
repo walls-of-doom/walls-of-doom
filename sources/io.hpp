@@ -72,7 +72,9 @@ Code read_player_name(const Settings &settings, std::string &destination, Render
  *
  * Returns a Milliseconds approximation of the time this function took.
  */
-Milliseconds draw_game(Game *const game, Renderer *renderer);
+Milliseconds draw_game(Game *game, Renderer *renderer);
+
+Code top_scores(const Settings &settings, Profiler &profiler, Renderer *renderer, CommandTable *table);
 
 void print_menu(const Settings &settings, const std::vector<std::string> &lines, Renderer *renderer);
 
@@ -80,7 +82,5 @@ void print_menu(const Settings &settings, const std::vector<std::string> &lines,
  * Prints the provided string after formatting it to increase readability.
  */
 void print_long_text(const Settings &settings, char *string, Renderer *renderer);
-
-void print_records(const Settings &settings, size_t count, const Record *records, Renderer *renderer);
 
 #endif

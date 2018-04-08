@@ -11,6 +11,7 @@
 #include "profiler.hpp"
 #include "random.hpp"
 #include "record.hpp"
+#include "record_table.hpp"
 #include "settings.hpp"
 #include "text.hpp"
 #include <SDL.h>
@@ -150,7 +151,7 @@ static void set_color(Renderer *renderer, Color color) {
  */
 Code initialize(Settings &settings, Window **window, Renderer **renderer) {
   char log_buffer[MAXIMUM_STRING_SIZE];
-  Uint32 renderer_flags = 0;
+  U32 renderer_flags = 0;
   initialize_logger();
   if (SDL_Init(SDL_INIT_FLAGS) != 0) {
     sprintf(log_buffer, "SDL initialization error: %s.", SDL_GetError());
@@ -417,24 +418,24 @@ Code read_player_name(const Settings &settings, std::string &destination, Render
   const char message[] = "Name your character: ";
   destination = get_user_name();
   /* While there is not a read error or a valid name. */
-  char name[MAXIMUM_PLAYER_NAME_SIZE] = {'\0'};
-  copy_string(name, destination.c_str(), MAXIMUM_PLAYER_NAME_SIZE);
+  std::vector<char> name(maximum_player_name_size);
+  copy_string(name.data(), destination.c_str(), maximum_player_name_size);
   while (code != CODE_OK || !valid_name) {
     auto x = settings.get_padding() * get_font_width();
     auto y = (settings.get_window_height() - get_font_height()) / 2;
-    code = read_string(settings, x, y, message, name, MAXIMUM_PLAYER_NAME_SIZE, renderer);
+    code = read_string(settings, x, y, message, name.data(), maximum_player_name_size, renderer);
     if (code == CODE_QUIT) {
       return CODE_QUIT;
     }
     if (code == CODE_OK) {
-      log_message("Read " + std::string(name) + " from the user.");
+      log_message("Read " + std::string(name.data()) + " from the user.");
       /* Trim the name the user entered. */
-      trim_string(name);
-      log_message("Trimmed the input to " + std::string(name) + ".");
-      valid_name = is_valid_player_name(std::string(name));
+      trim_string(name.data());
+      log_message("Trimmed the input to " + std::string(name.data()) + ".");
+      valid_name = is_valid_player_name(std::string(name.data()));
     }
   }
-  destination = std::string(name);
+  destination = std::string(name.data());
   return code;
 }
 
@@ -680,35 +681,43 @@ Milliseconds draw_game(Game *const game, Renderer *renderer) {
 }
 
 static std::string record_to_string(const Record &record, const int width) {
-  const char format[] = "%s%*.*s%d";
-  const char *name = record.name;
-  const int score = record.score;
+  const char format[] = "%s%*.*s%ld";
+  const auto name = record.get_name();
+  const auto score = record.get_score();
+  const auto pad_length = static_cast<int>(width - name.size() - count_digits(score));
   char pad_string[MAXIMUM_STRING_SIZE];
-  int pad_length;
   memset(pad_string, '.', MAXIMUM_STRING_SIZE - 1);
   pad_string[MAXIMUM_STRING_SIZE - 1] = '\0';
-  pad_length = width - strlen(name) - count_digits(score);
   char destination[MAXIMUM_STRING_SIZE];
-  sprintf(destination, format, name, pad_length, pad_length, pad_string, score);
+  sprintf(destination, format, name.c_str(), pad_length, pad_length, pad_string, score);
   return std::string(destination);
 }
 
-void print_records(const Settings &settings, const size_t count, const Record *records, Renderer *renderer) {
-  const ColorPair pair = COLOR_PAIR_DEFAULT;
+static void print_records(const Settings &settings, const RecordTable &records, Renderer *renderer) {
+  const auto pair = COLOR_PAIR_DEFAULT;
   const int x_padding = 2 * settings.get_padding() * get_font_width();
   const int y_padding = 2 * settings.get_padding() * get_font_height();
   const int available_window_height = settings.get_window_height() - y_padding;
-  const size_t text_lines_limit = available_window_height / get_font_height();
   const int text_width_in_pixels = settings.get_window_width() - x_padding;
   const size_t string_width = text_width_in_pixels / get_font_width();
-  const size_t printed = std::min(count, text_lines_limit);
+  const U32 text_lines_limit = available_window_height / get_font_height();
+  const size_t printed = std::min(records.size(), text_lines_limit);
   std::vector<std::string> strings;
   for (size_t i = 0; i < printed; i++) {
-    strings.push_back(record_to_string(records[i], string_width));
+    strings.push_back(record_to_string(*(records.begin() + i), string_width));
   }
   clear(renderer);
   print_centered_vertically(settings, strings, pair, renderer);
   present(renderer);
+}
+
+Code top_scores(const Settings &settings, Profiler &profiler, SDL_Renderer *renderer, CommandTable *table) {
+  profiler.start("top_scores");
+  RecordTable record_table(default_record_table_size);
+  record_table.load(default_record_table_filename);
+  print_records(settings, record_table, renderer);
+  profiler.stop();
+  return wait_for_input(settings, table);
 }
 
 /**
@@ -716,8 +725,8 @@ void print_records(const Settings &settings, const size_t count, const Record *r
  *
  * For simplicity, the user should only be able to enter letters and numbers.
  */
-static int is_valid_input_character(char c) {
-  return isalnum(c);
+static bool is_valid_input_character(char character) {
+  return isalnum(character);
 }
 
 /**
@@ -808,7 +817,7 @@ Code read_string(const Settings &settings, const int x, const int y, const char 
         }
       } else if (event.type == SDL_TEXTINPUT) {
         character = event.text.text[0];
-        if ((is_valid_input_character(character) != 0) && written + 1 < size) {
+        if (is_valid_input_character(character) && written + 1 < size) {
           *write = character;
           write++;
           written++;
