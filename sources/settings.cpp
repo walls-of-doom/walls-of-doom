@@ -203,20 +203,16 @@ Settings::Settings(const std::string &filename) {
   }
 }
 
-void Settings::compute_window_size() {
+void Settings::compute_window_size(U32 width, U32 height) {
   if (computed_window_size) {
     throw std::logic_error("Double initialization.");
   }
-  SDL_DisplayMode display_mode{};
-  SDL_GetCurrentDisplayMode(0, &display_mode);
-  const auto w = display_mode.w;
-  const auto h = display_mode.h;
   tile_w = 0;
-  while (tiles_on_x * (tile_w + 1) < get_screen_occupancy() * w) {
+  while (tiles_on_x * (tile_w + 1) < get_screen_occupancy() * width) {
     tile_w++;
   }
   tile_h = 0;
-  while (tiles_on_y * (tile_h + 1) + get_bar_height() * 2 < get_screen_occupancy() * h) {
+  while (tiles_on_y * (tile_h + 1) + get_bar_height() * 2 < get_screen_occupancy() * height) {
     tile_h++;
   }
   log_message("Using " + std::to_string(tile_w) + "x" + std::to_string(tile_h) + " for tile size.");

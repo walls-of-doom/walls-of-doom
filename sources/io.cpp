@@ -157,7 +157,9 @@ Code initialize(Settings &settings, Window **window, Renderer **renderer) {
     log_message(log_buffer);
     return CODE_ERROR;
   }
-  settings.compute_window_size();
+  SDL_DisplayMode display_mode{};
+  SDL_GetCurrentDisplayMode(0, &display_mode);
+  settings.compute_window_size(static_cast<U32>(display_mode.w), static_cast<U32>(display_mode.h));
   settings.validate_settings();
   SDL_ShowCursor(SDL_DISABLE);
   initialize_joystick();
@@ -338,10 +340,10 @@ void print_long_text(const Settings &settings, char *string, Renderer *renderer)
 /**
  * Prints the provided strings centered at the specified absolute line.
  */
-static Code print_centered_horizontally(const Settings &settings, const int y, const std::vector<std::string> &strings, const ColorPair pair, Renderer *renderer) {
+static Code print_centered_horizontally(const Settings &settings, const std::vector<std::string> &strings, const ColorPair color, Renderer *renderer, const int y) {
   char log_buffer[MAXIMUM_STRING_SIZE];
-  const SDL_Color foreground = pair.foreground.to_SDL_color();
-  const SDL_Color background = pair.background.to_SDL_color();
+  const SDL_Color foreground = color.foreground.to_SDL_color();
+  const SDL_Color background = color.background.to_SDL_color();
   const auto slice_size = settings.get_window_width() / strings.size();
   Font *font = global_monospaced_font;
   SDL_Surface *surface;
@@ -382,7 +384,7 @@ static Code print_centered_horizontally(const Settings &settings, const int y, c
 /**
  * Prints the provided strings centered in the middle of the screen.
  */
-Code print_centered_vertically(const Settings &settings, const std::vector<std::string> &strings, ColorPair color_pair, Renderer *renderer) {
+Code print_centered_vertically(const Settings &settings, const std::vector<std::string> &strings, ColorPair color, Renderer *renderer) {
   const int text_line_height = global_monospaced_font_height;
   const int padding = 2 * settings.get_padding() * global_monospaced_font_height;
   const int available_window_height = settings.get_window_height() - padding;
@@ -393,7 +395,7 @@ Code print_centered_vertically(const Settings &settings, const std::vector<std::
     const auto string = strings[i];
     auto *array = reinterpret_cast<char *>(malloc(string.size() + 1));
     copy_string(array, string.c_str(), string.size() + 1);
-    print_centered_horizontally(settings, y, {string}, color_pair, renderer);
+    print_centered_horizontally(settings, {string}, color, renderer, y);
     y += text_line_height;
     free(array);
   }
@@ -493,7 +495,7 @@ static void write_top_bar_strings(const Settings &settings, const std::vector<st
   int h = settings.get_bar_height();
   int w = settings.get_window_width();
   draw_absolute_rectangle(0, 0, w, h, color_pair.background, renderer);
-  print_centered_horizontally(settings, y, strings, color_pair, renderer);
+  print_centered_horizontally(settings, strings, color_pair, renderer, y);
 }
 
 /**

@@ -115,7 +115,7 @@ public:
     return platform_min_speed;
   }
 
-  void compute_window_size();
+  void compute_window_size(U32 width, U32 height);
 
   void validate_settings() const;
 

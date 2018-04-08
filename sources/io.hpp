@@ -51,7 +51,7 @@ Code finalize(Window **window, Renderer **renderer);
 
 Code print_absolute(int x, int y, const char *string, ColorPair color, Renderer *renderer);
 
-Code print_centered_vertically(const Settings &settings, const std::vector<std::string> &strings, ColorPair color_pair, Renderer *renderer);
+Code print_centered_vertically(const Settings &settings, const std::vector<std::string> &strings, ColorPair color, Renderer *renderer);
 
 /**
  * Reads a string from the user of up to size characters (including NUL).
