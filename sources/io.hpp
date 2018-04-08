@@ -51,11 +51,6 @@ Code finalize(Window **window, Renderer **renderer);
 
 Code print_absolute(int x, int y, const char *string, ColorPair color, Renderer *renderer);
 
-/**
- * Prints the provided strings centered at the specified absolute line.
- */
-Code print_centered_horizontally(int y, const std::vector<std::string> &strings, ColorPair color_pair, Renderer *renderer);
-
 Code print_centered_vertically(const Settings &settings, const std::vector<std::string> &strings, ColorPair color_pair, Renderer *renderer);
 
 /**

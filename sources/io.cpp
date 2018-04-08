@@ -338,11 +338,11 @@ void print_long_text(const Settings &settings, char *string, Renderer *renderer)
 /**
  * Prints the provided strings centered at the specified absolute line.
  */
-Code print_centered_horizontally(const Settings &settings, const int y, const std::vector<std::string> &strings, const ColorPair pair, Renderer *renderer) {
+static Code print_centered_horizontally(const Settings &settings, const int y, const std::vector<std::string> &strings, const ColorPair pair, Renderer *renderer) {
   char log_buffer[MAXIMUM_STRING_SIZE];
   const SDL_Color foreground = pair.foreground.to_SDL_color();
   const SDL_Color background = pair.background.to_SDL_color();
-  const int slice_size = settings.get_window_width() / strings.size();
+  const auto slice_size = settings.get_window_width() / strings.size();
   Font *font = global_monospaced_font;
   SDL_Surface *surface;
   SDL_Texture *texture;
