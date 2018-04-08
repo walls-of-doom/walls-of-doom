@@ -1,0 +1,42 @@
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
+
+#define REPETITION_DELAY 100
+
+/**
+ * All stack character buffers default to this size.
+ *
+ * This is the maximum size which the application strings should have.
+ *
+ * Several functions hold arrays of this size. Increasing it will likely dramatically increase stack usage.
+ */
+#define MAXIMUM_STRING_SIZE 256
+
+#define UPS 50
+
+#define PLAYER_RUNNING_SPEED 9
+
+#define PLAYER_FALLING_SPEED 12
+
+#define PLAYER_JUMPING_SPEED PLAYER_FALLING_SPEED
+
+#define PLAYER_JUMPING_HEIGHT PLAYER_JUMPING_SPEED
+
+/**
+ * Information required for font loading.
+ */
+#define MONOSPACED_FONT_PATH "assets/fonts/roboto-mono.ttf"
+
+#define ICON_PATH "assets/icons/icon.png"
+
+#define ADJECTIVES_FILE_PATH "assets/words/adjectives.txt"
+#define NOUNS_FILE_PATH "assets/words/nouns.txt"
+
+/**
+ * The maximum number of records that will be displayed to the player.
+ *
+ * May be more than the maximum available.
+ */
+#define MAXIMUM_DISPLAYED_RECORDS 50
+
+#endif

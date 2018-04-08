@@ -1,20 +1,32 @@
-language: c
+language: cpp
+
 sudo: required
 dist: trusty
 
-compiler:
-  - clang
-  - gcc
+addons:
+  apt:
+    packages:
+    - g++-7
+    - clang-5.0
+    - libegl1-mesa-dev
+    - libsdl2-dev
+    - libsdl2-ttf-dev
+    - libsdl2-image-dev
+    sources:
+    - ubuntu-toolchain-r-test
+    - llvm-toolchain-trusty-5.0
 
-install:
-  - bash scripts/setup.sh
+matrix:
+  include:
+    - env: COMPILER=clang++-5.0
+    - env: COMPILER=g++-7
 
 script:
-  - bash scripts/test.sh
+  - mkdir build && cd build && cmake .. -DCMAKE_CXX_COMPILER=$COMPILER && make && ./tests
 
 notifications:
   email:
     on_success: always
     on_failure: always
     recipients:
-      - mafagafogigante@gmail.com
+      - bernardo@bernardosulzbach.com
