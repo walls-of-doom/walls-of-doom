@@ -653,7 +653,7 @@ void update_player_vertical_position(Game *game) {
     }
   } else if (is_falling(game)) {
     int pending = 0;
-    if (game->player->perk == PERK_POWER_LOW_GRAVITY) {
+    if (game->player->perk == PERK_POWER_FEATHER_FALL) {
       pending = get_pending_movement(game, falling_speed / 2);
     } else {
       pending = get_pending_movement(game, falling_speed);
