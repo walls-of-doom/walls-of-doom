@@ -23,10 +23,10 @@ static F64 get_average_speed(const Game &game) {
 }
 
 F64 get_difficulty(const Game &game) {
-  const S32 min_width = get_platform_min_width() * game.tile_w;
-  const S32 max_width = get_platform_max_width() * game.tile_w;
-  const S32 min_speed = get_platform_min_speed() * game.tile_w;
-  const S32 max_speed = get_platform_max_speed() * game.tile_w;
+  const S32 min_width = game.settings->get_platform_min_width() * game.tile_w;
+  const S32 max_width = game.settings->get_platform_max_width() * game.tile_w;
+  const S32 min_speed = game.settings->get_platform_min_speed() * game.tile_w;
+  const S32 max_speed = game.settings->get_platform_max_speed() * game.tile_w;
   const F64 avg_width = (min_width + max_width) / 2.0;
   const F64 avg_speed = (min_speed + max_speed) / 2.0;
   const F64 game_avg_width = get_average_width(game);

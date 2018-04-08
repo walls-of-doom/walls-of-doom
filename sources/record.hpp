@@ -39,6 +39,6 @@ int save_record(Record *record);
  */
 size_t read_records(Record *destination, size_t destination_size);
 
-Code top_scores(Profiler &profiler, SDL_Renderer *renderer, CommandTable *table);
+Code top_scores(const Settings &settings, Profiler &profiler, SDL_Renderer *renderer, CommandTable *table);
 
 #endif

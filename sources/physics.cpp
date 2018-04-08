@@ -96,8 +96,8 @@ static void move_player(Game *game, int dx, int dy) {
 }
 
 static bool can_move_player_without_intersecting(Game *game, int dx, int dy) {
-  const auto tile_w = get_tile_w();
-  const auto tile_h = get_tile_h();
+  const S32 tile_w = game->settings->get_tile_w();
+  const S32 tile_h = game->settings->get_tile_h();
   for (auto x = game->player->x + dx; x < game->player->x + dx + tile_w; x++) {
     for (auto y = game->player->y + dy; y < game->player->y + dy + tile_h; y++) {
       if (get_from_rigid_matrix(game, x, y) != 0u) {
@@ -200,7 +200,7 @@ static bool is_in_front_of_platform(const Player *const player, const Platform *
 }
 
 static bool can_move_platform(Game *const game, Platform *p, int dx, int dy) {
-  if (get_player_stops_platforms() && is_over_platform(game->player, p)) {
+  if (game->settings->get_player_stops_platforms() && is_over_platform(game->player, p)) {
     return false;
   }
   if (dx == 0 && dy == 0) {
@@ -378,8 +378,10 @@ int select_random_line_awarely(const std::vector<unsigned char> &lines) {
 static void reposition(Game *const game, Platform *const platform) {
   const auto box = game->box;
   // The occupied size may be smaller than the array actually is.
-  const auto occupied_size = static_cast<U32>((get_window_height() - 2 * get_bar_height()) / get_tile_h());
-  const int tile_h = game->tile_h;
+  const auto settings = game->settings;
+  const auto bar_height = settings->get_bar_height();
+  const auto tile_h = game->tile_h;
+  const auto occupied_size = static_cast<U32>((settings->get_window_height() - 2 * bar_height) / tile_h);
   std::vector<U8> occupied(occupied_size);
   /* Build a table of occupied rows. */
   for (size_t i = 0; i < game->platform_count; i++) {
@@ -388,7 +390,7 @@ static void reposition(Game *const game, Platform *const platform) {
     }
   }
   int line;
-  if (get_reposition_algorithm() == REPOSITION_SELECT_BLINDLY) {
+  if (game->settings->get_reposition_algorithm() == REPOSITION_SELECT_BLINDLY) {
     line = select_random_line_blindly(occupied);
   } else {
     line = select_random_line_awarely(occupied);
@@ -490,9 +492,13 @@ void conceive_bonus(Player *const player, const Perk perk) {
   }
 }
 
-static void accelerate_platform(Platform *const platform) { platform->speed = platform->speed + platform->speed / 2; }
+static void accelerate_platform(Platform *const platform) {
+  platform->speed = platform->speed + platform->speed / 2;
+}
 
-static void reverse_platform(Platform *const platform) { platform->speed = -platform->speed; }
+static void reverse_platform(Platform *const platform) {
+  platform->speed = -platform->speed;
+}
 
 static void apply_to_platforms(Game *const game, void (*f)(Platform *const)) {
   for (size_t i = 0; i != game->platform_count; ++i) {
@@ -517,16 +523,17 @@ void process_curse(Game *const game, const Perk perk) {
 
 void update_perk(Game *const game) {
   auto next_perk_frame = game->perk_end_frame;
-  next_perk_frame += get_perk_interval() * UPS;
-  next_perk_frame -= get_perk_screen_duration() * UPS;
+  next_perk_frame += game->settings->get_perk_interval() * UPS;
+  next_perk_frame -= game->settings->get_perk_screen_duration() * UPS;
   if (game->played_frames == game->perk_end_frame) {
     game->perk = PERK_NONE;
   } else if (game->played_frames == next_perk_frame) {
     game->perk = get_random_perk();
-    game->perk_x = random_integer(0, get_window_width() - get_tile_w());
-    int random_y = random_integer(get_bar_height(), get_window_height() - 2 * get_bar_height());
-    game->perk_y = random_y - random_y % get_tile_h();
-    game->perk_end_frame = game->played_frames + get_perk_screen_duration() * UPS;
+    game->perk_x = random_integer(0, game->settings->get_window_width() - game->settings->get_tile_w());
+    const auto bar_height = game->settings->get_bar_height();
+    const auto random_y = random_integer(bar_height, game->settings->get_window_height() - 2 * bar_height);
+    game->perk_y = random_y - random_y % game->settings->get_tile_h();
+    game->perk_end_frame = game->played_frames + game->settings->get_perk_screen_duration() * UPS;
   }
 }
 
@@ -545,7 +552,9 @@ void update_player_horizontal_position(Game *game) {
   }
 }
 
-static bool is_jumping(const Player *const player) { return player->remaining_jump_height > 0; }
+static bool is_jumping(const Player *const player) {
+  return player->remaining_jump_height > 0;
+}
 
 void process_jump(Game *const game) {
   const int jumping_height = game->tile_h * PLAYER_JUMPING_HEIGHT;
@@ -617,7 +626,7 @@ static bool can_move_up(const Game *game) {
   if (y == game->box.min_y) {
     return true;
   }
-  for (int i = 0; i < get_tile_w(); i++) {
+  for (S32 i = 0; i < static_cast<S32>(game->settings->get_tile_w()); i++) {
     if (get_from_rigid_matrix(game, x + i, y - 1) != 0u) {
       return false;
     }
@@ -733,7 +742,7 @@ static void update_player_perk(Game *game) {
           /* this part would removed it, but this seems more correct. */
           player->perk = PERK_NONE;
         } else {
-          end_frame = game->played_frames + get_perk_screen_duration() * UPS;
+          end_frame = game->played_frames + game->settings->get_perk_screen_duration() * UPS;
           player->perk_end_frame = end_frame;
         }
         write_got_perk_message(game, perk);
@@ -749,7 +758,7 @@ static void update_player_graphics(Game *game) {
 void update_player(Game *game, Player *player) {
   game->profiler->start("update_player");
   if (player->physics) {
-    log_player_score(game->played_frames, player->score);
+    log_player_score(*game->settings, game->played_frames, player->score);
   }
   update_player_graphics(game);
   update_player_perk(game);

@@ -2,6 +2,7 @@
 #define LOGGER_H
 
 #include "score.hpp"
+#include "settings.hpp"
 #include <string>
 
 /**
@@ -19,6 +20,6 @@ void finalize_logger();
  */
 void log_message(const std::string &message);
 
-void log_player_score(const U64 frame, const Score score);
+void log_player_score(const Settings &settings, const U64 frame, const Score score);
 
 #endif

@@ -42,4 +42,6 @@ void Player::increment_score(const Score amount) {
   }
 }
 
-void Player::increment_score_from_event(const float rarity) { score += 100.0f / UPS * (1.0f + rarity); }
+void Player::increment_score_from_event(const float rarity) {
+  score += 100.0f / UPS * (1.0f + rarity);
+}

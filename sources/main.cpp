@@ -30,8 +30,6 @@ ParserResult parse_argument(const char *argument) {
 int main(int argc, char *argv[]) {
   int quit = 0;
   int result = 0;
-  SDL_Window *window;
-  SDL_Renderer *renderer;
   if (argc > 1) {
     for (int i = 1; i < argc && (quit == 0); i++) {
       if (parse_argument(argv[i]) == PARSER_RESULT_QUIT) {
@@ -44,8 +42,11 @@ int main(int argc, char *argv[]) {
   }
   try {
     seed_random();
-    initialize(&window, &renderer);
-    result = main_menu(renderer);
+    Settings settings(settings_filename);
+    SDL_Window *window;
+    SDL_Renderer *renderer;
+    initialize(settings, &window, &renderer);
+    result = main_menu(settings, renderer);
     finalize(&window, &renderer);
   } catch (std::exception &exception) {
     std::cout << "Exception!" << ' ' << exception.what() << '\n';

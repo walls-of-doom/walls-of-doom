@@ -3,6 +3,7 @@
 
 #include "clock.hpp"
 #include "code.hpp"
+#include "settings.hpp"
 
 /**
  * The Command enumeration represents the different commands the user may issue.
@@ -35,11 +36,11 @@ void initialize_command_table(CommandTable *table);
 
 bool test_command_table(CommandTable *table, enum Command command, Milliseconds repetition_delay);
 
-void read_commands(CommandTable *table);
+void read_commands(const Settings &settings, CommandTable *table);
 
 /**
  * Waits for any user input, blocking indefinitely.
  */
-Code wait_for_input(CommandTable *table);
+Code wait_for_input(const Settings &settings, CommandTable *table);
 
 #endif

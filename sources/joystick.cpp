@@ -44,9 +44,13 @@ static void log_joystick_count() {
   log_message(log_buffer);
 }
 
-SDL_Joystick *get_joystick() { return shared_joystick; }
+SDL_Joystick *get_joystick() {
+  return shared_joystick;
+}
 
-static void set_joystick(SDL_Joystick *joystick) { shared_joystick = joystick; }
+static void set_joystick(SDL_Joystick *joystick) {
+  shared_joystick = joystick;
+}
 
 void initialize_joystick() {
   log_joystick_count();
@@ -58,53 +62,53 @@ void initialize_joystick() {
   }
 }
 
-static int get_convert_button() {
-  if (get_joystick_profile() == JOYSTICK_PROFILE_XBOX) {
+static int get_convert_button(const Settings &settings) {
+  if (settings.get_joystick_profile() == JOYSTICK_PROFILE_XBOX) {
     return XBOX_B;
   }
   return DUALSHOCK_CIRCLE;
 }
 
-static int get_jump_button() {
-  if (get_joystick_profile() == JOYSTICK_PROFILE_XBOX) {
+static int get_jump_button(const Settings &settings) {
+  if (settings.get_joystick_profile() == JOYSTICK_PROFILE_XBOX) {
     return XBOX_A;
   }
   return DUALSHOCK_CROSS;
 }
 
-static int get_enter_button() {
-  if (get_joystick_profile() == JOYSTICK_PROFILE_XBOX) {
+static int get_enter_button(const Settings &settings) {
+  if (settings.get_joystick_profile() == JOYSTICK_PROFILE_XBOX) {
     return XBOX_START;
   }
   return DUALSHOCK_START;
 }
 
-static int get_pause_button() {
-  if (get_joystick_profile() == JOYSTICK_PROFILE_XBOX) {
+static int get_pause_button(const Settings &settings) {
+  if (settings.get_joystick_profile() == JOYSTICK_PROFILE_XBOX) {
     return XBOX_BACK;
   }
   return DUALSHOCK_SELECT;
 }
 
-Command command_from_joystick_button(Uint8 button) {
-  if (button == get_convert_button()) {
+Command command_from_joystick_button(const Settings &settings, Uint8 button) {
+  if (button == get_convert_button(settings)) {
     return COMMAND_CONVERT;
   }
-  if (button == get_jump_button()) {
+  if (button == get_jump_button(settings)) {
     return COMMAND_JUMP;
   }
-  if (button == get_enter_button()) {
+  if (button == get_enter_button(settings)) {
     return COMMAND_ENTER;
   }
-  if (button == get_pause_button()) {
+  if (button == get_pause_button(settings)) {
     return COMMAND_PAUSE;
   }
   return COMMAND_NONE;
 }
 
-Command command_from_joystick_event(const SDL_Event event) {
+Command command_from_joystick_event(const Settings &settings, const SDL_Event event) {
   if (event.type == SDL_JOYBUTTONDOWN || event.type == SDL_JOYBUTTONUP) {
-    return command_from_joystick_button(event.jbutton.button);
+    return command_from_joystick_button(settings, event.jbutton.button);
   }
   if (event.type == SDL_JOYAXISMOTION) {
     if (abs(event.jaxis.value) > JOYSTICK_DEAD_ZONE) {

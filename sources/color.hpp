@@ -13,8 +13,10 @@ public:
   U8 a = 0;
 
   Color() = default;
-  Color(U8 r, U8 g, U8 b) : r(r), g(g), b(b) {}
-  Color(U8 r, U8 g, U8 b, U8 a) : r(r), g(g), b(b), a(a) {}
+  Color(U8 r, U8 g, U8 b) : r(r), g(g), b(b) {
+  }
+  Color(U8 r, U8 g, U8 b, U8 a) : r(r), g(g), b(b), a(a) {
+  }
 
   inline Color mix(Color rhs, float rhsAmount) const {
     const auto lhsAmount = 1.0f - rhsAmount;

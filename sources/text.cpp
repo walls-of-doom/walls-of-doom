@@ -75,7 +75,9 @@ size_t copy_string_up_to(char *destination, const char *begin, const char *end, 
   return size;
 }
 
-bool string_equals(const char *a, const char *b) { return strcmp(a, b) == 0; }
+bool string_equals(const char *a, const char *b) {
+  return strcmp(a, b) == 0;
+}
 
 /**
  * Trims a string by removing all leading and trailing spaces.

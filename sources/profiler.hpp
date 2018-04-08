@@ -25,7 +25,8 @@ private:
   TimePoint get_time_point() const;
 
 public:
-  explicit Profiler(bool active) : active(active) {}
+  explicit Profiler(bool active) : active(active) {
+  }
   void start(const std::string &component);
   void stop();
   std::string dump();

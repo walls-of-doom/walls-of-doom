@@ -24,8 +24,6 @@
 
 #define PLAYER_JUMPING_HEIGHT PLAYER_JUMPING_SPEED
 
-#define SETTINGS_FILE "assets/settings/settings.txt"
-
 /**
  * Information required for font loading.
  */

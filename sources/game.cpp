@@ -19,23 +19,23 @@ static void initialize_rigid_matrix(Game *game) {
   }
 }
 
-Game::Game(Player *player, Profiler *profiler) : player(player), profiler(profiler) {
-  tile_w = get_tile_w();
-  tile_h = get_tile_h();
+Game::Game(Player *player, const Settings *settings, Profiler *profiler) : player(player), settings(settings), profiler(profiler) {
+  tile_w = settings->get_tile_w();
+  tile_h = settings->get_tile_h();
 
-  platform_count = get_platform_count();
+  platform_count = settings->get_platform_count();
 
   box.min_x = 0;
   box.min_y = 0;
-  box.max_x = get_window_width();
-  box.max_y = get_window_height() - 2 * get_bar_height();
+  box.max_x = settings->get_window_width();
+  box.max_y = settings->get_window_height() - 2 * settings->get_bar_height();
 
   player->w = tile_w;
   player->h = tile_h;
   reposition_player(this);
 
   const BoundingBox avoidance{player->x, player->y, player->x + player->w, player->y + player->h};
-  platforms = generate_platforms(box, avoidance, platform_count, tile_w, tile_h);
+  platforms = generate_platforms(*settings, box, avoidance, platform_count, tile_w, tile_h);
 
   current_frame = 0;
   desired_frame = 0;
@@ -47,7 +47,7 @@ Game::Game(Player *player, Profiler *profiler) : player(player), profiler(profil
   perk_x = 0;
   perk_y = 0;
   /* Don't start with a Perk on the screen. */
-  perk_end_frame = static_cast<U64>(get_perk_screen_duration() * UPS);
+  perk_end_frame = static_cast<U64>(settings->get_perk_screen_duration() * UPS);
 
   rigid_matrix_m = static_cast<size_t>(box.max_y - box.min_y + 1);
   rigid_matrix_n = static_cast<size_t>(box.max_x - box.min_x + 1);
@@ -91,7 +91,7 @@ void game_set_message(Game *const game, const char *message, const U64 duration,
   }
 }
 
-static void print_game_result(const Player *player, const int position, SDL_Renderer *renderer) {
+static void print_game_result(const Settings &settings, const Player *player, const int position, SDL_Renderer *renderer) {
   const auto name = player->name;
   const Score score = player->score;
   const ColorPair color = COLOR_PAIR_DEFAULT;
@@ -109,7 +109,7 @@ static void print_game_result(const Player *player, const int position, SDL_Rend
   lines.emplace_back(empty_line);
   lines.emplace_back(second_line);
   clear(renderer);
-  print_centered_vertically(lines, color, renderer);
+  print_centered_vertically(settings, lines, color, renderer);
   present(renderer);
 }
 
@@ -126,10 +126,10 @@ Code register_score(const Game *const game, SDL_Renderer *renderer) {
   scoreboard_index = save_record(&record);
   position = scoreboard_index + 1;
   log_message("Saved the record successfully.");
-  print_game_result(player, position, renderer);
+  print_game_result(*game->settings, player, position, renderer);
   const Milliseconds release_time = get_milliseconds() + register_score_release_delay;
   Code code = CODE_OK;
-  while ((code = wait_for_input(game->player->table)) == CODE_OK) {
+  while ((code = wait_for_input(*game->settings, game->player->table)) == CODE_OK) {
     if (get_milliseconds() > release_time) {
       break;
     }
@@ -162,7 +162,7 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
     }
     if (game->paused) {
       draw_game(game, renderer);
-      read_commands(game->player->table);
+      read_commands(*game->settings, game->player->table);
       if (test_command_table(game->player->table, COMMAND_CLOSE, REPETITION_DELAY)) {
         code = CODE_CLOSE;
       }
@@ -180,7 +180,7 @@ Code run_game(Game *const game, SDL_Renderer *renderer) {
       game->current_frame++;
     }
     draw_game(game, renderer);
-    read_commands(game->player->table);
+    read_commands(*game->settings, game->player->table);
     if (test_command_table(game->player->table, COMMAND_PAUSE, REPETITION_DELAY)) {
       game->paused = true;
     }

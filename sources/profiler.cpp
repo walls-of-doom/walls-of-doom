@@ -22,7 +22,9 @@ struct Record {
     }
   }
 
-  bool operator<(const Record &other) const { return base < other.base || (base == other.base && time > other.time); }
+  bool operator<(const Record &other) const {
+    return base < other.base || (base == other.base && time > other.time);
+  }
 };
 
 static double seconds_between(const TimePoint now, const TimePoint then) {
@@ -30,7 +32,9 @@ static double seconds_between(const TimePoint now, const TimePoint then) {
   return delta.count();
 }
 
-TimePoint Profiler::get_time_point() const { return std::chrono::steady_clock::now(); }
+TimePoint Profiler::get_time_point() const {
+  return std::chrono::steady_clock::now();
+}
 
 std::string Profiler::get_component_name() const {
   std::string name;
@@ -67,7 +71,9 @@ void Profiler::stop() {
   hierarchy.pop_back();
 }
 
-static std::string seconds_to_milliseconds_string(double value) { return double_to_string(1000.0 * value, 2) + " ms"; }
+static std::string seconds_to_milliseconds_string(double value) {
+  return double_to_string(1000.0 * value, 2) + " ms";
+}
 
 std::string Profiler::dump() {
   if (!active) {

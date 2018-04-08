@@ -7,7 +7,8 @@
 
 class Graphics {
 public:
-  inline explicit Graphics(size_t maximum_size) : maximum_size(maximum_size) {}
+  inline explicit Graphics(size_t maximum_size) : maximum_size(maximum_size) {
+  }
 
   inline void update_trail(S32 x, S32 y) {
     trail.emplace_back(x, y);
@@ -16,7 +17,9 @@ public:
     }
   }
 
-  inline size_t get_maximum_size() const { return maximum_size; }
+  inline size_t get_maximum_size() const {
+    return maximum_size;
+  }
 
   std::list<Point> trail;
 

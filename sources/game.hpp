@@ -22,6 +22,8 @@ class Game {
 public:
   Player *player;
 
+  const Settings *settings;
+
   Profiler *profiler;
 
   std::vector<Platform> platforms;
@@ -57,7 +59,7 @@ public:
   U64 message_end_frame;
   unsigned int message_priority;
 
-  Game(Player *player, Profiler *profiler);
+  Game(Player *player, const Settings *settings, Profiler *profiler);
 };
 
 Milliseconds update_game(Game *const game);

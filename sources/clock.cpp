@@ -7,7 +7,9 @@
  *
  * This function should be used to measure computation times.
  */
-Milliseconds get_milliseconds() { return SDL_GetTicks(); }
+Milliseconds get_milliseconds() {
+  return SDL_GetTicks();
+}
 
 /**
  * Sleeps for the specified number of milliseconds or more.

@@ -42,18 +42,28 @@ static const int PERK_FADING_INTERVAL = UPS;
 /**
  * Clears the screen.
  */
-void clear(Renderer *renderer) { SDL_RenderClear(renderer); }
+void clear(Renderer *renderer) {
+  SDL_RenderClear(renderer);
+}
 
 /**
  * Updates the screen with what has been rendered.
  */
-void present(Renderer *renderer) { SDL_RenderPresent(renderer); }
+void present(Renderer *renderer) {
+  SDL_RenderPresent(renderer);
+}
 
-Font *get_font() { return global_monospaced_font; }
+Font *get_font() {
+  return global_monospaced_font;
+}
 
-int get_font_width() { return global_monospaced_font_width; }
+int get_font_width() {
+  return global_monospaced_font_width;
+}
 
-int get_font_height() { return global_monospaced_font_height; }
+int get_font_height() {
+  return global_monospaced_font_height;
+}
 
 /**
  * Swap the renderer color by the provided color.
@@ -70,14 +80,14 @@ static void swap_color(Renderer *renderer, SDL_Color *color) {
 /**
  * Initializes the global fonts.
  */
-static Code initialize_fonts() {
+static Code initialize_fonts(const Settings &settings) {
   char log_buffer[MAXIMUM_STRING_SIZE];
   Font *font = nullptr;
   if (global_monospaced_font != nullptr) {
     return CODE_OK;
   }
   /* We try to open the font if we need to initialize. */
-  font = TTF_OpenFont(MONOSPACED_FONT_PATH, get_font_size());
+  font = TTF_OpenFont(MONOSPACED_FONT_PATH, settings.get_font_size());
   /* If it failed, we log an error. */
   if (font == nullptr) {
     sprintf(log_buffer, "TTF font opening error: %s.", SDL_GetError());
@@ -106,16 +116,11 @@ static Code initialize_font_metrics() {
   return CODE_OK;
 }
 
-/**
- * Creates a new fullscreen window.
- *
- * Updates the pointers with the window width, window height, and bar height.
- */
-static Window *create_window(int *width, int *height) {
+static Window *create_window(const Settings &settings, int *width, int *height) {
   const int x = SDL_WINDOWPOS_CENTERED;
   const int y = SDL_WINDOWPOS_CENTERED;
-  const int w = get_window_width();
-  const int h = get_window_height();
+  const int w = settings.get_window_width();
+  const int h = settings.get_window_height();
   const Uint32 flags = SDL_WINDOW_INPUT_FOCUS;
   Window *window = SDL_CreateWindow(game_name, x, y, w, h, flags);
   SDL_GetWindowSize(window, width, height);
@@ -143,7 +148,7 @@ static void set_color(Renderer *renderer, Color color) {
  *
  * Should only be called once, right after starting.
  */
-Code initialize(Window **window, Renderer **renderer) {
+Code initialize(Settings &settings, Window **window, Renderer **renderer) {
   char log_buffer[MAXIMUM_STRING_SIZE];
   Uint32 renderer_flags = 0;
   initialize_logger();
@@ -152,8 +157,9 @@ Code initialize(Window **window, Renderer **renderer) {
     log_message(log_buffer);
     return CODE_ERROR;
   }
+  settings.compute_window_size();
+  settings.validate_settings();
   SDL_ShowCursor(SDL_DISABLE);
-  initialize_settings();
   initialize_joystick();
   if (TTF_WasInit() == 0) {
     if (TTF_Init() != 0) {
@@ -167,13 +173,8 @@ Code initialize(Window **window, Renderer **renderer) {
     log_message(log_buffer);
     return CODE_ERROR;
   }
-  /**
-   * The number of columns and the number of lines are fixed. However, the
-   * number of pixels we need for the screen is not. We find this number by
-   * experimenting before creating the window.
-   */
-  /* Log the size of the window we are going to create. */
-  *window = create_window(&window_width, &window_height);
+  *window = create_window(settings, &window_width, &window_height);
+  // Log the size of the window we are going to create.
   sprintf(log_buffer, "Created a %dx%d window.", window_width, window_height);
   log_message(log_buffer);
   if (*window == nullptr) {
@@ -181,7 +182,7 @@ Code initialize(Window **window, Renderer **renderer) {
     log_message(log_buffer);
     return CODE_ERROR;
   }
-  if (initialize_fonts() != 0u) {
+  if (initialize_fonts(settings) != 0u) {
     sprintf(log_buffer, "Failed to initialize fonts.");
     log_message(log_buffer);
     return CODE_ERROR;
@@ -194,7 +195,7 @@ Code initialize(Window **window, Renderer **renderer) {
   /* Must disable text input to prevent a name capture bug. */
   SDL_StopTextInput();
   set_window_title_and_icon(*window);
-  if (get_renderer_type() == RENDERER_HARDWARE) {
+  if (settings.get_renderer_type() == RENDERER_HARDWARE) {
     renderer_flags = SDL_RENDERER_ACCELERATED;
   } else {
     renderer_flags = SDL_RENDERER_SOFTWARE;
@@ -236,7 +237,7 @@ Code finalize(Window **window, Renderer **renderer) {
   return CODE_OK;
 }
 
-Code print_absolute(const int x, const int y, const char *string, const ColorPair color_pair, Renderer *renderer) {
+Code print_absolute(const int x, const int y, const char *string, const ColorPair color, Renderer *renderer) {
   char log_buffer[MAXIMUM_STRING_SIZE];
   Font *font = global_monospaced_font;
   SDL_Surface *surface;
@@ -251,8 +252,8 @@ Code print_absolute(const int x, const int y, const char *string, const ColorPai
   if (x < 0 || y < 0) {
     return CODE_ERROR;
   }
-  auto foreground_color = color_pair.foreground.to_SDL_color();
-  auto background_color = color_pair.background.to_SDL_color();
+  auto foreground_color = color.foreground.to_SDL_color();
+  auto background_color = color.background.to_SDL_color();
   surface = TTF_RenderText_Shaded(font, string, foreground_color, background_color);
   if (surface == nullptr) {
     sprintf(log_buffer, CREATE_SURFACE_FAIL, "print_absolute()");
@@ -298,16 +299,16 @@ static void remove_first_breaks(char *string) {
 /**
  * Prints the provided string after formatting it to increase readability.
  */
-void print_long_text(char *string, Renderer *renderer) {
+void print_long_text(const Settings &settings, char *string, Renderer *renderer) {
   char log_buffer[MAXIMUM_STRING_SIZE];
   const int font_width = get_font_width();
-  const int width = get_window_width() - 2 * get_padding() * font_width;
+  const int width = settings.get_window_width() - 2 * settings.get_padding() * font_width;
   TTF_Font *font = get_font();
   SDL_Surface *surface;
   SDL_Texture *texture;
   SDL_Rect position{};
-  position.x = get_padding() * font_width;
-  position.y = get_padding() * font_width;
+  position.x = settings.get_padding() * font_width;
+  position.y = settings.get_padding() * font_width;
   clear(renderer);
   /* Validate that the string is not empty and that x and y are nonnegative. */
   if (string == nullptr || string[0] == '\0') {
@@ -337,12 +338,11 @@ void print_long_text(char *string, Renderer *renderer) {
 /**
  * Prints the provided strings centered at the specified absolute line.
  */
-Code print_centered_horizontally(const int y, const std::vector<std::string> &strings, const ColorPair pair,
-                                 Renderer *renderer) {
+Code print_centered_horizontally(const Settings &settings, const int y, const std::vector<std::string> &strings, const ColorPair pair, Renderer *renderer) {
   char log_buffer[MAXIMUM_STRING_SIZE];
   const SDL_Color foreground = pair.foreground.to_SDL_color();
   const SDL_Color background = pair.background.to_SDL_color();
-  const int slice_size = get_window_width() / strings.size();
+  const int slice_size = settings.get_window_width() / strings.size();
   Font *font = global_monospaced_font;
   SDL_Surface *surface;
   SDL_Texture *texture;
@@ -382,32 +382,34 @@ Code print_centered_horizontally(const int y, const std::vector<std::string> &st
 /**
  * Prints the provided strings centered in the middle of the screen.
  */
-Code print_centered_vertically(const std::vector<std::string> &strings, const ColorPair pair, Renderer *renderer) {
+Code print_centered_vertically(const Settings &settings, const std::vector<std::string> &strings, ColorPair color_pair, Renderer *renderer) {
   const int text_line_height = global_monospaced_font_height;
-  const int padding = 2 * get_padding() * global_monospaced_font_height;
-  const int available_window_height = get_window_height() - padding;
+  const int padding = 2 * settings.get_padding() * global_monospaced_font_height;
+  const int available_window_height = settings.get_window_height() - padding;
   const int text_lines_limit = available_window_height / text_line_height;
   const auto printed_count = std::min(text_lines_limit, static_cast<int>(strings.size()));
-  auto y = (get_window_height() - strings.size() * text_line_height) / 2;
+  auto y = (settings.get_window_height() - strings.size() * text_line_height) / 2;
   for (int i = 0; i < printed_count; i++) {
     const auto string = strings[i];
     auto *array = reinterpret_cast<char *>(malloc(string.size() + 1));
     copy_string(array, string.c_str(), string.size() + 1);
-    print_centered_horizontally(y, {string}, pair, renderer);
+    print_centered_horizontally(settings, y, {string}, color_pair, renderer);
     y += text_line_height;
     free(array);
   }
   return CODE_OK;
 }
 
-static bool is_valid_player_name(const std::string &player_name) { return player_name.size() >= 2; }
+static bool is_valid_player_name(const std::string &player_name) {
+  return player_name.size() >= 2;
+}
 
 /**
  * Attempts to read a player name.
  *
  * Returns a Code, which may indicate that the player tried to quit.
  */
-Code read_player_name(std::string &destination, Renderer *renderer) {
+Code read_player_name(const Settings &settings, std::string &destination, Renderer *renderer) {
   Code code = CODE_ERROR;
   bool valid_name = false;
   const char message[] = "Name your character: ";
@@ -416,9 +418,9 @@ Code read_player_name(std::string &destination, Renderer *renderer) {
   char name[MAXIMUM_PLAYER_NAME_SIZE] = {'\0'};
   copy_string(name, destination.c_str(), MAXIMUM_PLAYER_NAME_SIZE);
   while (code != CODE_OK || !valid_name) {
-    auto x = get_padding() * get_font_width();
-    auto y = (get_window_height() - get_font_height()) / 2;
-    code = read_string(x, y, message, name, MAXIMUM_PLAYER_NAME_SIZE, renderer);
+    auto x = settings.get_padding() * get_font_width();
+    auto y = (settings.get_window_height() - get_font_height()) / 2;
+    code = read_string(settings, x, y, message, name, MAXIMUM_PLAYER_NAME_SIZE, renderer);
     if (code == CODE_QUIT) {
       return CODE_QUIT;
     }
@@ -434,9 +436,9 @@ Code read_player_name(std::string &destination, Renderer *renderer) {
   return code;
 }
 
-void print_menu(const std::vector<std::string> &lines, Renderer *renderer) {
+void print_menu(const Settings &settings, const std::vector<std::string> &lines, Renderer *renderer) {
   clear(renderer);
-  print_centered_vertically(lines, COLOR_PAIR_DEFAULT, renderer);
+  print_centered_vertically(settings, lines, COLOR_PAIR_DEFAULT, renderer);
   present(renderer);
 }
 
@@ -471,33 +473,33 @@ static void draw_shaded_absolute_rectangle(int x, int y, int w, int h, Color col
   swap_color(renderer, &swap);
 }
 
-static void draw_absolute_tile_rectangle(int x, int y, Color color, Renderer *renderer) {
-  const int w = get_tile_w();
-  const int h = get_tile_h();
-  y += get_bar_height();
+static void draw_absolute_tile_rectangle(const Settings &settings, int x, int y, Color color, Renderer *renderer) {
+  const int w = settings.get_tile_w();
+  const int h = settings.get_tile_h();
+  y += settings.get_bar_height();
   draw_absolute_rectangle(x, y, w, h, color, renderer);
 }
 
-static void draw_shaded_absolute_tile_rectangle(int x, int y, Color color, Renderer *renderer) {
-  const int w = get_tile_w();
-  const int h = get_tile_h();
-  y += get_bar_height();
+static void draw_shaded_absolute_tile_rectangle(const Settings &settings, int x, int y, Color color, Renderer *renderer) {
+  const int w = settings.get_tile_w();
+  const int h = settings.get_tile_h();
+  y += settings.get_bar_height();
   draw_shaded_absolute_rectangle(x, y, w, h, color, renderer);
 }
 
-static void write_top_bar_strings(const std::vector<std::string> &strings, Renderer *renderer) {
+static void write_top_bar_strings(const Settings &settings, const std::vector<std::string> &strings, Renderer *renderer) {
   const ColorPair color_pair = COLOR_PAIR_TOP_BAR;
-  const int y = (get_bar_height() - get_font_height()) / 2;
-  int h = get_bar_height();
-  int w = get_window_width();
+  const int y = (settings.get_bar_height() - get_font_height()) / 2;
+  int h = settings.get_bar_height();
+  int w = settings.get_window_width();
   draw_absolute_rectangle(0, 0, w, h, color_pair.background, renderer);
-  print_centered_horizontally(y, strings, color_pair, renderer);
+  print_centered_horizontally(settings, y, strings, color_pair, renderer);
 }
 
 /**
  * Draws the top status bar on the screen for a given Player.
  */
-static void draw_top_bar(const Game *game, Renderer *renderer) {
+static void draw_top_bar(const Settings &settings, const Game *game, Renderer *renderer) {
   const Player *player = game->player;
   std::vector<std::string> strings;
   std::string perk_name = "No Power";
@@ -510,14 +512,14 @@ static void draw_top_bar(const Game *game, Renderer *renderer) {
   strings.push_back(perk_name);
   strings.push_back("Lives: " + std::to_string(player->lives));
   strings.push_back("Score: " + std::to_string(player->score));
-  write_top_bar_strings(strings, renderer);
+  write_top_bar_strings(settings, strings, renderer);
 }
 
-static void write_bottom_bar_string(const char *string, Renderer *renderer) {
+static void write_bottom_bar_string(const Settings &settings, const char *string, Renderer *renderer) {
   /* Use half a character for horizontal padding. */
   const int x = get_font_width() / 2;
-  const int bar_start = get_window_height() - get_bar_height();
-  const int padding = (get_bar_height() - get_font_height()) / 2;
+  const int bar_start = settings.get_window_height() - settings.get_bar_height();
+  const int padding = (settings.get_bar_height() - get_font_height()) / 2;
   const int y = bar_start + padding;
   print_absolute(x, y, string, COLOR_PAIR_BOTTOM_BAR, renderer);
 }
@@ -525,21 +527,21 @@ static void write_bottom_bar_string(const char *string, Renderer *renderer) {
 /*
  * Draws the bottom status bar on the screen for a given Player.
  */
-static void draw_bottom_bar(const char *message, Renderer *renderer) {
+static void draw_bottom_bar(const Settings &settings, const char *message, Renderer *renderer) {
   const Color color = COLOR_PAIR_BOTTOM_BAR.background;
-  const int y = get_window_height() - get_bar_height();
-  const int w = get_window_width();
-  const int h = get_bar_height();
+  const int y = settings.get_window_height() - settings.get_bar_height();
+  const int w = settings.get_window_width();
+  const int h = settings.get_bar_height();
   draw_absolute_rectangle(0, y, w, h, color, renderer);
-  write_bottom_bar_string(message, renderer);
+  write_bottom_bar_string(settings, message, renderer);
 }
 
 static Color get_platform_color(Platform platform) {
   return COLOR_PAIR_PLATFORM_A.foreground.mix(COLOR_PAIR_PLATFORM_B.foreground, platform.rarity);
 }
 
-static void draw_platforms(const std::vector<Platform> &platforms, BoundingBox box, Renderer *renderer) {
-  const auto y_padding = get_bar_height();
+static void draw_platforms(const Settings &settings, const std::vector<Platform> &platforms, BoundingBox box, Renderer *renderer) {
+  const auto y_padding = settings.get_bar_height();
   for (const auto &platform : platforms) {
     auto p = platform;
     auto x = std::max(box.min_x, p.x);
@@ -550,7 +552,9 @@ static void draw_platforms(const std::vector<Platform> &platforms, BoundingBox b
   }
 }
 
-static int has_active_perk(const Game *const game) { return static_cast<int>(game->perk != PERK_NONE); }
+static int has_active_perk(const Game *const game) {
+  return static_cast<int>(game->perk != PERK_NONE);
+}
 
 static void draw_resized_perk(int x, int y, int w, int h, double f, Renderer *renderer) {
   /* The scaled values. */
@@ -586,9 +590,9 @@ static void draw_resized_perk(int x, int y, int w, int h, double f, Renderer *re
   draw_absolute_rectangle(f_x, f_y, f_w, f_h, f_color, renderer);
 }
 
-static void draw_active_perk(const Game *const game, Renderer *renderer) {
+static void draw_active_perk(const Settings &settings, const Game *const game, Renderer *renderer) {
   const int interval = PERK_FADING_INTERVAL;
-  const int y_padding = get_bar_height();
+  const int y_padding = settings.get_bar_height();
   const auto remaining = static_cast<int>(game->perk_end_frame - game->played_frames);
   const double fraction = std::min(interval, remaining) / static_cast<double>(interval);
   const int x = game->perk_x;
@@ -596,27 +600,27 @@ static void draw_active_perk(const Game *const game, Renderer *renderer) {
   draw_resized_perk(x, y, game->tile_w, game->tile_h, fraction, renderer);
 }
 
-static void draw_perk(const Game *const game, Renderer *renderer) {
+static void draw_perk(const Settings &settings, const Game *const game, Renderer *renderer) {
   if (has_active_perk(game) != 0) {
-    draw_active_perk(game, renderer);
+    draw_active_perk(settings, game, renderer);
   }
 }
 
-Code draw_player(const Player *const player, Renderer *renderer) {
-  draw_absolute_tile_rectangle(player->x, player->y, COLOR_PAIR_PLAYER.foreground, renderer);
+Code draw_player(const Settings &settings, const Player *const player, Renderer *renderer) {
+  draw_absolute_tile_rectangle(settings, player->x, player->y, COLOR_PAIR_PLAYER.foreground, renderer);
   const auto points = static_cast<double>(player->graphics.get_maximum_size());
   size_t i = 0;
   for (const auto point : player->graphics.trail) {
     auto color = COLOR_PAIR_PLAYER.foreground;
     color.a = static_cast<U8>((i + 1) * (std::numeric_limits<U8>::max() / points));
-    draw_shaded_absolute_tile_rectangle(point.x, point.y, color, renderer);
+    draw_shaded_absolute_tile_rectangle(settings, point.x, point.y, color, renderer);
     i++;
   }
   return CODE_OK;
 }
 
-static void draw_debugging(Game *const game, Renderer *renderer) {
-  const auto height = get_bar_height();
+static void draw_debugging(const Settings &settings, Game *const game, Renderer *renderer) {
+  const auto height = settings.get_bar_height();
   const Color color(255, 255, 255, 127);
   for (int x = game->box.min_x; x <= game->box.max_x; x++) {
     for (int y = game->box.min_y; y <= game->box.max_y; y++) {
@@ -634,7 +638,7 @@ static void draw_debugging(Game *const game, Renderer *renderer) {
  */
 Milliseconds draw_game(Game *const game, Renderer *renderer) {
   Milliseconds draw_game_start = get_milliseconds();
-
+  const auto &settings = *game->settings;
   game->profiler->start("draw_game");
 
   game->profiler->start("clear");
@@ -642,27 +646,27 @@ Milliseconds draw_game(Game *const game, Renderer *renderer) {
   game->profiler->stop();
 
   game->profiler->start("draw_top_bar");
-  draw_top_bar(game, renderer);
+  draw_top_bar(settings, game, renderer);
   game->profiler->stop();
 
   game->profiler->start("draw_bottom_bar");
-  draw_bottom_bar(game->message, renderer);
+  draw_bottom_bar(settings, game->message, renderer);
   game->profiler->stop();
 
   game->profiler->start("draw_platforms");
-  draw_platforms(game->platforms, game->box, renderer);
+  draw_platforms(settings, game->platforms, game->box, renderer);
   game->profiler->stop();
 
   game->profiler->start("draw_perk");
-  draw_perk(game, renderer);
+  draw_perk(settings, game, renderer);
   game->profiler->stop();
 
   game->profiler->start("draw_player");
-  draw_player(game->player, renderer);
+  draw_player(settings, game->player, renderer);
   game->profiler->stop();
 
   if (game->debugging) {
-    draw_debugging(game, renderer);
+    draw_debugging(settings, game, renderer);
   }
 
   game->profiler->start("present");
@@ -687,13 +691,13 @@ static std::string record_to_string(const Record &record, const int width) {
   return std::string(destination);
 }
 
-void print_records(const size_t count, const Record *records, Renderer *renderer) {
+void print_records(const Settings &settings, const size_t count, const Record *records, Renderer *renderer) {
   const ColorPair pair = COLOR_PAIR_DEFAULT;
-  const int x_padding = 2 * get_padding() * get_font_width();
-  const int y_padding = 2 * get_padding() * get_font_height();
-  const int available_window_height = get_window_height() - y_padding;
+  const int x_padding = 2 * settings.get_padding() * get_font_width();
+  const int y_padding = 2 * settings.get_padding() * get_font_height();
+  const int available_window_height = settings.get_window_height() - y_padding;
   const size_t text_lines_limit = available_window_height / get_font_height();
-  const int text_width_in_pixels = get_window_width() - x_padding;
+  const int text_width_in_pixels = settings.get_window_width() - x_padding;
   const size_t string_width = text_width_in_pixels / get_font_width();
   const size_t printed = std::min(count, text_lines_limit);
   std::vector<std::string> strings;
@@ -701,7 +705,7 @@ void print_records(const size_t count, const Record *records, Renderer *renderer
     strings.push_back(record_to_string(records[i], string_width));
   }
   clear(renderer);
-  print_centered_vertically(strings, pair, renderer);
+  print_centered_vertically(settings, strings, pair, renderer);
   present(renderer);
 }
 
@@ -710,7 +714,9 @@ void print_records(const size_t count, const Record *records, Renderer *renderer
  *
  * For simplicity, the user should only be able to enter letters and numbers.
  */
-static int is_valid_input_character(char c) { return isalnum(c); }
+static int is_valid_input_character(char c) {
+  return isalnum(c);
+}
 
 /**
  * Prints a string starting from (x, y) but limits to its first limit
@@ -748,11 +754,10 @@ static void print_limited(const int x, const int y, const char *string, const si
 /**
  * Reads a string from the user of up to size characters (including NUL).
  */
-Code read_string(const int x, const int y, const char *prompt, char *destination, const size_t size,
-                 Renderer *renderer) {
+Code read_string(const Settings &settings, const int x, const int y, const char *prompt, char *destination, const size_t size, Renderer *renderer) {
   const int buffer_x = x + (strlen(prompt) + 1) * get_font_width();
-  const int padding_size = get_padding() * get_font_width();
-  const int buffer_view_size = get_window_width() - buffer_x - padding_size;
+  const int padding_size = settings.get_padding() * get_font_width();
+  const int buffer_view_size = settings.get_window_width() - buffer_x - padding_size;
   const int buffer_view_limit = buffer_view_size / get_font_width();
   int is_done = 0;
   int should_rerender = 1;
@@ -796,7 +801,7 @@ Code read_string(const int x, const int y, const char *prompt, char *destination
           is_done = 1;
         }
       } else if (event.type == SDL_JOYBUTTONDOWN) {
-        if (command_from_joystick_event(event) == COMMAND_ENTER) {
+        if (command_from_joystick_event(settings, event) == COMMAND_ENTER) {
           is_done = 1;
         }
       } else if (event.type == SDL_TEXTINPUT) {

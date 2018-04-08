@@ -2,6 +2,7 @@
 
 #include "clock.hpp"
 #include "joystick.hpp"
+#include "settings.hpp"
 
 /**
  * Returns the Command value corresponding to the provided key combination.
@@ -49,15 +50,15 @@ static void set_command_table(CommandTable *table, Command command, double value
   table->last_modified[command] = time;
 }
 
-static void digest_joystick_event(CommandTable *table, SDL_Event event) {
+static void digest_joystick_event(const Settings &settings, CommandTable *table, SDL_Event event) {
   const Milliseconds time = get_milliseconds();
   if (table == nullptr) {
     return;
   }
   if (event.type == SDL_JOYBUTTONDOWN) {
-    set_command_table(table, command_from_joystick_event(event), 1.0, time);
+    set_command_table(table, command_from_joystick_event(settings, event), 1.0, time);
   } else if (event.type == SDL_JOYBUTTONUP) {
-    set_command_table(table, command_from_joystick_event(event), 0.0, time);
+    set_command_table(table, command_from_joystick_event(settings, event), 0.0, time);
   } else if (event.type == SDL_JOYAXISMOTION) {
     if (abs(event.jaxis.value) > JOYSTICK_DEAD_ZONE) {
       double magnitude = event.jaxis.value / static_cast<double>(MAXIMUM_JOYSTICK_AXIS_VALUE);
@@ -90,7 +91,7 @@ static void digest_joystick_event(CommandTable *table, SDL_Event event) {
   }
 }
 
-static void digest_event(CommandTable *table, const SDL_Event event) {
+static void digest_event(const Settings &settings, CommandTable *table, const SDL_Event event) {
   const Milliseconds time = get_milliseconds();
   if (table == nullptr) {
     return;
@@ -102,7 +103,7 @@ static void digest_event(CommandTable *table, const SDL_Event event) {
   } else if (event.type == SDL_KEYUP) {
     set_command_table(table, command_from_key(event.key.keysym), 0.0, time);
   } else if (event.type == SDL_JOYAXISMOTION || event.type == SDL_JOYBUTTONDOWN || event.type == SDL_JOYBUTTONUP) {
-    digest_joystick_event(table, event);
+    digest_joystick_event(settings, table, event);
   }
 }
 
@@ -115,10 +116,10 @@ void initialize_command_table(CommandTable *table) {
   }
 }
 
-void read_commands(CommandTable *table) {
+void read_commands(const Settings &settings, CommandTable *table) {
   SDL_Event event{};
   while (SDL_PollEvent(&event) != 0) {
-    digest_event(table, event);
+    digest_event(settings, table, event);
   }
 }
 
@@ -137,11 +138,11 @@ bool test_command_table(CommandTable *table, Command command, Milliseconds repet
 /**
  * Waits for any user input, blocking indefinitely.
  */
-Code wait_for_input(CommandTable *table) {
+Code wait_for_input(const Settings &settings, CommandTable *table) {
   SDL_Event event{};
   while (true) {
     if (SDL_WaitEvent(&event) != 0) {
-      digest_event(table, event);
+      digest_event(settings, table, event);
       if (event.type == SDL_QUIT) {
         return CODE_QUIT;
       }
@@ -151,7 +152,7 @@ Code wait_for_input(CommandTable *table) {
         return CODE_OK;
       }
       if (event.type == SDL_JOYBUTTONDOWN) {
-        test_command_table(table, command_from_joystick_event(event), 0);
+        test_command_table(table, command_from_joystick_event(settings, event), 0);
         return CODE_OK;
       }
     } else {

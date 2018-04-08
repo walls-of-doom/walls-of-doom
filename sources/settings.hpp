@@ -2,66 +2,161 @@
 #define SETTINGS_H
 
 #include "integers.hpp"
-
-/* These maximums are made public so that static allocation is possible. */
+#include <string>
 
 #define MAXIMUM_PLATFORM_COUNT 256
 
-#define JOYSTICK_PROFILE_XBOX 1
-#define JOYSTICK_PROFILE_DUALSHOCK 2
+extern const char *const settings_filename;
 
-typedef enum RepositionAlgorithm { REPOSITION_SELECT_BLINDLY, REPOSITION_SELECT_AWARELY } RepositionAlgorithm;
+enum RendererType { RENDERER_HARDWARE, RENDERER_SOFTWARE };
 
-typedef enum RendererType { RENDERER_HARDWARE, RENDERER_SOFTWARE } RendererType;
+enum JoystickProfile { JOYSTICK_PROFILE_XBOX, JOYSTICK_PROFILE_DUALSHOCK };
 
-void initialize_settings();
+enum RepositionAlgorithm { REPOSITION_SELECT_BLINDLY, REPOSITION_SELECT_AWARELY };
 
-RepositionAlgorithm get_reposition_algorithm();
+class Settings {
+public:
+  explicit Settings(const std::string &filename);
 
-U64 get_platform_count();
+  inline RendererType get_renderer_type() const {
+    return renderer_type;
+  }
 
-int get_font_size();
+  inline JoystickProfile get_joystick_profile() const {
+    return joystick_profile;
+  }
 
-int get_window_width();
+  inline RepositionAlgorithm get_reposition_algorithm() const {
+    return reposition_algorithm;
+  }
 
-int get_window_height();
+  inline bool get_hide_cursor() const {
+    return hide_cursor;
+  }
 
-U16 get_tiles_on_x();
+  inline bool get_player_stops_platforms() const {
+    return player_stops_platforms;
+  }
 
-U16 get_tiles_on_y();
+  inline bool is_logging_player_score() const {
+    return logging_player_score;
+  }
 
-int get_tile_w();
+  inline F32 get_screen_occupancy() const {
+    return screen_occupancy;
+  }
 
-int get_tile_h();
+  inline U32 get_platform_count() const {
+    return platform_count;
+  }
 
-int get_bar_height();
+  inline U32 get_font_size() const {
+    return font_size;
+  }
 
-long get_padding();
+  // How many spaces should be left from the margins when printing text.
+  inline U32 get_padding() const {
+    return padding;
+  }
 
-bool get_player_stops_platforms();
+  inline U32 get_perk_interval() const {
+    return perk_interval;
+  }
 
-int get_joystick_profile();
+  inline U32 get_perk_screen_duration() const {
+    return perk_screen_duration;
+  };
 
-RendererType get_renderer_type();
+  inline U32 get_perk_player_duration() const {
+    return perk_player_duration;
+  };
 
-int get_platform_max_width();
+  inline U32 get_window_width() const {
+    return get_tile_w() * get_tiles_on_x();
+  }
 
-int get_platform_min_width();
+  inline U32 get_window_height() const {
+    return get_tile_h() * get_tiles_on_y() + get_bar_height() * 2;
+  };
 
-int get_platform_max_speed();
+  inline U32 get_tiles_on_x() const {
+    return tiles_on_x;
+  }
 
-int get_platform_min_speed();
+  inline U32 get_tiles_on_y() const {
+    return tiles_on_y;
+  }
 
-S32 get_perk_interval();
+  inline U32 get_tile_w() const {
+    return tile_w;
+  }
 
-S32 get_perk_screen_duration();
+  inline U32 get_tile_h() const {
+    return tile_h;
+  }
 
-S32 get_perk_player_duration();
+  inline U32 get_bar_height() const {
+    return bar_height;
+  }
 
-int is_logging_player_score();
+  inline U32 get_platform_max_width() const {
+    return platform_max_width;
+  }
 
-bool should_hide_cursor();
+  inline U32 get_platform_min_width() const {
+    return platform_min_width;
+  }
 
-F64 get_screen_occupancy();
+  inline U32 get_platform_max_speed() const {
+    return platform_max_speed;
+  }
+
+  inline U32 get_platform_min_speed() const {
+    return platform_min_speed;
+  }
+
+  void compute_window_size();
+
+  void validate_settings() const;
+
+private:
+  bool computed_window_size = false;
+
+  RendererType renderer_type = RENDERER_HARDWARE;
+
+  JoystickProfile joystick_profile = JOYSTICK_PROFILE_DUALSHOCK;
+
+  RepositionAlgorithm reposition_algorithm = REPOSITION_SELECT_AWARELY;
+
+  bool hide_cursor = true;
+  bool player_stops_platforms = false;
+  bool logging_player_score = false;
+
+  F32 screen_occupancy = 0.8;
+
+  U32 platform_count = 16;
+
+  U32 font_size = 20;
+
+  U32 padding = 2;
+
+  U32 perk_interval = 20;
+  U32 perk_screen_duration = 10;
+  U32 perk_player_duration = 5;
+
+  U32 tiles_on_x = 0;
+  U32 tiles_on_y = 0;
+
+  U32 tile_w = 0;
+  U32 tile_h = 0;
+
+  U32 bar_height = 0;
+
+  U32 platform_min_width = 4;
+  U32 platform_max_width = 16;
+
+  U32 platform_min_speed = 1;
+  U32 platform_max_speed = 4;
+};
 
 #endif

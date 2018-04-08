@@ -32,27 +32,27 @@ public:
 /**
  * Writes the provided Menu for the user.
  */
-void write_menu(const Menu &menu, SDL_Renderer *renderer) {
+void write_menu(const Settings &settings, const Menu &menu, SDL_Renderer *renderer) {
   std::vector<std::string> string_vector;
   string_vector.emplace_back(game_name);
   string_vector.insert(std::end(string_vector), std::begin(menu.options), std::end(menu.options));
   const auto selected_option_index = menu.selected_option + 1;
   string_vector[selected_option_index] = "> " + string_vector[selected_option_index] + " <";
-  print_menu(string_vector, renderer);
+  print_menu(settings, string_vector, renderer);
 }
 
-Code game(Profiler *profiler, SDL_Renderer *renderer, CommandTable *table) {
+Code game(const Settings &settings, Profiler *profiler, SDL_Renderer *renderer, CommandTable *table) {
   std::string name;
-  Code code = read_player_name(name, renderer);
+  Code code = read_player_name(settings, name, renderer);
   if (code == CODE_QUIT || code == CODE_CLOSE) {
     return code;
   }
   Player player(name, table);
-  Game game(&player, profiler);
+  Game game(&player, &settings, profiler);
   return run_game(&game, renderer);
 }
 
-int main_menu(SDL_Renderer *renderer) {
+int main_menu(const Settings &settings, SDL_Renderer *renderer) {
   auto should_quit = false;
   Code code = CODE_OK;
   Menu menu;
@@ -66,8 +66,8 @@ int main_menu(SDL_Renderer *renderer) {
   menu.selected_option = 0;
   Profiler profiler(true);
   while (!should_quit) {
-    write_menu(menu, renderer);
-    read_commands(&command_table);
+    write_menu(settings, menu, renderer);
+    read_commands(settings, &command_table);
     const auto got_up = test_command_table(&command_table, COMMAND_UP, REPETITION_DELAY);
     const auto got_down = test_command_table(&command_table, COMMAND_DOWN, REPETITION_DELAY);
     const auto got_enter = test_command_table(&command_table, COMMAND_ENTER, REPETITION_DELAY);
@@ -86,11 +86,11 @@ int main_menu(SDL_Renderer *renderer) {
       }
     } else if (got_enter || got_center) {
       if (menu.selected_option == 0) {
-        code = game(&profiler, renderer, &command_table);
+        code = game(settings, &profiler, renderer, &command_table);
       } else if (menu.selected_option == 1) {
-        code = top_scores(profiler, renderer, &command_table);
+        code = top_scores(settings, profiler, renderer, &command_table);
       } else if (menu.selected_option == 2) {
-        code = info(renderer, &command_table);
+        code = info(settings, renderer, &command_table);
       } else if (menu.selected_option == 3) {
         should_quit = true;
       }

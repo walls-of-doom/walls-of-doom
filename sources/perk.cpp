@@ -2,9 +2,13 @@
 #include "logger.hpp"
 #include "random.hpp"
 
-Perk get_random_perk() { return static_cast<Perk>(random_integer(0, PERK_COUNT - 1)); }
+Perk get_random_perk() {
+  return static_cast<Perk>(random_integer(0, PERK_COUNT - 1));
+}
 
-bool is_bonus_perk(Perk perk) { return perk == PERK_BONUS_EXTRA_POINTS || perk == PERK_BONUS_EXTRA_LIFE; }
+bool is_bonus_perk(Perk perk) {
+  return perk == PERK_BONUS_EXTRA_POINTS || perk == PERK_BONUS_EXTRA_LIFE;
+}
 
 bool is_curse_perk(Perk perk) {
   const auto is_accelerate_platforms = perk == PERK_CURSE_ACCELERATE_PLATFORMS;

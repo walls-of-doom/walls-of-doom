@@ -203,11 +203,11 @@ size_t read_records(Record *destination, size_t destination_size) {
   return i;
 }
 
-Code top_scores(Profiler &profiler, SDL_Renderer *renderer, CommandTable *table) {
+Code top_scores(const Settings &settings, Profiler &profiler, SDL_Renderer *renderer, CommandTable *table) {
   profiler.start("top_scores");
   Record records[MAXIMUM_DISPLAYED_RECORDS];
   const size_t count = read_records(records, MAXIMUM_DISPLAYED_RECORDS);
-  print_records(count, records, renderer);
+  print_records(settings, count, records, renderer);
   profiler.stop();
-  return wait_for_input(table);
+  return wait_for_input(settings, table);
 }

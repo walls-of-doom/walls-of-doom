@@ -81,10 +81,10 @@ void log_message(const std::string &message) {
   append_to_file(path, string);
 }
 
-void log_player_score(const U64 frame, const Score score) {
+void log_player_score(const Settings &settings, const U64 frame, const Score score) {
   char path[MAXIMUM_PATH_SIZE];
   char string[LOG_MESSAGE_SIZE];
-  if (is_logging_player_score() != 0) {
+  if (settings.is_logging_player_score() != 0) {
     get_full_path(path, SCORE_FILE_NAME);
     sprintf(string, "%ld,%ld", frame, score);
     append_to_file(path, string);

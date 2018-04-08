@@ -40,7 +40,7 @@ int get_font_height();
  *
  * Should only be called once, right after starting.
  */
-Code initialize(Window **window, Renderer **renderer);
+Code initialize(Settings &settings, Window **window, Renderer **renderer);
 
 /**
  * Finalizes the acquired resources.
@@ -49,28 +49,28 @@ Code initialize(Window **window, Renderer **renderer);
  */
 Code finalize(Window **window, Renderer **renderer);
 
-Code print_absolute(int x, int y, const char *string, ColorPair color_pair, Renderer *renderer);
+Code print_absolute(int x, int y, const char *string, ColorPair color, Renderer *renderer);
 
 /**
  * Prints the provided strings centered at the specified absolute line.
  */
-Code print_centered_horizontally(int y, const std::vector<std::string> &strings, ColorPair pair, Renderer *renderer);
+Code print_centered_horizontally(int y, const std::vector<std::string> &strings, ColorPair color_pair, Renderer *renderer);
 
-Code print_centered_vertically(const std::vector<std::string> &strings, ColorPair pair, Renderer *renderer);
+Code print_centered_vertically(const Settings &settings, const std::vector<std::string> &strings, ColorPair color_pair, Renderer *renderer);
 
 /**
  * Reads a string from the user of up to size characters (including NUL).
  *
  * The string will be echoed after the prompt, which starts at (x, y).
  */
-Code read_string(int x, int y, const char *prompt, char *destination, size_t size, Renderer *renderer);
+Code read_string(const Settings &settings, int x, int y, const char *prompt, char *destination, size_t size, Renderer *renderer);
 
 /**
  * Attempts to read a player name.
  *
  * Returns a Code, which may indicate that the player tried to quit.
  */
-Code read_player_name(std::string &destination, Renderer *renderer);
+Code read_player_name(const Settings &settings, std::string &destination, Renderer *renderer);
 
 /**
  * Draws a full game to the screen.
@@ -79,13 +79,13 @@ Code read_player_name(std::string &destination, Renderer *renderer);
  */
 Milliseconds draw_game(Game *const game, Renderer *renderer);
 
-void print_menu(const std::vector<std::string> &lines, Renderer *renderer);
+void print_menu(const Settings &settings, const std::vector<std::string> &lines, Renderer *renderer);
 
 /**
  * Prints the provided string after formatting it to increase readability.
  */
-void print_long_text(char *string, Renderer *renderer);
+void print_long_text(const Settings &settings, char *string, Renderer *renderer);
 
-void print_records(size_t count, const Record *records, Renderer *renderer);
+void print_records(const Settings &settings, size_t count, const Record *records, Renderer *renderer);
 
 #endif

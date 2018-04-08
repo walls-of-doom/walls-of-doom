@@ -253,7 +253,8 @@ TEST_CASE("generate_platforms() avoids multiple platforms on the same line") {
   box.min_y = 0;
   box.max_x = platform_count - 1;
   box.max_y = platform_count - 1;
-  auto platforms = generate_platforms(box, empty, platform_count, 1, 1);
+  Settings settings(settings_filename);
+  auto platforms = generate_platforms(settings, box, empty, platform_count, 1, 1);
   /* Each platform in platforms should have a different y coordinate. */
   for (i = 0; i < platform_count; i++) {
     y = platforms[i].y;
@@ -271,7 +272,9 @@ TEST_CASE("generate_platforms() avoids multiple platforms on the same line") {
   resize_memory(y_counter, 0);
 }
 
-TEST_CASE("find_next_power_of_two() works for zero") { REQUIRE(find_next_power_of_two(0) == 1); }
+TEST_CASE("find_next_power_of_two() works for zero") {
+  REQUIRE(find_next_power_of_two(0) == 1);
+}
 
 TEST_CASE("find_next_power_of_two() works for positive integers") {
   const unsigned long one = 1;
